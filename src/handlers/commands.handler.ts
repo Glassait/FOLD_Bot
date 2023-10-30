@@ -1,22 +1,20 @@
-import { Client, REST, Routes  } from 'discord.js';
+import { Client, REST, Routes } from 'discord.js';
 import { readdirSync } from 'fs';
 import { join } from 'path';
-import { token, client_id } from '../config.json';
-import { SlashCommand } from "../utils/slash-command.class";
+import { client_id, token } from '../config.json';
 
-module.exports = async (client: Client): Promise<void> => {
+module.exports = async (_client: Client): Promise<void> => {
     const slashCommandsDir: string = join(__dirname, '../slash-commands');
     const body: any[] = [];
 
     readdirSync(slashCommandsDir).forEach((file: string): void => {
-        if (!file.endsWith('.js')) return;
+        if (!file.endsWith('.ts')) return;
 
-        const command: SlashCommand = require(`${slashCommandsDir}/${file}`).command;
+        const command = require(`${slashCommandsDir}/${file}`).command;
+
+        body.push(command.data.toJSON());
 
         console.log(`🔥 Successfully loaded command ${command.name}`);
-
-        // client.slashCommands.set(command.name, command);
-        body.push(command.data.toJSON());
     });
 
     const rest: REST = new REST({ version: '10' }).setToken(token);

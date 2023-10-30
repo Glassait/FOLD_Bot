@@ -3,17 +3,11 @@ import { readdirSync } from 'fs';
 import { join } from 'path';
 import { token } from './config.json';
 
-console.log('Bot is starting...');
+console.log('🤖 Bot is starting...');
 
 const client: Client = new Client({
-    intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent,
-    ],
+    intents: [GatewayIntentBits.Guilds],
 });
-
-// client.slashCommands = new Collection<string, SlashCommand>();
 
 const handlersDir: string = join(__dirname, './handlers');
 
