@@ -1,0 +1,15 @@
+{
+    "name": "free_puntos_bot",
+    "version": "1.0.0",
+    "description": "",
+    "main": "src/index.ts",
+    "scripts": {
+        "start": "ts-node src/index.ts"
+    },
+    "dependencies": {
+        "discord.js": "^14.13.0",
+        "prettier": "^3.0.3",
+        "ts-node": "^10.9.1",
+        "typescript": "^5.2.2"
+    }
+}
