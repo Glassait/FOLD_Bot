@@ -9,8 +9,8 @@ import {
 import { SlashCommand } from '../utils/slash-command.class';
 
 export const command: SlashCommand = new SlashCommand(
-    'kick',
-    "Pour kick quelqu'un",
+    'disconnect',
+    "Pour virer quelqu'un d'un channel vocal",
     async (interaction: ChatInputCommandInteraction): Promise<void> => {
         const option: CommandInteractionOption | null = interaction.options.get('target');
         const guild: Guild | null = interaction.guild;
@@ -31,7 +31,7 @@ export const command: SlashCommand = new SlashCommand(
 
         if (!targetUser) {
             await interaction.editReply({
-                content: "L'utilisateur n'existe pas",
+                content: "L'utilisateur n'existe pas !",
             });
             return;
         }
@@ -39,11 +39,11 @@ export const command: SlashCommand = new SlashCommand(
         try {
             await targetUser.voice.disconnect();
             await interaction.editReply({
-                content: "L'utilisateur a été kick",
+                content: "L'utilisateur a été déconnecté",
             });
         } catch (error) {
             await interaction.editReply({
-                content: `Il y a eu un problème au moment de kick ${targetUser.nickname}, error: ${error}`,
+                content: `Il y a eu un problème au moment de déconnecté ${targetUser.nickname}, erreur: ${error}`,
             });
             console.error(`error kick: ${error}`);
             return;
@@ -53,8 +53,8 @@ export const command: SlashCommand = new SlashCommand(
         optionType: 'MentionableOption',
         base: new SlashCommandMentionableOption()
             .setName('target')
-            .setDescription("L'utilisateur a kick")
+            .setDescription("L'utilisateu à déconnecter")
             .setRequired(true),
     },
-    PermissionsBitField.Flags.KickMembers
+    PermissionsBitField.Flags.MoveMembers
 );
