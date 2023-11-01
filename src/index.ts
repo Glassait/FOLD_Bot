@@ -1,12 +1,26 @@
 import { Client, GatewayIntentBits } from 'discord.js';
-import { readdirSync } from 'fs';
+import { readdirSync, readFileSync, writeFile } from 'fs';
 import { join } from 'path';
 import { token } from './config.json';
+import { FeatureSingleton } from './singleton/feature.singleton';
 
 console.log('🤖 Bot is starting...');
 
+const feature: FeatureSingleton = FeatureSingleton.instance;
+
+try {
+    feature.data = JSON.parse(readFileSync(FeatureSingleton.path).toString());
+} catch (e) {
+    writeFile(FeatureSingleton.path, JSON.stringify(feature.data), err => {
+        if (err) {
+            throw err;
+        }
+        console.log('📁 Feature file created');
+    });
+}
+
 const client: Client = new Client({
-    intents: [GatewayIntentBits.Guilds],
+    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates],
 });
 
 const handlersDir: string = join(__dirname, './handlers');

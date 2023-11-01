@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/Glassait/freePuntosBot#readme",
   "dependencies": {
+    "@discordjs/voice": "^0.16.0",
     "discord.js": "^14.13.0",
     "ts-node": "10.9.1"
   },
