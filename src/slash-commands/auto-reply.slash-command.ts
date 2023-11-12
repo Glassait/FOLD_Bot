@@ -1,5 +1,5 @@
 import { SlashCommandMentionableOption, SlashCommandStringOption } from '@discordjs/builders';
-import { ChatInputCommandInteraction, GuildMember } from 'discord.js';
+import { ChatInputCommandInteraction, CommandInteractionOption, GuildMember } from 'discord.js';
 import { FeatureSingleton } from '../singleton/feature.singleton';
 import { SlashCommand } from '../utils/slash-command.class';
 import { UserUtils } from '../utils/user.utils';
@@ -13,10 +13,11 @@ export const command: SlashCommand = new SlashCommand(
             'target',
             true
         );
+        const option: CommandInteractionOption | null = interaction.options.get('désactiver');
 
         const feature: FeatureSingleton = FeatureSingleton.instance;
 
-        if (targetUser) {
+        if (targetUser && !option) {
             const alreadyAutoReply: boolean = feature.hasAutoReplyTo(
                 interaction.user.id,
                 targetUser.id
@@ -28,9 +29,19 @@ export const command: SlashCommand = new SlashCommand(
                 });
                 return;
             }
+
             feature.pushAutoreply({ activateFor: interaction.user.id, replyTo: targetUser.id });
             await interaction.editReply({
-                content: 'Réponse automatique mis en place',
+                content: `Réponse automatique mis en place pour <@${targetUser.id}>`,
+            });
+        } else if (targetUser) {
+            feature.deletAutoreply(interaction.user.id, targetUser.id);
+            await interaction.editReply({
+                content: `Réponse automatique désactiver pour <@${targetUser.id}>`,
+            });
+        } else {
+            await interaction.editReply({
+                content: 'Technical error',
             });
         }
     },
@@ -48,7 +59,8 @@ export const command: SlashCommand = new SlashCommand(
                 .setName('désactiver')
                 .setDescription(
                     "Renseigner pour désactiver la réponse automatique pour l'utilisateur"
-                ),
+                )
+                .setChoices({ name: 'oui', value: 'oui' }),
         },
     ]
 );

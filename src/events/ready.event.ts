@@ -1,4 +1,4 @@
-import { Client, Events } from 'discord.js';
+import { ActivityType, Client, Events } from 'discord.js';
 import { BotEvent } from '../types/bot-event.type';
 
 const event: BotEvent = {
@@ -6,6 +6,15 @@ const event: BotEvent = {
     once: true,
     async execute(client: Client): Promise<void> {
         console.log(`💪 Logged in as ${client.user?.tag}`);
+        client.user?.setPresence({
+            activities: [
+                {
+                    type: ActivityType.Playing,
+                    name: 'Imagine un monde sans Bady',
+                },
+            ],
+            status: 'online',
+        });
     },
 };
 

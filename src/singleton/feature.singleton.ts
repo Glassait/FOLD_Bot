@@ -48,8 +48,26 @@ export class FeatureSingleton {
         this.updateFile();
     }
 
+    public deletAutoreply(activateFor: DiscordId, replyTo: DiscordId): void {
+        const object: Reply | undefined = this._data.auto_reply.find(
+            (value: Reply) => value.activateFor === activateFor && value.replyTo === replyTo
+        );
+        if (!object) {
+            return;
+        }
+
+        const index: number = this._data.auto_reply.indexOf(object);
+
+        if (index < 0) {
+            return;
+        }
+
+        this._data.auto_reply.splice(index, 1);
+        this.updateFile();
+    }
+
     public getArrayFromReplyto(replyTo: DiscordId): Reply[] {
-        return this.data.auto_reply.filter((value: Reply): boolean => value.replyTo === replyTo);
+        return this._data.auto_reply.filter((value: Reply): boolean => value.replyTo === replyTo);
     }
 
     public hasAutoReplyTo(activateFor: DiscordId, replyTo: DiscordId): boolean {
