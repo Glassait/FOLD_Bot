@@ -9,7 +9,13 @@ console.log('🤖 Bot is starting...');
 const feature: FeatureSingleton = FeatureSingleton.instance;
 
 try {
-    feature.data = JSON.parse(readFileSync(FeatureSingleton.path).toString());
+    const json: Buffer = readFileSync(FeatureSingleton.path);
+
+    if (json.toString()) {
+        feature.data = JSON.parse(json.toString());
+    } else {
+        feature.data = { version: 0, auto_reply: [], auto_disconnect: '' };
+    }
 } catch (e) {
     writeFile(FeatureSingleton.path, JSON.stringify(feature.data), err => {
         if (err) {
@@ -20,7 +26,11 @@ try {
 }
 
 const client: Client = new Client({
-    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates],
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildVoiceStates,
+        GatewayIntentBits.GuildMessages,
+    ],
 });
 
 const handlersDir: string = join(__dirname, './handlers');

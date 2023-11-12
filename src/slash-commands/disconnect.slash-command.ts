@@ -31,12 +31,14 @@ export const command: SlashCommand = new SlashCommand(
             return;
         }
     },
-    {
-        optionType: 'MentionableOption',
-        base: new SlashCommandMentionableOption()
-            .setName('target')
-            .setDescription("L'utilisateur à déconnecter")
-            .setRequired(true),
-    },
+    [
+        {
+            optionType: 'MentionableOption',
+            base: new SlashCommandMentionableOption()
+                .setName('target')
+                .setDescription("L'utilisateur à déconnecter")
+                .setRequired(true),
+        },
+    ],
     PermissionsBitField.Flags.MoveMembers
 );

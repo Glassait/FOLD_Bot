@@ -28,13 +28,15 @@ export const command: SlashCommand = new SlashCommand(
             });
         }
     },
-    {
-        optionType: 'MentionableOption',
-        base: new SlashCommandMentionableOption()
-            .setName('target')
-            .setDescription(
-                "L'utilisateur à déconnecter automatiquement. Laisser vide pour désactiver"
-            ),
-    },
+    [
+        {
+            optionType: 'MentionableOption',
+            base: new SlashCommandMentionableOption()
+                .setName('target')
+                .setDescription(
+                    "L'utilisateur à déconnecter automatiquement. Laisser vide pour désactiver"
+                ),
+        },
+    ],
     PermissionsBitField.Flags.MoveMembers
 );
