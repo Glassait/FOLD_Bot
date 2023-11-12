@@ -1,3 +1,9 @@
+export type DiscordId = string; // NOSONAR
+
+export type Reply = { activateFor: DiscordId; replyTo: DiscordId };
+
 export type FeatureType = {
-    auto_disconnect: string;
+    version: number;
+    auto_disconnect: DiscordId;
+    auto_reply: Reply[];
 };

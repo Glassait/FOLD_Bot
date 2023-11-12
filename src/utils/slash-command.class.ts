@@ -10,20 +10,22 @@ export class SlashCommand {
         name: string,
         description: string,
         execute: (interaction: ChatInputCommandInteraction) => Promise<void>,
-        option?: OptionType,
+        option?: OptionType[],
         permission?: bigint
     ) {
         this._name = name;
         this._data = new SlashCommandBuilder().setName(name).setDescription(description);
         if (option) {
-            switch (option.optionType) {
-                case 'StringOption':
-                    this._data.addStringOption(option.base);
-                    break;
-                case 'MentionableOption':
-                    this._data.addMentionableOption(option.base);
-                    break;
-            }
+            option.forEach((value: OptionType): void => {
+                switch (value.optionType) {
+                    case 'StringOption':
+                        this._data.addStringOption(value.base);
+                        break;
+                    case 'MentionableOption':
+                        this._data.addMentionableOption(value.base);
+                        break;
+                }
+            });
         }
 
         if (permission) {

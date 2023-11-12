@@ -1,12 +1,14 @@
 import { writeFile } from 'fs';
-import { FeatureType } from '../types/feature.type';
+import { DiscordId, FeatureType, Reply } from '../types/feature.type';
 
 export class FeatureSingleton {
     public static path: string = './src/feature.json';
 
     constructor() {
         this._data = {
+            version: 2,
             auto_disconnect: '',
+            auto_reply: [],
         };
     }
 
@@ -26,13 +28,34 @@ export class FeatureSingleton {
     }
 
     set data(value: FeatureType) {
-        this._data = value;
+        if (!value.version || value.version != this._data.version) {
+            this._data.auto_disconnect = value.auto_disconnect ? value.auto_disconnect : '';
+            this._data.auto_reply = value.auto_reply ? value.auto_reply : [];
+        } else {
+            this._data = value;
+        }
+
         this.updateFile();
     }
 
-    set autoDisconnect(targetId: string) {
+    set autoDisconnect(targetId: DiscordId) {
         this._data.auto_disconnect = targetId;
         this.updateFile();
+    }
+
+    public pushAutoreply(item: Reply): void {
+        this._data.auto_reply.push(item);
+        this.updateFile();
+    }
+
+    public getArrayFromReplyto(replyTo: DiscordId): Reply[] {
+        return this.data.auto_reply.filter((value: Reply): boolean => value.replyTo === replyTo);
+    }
+
+    public hasAutoReplyTo(activateFor: DiscordId, replyTo: DiscordId): boolean {
+        return this._data.auto_reply.some(
+            (value: Reply) => value.activateFor === activateFor && value.replyTo === replyTo
+        );
     }
 
     private updateFile(): void {

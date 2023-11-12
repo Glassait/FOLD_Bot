@@ -1,12 +1,7 @@
-import { ChatInputCommandInteraction, Client, Events, GuildMember, VoiceState } from 'discord.js';
+import { Client, Events, GuildMember, VoiceState } from 'discord.js';
 import { FeatureSingleton } from '../singleton/feature.singleton';
 import { BotEvent } from '../types/bot-event.type';
-import { SlashCommand } from '../utils/slash-command.class';
 import { UserUtils } from '../utils/user.utils';
-
-function getCommand(interaction: ChatInputCommandInteraction): SlashCommand | undefined {
-    return require(`../slash-commands/${interaction.commandName}.slash-command`).command;
-}
 
 const event: BotEvent = {
     name: Events.VoiceStateUpdate,
