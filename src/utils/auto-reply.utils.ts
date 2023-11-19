@@ -17,7 +17,7 @@ export class AutoReplyUtils {
 
         const feature: FeatureSingleton = FeatureSingleton.instance;
         const id: DiscordId = message.author.id;
-        const autoReply: Reply[] = feature.getArrayFromReplyto(id);
+        const autoReply: Reply[] = feature.getArrayFromReplyTo(id);
 
         if (!autoReply) {
             return;

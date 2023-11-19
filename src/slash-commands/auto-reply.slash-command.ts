@@ -30,12 +30,12 @@ export const command: SlashCommand = new SlashCommand(
                 return;
             }
 
-            feature.pushAutoreply({ activateFor: interaction.user.id, replyTo: targetUser.id });
+            feature.pushAutoReply({ activateFor: interaction.user.id, replyTo: targetUser.id });
             await interaction.editReply({
                 content: `Réponse automatique mis en place pour <@${targetUser.id}>`,
             });
         } else if (targetUser) {
-            feature.deletAutoreply(interaction.user.id, targetUser.id);
+            feature.deleteAutoReply(interaction.user.id, targetUser.id);
             await interaction.editReply({
                 content: `Réponse automatique désactiver pour <@${targetUser.id}>`,
             });

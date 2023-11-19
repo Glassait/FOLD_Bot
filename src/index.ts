@@ -3,8 +3,14 @@ import { readdirSync, readFileSync, writeFile } from 'fs';
 import { join } from 'path';
 import { token } from './config.json';
 import { FeatureSingleton } from './singleton/feature.singleton';
+import { LoggerSingleton } from './singleton/logger.singleton';
+import { Context } from './utils/context.class';
 
-console.log('🤖 Bot is starting...');
+const logger: LoggerSingleton = LoggerSingleton.instance;
+logger.createLogFile();
+const context: Context = new Context('INDEX');
+
+logger.debug(context.context, '🤖 Bot is starting...');
 
 const feature: FeatureSingleton = FeatureSingleton.instance;
 
@@ -21,7 +27,7 @@ try {
         if (err) {
             throw err;
         }
-        console.log('📁 Feature file created');
+        logger.error(context.context, '📁 Feature file created');
     });
 }
 
@@ -41,8 +47,8 @@ readdirSync(handlersDir).forEach((handler: string): void => {
 
 client.login(token).then((value: string): void => {
     if (value) {
-        console.log('The bot is ready to kick some ass');
+        logger.debug(context.context, 'The bot is ready to kick some ass');
     } else {
-        console.error('Failed to connect');
+        logger.error(context.context, 'Failed to connect');
     }
 });

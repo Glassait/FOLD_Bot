@@ -1,7 +1,12 @@
 import { SlashCommandMentionableOption } from '@discordjs/builders';
 import { ChatInputCommandInteraction, GuildMember, PermissionsBitField } from 'discord.js';
+import { LoggerSingleton } from '../singleton/logger.singleton';
+import { Context } from '../utils/context.class';
 import { SlashCommand } from '../utils/slash-command.class';
 import { UserUtils } from '../utils/user.utils';
+
+const logger: LoggerSingleton = LoggerSingleton.instance;
+const context: Context = new Context('COMMANDS-HANDLER');
 
 export const command: SlashCommand = new SlashCommand(
     'disconnect',
@@ -27,7 +32,7 @@ export const command: SlashCommand = new SlashCommand(
             await interaction.editReply({
                 content: `Il y a eu un problème au moment de déconnecté ${targetUser.nickname}, erreur: ${error}`,
             });
-            console.error(`error kick: ${error}`);
+            logger.error(context.context, `error kick: ${error}`);
             return;
         }
     },
