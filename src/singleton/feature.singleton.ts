@@ -1,10 +1,15 @@
 import { writeFile } from 'fs';
 import { DiscordId, FeatureType, Reply } from '../types/feature.type';
+import { Context } from '../utils/context.class';
+import { LoggerSingleton } from './logger.singleton';
 
-export class FeatureSingleton {
-    public static path: string = './src/feature.json';
+export class FeatureSingleton extends Context {
+    public static readonly path: string = './src/feature.json';
+
+    private readonly logger: LoggerSingleton = LoggerSingleton.instance;
 
     constructor() {
+        super(FeatureSingleton);
         this._data = {
             version: 2,
             auto_disconnect: '',
@@ -43,12 +48,12 @@ export class FeatureSingleton {
         this.updateFile();
     }
 
-    public pushAutoreply(item: Reply): void {
+    public pushAutoReply(item: Reply): void {
         this._data.auto_reply.push(item);
         this.updateFile();
     }
 
-    public deletAutoreply(activateFor: DiscordId, replyTo: DiscordId): void {
+    public deleteAutoReply(activateFor: DiscordId, replyTo: DiscordId): void {
         const object: Reply | undefined = this._data.auto_reply.find(
             (value: Reply) => value.activateFor === activateFor && value.replyTo === replyTo
         );
@@ -66,7 +71,7 @@ export class FeatureSingleton {
         this.updateFile();
     }
 
-    public getArrayFromReplyto(replyTo: DiscordId): Reply[] {
+    public getArrayFromReplyTo(replyTo: DiscordId): Reply[] {
         return this._data.auto_reply.filter((value: Reply): boolean => value.replyTo === replyTo);
     }
 
@@ -79,7 +84,10 @@ export class FeatureSingleton {
     private updateFile(): void {
         writeFile(FeatureSingleton.path, JSON.stringify(this._data), err => {
             if (err) {
-                console.error(`🔄❌ Failed to sync the feature file with error: ${err}`);
+                this.logger.warning(
+                    this.context,
+                    `🔄❌ Failed to sync the feature file with error: ${err}`
+                );
             }
         });
     }

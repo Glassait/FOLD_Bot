@@ -1,7 +1,12 @@
 import { Client } from 'discord.js';
 import { readdirSync } from 'fs';
 import { join } from 'path';
+import { LoggerSingleton } from '../singleton/logger.singleton';
 import { BotEvent } from '../types/bot-event.type';
+import { Context } from '../utils/context.class';
+
+const logger: LoggerSingleton = LoggerSingleton.instance;
+const context: Context = new Context('EVENT-HANDLER');
 
 module.exports = (client: Client): void => {
     let eventsDir: string = join(__dirname, '../events');
@@ -15,6 +20,6 @@ module.exports = (client: Client): void => {
             ? client.once(event.name, (...args: any[]) => event.execute(client, ...args))
             : client.on(event.name, (...args: any[]) => event.execute(client, ...args));
 
-        console.log(`🌠 Successfully loaded event ${event.name}`);
+        logger.info(context.context, `🌠 Successfully loaded event ${event.name}`);
     });
 };
