@@ -1,13 +1,7 @@
 {
   "newsLetter": {
-    "channel": "906336491553296424",
+    "channel": "1177006853318779002",
     "website": [
-      {
-        "liveUrl": "https://wotexpress.info/",
-        "lastUrl": "",
-        "name": "Wot Express",
-        "selector": "a.news-block-row"
-      },
       {
         "liveUrl": "https://thedailybounce.net/",
         "lastUrl": "",
@@ -19,6 +13,12 @@
         "lastUrl": "",
         "name": "The Armored Patrol",
         "selector": "article.post"
+      },
+      {
+        "liveUrl": "https://wotexpress.info/",
+        "lastUrl": "",
+        "name": "Wot Express",
+        "selector": "a.news-block-row"
       }
     ]
   }
