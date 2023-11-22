@@ -25,12 +25,12 @@
   "homepage": "https://github.com/Glassait/freePuntosBot#readme",
   "dependencies": {
     "@discordjs/voice": "^0.16.0",
+    "axios": "^1.6.2",
     "cheerio": "^1.0.0-rc.12",
     "discord.js": "^14.13.0",
     "ts-node": "10.9.1"
   },
   "devDependencies": {
-    "@types/axios": "^0.14.0",
     "@types/cheerio": "^0.22.34",
     "@types/node": "^20.8.10",
     "prettier": "^3.0.3",
