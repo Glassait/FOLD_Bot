@@ -4,13 +4,13 @@
     "website": [
       {
         "liveUrl": "https://wotexpress.info/",
-        "lastUrl": "https://wotexpress.info/news/wot/pokupka-tovarov-v-world-of-tanks-iz-rossii-i-belar/",
+        "lastUrl": "",
         "name": "Wot Express",
         "selector": "a.news-block-row"
       },
       {
         "liveUrl": "https://thedailybounce.net/",
-        "lastUrl": "https://thedailybounce.net/historical/the-fv4005s-historic-revival-world-of-tanks-the-tank-museum-and-mr-hewes-unite/",
+        "lastUrl": "",
         "name": "THE DAILY BOUNCE",
         "selector": "article.archive-image-left div.list-style div.color-pad"
       },
