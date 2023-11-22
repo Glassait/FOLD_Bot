@@ -1,4 +1,5 @@
 import { ActivityType } from 'discord.js';
+import { MockEnum } from '../enums/mock.enum';
 import { DiscordId } from '../types/feature.type';
 
 export class SentenceUtils {
@@ -43,11 +44,13 @@ export class SentenceUtils {
     }
 
     public static getRandomStatus(): any {
-        return this.status[this.getRandomNumber(this.status.length)];
+        return process.argv[3] === MockEnum.DEV
+            ? [ActivityType.Custom, 'Entrain de ce faire toucher le code']
+            : this.status[this.getRandomNumber(this.status.length)];
     }
 
     private static getRandomNumber(max?: number): number {
         max = max || 1;
-        return Math.floor(Math.random() * max + 1);
+        return Math.floor(Math.random() * max);
     }
 }

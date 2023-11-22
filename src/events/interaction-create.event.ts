@@ -1,4 +1,5 @@
 import { ChatInputCommandInteraction, Client, Events, Interaction } from 'discord.js';
+import { MockEnum } from '../enums/mock.enum';
 import { LoggerSingleton } from '../singleton/logger.singleton';
 import { BotEvent } from '../types/bot-event.type';
 import { Context } from '../utils/context.class';
@@ -18,6 +19,15 @@ const event: BotEvent = {
         let command: SlashCommand | undefined;
 
         if (interaction.isChatInputCommand()) {
+            if (process.argv[3] === MockEnum.DEV) {
+                await interaction.reply({
+                    content:
+                        "Je suis actuellement entrain d'être améliorer par mon créateur. Cette commande ne fonctionne pas !",
+                    ephemeral: true,
+                });
+                return;
+            }
+
             command = getCommand(interaction);
 
             if (!command) {

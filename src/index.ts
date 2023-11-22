@@ -3,6 +3,7 @@ import { readdirSync, readFileSync, writeFile } from 'fs';
 import { join } from 'path';
 import { token } from './config.json';
 import { FeatureSingleton } from './singleton/feature.singleton';
+import { InventorySingleton } from './singleton/inventory.singleton';
 import { LoggerSingleton } from './singleton/logger.singleton';
 import { Context } from './utils/context.class';
 
@@ -13,6 +14,7 @@ const context: Context = new Context('INDEX');
 logger.debug(context.context, '🤖 Bot is starting...');
 
 const feature: FeatureSingleton = FeatureSingleton.instance;
+const inventory: InventorySingleton = InventorySingleton.instance;
 
 try {
     const json: Buffer = readFileSync(FeatureSingleton.path);
@@ -52,3 +54,7 @@ client.login(token).then((value: string): void => {
         logger.error(context.context, 'Failed to connect');
     }
 });
+
+setTimeout(() => {
+    inventory.scrapWebSite(client).then();
+}, 500);

@@ -73,7 +73,7 @@ export class LoggerSingleton extends Context {
     ): void {
         this._log += `<span style="color:${color}">[${new Date().toLocaleString(
             'fr-FR'
-        )}][${action}][${context}] ${msg} </span><br>`;
+        )}][${action}][${context}] ${msg} </span><br>\n`;
         this.updateFile();
     }
 
