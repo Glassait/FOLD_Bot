@@ -57,7 +57,7 @@ export class InventorySingleton extends Context {
             if (index >= length) {
                 index = 0;
             }
-            await new Promise(r => setTimeout(r, 5000 /*1000 * 60 * 60*/));
+            await new Promise(r => setTimeout(r, 1000 * 60 * 30));
         }
     }
 

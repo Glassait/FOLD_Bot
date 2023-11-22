@@ -1,25 +1,25 @@
 {
-	"newsLetter": {
-		"channel": "906336491553296424",
-		"website": [
-			{
-				"liveUrl": "https://wotexpress.info/",
-				"lastUrl": "",
-				"name": "Wot Express",
-				"selector": "a.news-block-row"
-			},
-			{
-				"liveUrl": "https://thedailybounce.net/",
-				"lastUrl": "",
-				"name": "THE DAILY BOUNCE",
-				"selector": "article.archive-image-left div.list-style div.color-pad"
-			},
-			{
-				"liveUrl": "https://thearmoredpatrol.com/category/world-of-tanks/",
-				"lastUrl": "",
-				"name": "The Armored Patrol",
-				"selector": "article.post"
-			}
-		]
-	}
+  "newsLetter": {
+    "channel": "906336491553296424",
+    "website": [
+      {
+        "liveUrl": "https://wotexpress.info/",
+        "lastUrl": "https://wotexpress.info/news/wot/pokupka-tovarov-v-world-of-tanks-iz-rossii-i-belar/",
+        "name": "Wot Express",
+        "selector": "a.news-block-row"
+      },
+      {
+        "liveUrl": "https://thedailybounce.net/",
+        "lastUrl": "https://thedailybounce.net/historical/the-fv4005s-historic-revival-world-of-tanks-the-tank-museum-and-mr-hewes-unite/",
+        "name": "THE DAILY BOUNCE",
+        "selector": "article.archive-image-left div.list-style div.color-pad"
+      },
+      {
+        "liveUrl": "https://thearmoredpatrol.com/category/world-of-tanks/",
+        "lastUrl": "",
+        "name": "The Armored Patrol",
+        "selector": "article.post"
+      }
+    ]
+  }
 }

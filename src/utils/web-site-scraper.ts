@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import cheerio from 'cheerio';
+import * as cheerio from 'cheerio';
+import { CheerioAPI } from 'cheerio';
 import { Client, EmbedBuilder, TextChannel } from 'discord.js';
 import { InventorySingleton } from '../singleton/inventory.singleton';
 import { LoggerSingleton } from '../singleton/logger.singleton';
@@ -60,7 +61,7 @@ export class WebSiteScraper extends Context {
             return;
         }
 
-        const $: cheerio.Root = cheerio.load(html);
+        const $: CheerioAPI = cheerio.load(html);
         if (this.webSiteState.name === 'Wot Express') {
             const links: any[] = $(this.webSiteState.selector).get();
             const index: number = links.indexOf(
