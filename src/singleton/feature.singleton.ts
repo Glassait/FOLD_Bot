@@ -82,7 +82,7 @@ export class FeatureSingleton extends Context {
     }
 
     private updateFile(): void {
-        writeFile(FeatureSingleton.path, JSON.stringify(this._data), err => {
+        writeFile(FeatureSingleton.path, JSON.stringify(this._data, null, '\t'), err => {
             if (err) {
                 this.logger.warning(
                     this.context,
