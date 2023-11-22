@@ -1,38 +1,38 @@
 {
-  "name": "freepuntosbot",
-  "version": "1.0.0",
-  "description": "A bot for the free puntos discord server",
-  "main": "src/index.ts",
-  "scripts": {
-    "start": "ts-node .",
-    "start:mock": "ts-node . -- DEV"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Glassait/freePuntosBot.git"
-  },
-  "keywords": [
-    "discord",
-    "typescript",
-    "discordjs",
-    "bot"
-  ],
-  "author": "Glassait",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Glassait/freePuntosBot/issues"
-  },
-  "homepage": "https://github.com/Glassait/freePuntosBot#readme",
-  "dependencies": {
-    "@discordjs/voice": "^0.16.0",
-    "axios": "^1.6.2",
-    "cheerio": "^1.0.0-rc.12",
-    "discord.js": "^14.13.0",
-    "ts-node": "^10.9.1"
-  },
-  "devDependencies": {
-    "@types/node": "^20.8.10",
-    "prettier": "^3.0.3",
-    "typescript": "^5.2.2"
-  }
+    "name": "freepuntosbot",
+    "version": "1.0.0",
+    "description": "A bot for the free puntos discord server",
+    "main": "src/index.ts",
+    "scripts": {
+        "start": "ts-node .",
+        "start:mock": "ts-node . -- DEV"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Glassait/freePuntosBot.git"
+    },
+    "keywords": [
+        "discord",
+        "typescript",
+        "discordjs",
+        "bot"
+    ],
+    "author": "Glassait",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/Glassait/freePuntosBot/issues"
+    },
+    "homepage": "https://github.com/Glassait/freePuntosBot#readme",
+    "dependencies": {
+        "@discordjs/voice": "^0.16.0",
+        "axios": "^1.6.2",
+        "cheerio": "^1.0.0-rc.12",
+        "discord.js": "^14.13.0",
+        "ts-node": "^10.9.1"
+    },
+    "devDependencies": {
+        "@types/node": "^20.8.10",
+        "prettier": "^3.0.3",
+        "typescript": "^5.2.2"
+    }
 }
