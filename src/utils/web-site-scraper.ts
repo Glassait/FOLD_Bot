@@ -77,17 +77,16 @@ export class WebSiteScraper extends Context {
             }
         } else if (this.webSiteState.name === 'THE DAILY BOUNCE') {
             let containers: any[] = $(this.webSiteState.selector).get();
-            let index: number = containers.indexOf(
-                containers.find(
-                    value => value.children[0].children[1].attribs.href == this.webSiteState.lastUrl
-                )
+            const links: any[] = $(`${this.webSiteState.selector} div.read-img a`).get();
+            let index: number = links.indexOf(
+                links.find(value => value.attribs.href == this.webSiteState.lastUrl)
             );
 
             if (!this.webSiteState.lastUrl) {
-                await this.dailyBounce(channel, containers, 0);
+                await this.dailyBounce(channel, containers, links, 0, $);
             } else if (index > 0) {
                 for (let i = index - 1; i >= 0; i--) {
-                    await this.dailyBounce(channel, containers, i);
+                    await this.dailyBounce(channel, containers, links, i, $);
                 }
             }
         } else if (this.webSiteState.name === 'The Armored Patrol') {
@@ -101,26 +100,29 @@ export class WebSiteScraper extends Context {
             );
 
             if (!this.webSiteState.lastUrl) {
-                await this.armoredPatrol(channel, containers, 0);
+                await this.armoredPatrol(channel, containers, 0, $);
             } else if (index > 0) {
                 for (let i = index - 1; i >= 0; i--) {
-                    await this.armoredPatrol(channel, containers, i);
+                    await this.armoredPatrol(channel, containers, i, $);
                 }
             }
         }
     }
 
-    private async armoredPatrol(channel: TextChannel, containers: any[], index: number) {
-        const link = containers[index].children[1].children[1].children[0];
-        const image =
-            containers[index].children[7].children[1].children[1].children[1].children[0]
-                .children[0].attribs.src;
+    private async armoredPatrol(
+        channel: TextChannel,
+        containers: any[],
+        index: number,
+        $: CheerioAPI
+    ): Promise<void> {
+        const link: any = $(`article#${containers[index].attribs.id} a`).get()[0];
+
         await this.sendNews(
             channel,
             link.attribs.href,
             link.children[0].data,
             `Nouvelle rumeur venant de ${this.webSiteState.name}`,
-            image
+            $(`article#${containers[index].attribs.id} img`).attr('src')
         );
     }
 
@@ -137,16 +139,22 @@ export class WebSiteScraper extends Context {
     private async dailyBounce(
         channel: TextChannel,
         containers: any[],
-        index: number
+        links: any[],
+        index: number,
+        $: CheerioAPI
     ): Promise<void> {
-        const link: any = containers[index].children[0];
-        const description: any = containers[index].children[1];
+        const title: any = $(
+            `${this.webSiteState.selector}#${containers[index].attribs.id} div.read-title a`
+        ).get()[0];
+        const description: any = $(
+            `${this.webSiteState.selector}#${containers[index].attribs.id} div.post-description p`
+        ).get()[0];
         await this.sendNews(
             channel,
-            link.children[1].attribs.href,
-            description.children[1].children[0].children[1].children[0].data,
-            description.children[6].children[0].children[0].children[0].data,
-            link.children[1].children[1].attribs['data-large-file']
+            links[index].attribs.href,
+            title.children[0].data,
+            description.children[0].data,
+            links[index].children[1].attribs['data-large-file']
         );
     }
 
