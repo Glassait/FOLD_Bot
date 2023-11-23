@@ -2,6 +2,7 @@ import { Client } from 'discord.js';
 import { readFileSync, writeFile } from 'fs';
 import { InventoryType, WebSiteState } from '../types/inventory.type';
 import { Context } from '../utils/context.class';
+import { EnvUtil } from '../utils/env.util';
 import { WebSiteScraper } from '../utils/web-site-scraper';
 import { LoggerSingleton } from './logger.singleton';
 
@@ -17,6 +18,10 @@ export class InventorySingleton extends Context {
         try {
             const json: Buffer = readFileSync(this.path);
             this._inventory = JSON.parse(json.toString());
+
+            if (EnvUtil.isDev() && this._inventory) {
+                this._inventory.newsLetter.channel = '1171525891604623472';
+            }
         } catch (e) {
             this.logger.error(this.context, 'Inventory file not found');
             throw new Error('Inventory file not found');

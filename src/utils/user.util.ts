@@ -5,7 +5,7 @@ import {
     GuildMember,
 } from 'discord.js';
 
-export class UserUtils {
+export class UserUtil {
     public static async getGuildMemberFromInteraction(
         interaction: ChatInputCommandInteraction,
         optionName: string,

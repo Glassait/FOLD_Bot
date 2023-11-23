@@ -1,8 +1,8 @@
 import { ActivityType } from 'discord.js';
-import { MockEnum } from '../enums/mock.enum';
 import { DiscordId } from '../types/feature.type';
+import { EnvUtil } from './env.util';
 
-export class SentenceUtils {
+export class SentenceUtil {
     private static response: string[] = [
         'Évolue un peu <@discordId> !',
         '<@discordId> pourquoi ne pas réfléchir un peu plus avant de poser des questions ?',
@@ -44,7 +44,7 @@ export class SentenceUtils {
     }
 
     public static getRandomStatus(): any {
-        return process.argv[3] === MockEnum.DEV
+        return EnvUtil.isDev()
             ? [ActivityType.Custom, 'Entrain de ce faire toucher le code']
             : this.status[this.getRandomNumber(this.status.length)];
     }
