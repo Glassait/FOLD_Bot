@@ -2,13 +2,13 @@ import { SlashCommandMentionableOption } from '@discordjs/builders';
 import { ChatInputCommandInteraction, GuildMember, PermissionsBitField } from 'discord.js';
 import { FeatureSingleton } from '../singleton/feature.singleton';
 import { SlashCommand } from '../utils/slash-command.class';
-import { UserUtils } from '../utils/user.utils';
+import { UserUtil } from '../utils/user.util';
 
 export const command: SlashCommand = new SlashCommand(
     'auto-disconnect',
     "Pour déconnecter automatiquement quelqu'un d'un channel vocal",
     async (interaction: ChatInputCommandInteraction): Promise<void> => {
-        const targetUser: GuildMember | undefined = await UserUtils.getGuildMemberFromInteraction(
+        const targetUser: GuildMember | undefined = await UserUtil.getGuildMemberFromInteraction(
             interaction,
             'target'
         );

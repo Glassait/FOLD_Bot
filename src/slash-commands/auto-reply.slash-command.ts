@@ -2,13 +2,13 @@ import { SlashCommandMentionableOption, SlashCommandStringOption } from '@discor
 import { ChatInputCommandInteraction, CommandInteractionOption, GuildMember } from 'discord.js';
 import { FeatureSingleton } from '../singleton/feature.singleton';
 import { SlashCommand } from '../utils/slash-command.class';
-import { UserUtils } from '../utils/user.utils';
+import { UserUtil } from '../utils/user.util';
 
 export const command: SlashCommand = new SlashCommand(
     'auto-reply',
     "Pour répondre automatiquement lorsqu'une personne vous mention",
     async (interaction: ChatInputCommandInteraction): Promise<void> => {
-        const targetUser: GuildMember | undefined = await UserUtils.getGuildMemberFromInteraction(
+        const targetUser: GuildMember | undefined = await UserUtil.getGuildMemberFromInteraction(
             interaction,
             'target',
             true

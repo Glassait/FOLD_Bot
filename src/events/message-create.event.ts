@@ -1,17 +1,17 @@
 import { Client, Events, Message } from 'discord.js';
-import { MockEnum } from '../enums/mock.enum';
 import { BotEvent } from '../types/bot-event.type';
-import { AutoReplyUtils } from '../utils/auto-reply.utils';
+import { AutoReplyUtil } from '../utils/auto-reply.util';
+import { EnvUtil } from '../utils/env.util';
 
 const event: BotEvent = {
     name: Events.MessageCreate,
     once: false,
     async execute(_client: Client, message: Message): Promise<void> {
-        if (process.argv[3] === MockEnum.DEV) {
+        if (EnvUtil.isDev()) {
             return;
         }
 
-        await AutoReplyUtils.autoReply(message);
+        await AutoReplyUtil.autoReply(message);
     },
 };
 

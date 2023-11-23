@@ -2,7 +2,7 @@ import { Client, Events } from 'discord.js';
 import { LoggerSingleton } from '../singleton/logger.singleton';
 import { BotEvent } from '../types/bot-event.type';
 import { Context } from '../utils/context.class';
-import { SentenceUtils } from '../utils/sentence.utils';
+import { SentenceUtil } from '../utils/sentence.util';
 
 const logger: LoggerSingleton = LoggerSingleton.instance;
 const context: Context = new Context('READY-EVENT');
@@ -12,7 +12,7 @@ const event: BotEvent = {
     once: true,
     async execute(client: Client): Promise<void> {
         logger.info(context.context, `💪 Logged in as ${client.user?.tag}`);
-        const status = SentenceUtils.getRandomStatus();
+        const status = SentenceUtil.getRandomStatus();
 
         client.user?.setPresence({
             activities: [

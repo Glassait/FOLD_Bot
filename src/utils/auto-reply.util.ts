@@ -1,9 +1,9 @@
 import { Collection, Message, User } from 'discord.js';
 import { FeatureSingleton } from '../singleton/feature.singleton';
 import { DiscordId, Reply } from '../types/feature.type';
-import { SentenceUtils } from './sentence.utils';
+import { SentenceUtil } from './sentence.util';
 
-export class AutoReplyUtils {
+export class AutoReplyUtil {
     public static async autoReply(message: Message): Promise<void> {
         if (message.author.bot) {
             return;
@@ -28,7 +28,7 @@ export class AutoReplyUtils {
         );
 
         if (hasAutoReply) {
-            await message.channel.send(SentenceUtils.getRandomResponse(id));
+            await message.channel.send(SentenceUtil.getRandomResponse(id));
         }
     }
 }

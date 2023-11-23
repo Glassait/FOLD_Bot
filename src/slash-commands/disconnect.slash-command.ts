@@ -3,7 +3,7 @@ import { ChatInputCommandInteraction, GuildMember, PermissionsBitField } from 'd
 import { LoggerSingleton } from '../singleton/logger.singleton';
 import { Context } from '../utils/context.class';
 import { SlashCommand } from '../utils/slash-command.class';
-import { UserUtils } from '../utils/user.utils';
+import { UserUtil } from '../utils/user.util';
 
 const logger: LoggerSingleton = LoggerSingleton.instance;
 const context: Context = new Context('COMMANDS-HANDLER');
@@ -12,7 +12,7 @@ export const command: SlashCommand = new SlashCommand(
     'disconnect',
     "Pour déconnecter quelqu'un d'un channel vocal",
     async (interaction: ChatInputCommandInteraction): Promise<void> => {
-        const targetUser: GuildMember | undefined = await UserUtils.getGuildMemberFromInteraction(
+        const targetUser: GuildMember | undefined = await UserUtil.getGuildMemberFromInteraction(
             interaction,
             'target',
             true

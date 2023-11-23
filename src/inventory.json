@@ -1,25 +1,25 @@
 {
-  "newsLetter": {
-    "channel": "1177006853318779002",
-    "website": [
-      {
-        "liveUrl": "https://thedailybounce.net/",
-        "lastUrl": "",
-        "name": "THE DAILY BOUNCE",
-        "selector": "article.archive-image-left div.list-style div.color-pad"
-      },
-      {
-        "liveUrl": "https://thearmoredpatrol.com/category/world-of-tanks/",
-        "lastUrl": "",
-        "name": "The Armored Patrol",
-        "selector": "article.post"
-      },
-      {
-        "liveUrl": "https://wotexpress.info/",
-        "lastUrl": "",
-        "name": "Wot Express",
-        "selector": "a.news-block-row"
-      }
-    ]
-  }
+	"newsLetter": {
+		"channel": "1177006853318779002",
+		"website": [
+			{
+				"liveUrl": "https://wotexpress.info/",
+				"lastUrl": "",
+				"name": "Wot Express",
+				"selector": "a.news-block-row"
+			},
+			{
+				"liveUrl": "https://thedailybounce.net/",
+				"lastUrl": "",
+				"name": "THE DAILY BOUNCE",
+				"selector": "article.archive-image-left"
+			},
+			{
+				"liveUrl": "https://thearmoredpatrol.com/category/world-of-tanks/",
+				"lastUrl": "",
+				"name": "The Armored Patrol",
+				"selector": "article.post"
+			}
+		]
+	}
 }
