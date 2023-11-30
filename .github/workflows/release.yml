@@ -33,4 +33,5 @@ jobs:
       - name: Push version
         run: |
           git show
-          git push --tags
+          echo "https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" "${{ github.head_ref }}"
+          git push "https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" "${{ github.head_ref }}"
