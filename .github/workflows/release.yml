@@ -10,6 +10,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
@@ -20,19 +23,14 @@ jobs:
           git config user.email '${{ secrets.MAINTAINER_EMAIL }}'
       - name: Patch version
         if: ${{ contains(github.event.head_commit.message, 'patch') }}
-        uses: Reedyuk/NPM-Version@1.2.2
-        with:
-          version: 'patch'
-          git-tag-version: 'true'
+        run: npm version patch
       - name: Minor version
         if: ${{ contains(github.event.head_commit.message, 'minor') }}
-        uses: Reedyuk/NPM-Version@1.2.2
-        with:
-          version: 'minor'
-          git-tag-version: 'true'
+        run: npm version minor
       - name: Major version
         if: ${{ contains(github.event.head_commit.message, 'major') }}
-        uses: Reedyuk/NPM-Version@1.2.2
-        with:
-          version: 'major'
-          git-tag-version: 'true'
+        run: npm version major
+      - name: Push version
+        run: |
+          git show
+          git push "https://${{ secrets.TOKEN }}@github.com/${{ github.repository }}" "${{ github.head_ref }} --follow-tags"
