@@ -14,20 +14,21 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18.X'
-      - name: Setup Git
-        run: |
-          git config user.name '${{ secrets.MAINTAINER_NAME }}'
-          git config user.email '${{ secrets.MAINTAINER_EMAIL }}'
       - name: Patch version
         if: ${{ contains(github.event.head_commit.message, 'patch') }}
-        run: npm version patch
+        uses: Reedyuk/NPM-Version@1.2.2
+        with:
+          version: 'patch'
+          git-tag-version: 'true'
       - name: Minor version
         if: ${{ contains(github.event.head_commit.message, 'minor') }}
-        run: npm version minor
+        uses: Reedyuk/NPM-Version@1.2.2
+        with:
+          version: 'minor'
+          git-tag-version: 'true'
       - name: Major version
         if: ${{ contains(github.event.head_commit.message, 'major') }}
-        run: npm version major
-      - name: Commit & Push changes
-        uses: actions-js/push@v1.4
+        uses: Reedyuk/NPM-Version@1.2.2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          version: 'major'
+          git-tag-version: 'true'
