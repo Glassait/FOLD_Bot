@@ -32,5 +32,4 @@ jobs:
         run: npm version major
       - name: Push version
         run: |
-          git pull
           git push --tags https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} main
