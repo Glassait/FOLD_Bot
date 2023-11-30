@@ -1,0 +1,29 @@
+on:
+  push:
+    branches:
+      - main
+name: Update package version
+jobs:
+  release:
+    name: Update version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.X'
+      - name: Setup Git
+        run: |
+          git config user.name '${{ secrets.MAINTAINER_NAME }}'
+          git config user.email '${{ secrets.MAINTAINER_EMAIL }}'
+      - name: Patch version
+        if: "contains(github.event.head_commit.message, 'patch')"
+        run: npm version patch
+      - name: Minor version
+        if: "contains(github.event.head_commit.message, 'minor')"
+        run: npm version minor
+      - name: Major version
+        if: "contains(github.event.head_commit.message, 'major')"
+        run: npm version major
