@@ -14,19 +14,19 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18.X'
-      - name: Update version
+      - name: Patch version
         if: ${{ contains(github.event.head_commit.message, 'patch') }}
         uses: Reedyuk/NPM-Version@1.2.2
         with:
           version: 'patch'
           git-tag-version: 'true'
-      - name: Update version
+      - name: Minor version
         if: ${{ contains(github.event.head_commit.message, 'minor') }}
         uses: Reedyuk/NPM-Version@1.2.2
         with:
           version: 'minor'
           git-tag-version: 'true'
-      - name: Update version
+      - name: Major version
         if: ${{ contains(github.event.head_commit.message, 'major') }}
         uses: Reedyuk/NPM-Version@1.2.2
         with:
