@@ -34,5 +34,3 @@ jobs:
         run: |
           git show
           git push --tags
-        with:
-          token: ${{ secrets.TOKEN }}
