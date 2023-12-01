@@ -2,6 +2,7 @@ import { SlashCommandMentionableOption } from '@discordjs/builders';
 import { ChatInputCommandInteraction, GuildMember, PermissionsBitField } from 'discord.js';
 import { LoggerSingleton } from '../singleton/logger.singleton';
 import { Context } from '../utils/context.class';
+import { SendUtils } from '../utils/send.utils';
 import { SlashCommand } from '../utils/slash-command.class';
 import { UserUtil } from '../utils/user.util';
 
@@ -12,37 +13,30 @@ export const command: SlashCommand = new SlashCommand(
     'disconnect',
     "Pour déconnecter quelqu'un d'un channel vocal",
     async (interaction: ChatInputCommandInteraction): Promise<void> => {
-        const targetUser: GuildMember | undefined = await UserUtil.getGuildMemberFromInteraction(
-            interaction,
-            'target',
-            true
-        );
+        const targetUser: GuildMember | undefined = await UserUtil.getGuildMemberFromInteraction(interaction, 'target', true);
 
         if (!targetUser) {
             return;
         }
 
         try {
+            logger.trace(context.context, `Disconnect user \`${targetUser.displayName}\``);
             await targetUser.voice.disconnect();
-            await interaction.editReply({
-                content:
-                    "L'utilisateur a été déconnecté, c'est méchant mais c'est toi qui décide...",
+            await SendUtils.editReply(interaction, {
+                content: "L'utilisateur a été déconnecté, c'est méchant mais c'est toi qui décide...",
             });
         } catch (error) {
-            await interaction.editReply({
-                content: `Il y a eu un problème au moment de déconnecté ${targetUser.nickname}, erreur: ${error}`,
+            await SendUtils.editReply(interaction, {
+                content: `Il y a eu un problème au moment de déconnecté ${targetUser.displayName}, erreur: ${error}`,
             });
-            logger.error(context.context, `error kick: ${error}`);
+            logger.error(context.context, `Error when disconnecting: ${error}`);
             return;
         }
     },
     [
         {
             optionType: 'MentionableOption',
-            base: new SlashCommandMentionableOption()
-                .setName('target')
-                .setDescription("L'utilisateur à déconnecter")
-                .setRequired(true),
+            base: new SlashCommandMentionableOption().setName('target').setDescription("L'utilisateur à déconnecter").setRequired(true),
         },
     ],
     PermissionsBitField.Flags.MoveMembers

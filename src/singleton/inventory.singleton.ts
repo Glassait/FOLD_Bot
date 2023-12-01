@@ -22,6 +22,8 @@ export class InventorySingleton extends Context {
             if (EnvUtil.isDev() && this._inventory) {
                 this._inventory.newsLetter.channel = '1171525891604623472';
             }
+
+            this.logger.trace(this.context, 'Inventory instance initialized');
         } catch (e) {
             this.logger.error(this.context, 'Inventory file not found');
             throw new Error('Inventory file not found');
@@ -62,6 +64,7 @@ export class InventorySingleton extends Context {
             if (index >= length) {
                 index = 0;
             }
+            this.logger.trace(this.context, 'End scrapping, next one in 30 minutes');
             await new Promise(r => setTimeout(r, 1000 * 60 * 30));
         }
     }
@@ -72,15 +75,10 @@ export class InventorySingleton extends Context {
             return;
         }
 
-        const webSite: WebSiteState | undefined = this._inventory.newsLetter.website.find(
-            (value: WebSiteState): boolean => value.name === newsLetterName
-        );
+        const webSite: WebSiteState | undefined = this._inventory.newsLetter.website.find((value: WebSiteState): boolean => value.name === newsLetterName);
 
         if (!webSite) {
-            this.logger.error(
-                this.context,
-                `This website ${newsLetterName} is not registered in the inventory`
-            );
+            this.logger.error(this.context, `This website ${newsLetterName} is not registered in the inventory`);
             return;
         }
 
@@ -92,10 +90,9 @@ export class InventorySingleton extends Context {
     private updateFile(): void {
         writeFile(this.path, JSON.stringify(this._inventory, null, '\t'), err => {
             if (err) {
-                this.logger.warning(
-                    this.context,
-                    `🔄❌ Failed to sync the inventory file with error: ${err}`
-                );
+                this.logger.warning(this.context, `🔄❌ Failed to sync the inventory file with error: ${err}`);
+            } else {
+                this.logger.trace(this.context, 'Inventory successfully updated');
             }
         });
     }

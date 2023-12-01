@@ -15,6 +15,8 @@ export class FeatureSingleton extends Context {
             auto_disconnect: '',
             auto_reply: [],
         };
+
+        this.logger.trace(this.context, 'Feature instance initialized');
     }
 
     private static _instance: FeatureSingleton | undefined;
@@ -54,9 +56,7 @@ export class FeatureSingleton extends Context {
     }
 
     public deleteAutoReply(activateFor: DiscordId, replyTo: DiscordId): void {
-        const object: Reply | undefined = this._data.auto_reply.find(
-            (value: Reply) => value.activateFor === activateFor && value.replyTo === replyTo
-        );
+        const object: Reply | undefined = this._data.auto_reply.find((value: Reply) => value.activateFor === activateFor && value.replyTo === replyTo);
         if (!object) {
             return;
         }
@@ -76,18 +76,15 @@ export class FeatureSingleton extends Context {
     }
 
     public hasAutoReplyTo(activateFor: DiscordId, replyTo: DiscordId): boolean {
-        return this._data.auto_reply.some(
-            (value: Reply) => value.activateFor === activateFor && value.replyTo === replyTo
-        );
+        return this._data.auto_reply.some((value: Reply) => value.activateFor === activateFor && value.replyTo === replyTo);
     }
 
     private updateFile(): void {
         writeFile(FeatureSingleton.path, JSON.stringify(this._data, null, '\t'), err => {
             if (err) {
-                this.logger.warning(
-                    this.context,
-                    `🔄❌ Failed to sync the feature file with error: ${err}`
-                );
+                this.logger.warning(this.context, `🔄❌ Failed to sync the feature file with error: ${err}`);
+            } else {
+                this.logger.trace(this.context, 'Feature.json successfully updated');
             }
         });
     }

@@ -10,16 +10,17 @@ const context: Context = new Context('EVENT-HANDLER');
 
 module.exports = (client: Client): void => {
     let eventsDir: string = join(__dirname, '../events');
+    let numberOfEvent: number = 0;
 
     readdirSync(eventsDir).forEach((file: string): void => {
         if (!file.endsWith('.ts')) return;
 
         const event: BotEvent = require(`${eventsDir}/${file}`).default;
 
-        event.once
-            ? client.once(event.name, (...args: any[]) => event.execute(client, ...args))
-            : client.on(event.name, (...args: any[]) => event.execute(client, ...args));
+        event.once ? client.once(event.name, (...args: any[]) => event.execute(client, ...args)) : client.on(event.name, (...args: any[]) => event.execute(client, ...args));
 
+        numberOfEvent++;
         logger.info(context.context, `🌠 Successfully loaded event ${event.name}`);
     });
+    logger.info(context.context, `Loaded ${numberOfEvent} events`);
 };

@@ -13,6 +13,7 @@ const event: BotEvent = {
     async execute(client: Client): Promise<void> {
         logger.info(context.context, `💪 Logged in as ${client.user?.tag}`);
         const status = SentenceUtil.getRandomStatus();
+        logger.info(context.context, `Status of the bot set to ${status[0]} and ${status[1]}`);
 
         client.user?.setPresence({
             activities: [
