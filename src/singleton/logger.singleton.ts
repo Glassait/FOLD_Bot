@@ -3,11 +3,7 @@ import { Context } from '../utils/context.class';
 
 export class LoggerSingleton extends Context {
     public static dir: string = './src/logs/';
-    public static path: string = `${LoggerSingleton.dir}${new Date()
-        .toLocaleString('fr-FR')
-        .replace(/\//g, '-')
-        .replace(/ /g, '_')
-        .replace(/:/g, '-')}.md`;
+    public static path: string = `${LoggerSingleton.dir}${new Date().toLocaleString('fr-FR').replace(/\//g, '-').replace(/ /g, '_').replace(/:/g, '-')}.md`;
     private _log: string;
 
     constructor() {
@@ -45,6 +41,11 @@ export class LoggerSingleton extends Context {
         }
     }
 
+    public trace(context: string, msg: string): void {
+        console.debug(msg);
+        this.addToLog('TRACE', 'gray', context, msg);
+    }
+
     public debug(context: string, msg: string): void {
         console.debug(msg);
         this.addToLog('DEBUG', 'grey', context, msg);
@@ -65,15 +66,8 @@ export class LoggerSingleton extends Context {
         this.addToLog('ERROR', 'red', context, msg);
     }
 
-    private addToLog(
-        action: 'DEBUG' | 'INFO' | 'WARNING' | 'ERROR',
-        color: string,
-        context: string,
-        msg: string
-    ): void {
-        this._log += `<span style="color:${color}">[${new Date().toLocaleString(
-            'fr-FR'
-        )}][${action}][${context}] ${msg} </span><br>\n`;
+    private addToLog(action: 'TRACE' | 'DEBUG' | 'INFO' | 'WARNING' | 'ERROR', color: string, context: string, msg: string): void {
+        this._log += `<span style="color:${color}">[${new Date().toLocaleString('fr-FR')}][${action}][${context}] ${msg} </span><br>\n`;
         this.updateFile();
     }
 

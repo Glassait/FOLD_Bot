@@ -3,6 +3,7 @@ import { LoggerSingleton } from '../singleton/logger.singleton';
 import { BotEvent } from '../types/bot-event.type';
 import { Context } from '../utils/context.class';
 import { EnvUtil } from '../utils/env.util';
+import { SendUtils } from '../utils/send.utils';
 import { SlashCommand } from '../utils/slash-command.class';
 
 const logger: LoggerSingleton = LoggerSingleton.instance;
@@ -20,9 +21,8 @@ const event: BotEvent = {
 
         if (interaction.isChatInputCommand()) {
             if (EnvUtil.isDev()) {
-                await interaction.reply({
-                    content:
-                        "Je suis actuellement entrain d'être améliorer par mon créateur. Cette commande ne fonctionne pas !",
+                await SendUtils.reply(interaction, {
+                    content: "Je suis actuellement entrain d'être améliorer par mon créateur, cette commande ne fonctionne pas !\nMerci d'éssayer plus tard :)",
                     ephemeral: true,
                 });
                 return;
@@ -31,14 +31,12 @@ const event: BotEvent = {
             command = getCommand(interaction);
 
             if (!command) {
-                logger.error(
-                    context.context,
-                    `No slash commands matching ${interaction.commandName} was found.`
-                );
+                logger.error(context.context, `No slash commands matching \`${interaction.commandName}\` was found.`);
                 return;
             }
 
             try {
+                logger.trace(context.context, `Chat input command received : \`${command.name}\``);
                 await command.execute(interaction);
             } catch (error) {
                 logger.error(context.context, `${error}`);

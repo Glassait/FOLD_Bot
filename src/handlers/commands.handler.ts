@@ -11,6 +11,7 @@ const context: Context = new Context('COMMANDS-HANDLER');
 module.exports = async (_client: Client): Promise<void> => {
     const slashCommandsDir: string = join(__dirname, '../slash-commands');
     const body: any[] = [];
+    let numberOfCommand: number = 0;
 
     readdirSync(slashCommandsDir).forEach((file: string): void => {
         if (!file.endsWith('.ts')) return;
@@ -18,6 +19,7 @@ module.exports = async (_client: Client): Promise<void> => {
         const command = require(`${slashCommandsDir}/${file}`).command;
 
         body.push(command.data.toJSON());
+        numberOfCommand++;
 
         logger.info(context.context, `🔥 Successfully loaded command ${command.name}`);
     });
@@ -29,7 +31,7 @@ module.exports = async (_client: Client): Promise<void> => {
             body: body,
         });
 
-        logger.debug(context.context, 'Successfully reloaded application (/) commands.');
+        logger.debug(context.context, `Successfully reloaded application ${numberOfCommand} slash-commands.`);
     } catch (error) {
         logger.error(context.context, `${error}`);
     }
