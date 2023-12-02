@@ -20,7 +20,7 @@ module.exports = (client: Client): void => {
         event.once ? client.once(event.name, (...args: any[]) => event.execute(client, ...args)) : client.on(event.name, (...args: any[]) => event.execute(client, ...args));
 
         numberOfEvent++;
-        logger.info(context.context, `🌠 Successfully loaded event ${event.name}`);
+        logger.info(context, `🌠 Successfully loaded event ${event.name}`);
     });
-    logger.info(context.context, `Loaded ${numberOfEvent} events`);
+    logger.info(context, `Loaded ${numberOfEvent} events`);
 };

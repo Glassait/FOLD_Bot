@@ -31,15 +31,15 @@ const event: BotEvent = {
             command = getCommand(interaction);
 
             if (!command) {
-                logger.error(context.context, `No slash commands matching \`${interaction.commandName}\` was found.`);
+                logger.error(context, `No slash commands matching \`${interaction.commandName}\` was found.`);
                 return;
             }
 
             try {
-                logger.trace(context.context, `Chat input command received : \`${command.name}\``);
+                logger.trace(context, `Chat input command received : \`${command.name}\``);
                 await command.execute(interaction);
             } catch (error) {
-                logger.error(context.context, `${error}`);
+                logger.error(context, `${error}`);
             }
         }
     },

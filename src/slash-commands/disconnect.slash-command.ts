@@ -7,7 +7,7 @@ import { SlashCommand } from '../utils/slash-command.class';
 import { UserUtil } from '../utils/user.util';
 
 const logger: LoggerSingleton = LoggerSingleton.instance;
-const context: Context = new Context('COMMANDS-HANDLER');
+const context: Context = new Context('DISCONNECT-SLASh-COMMAND');
 
 export const command: SlashCommand = new SlashCommand(
     'disconnect',
@@ -20,7 +20,7 @@ export const command: SlashCommand = new SlashCommand(
         }
 
         try {
-            logger.trace(context.context, `Disconnect user \`${targetUser.displayName}\``);
+            logger.trace(context, `Disconnect user \`${targetUser.displayName}\``);
             await targetUser.voice.disconnect();
             await SendUtils.editReply(interaction, {
                 content: "L'utilisateur a été déconnecté, c'est méchant mais c'est toi qui décide...",
@@ -29,7 +29,7 @@ export const command: SlashCommand = new SlashCommand(
             await SendUtils.editReply(interaction, {
                 content: `Il y a eu un problème au moment de déconnecté ${targetUser.displayName}, erreur: ${error}`,
             });
-            logger.error(context.context, `Error when disconnecting: ${error}`);
+            logger.error(context, `Error when disconnecting: ${error}`);
             return;
         }
     },

@@ -1,10 +1,10 @@
-import { writeFile } from 'fs';
+import { readFileSync, writeFile } from 'fs';
 import { DiscordId, FeatureType, Reply } from '../types/feature.type';
 import { Context } from '../utils/context.class';
 import { LoggerSingleton } from './logger.singleton';
 
 export class FeatureSingleton extends Context {
-    public static readonly path: string = './src/feature.json';
+    public readonly path: string = './src/feature.json';
 
     private readonly logger: LoggerSingleton = LoggerSingleton.instance;
 
@@ -15,8 +15,8 @@ export class FeatureSingleton extends Context {
             auto_disconnect: '',
             auto_reply: [],
         };
-
-        this.logger.trace(this.context, 'Feature instance initialized');
+        this.syncFeatureFile();
+        this.logger.trace(this, 'Feature instance initialized');
     }
 
     private static _instance: FeatureSingleton | undefined;
@@ -28,19 +28,16 @@ export class FeatureSingleton extends Context {
         return this._instance;
     }
 
-    private _data: FeatureType;
+    private readonly _data: FeatureType;
 
     get data(): FeatureType {
         return this._data;
     }
 
     set data(value: FeatureType) {
-        if (!value.version || value.version != this._data.version) {
-            this._data.auto_disconnect = value.auto_disconnect ? value.auto_disconnect : '';
-            this._data.auto_reply = value.auto_reply ? value.auto_reply : [];
-        } else {
-            this._data = value;
-        }
+        this._data.version = value.version ?? 2;
+        this._data.auto_disconnect = value.auto_disconnect ?? '';
+        this._data.auto_reply = value.auto_reply ?? [];
 
         this.updateFile();
     }
@@ -79,12 +76,24 @@ export class FeatureSingleton extends Context {
         return this._data.auto_reply.some((value: Reply) => value.activateFor === activateFor && value.replyTo === replyTo);
     }
 
+    private syncFeatureFile(): void {
+        try {
+            const json: Buffer = readFileSync(this.path);
+
+            if (json.toString()) {
+                this.data = JSON.parse(json.toString());
+            }
+        } catch (e) {
+            this.updateFile();
+        }
+    }
+
     private updateFile(): void {
-        writeFile(FeatureSingleton.path, JSON.stringify(this._data, null, '\t'), err => {
+        writeFile(this.path, JSON.stringify(this._data, null, '\t'), err => {
             if (err) {
-                this.logger.warning(this.context, `🔄❌ Failed to sync the feature file with error: ${err}`);
+                this.logger.warning(this, `🔄❌ Failed to sync the feature file with error: ${err}`);
             } else {
-                this.logger.trace(this.context, 'Feature.json successfully updated');
+                this.logger.trace(this, 'Feature.json successfully updated');
             }
         });
     }

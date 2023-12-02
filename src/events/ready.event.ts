@@ -11,9 +11,9 @@ const event: BotEvent = {
     name: Events.ClientReady,
     once: true,
     async execute(client: Client): Promise<void> {
-        logger.info(context.context, `💪 Logged in as ${client.user?.tag}`);
+        logger.info(context, `💪 Logged in as ${client.user?.tag}`);
         const status = SentenceUtil.getRandomStatus();
-        logger.info(context.context, `Status of the bot set to ${status[0]} and ${status[1]}`);
+        logger.info(context, `Status of the bot set to ${status[0]} and ${status[1]}`);
 
         client.user?.setPresence({
             activities: [

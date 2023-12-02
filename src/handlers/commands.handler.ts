@@ -21,7 +21,7 @@ module.exports = async (_client: Client): Promise<void> => {
         body.push(command.data.toJSON());
         numberOfCommand++;
 
-        logger.info(context.context, `🔥 Successfully loaded command ${command.name}`);
+        logger.info(context, `🔥 Successfully loaded command ${command.name}`);
     });
 
     const rest: REST = new REST({ version: '10' }).setToken(token);
@@ -31,8 +31,8 @@ module.exports = async (_client: Client): Promise<void> => {
             body: body,
         });
 
-        logger.debug(context.context, `Successfully reloaded application ${numberOfCommand} slash-commands.`);
+        logger.debug(context, `Successfully reloaded application ${numberOfCommand} slash-commands.`);
     } catch (error) {
-        logger.error(context.context, `${error}`);
+        logger.error(context, `${error}`);
     }
 };

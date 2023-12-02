@@ -18,14 +18,14 @@ export const command: SlashCommand = new SlashCommand(
 
         const feature: FeatureSingleton = FeatureSingleton.instance;
         if (targetUser) {
-            logger.trace(context.context, `AutoDisconnect activated on \`${targetUser.displayName}\``);
+            logger.info(context, `AutoDisconnect activated on \`${targetUser.displayName}\``);
             feature.autoDisconnect = targetUser.id.toString();
             await require('./disconnect.slash-command').command.execute(interaction);
             await SendUtils.editReply(interaction, {
                 content: 'Déconnexion automatique activé, un vrai 😈 😈 😈',
             });
         } else {
-            logger.trace(context.context, `AutoDisconnect deactivated`);
+            logger.info(context, `AutoDisconnect deactivated`);
             feature.autoDisconnect = '';
             await SendUtils.editReply(interaction, {
                 content: "Déconnexion automatique désactivée, c'est bien de laisser les gens vivre !",

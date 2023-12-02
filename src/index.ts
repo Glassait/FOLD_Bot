@@ -1,5 +1,5 @@
 import { Client, GatewayIntentBits } from 'discord.js';
-import { readdirSync, readFileSync, writeFile } from 'fs';
+import { readdirSync } from 'fs';
 import { join } from 'path';
 import { token } from './config.json';
 import { FeatureSingleton } from './singleton/feature.singleton';
@@ -8,37 +8,15 @@ import { LoggerSingleton } from './singleton/logger.singleton';
 import { Context } from './utils/context.class';
 
 const logger: LoggerSingleton = LoggerSingleton.instance;
-logger.createLogFile();
 const context: Context = new Context('INDEX');
 
-logger.debug(context.context, '🤖 Bot is starting...');
+logger.debug(context, '🤖 Bot is starting...');
 
-const feature: FeatureSingleton = FeatureSingleton.instance;
+const _feature: FeatureSingleton = FeatureSingleton.instance;
 const inventory: InventorySingleton = InventorySingleton.instance;
 
-try {
-    const json: Buffer = readFileSync(FeatureSingleton.path);
-
-    if (json.toString()) {
-        feature.data = JSON.parse(json.toString());
-    } else {
-        feature.data = { version: 0, auto_reply: [], auto_disconnect: '' };
-    }
-} catch (e) {
-    writeFile(FeatureSingleton.path, JSON.stringify(feature.data), err => {
-        if (err) {
-            throw err;
-        }
-        logger.error(context.context, '📁 Feature file created');
-    });
-}
-
 const client: Client = new Client({
-    intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildVoiceStates,
-        GatewayIntentBits.GuildMessages,
-    ],
+    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.GuildMessages],
 });
 
 const handlersDir: string = join(__dirname, './handlers');
@@ -49,12 +27,14 @@ readdirSync(handlersDir).forEach((handler: string): void => {
 
 client.login(token).then((value: string): void => {
     if (value) {
-        logger.debug(context.context, 'The bot is ready to kick some ass');
+        logger.debug(context, 'The bot is ready to kick some ass');
     } else {
-        logger.error(context.context, 'Failed to connect');
+        logger.error(context, 'Failed to connect');
     }
 });
 
-setTimeout(() => {
-    inventory.scrapWebSite(client).then();
+setTimeout((): void => {
+    (async (): Promise<void> => {
+        await inventory.scrapWebSite(client);
+    })();
 }, 500);

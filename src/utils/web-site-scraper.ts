@@ -22,7 +22,7 @@ export class WebSiteScraper extends Context {
         const channel: string | undefined = this.inventory.getNewsLetterChannel();
 
         if (!channel) {
-            this.logger.error(this.context, `The channel for the news letter not found in the inventory`);
+            this.logger.error(this, `The channel for the news letter not found in the inventory`);
             return;
         }
 
@@ -32,11 +32,11 @@ export class WebSiteScraper extends Context {
     public getHtml(websiteIndex: number, client: Client): void {
         const newsLetter: WebSiteState | undefined = this.inventory.getNewsLetter(websiteIndex);
         if (!newsLetter) {
-            this.logger.warning(this.context, `Index out of bound ${websiteIndex} in newsletter array`);
+            this.logger.warning(this, `Index out of bound ${websiteIndex} in newsletter array`);
             return;
         }
 
-        this.logger.trace(this.context, `⛏️ Start scrapping ${newsLetter.name}`);
+        this.logger.trace(this, `⛏️ Start scrapping ${newsLetter.name}`);
         this.webSiteState = newsLetter;
         this.axiosInstance
             .get(this.webSiteState?.liveUrl)
@@ -50,7 +50,7 @@ export class WebSiteScraper extends Context {
         const channel: TextChannel | undefined = <TextChannel>client.channels.cache.get(this.channel);
 
         if (!channel) {
-            this.logger.error(this.context, `Channel ${this.channel} not found in the guild`);
+            this.logger.error(this, `Channel ${this.channel} not found in the guild`);
             return;
         }
 
@@ -109,7 +109,7 @@ export class WebSiteScraper extends Context {
     }
 
     private async sendNews(channel: TextChannel, url: string, title: string, description: string, image?: string): Promise<void> {
-        this.logger.debug(this.context, `📨 Sending news on channel ${channel.name} for the web site ${this.webSiteState.name}, with the url ${url}`);
+        this.logger.debug(this, `📨 Sending news on channel ${channel.name} for the web site ${this.webSiteState.name}, with the url ${url}`);
         this.inventory.updateLastUrlOfWebsite(url, this.webSiteState.name);
         const embed: EmbedBuilder = new EmbedBuilder().setTitle(title).setDescription(description).setURL(url);
 

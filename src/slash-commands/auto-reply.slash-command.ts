@@ -8,7 +8,7 @@ import { SlashCommand } from '../utils/slash-command.class';
 import { UserUtil } from '../utils/user.util';
 
 const logger: LoggerSingleton = LoggerSingleton.instance;
-const context: Context = new Context('AUTO-DISCONNECT-SLASH-COMMAND');
+const context: Context = new Context('AUTO-REPLY-SLASH-COMMAND');
 
 export const command: SlashCommand = new SlashCommand(
     'auto-reply',
@@ -22,26 +22,26 @@ export const command: SlashCommand = new SlashCommand(
             const alreadyAutoReply: boolean = feature.hasAutoReplyTo(interaction.user.id, targetUser.id);
 
             if (alreadyAutoReply) {
-                logger.trace(context.context, `AutoReply already activated for \`${interaction.user.displayName}\` to reply to \`${targetUser.displayName}\``);
+                logger.info(context, `AutoReply already activated for \`${interaction.user.displayName}\` to reply to \`${targetUser.displayName}\``);
                 await SendUtils.editReply(interaction, {
                     content: `Tu as déjà une réponse automatique mis en place pour <@${targetUser.id}>`,
                 });
                 return;
             }
 
-            logger.trace(context.context, `AutoReply activated for \`${interaction.user.displayName}\` to reply to \`${targetUser.displayName}\``);
+            logger.info(context, `AutoReply activated for \`${interaction.user.displayName}\` to reply to \`${targetUser.displayName}\``);
             feature.pushAutoReply({ activateFor: interaction.user.id, replyTo: targetUser.id });
             await SendUtils.editReply(interaction, {
                 content: `Réponse automatique mis en place pour <@${targetUser.id}>`,
             });
         } else if (targetUser) {
             feature.deleteAutoReply(interaction.user.id, targetUser.id);
-            logger.trace(context.context, `AutoReply deactivated for \`${interaction.user.displayName}\` to reply to \`${targetUser.displayName}\``);
+            logger.info(context, `AutoReply deactivated for \`${interaction.user.displayName}\` to reply to \`${targetUser.displayName}\``);
             await SendUtils.editReply(interaction, {
                 content: `Réponse automatique désactiver pour <@${targetUser.id}>`,
             });
         } else {
-            logger.warning(context.context, 'Technical error when activating autoReply');
+            logger.warning(context, 'Technical error when activating autoReply');
             await SendUtils.editReply(interaction, {
                 content: 'Technical error',
             });

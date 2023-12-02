@@ -1,9 +1,10 @@
 import { ChatInputCommandInteraction, InteractionEditReplyOptions, InteractionReplyOptions, MessagePayload, TextBasedChannel } from 'discord.js';
 import { LoggerSingleton } from '../singleton/logger.singleton';
+import { Context } from './context.class';
 
 export class SendUtils {
     private static readonly logger: LoggerSingleton = LoggerSingleton.instance;
-    private static readonly context: string = SendUtils.name;
+    private static readonly context: Context = new Context(SendUtils.name);
 
     /**
      * Method create to log the reply of an interaction
@@ -11,7 +12,7 @@ export class SendUtils {
      * @param options The reply option
      */
     public static async reply(interaction: ChatInputCommandInteraction, options: string | MessagePayload | InteractionReplyOptions): Promise<void> {
-        this.logger.trace(this.context, `Interaction reply with \`${JSON.stringify(options)}\` to the channel \`${interaction.channel?.id}\``);
+        this.logger.trace(SendUtils.context, `Interaction reply with \`${JSON.stringify(options)}\` to the channel \`${interaction.channel?.id}\``);
         await interaction.reply(options);
     }
 
@@ -21,7 +22,7 @@ export class SendUtils {
      * @param options The reply option
      */
     public static async editReply(interaction: ChatInputCommandInteraction, options: string | MessagePayload | InteractionEditReplyOptions): Promise<void> {
-        this.logger.trace(this.context, `Interaction reply edit with \`${JSON.stringify(options)}\` to the channel \`${interaction.channel?.id}\``);
+        this.logger.trace(SendUtils.context, `Interaction reply edit with \`${JSON.stringify(options)}\` to the channel \`${interaction.channel?.id}\``);
         await interaction.editReply(options);
     }
 
@@ -31,7 +32,7 @@ export class SendUtils {
      * @param message The message to send
      */
     public static async send(channel: TextBasedChannel, message: string): Promise<void> {
-        this.logger.trace(this.context, `Message send to the channel \`${channel.id}\` with message \`${message}\``);
+        this.logger.trace(SendUtils.context, `Message send to the channel \`${channel.id}\` with message \`${message}\``);
         await channel.send(message);
     }
 }
