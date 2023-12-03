@@ -3,7 +3,6 @@ import { ChatInputCommandInteraction, CommandInteractionOption, GuildMember } fr
 import { FeatureSingleton } from '../singleton/feature.singleton';
 import { LoggerSingleton } from '../singleton/logger.singleton';
 import { Context } from '../utils/context.class';
-import { SendUtils } from '../utils/send.utils';
 import { SlashCommand } from '../utils/slash-command.class';
 import { UserUtil } from '../utils/user.util';
 
@@ -23,7 +22,7 @@ export const command: SlashCommand = new SlashCommand(
 
             if (alreadyAutoReply) {
                 logger.info(context, `AutoReply already activated for \`${interaction.user.displayName}\` to reply to \`${targetUser.displayName}\``);
-                await SendUtils.editReply(interaction, {
+                await interaction.editReply({
                     content: `Tu as déjà une réponse automatique mis en place pour <@${targetUser.id}>`,
                 });
                 return;
@@ -31,18 +30,18 @@ export const command: SlashCommand = new SlashCommand(
 
             logger.info(context, `AutoReply activated for \`${interaction.user.displayName}\` to reply to \`${targetUser.displayName}\``);
             feature.pushAutoReply({ activateFor: interaction.user.id, replyTo: targetUser.id });
-            await SendUtils.editReply(interaction, {
+            await interaction.editReply({
                 content: `Réponse automatique mis en place pour <@${targetUser.id}>`,
             });
         } else if (targetUser) {
-            feature.deleteAutoReply(interaction.user.id, targetUser.id);
             logger.info(context, `AutoReply deactivated for \`${interaction.user.displayName}\` to reply to \`${targetUser.displayName}\``);
-            await SendUtils.editReply(interaction, {
+            feature.deleteAutoReply(interaction.user.id, targetUser.id);
+            await interaction.editReply({
                 content: `Réponse automatique désactiver pour <@${targetUser.id}>`,
             });
         } else {
             logger.warning(context, 'Technical error when activating autoReply');
-            await SendUtils.editReply(interaction, {
+            await interaction.editReply({
                 content: 'Technical error',
             });
         }

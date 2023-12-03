@@ -27,6 +27,7 @@ export class LoggerSingleton extends Context {
 
         writeFile(this.path, this.log, err => {
             if (err) {
+                this.error(this, err.message);
                 throw err;
             }
             this.info(this, '📁 Log file created');

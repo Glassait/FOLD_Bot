@@ -3,7 +3,6 @@ import { LoggerSingleton } from '../singleton/logger.singleton';
 import { BotEvent } from '../types/bot-event.type';
 import { Context } from '../utils/context.class';
 import { EnvUtil } from '../utils/env.util';
-import { SendUtils } from '../utils/send.utils';
 import { SlashCommand } from '../utils/slash-command.class';
 
 const logger: LoggerSingleton = LoggerSingleton.instance;
@@ -21,7 +20,7 @@ const event: BotEvent = {
 
         if (interaction.isChatInputCommand()) {
             if (EnvUtil.isDev()) {
-                await SendUtils.reply(interaction, {
+                await interaction.reply({
                     content: "Je suis actuellement entrain d'être améliorer par mon créateur, cette commande ne fonctionne pas !\nMerci d'éssayer plus tard :)",
                     ephemeral: true,
                 });

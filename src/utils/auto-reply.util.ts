@@ -3,7 +3,6 @@ import { FeatureSingleton } from '../singleton/feature.singleton';
 import { LoggerSingleton } from '../singleton/logger.singleton';
 import { DiscordId, Reply } from '../types/feature.type';
 import { Context } from './context.class';
-import { SendUtils } from './send.utils';
 import { SentenceUtil } from './sentence.util';
 
 export class AutoReplyUtil {
@@ -28,12 +27,12 @@ export class AutoReplyUtil {
         if (!autoReply) {
             return;
         }
-        this.logger.trace(AutoReplyUtil.context, `Auto reply send to channel \`${message.channel.id}\` to user \`${message.author.id}\``);
 
         let hasAutoReply: boolean = mention.some((user: User): boolean => autoReply.some((reply: Reply): boolean => reply.activateFor === user.id));
 
         if (hasAutoReply) {
-            await SendUtils.send(message.channel, SentenceUtil.getRandomResponse(id));
+            this.logger.trace(AutoReplyUtil.context, `Auto reply send to channel \`${message.channel.id}\` to user \`${message.author.displayName}\``);
+            await message.channel.send(SentenceUtil.getRandomResponse(id));
         }
     }
 }
