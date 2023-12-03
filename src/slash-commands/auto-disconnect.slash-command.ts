@@ -3,7 +3,6 @@ import { ChatInputCommandInteraction, GuildMember, PermissionsBitField } from 'd
 import { FeatureSingleton } from '../singleton/feature.singleton';
 import { LoggerSingleton } from '../singleton/logger.singleton';
 import { Context } from '../utils/context.class';
-import { SendUtils } from '../utils/send.utils';
 import { SlashCommand } from '../utils/slash-command.class';
 import { UserUtil } from '../utils/user.util';
 
@@ -21,13 +20,13 @@ export const command: SlashCommand = new SlashCommand(
             logger.info(context, `AutoDisconnect activated on \`${targetUser.displayName}\``);
             feature.autoDisconnect = targetUser.id.toString();
             await require('./disconnect.slash-command').command.execute(interaction);
-            await SendUtils.editReply(interaction, {
+            await interaction.editReply({
                 content: 'Déconnexion automatique activé, un vrai 😈 😈 😈',
             });
         } else {
             logger.info(context, `AutoDisconnect deactivated`);
             feature.autoDisconnect = '';
-            await SendUtils.editReply(interaction, {
+            await interaction.editReply({
                 content: "Déconnexion automatique désactivée, c'est bien de laisser les gens vivre !",
             });
         }

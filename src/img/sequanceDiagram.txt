@@ -1,0 +1,45 @@
+begin Index as I
+
+  begin Logger as L
+    I -> L: LoggerSingleton.instance
+    L -> L: Create log file
+  end L
+
+  begin Feature as F
+    I -> F: FeatureSingleton.instance
+    F -> F: Sync feature file
+  end F
+
+  begin Inventory as Inv
+    I -> Inv: Inventory.instance
+    Inv -> Inv: Sync the inventory file
+
+    begin Client as C
+      I -> +C: new Client()
+      I <-- !C:  New discord client instnce with intents
+    end C
+
+    repeat Until all event loaded
+      begin reference: Events as E
+      I -> E:
+      end E
+    end
+
+
+    begin Discord as D
+      I -> ...login
+      ...login -> D: client.login(token)
+      D -> ...login
+      ...login -> I: then(): Update the client
+    end D
+
+    I -> ...scrap
+    ...scrap -> Inv: inventory.scrapWebSite()
+
+    begin reference: WebSiteScrapper as W
+      Inv -> W
+    end W
+
+  end Inv
+
+terminators box

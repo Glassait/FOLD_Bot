@@ -43,7 +43,7 @@ export class WebSiteScraper extends Context {
             .then((response: AxiosResponse<any>): void => {
                 this.getLastNews(response.data, client).then();
             })
-            .catch(console.error);
+            .catch(reason => this.logger.error(this, reason));
     }
 
     public async getLastNews(html: string, client: Client): Promise<void> {
