@@ -107,9 +107,9 @@ This project need node v18.16.0 or higher
 
 ## Roadmap
 
-- [ ] Update Architecture
-- [ ] Add more readme
-- [ ] Create Sequence diagram and wiki on github
+- [x] Update Architecture
+- [x] Add more readme
+- [x] Create Sequence diagram and wiki on github
 - [ ] Translation for Wot express
 - [ ] Upgrade autoReply
 - [ ] ROULETTE

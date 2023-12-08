@@ -1,9 +1,9 @@
 import { SlashCommandMentionableOption } from '@discordjs/builders';
 import { ChatInputCommandInteraction, GuildMember, PermissionsBitField } from 'discord.js';
-import { LoggerSingleton } from '../singleton/logger.singleton';
-import { Context } from '../utils/context.class';
-import { SlashCommand } from '../utils/slash-command.class';
-import { UserUtil } from '../utils/user.util';
+import { LoggerSingleton } from '../../../singleton/logger.singleton';
+import { Context } from '../../../utils/context.class';
+import { SlashCommand } from '../../../utils/slash-command.class';
+import { UserUtil } from '../../../utils/user.util';
 
 const logger: LoggerSingleton = LoggerSingleton.instance;
 const context: Context = new Context('DISCONNECT-SLASh-COMMAND');
