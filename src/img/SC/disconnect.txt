@@ -1,0 +1,21 @@
+title Disconnect
+begin User as U, Discord as D, Bot as B
+U is a person
+
+U -> ...com
+...com -> B: /disconnect target
+
+B -> ...check
+...check -> D: Check target
+D --> ...check
+...check --> B: Target
+
+if Target found
+  B --> ...dis
+  ...dis --> D: Target disconnected
+end
+
+B --> ...rep
+...rep --> U: Ephemeral reply
+
+terminators box

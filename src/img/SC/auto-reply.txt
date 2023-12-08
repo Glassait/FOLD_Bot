@@ -1,0 +1,41 @@
+title Auto-reply
+begin User as U, Discord as D, Bot as B, Feature as F
+U is a person
+
+U -> ...target
+...target -> B: /auto-reply target
+
+B -> ...check
+...check -> D: Check target
+
+D --> ...check
+...check --> B: Target
+
+B -> B: Get interraction option
+
+B -> +F: Get instance
+B <-- -F: Instance
+
+if Has target and no disabled option
+  note right of B: Enabled the auto-reply
+
+  B -> +F: Check auto-reply
+  B <-- -F: boolean
+
+  if Already have auto-reply
+    note right of B: "The user already have autoreply
+End the execution here"
+    B --> ...rep
+    ...rep --> U: Ephemeral reply
+  end
+
+  B -> F: Add auto-reply & update feature.json
+else if: Has target and disabled option
+  note right of B: Disabled the auto-reply
+  B -> F: Delete auto-reply  & update feature.json
+end
+
+B --> ...rep
+...rep --> U: Ephemeral reply
+
+terminators box
