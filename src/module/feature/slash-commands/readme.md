@@ -9,7 +9,7 @@
       <a href="#create-new-slash-command">Create new slash command</a>
     </li>
     <li>
-        <a href="#optionspermission">⚙️ Options & Permission</a>
+        <a href="#⚙-options--permission">⚙️ Options & Permission</a>
         <ul>
             <li>
                 <a href="#options">Options</a>
