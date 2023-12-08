@@ -1,13 +1,3 @@
-<style>
-    h1 {
-        display: flex;
-        justify-content: center;
-        text-transform: uppercase;
-    }
-    a {
-        text-transform: capitalize;
-    }
-</style>
 ![GitHub issues by-label](https://img.shields.io/github/issues/Glassait/freePuntosBot/enhancement?logo=github&color=green&style=for-the-badge)
 ![GitHub issues by-label](https://img.shields.io/github/issues/Glassait/freePuntosBot/bug?logo=github&color=red&style=for-the-badge)
 ![GitHub closed issues](https://img.shields.io/github/issues-closed/Glassait/freePuntosBot?logo=github&color=open&style=for-the-badge&link=https%3A%2F%2Fgithub.com%2FGlassait%2FfreePuntosBot%2Fissues)
@@ -32,7 +22,7 @@
   <summary>Table of Contents</summary>
   <ol>
     <li>
-      <a href="#🛠️-languages-and-tools-🛠️">Languages and Tools</a>
+      <a href="#🛠-languages-and-tools-🛠">🛠️ Languages and Tools 🛠️</a>
     </li>
     <li>
         <a href="#getting-started">Getting Started</a>

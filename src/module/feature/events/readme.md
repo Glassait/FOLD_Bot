@@ -6,7 +6,7 @@
   <summary>Table of Contents</summary>
   <ol>
     <li>
-      <a href="#create-new-event">Create new Event</a>
+      <a href="#create-new-events">Create new events</a>
     </li>
     <li>
         <a href="#log">Log</a>    
