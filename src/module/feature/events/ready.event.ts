@@ -1,8 +1,8 @@
 import { Client, Events } from 'discord.js';
-import { LoggerSingleton } from '../singleton/logger.singleton';
-import { BotEvent } from '../types/bot-event.type';
-import { Context } from '../utils/context.class';
-import { SentenceUtil } from '../utils/sentence.util';
+import { LoggerSingleton } from '../../shared/singleton/logger.singleton';
+import { BotEvent } from '../../shared/types/bot-event.type';
+import { Context } from '../../shared/utils/context.class';
+import { SentenceUtil } from '../../shared/utils/sentence.util';
 
 const logger: LoggerSingleton = LoggerSingleton.instance;
 const context: Context = new Context('READY-EVENT');

@@ -26,7 +26,7 @@ if Has target and no disabled option
     note right of B: "The user already have autoreply
 End the execution here"
     B --> ...rep
-    ...rep --> U: Embedded reply
+    ...rep --> U: Ephemeral reply
   end
 
   B -> F: Add auto-reply & update feature.json
@@ -36,6 +36,6 @@ else if: Has target and disabled option
 end
 
 B --> ...rep
-...rep --> U: Embedded reply
+...rep --> U: Ephemeral reply
 
 terminators box

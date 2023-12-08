@@ -1,9 +1,9 @@
 import { Client } from 'discord.js';
 import { readdirSync } from 'fs';
 import { join } from 'path';
-import { LoggerSingleton } from '../../../singleton/logger.singleton';
-import { BotEvent } from '../../../types/bot-event.type';
-import { Context } from '../../../utils/context.class';
+import { LoggerSingleton } from '../../shared/singleton/logger.singleton';
+import { BotEvent } from '../../shared/types/bot-event.type';
+import { Context } from '../../shared/utils/context.class';
 
 const logger: LoggerSingleton = LoggerSingleton.instance;
 const context: Context = new Context('EVENT-HANDLER');

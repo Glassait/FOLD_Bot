@@ -6,13 +6,7 @@ export class SlashCommand {
     private readonly _data: SlashCommandBuilder;
     private readonly _execute: (interaction: ChatInputCommandInteraction) => Promise<void>;
 
-    constructor(
-        name: string,
-        description: string,
-        execute: (interaction: ChatInputCommandInteraction) => Promise<void>,
-        option?: OptionType[],
-        permission?: bigint
-    ) {
+    constructor(name: string, description: string, execute: (interaction: ChatInputCommandInteraction) => Promise<void>, option?: OptionType[], permission?: bigint) {
         this._name = name;
         this._data = new SlashCommandBuilder().setName(name).setDescription(description);
         if (option) {

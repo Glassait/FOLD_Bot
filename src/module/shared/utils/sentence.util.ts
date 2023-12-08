@@ -44,9 +44,7 @@ export class SentenceUtil {
     }
 
     public static getRandomStatus(): any {
-        return EnvUtil.isDev()
-            ? [ActivityType.Custom, 'Entrain de ce faire toucher le code']
-            : this.status[this.getRandomNumber(this.status.length)];
+        return EnvUtil.isDev() ? [ActivityType.Custom, 'Entrain de ce faire toucher le code'] : this.status[this.getRandomNumber(this.status.length)];
     }
 
     private static getRandomNumber(max?: number): number {

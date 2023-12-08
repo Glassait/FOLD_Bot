@@ -2,8 +2,8 @@ import { Client, REST, Routes } from 'discord.js';
 import { readdirSync } from 'fs';
 import { join } from 'path';
 import { client_id, token } from '../../../config.json';
-import { LoggerSingleton } from '../../../singleton/logger.singleton';
-import { Context } from '../../../utils/context.class';
+import { LoggerSingleton } from '../../shared/singleton/logger.singleton';
+import { Context } from '../../shared/utils/context.class';
 
 const logger: LoggerSingleton = LoggerSingleton.instance;
 const context: Context = new Context('COMMANDS-HANDLER');

@@ -16,6 +16,6 @@ if Target found
 end
 
 B --> ...rep
-...rep --> U: Embedded reply
+...rep --> U: Ephemeral reply
 
 terminators box

@@ -2,10 +2,10 @@ import { Client, GatewayIntentBits } from 'discord.js';
 import { readdirSync } from 'fs';
 import { join } from 'path';
 import { token } from './config.json';
-import { FeatureSingleton } from './singleton/feature.singleton';
-import { InventorySingleton } from './singleton/inventory.singleton';
-import { LoggerSingleton } from './singleton/logger.singleton';
-import { Context } from './utils/context.class';
+import { FeatureSingleton } from './module/shared/singleton/feature.singleton';
+import { InventorySingleton } from './module/shared/singleton/inventory.singleton';
+import { LoggerSingleton } from './module/shared/singleton/logger.singleton';
+import { Context } from './module/shared/utils/context.class';
 
 const logger: LoggerSingleton = LoggerSingleton.instance;
 const context: Context = new Context('INDEX');

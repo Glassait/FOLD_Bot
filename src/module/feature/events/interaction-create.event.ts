@@ -1,9 +1,9 @@
 import { ChatInputCommandInteraction, Client, Events, Interaction } from 'discord.js';
-import { LoggerSingleton } from '../singleton/logger.singleton';
-import { BotEvent } from '../types/bot-event.type';
-import { Context } from '../utils/context.class';
-import { EnvUtil } from '../utils/env.util';
-import { SlashCommand } from '../utils/slash-command.class';
+import { LoggerSingleton } from '../../shared/singleton/logger.singleton';
+import { BotEvent } from '../../shared/types/bot-event.type';
+import { Context } from '../../shared/utils/context.class';
+import { EnvUtil } from '../../shared/utils/env.util';
+import { SlashCommand } from '../../shared/utils/slash-command.class';
 
 const logger: LoggerSingleton = LoggerSingleton.instance;
 const context: Context = new Context('INTERACTION-CREATE-EVENT');

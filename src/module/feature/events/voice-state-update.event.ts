@@ -1,9 +1,9 @@
 import { Client, Events, GuildMember, VoiceState } from 'discord.js';
-import { FeatureSingleton } from '../singleton/feature.singleton';
-import { LoggerSingleton } from '../singleton/logger.singleton';
-import { BotEvent } from '../types/bot-event.type';
-import { Context } from '../utils/context.class';
-import { UserUtil } from '../utils/user.util';
+import { FeatureSingleton } from '../../shared/singleton/feature.singleton';
+import { LoggerSingleton } from '../../shared/singleton/logger.singleton';
+import { BotEvent } from '../../shared/types/bot-event.type';
+import { Context } from '../../shared/utils/context.class';
+import { UserUtil } from '../../shared/utils/user.util';
 
 const logger: LoggerSingleton = LoggerSingleton.instance;
 const context: Context = new Context('VOICE-STATE-UPDATE-EVENT');
