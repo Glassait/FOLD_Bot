@@ -1,10 +1,10 @@
 {
 	"newsLetter": {
-		"channel": "1171525891604623472",
+		"channel": "1177006853318779002",
 		"website": [
 			{
 				"liveUrl": "https://wotexpress.info/",
-				"lastUrl": "https://wotexpress.info/news/mir-tankov/type-3-ju-nu-t-na-superteste-v-mire-tankov/",
+				"lastUrl": "",
 				"name": "Wot Express",
 				"selector": "a.news-block-row"
 			},
