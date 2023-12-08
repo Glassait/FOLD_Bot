@@ -1,14 +1,14 @@
 import { Client } from 'discord.js';
 import { readdirSync } from 'fs';
 import { join } from 'path';
-import { LoggerSingleton } from '../singleton/logger.singleton';
-import { BotEvent } from '../types/bot-event.type';
-import { Context } from '../utils/context.class';
+import { LoggerSingleton } from '../../../singleton/logger.singleton';
+import { BotEvent } from '../../../types/bot-event.type';
+import { Context } from '../../../utils/context.class';
 
 const logger: LoggerSingleton = LoggerSingleton.instance;
 const context: Context = new Context('EVENT-HANDLER');
 
-module.exports = (client: Client): void => {
+module.exports = async (client: Client): Promise<void> => {
     let eventsDir: string = join(__dirname, '../events');
     let numberOfEvent: number = 0;
 

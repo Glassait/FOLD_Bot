@@ -19,7 +19,7 @@ const client: Client = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.GuildMessages],
 });
 
-const handlersDir: string = join(__dirname, './handlers');
+const handlersDir: string = join(__dirname, './module/feature/handlers');
 
 readdirSync(handlersDir).forEach((handler: string): void => {
     require(`${handlersDir}/${handler}`)(client);
