@@ -22,6 +22,8 @@ const client: Client = new Client({
 const handlersDir: string = join(__dirname, './module/feature/handlers');
 
 readdirSync(handlersDir).forEach((handler: string): void => {
+    if (!handler.endsWith('.ts')) return;
+
     require(`${handlersDir}/${handler}`)(client);
 });
 

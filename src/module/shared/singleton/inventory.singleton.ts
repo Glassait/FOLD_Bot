@@ -6,10 +6,25 @@ import { EnvUtil } from '../utils/env.util';
 import { WebSiteScraper } from '../utils/web-site-scraper';
 import { LoggerSingleton } from './logger.singleton';
 
+/**
+ * Class used to manage the inventory.json file
+ * This class implement the Singleton pattern
+ */
 export class InventorySingleton extends Context {
+    /**
+     * The path to the inventory.json file
+     */
     public readonly path: string = './src/inventory.json';
 
+    /**
+     * The instance of the logger
+     * @private
+     */
     private readonly logger: LoggerSingleton = LoggerSingleton.instance;
+    /**
+     * The data of the inventory
+     * @private
+     */
     private readonly _inventory: InventoryType | undefined;
 
     constructor() {
@@ -30,8 +45,15 @@ export class InventorySingleton extends Context {
         }
     }
 
+    /**
+     * The instance of the class, used for the singleton pattern
+     * @private
+     */
     private static _instance: InventorySingleton | undefined;
 
+    /**
+     * Getter for {@link _instance}
+     */
     public static get instance(): InventorySingleton {
         if (!this._instance) {
             this._instance = new InventorySingleton();
@@ -39,14 +61,25 @@ export class InventorySingleton extends Context {
         return this._instance;
     }
 
+    /**
+     * Get the website at the index
+     * @param index The index of the website
+     */
     public getNewsLetter(index: number): WebSiteState | undefined {
         return this._inventory?.newsLetter.website[index];
     }
 
+    /**
+     * Get the channel id where to send news
+     */
     public getNewsLetterChannel(): string | undefined {
         return this._inventory?.newsLetter.channel;
     }
 
+    /**
+     * This method launch the scrapping of the website
+     * @param client
+     */
     public async scrapWebSite(client: Client): Promise<void> {
         const length: number | undefined = this._inventory?.newsLetter.website.length;
 
@@ -69,6 +102,12 @@ export class InventorySingleton extends Context {
         }
     }
 
+    /**
+     * Update the last news send by the bot.
+     * Update the inventory.josn file
+     * @param url The new url
+     * @param newsLetterName The name of the website
+     */
     public updateLastUrlOfWebsite(url: string, newsLetterName: string): void {
         if (!this._inventory) {
             this.logger.error(this, 'No inventory found !');
@@ -87,6 +126,10 @@ export class InventorySingleton extends Context {
         this.updateFile();
     }
 
+    /**
+     * Method to update the inventory.json file
+     * @private
+     */
     private updateFile(): void {
         writeFile(this.path, JSON.stringify(this._inventory, null, '\t'), err => {
             if (err) {
