@@ -1,13 +1,12 @@
 import { SlashCommandMentionableOption } from '@discordjs/builders';
 import { ChatInputCommandInteraction, GuildMember, PermissionsBitField } from 'discord.js';
 import { FeatureSingleton } from '../../shared/singleton/feature.singleton';
-import { LoggerSingleton } from '../../shared/singleton/logger.singleton';
-import { Context } from '../../shared/utils/context.class';
-import { SlashCommand } from '../../shared/utils/slash-command.class';
+import { Context } from '../../shared/classes/context';
+import { SlashCommand } from '../../shared/classes/slash-command';
 import { UserUtil } from '../../shared/utils/user.util';
+import { Logger } from '../../shared/classes/logger';
 
-const logger: LoggerSingleton = LoggerSingleton.instance;
-const context: Context = new Context('AUTO-DISCONNECT-SLASH-COMMAND');
+const logger: Logger = new Logger(new Context('AUTO-DISCONNECT-SLASH-COMMAND'));
 
 export const command: SlashCommand = new SlashCommand(
     'auto-disconnect',
@@ -17,14 +16,14 @@ export const command: SlashCommand = new SlashCommand(
 
         const feature: FeatureSingleton = FeatureSingleton.instance;
         if (targetUser) {
-            logger.info(context, `AutoDisconnect activated on \`${targetUser.displayName}\``);
+            logger.info(`AutoDisconnect activated on \`${targetUser.displayName}\``);
             feature.autoDisconnect = targetUser.id.toString();
             await require('./disconnect.slash-command').command.execute(interaction);
             await interaction.editReply({
                 content: 'Déconnexion automatique activé, un vrai 😈 😈 😈',
             });
         } else {
-            logger.info(context, `AutoDisconnect deactivated`);
+            logger.info(`AutoDisconnect deactivated`);
             feature.autoDisconnect = '';
             await interaction.editReply({
                 content: "Déconnexion automatique désactivée, c'est bien de laisser les gens vivre !",
@@ -34,7 +33,9 @@ export const command: SlashCommand = new SlashCommand(
     [
         {
             optionType: 'MentionableOption',
-            base: new SlashCommandMentionableOption().setName('target').setDescription("L'utilisateur à déconnecter automatiquement. Laisser vide pour désactiver"),
+            base: new SlashCommandMentionableOption()
+                .setName('target')
+                .setDescription("L'utilisateur à déconnecter automatiquement. Laisser vide pour désactiver"),
         },
     ],
     PermissionsBitField.Flags.MoveMembers

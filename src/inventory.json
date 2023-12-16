@@ -1,10 +1,10 @@
 {
 	"newsLetter": {
-		"channel": "1177006853318779002",
+		"channel": "1171525891604623472",
 		"website": [
 			{
 				"liveUrl": "https://wotexpress.info/",
-				"lastUrl": "",
+				"lastUrl": "https://wotexpress.info/news/wot/sobytiya/novogodnee-nastuplenie/2024/novogodniy-kalendar/den-16-novogodniy-kalendar-v-world-of-tanks/",
 				"name": "Wot Express",
 				"selector": "a.news-block-row"
 			},

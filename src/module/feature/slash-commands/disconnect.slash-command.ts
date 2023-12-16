@@ -1,12 +1,11 @@
 import { SlashCommandMentionableOption } from '@discordjs/builders';
 import { ChatInputCommandInteraction, GuildMember, PermissionsBitField } from 'discord.js';
-import { LoggerSingleton } from '../../shared/singleton/logger.singleton';
-import { Context } from '../../shared/utils/context.class';
-import { SlashCommand } from '../../shared/utils/slash-command.class';
+import { Context } from '../../shared/classes/context';
+import { SlashCommand } from '../../shared/classes/slash-command';
 import { UserUtil } from '../../shared/utils/user.util';
+import { Logger } from '../../shared/classes/logger';
 
-const logger: LoggerSingleton = LoggerSingleton.instance;
-const context: Context = new Context('DISCONNECT-SLASh-COMMAND');
+const logger: Logger = new Logger(new Context('DISCONNECT-SLASh-COMMAND'));
 
 export const command: SlashCommand = new SlashCommand(
     'disconnect',
@@ -19,13 +18,13 @@ export const command: SlashCommand = new SlashCommand(
         }
 
         try {
-            logger.trace(context, `Disconnect user \`${targetUser.displayName}\``);
+            logger.trace(`Disconnect user \`${targetUser.displayName}\``);
             await targetUser.voice.disconnect();
             await interaction.editReply({
                 content: "L'utilisateur a été déconnecté, c'est méchant mais c'est toi qui décide...",
             });
         } catch (error) {
-            logger.error(context, `Error when disconnecting: ${error}`);
+            logger.error(`Error when disconnecting: ${error}`);
             await interaction.editReply({
                 content: `Il y a eu un problème au moment de déconnecté ${targetUser.displayName}, erreur: ${error}`,
             });

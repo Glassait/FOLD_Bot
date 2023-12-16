@@ -5,7 +5,7 @@ import { token } from './config.json';
 import { FeatureSingleton } from './module/shared/singleton/feature.singleton';
 import { InventorySingleton } from './module/shared/singleton/inventory.singleton';
 import { LoggerSingleton } from './module/shared/singleton/logger.singleton';
-import { Context } from './module/shared/utils/context.class';
+import { Context } from './module/shared/classes/context';
 
 const logger: LoggerSingleton = LoggerSingleton.instance;
 const context: Context = new Context('INDEX');

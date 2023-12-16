@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync, writeFile } from 'fs';
-import { Context } from '../utils/context.class';
+import { Context } from '../classes/context';
 
 /**
  * Class used to manage the persistence of the log

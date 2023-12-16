@@ -2,11 +2,10 @@ import { Client, REST, Routes } from 'discord.js';
 import { readdirSync } from 'fs';
 import { join } from 'path';
 import { client_id, token } from '../../../config.json';
-import { LoggerSingleton } from '../../shared/singleton/logger.singleton';
-import { Context } from '../../shared/utils/context.class';
+import { Context } from '../../shared/classes/context';
+import { Logger } from '../../shared/classes/logger';
 
-const logger: LoggerSingleton = LoggerSingleton.instance;
-const context: Context = new Context('COMMANDS-HANDLER');
+const logger: Logger = new Logger(new Context('COMMANDS-HANDLER'));
 
 module.exports = async (_client: Client): Promise<void> => {
     const slashCommandsDir: string = join(__dirname, '../slash-commands');
@@ -21,7 +20,7 @@ module.exports = async (_client: Client): Promise<void> => {
         body.push(command.data.toJSON());
         numberOfCommand++;
 
-        logger.info(context, `🔥 Successfully loaded command ${command.name}`);
+        logger.info(`🔥 Successfully loaded command ${command.name}`);
     });
 
     const rest: REST = new REST({ version: '10' }).setToken(token);
@@ -31,8 +30,8 @@ module.exports = async (_client: Client): Promise<void> => {
             body: body,
         });
 
-        logger.debug(context, `Successfully reloaded application ${numberOfCommand} slash-commands.`);
+        logger.debug(`Successfully reloaded application ${numberOfCommand} slash-commands.`);
     } catch (error) {
-        logger.error(context, `${error}`);
+        logger.error(`${error}`);
     }
 };
