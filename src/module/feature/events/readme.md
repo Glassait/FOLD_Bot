@@ -46,14 +46,13 @@ If you want to add persistent log in to execute of the event, follow the followi
 
 1. Add the logger and the context to the file 
     ```typescript
-    import { LoggerSingleton } from '../../../singleton/logger.singleton';
+    import { Logger } from '../../shared/classes/logger';
     import { Context } from '../../../utils/context.class';
 
-    const logger: LoggerSingleton = LoggerSingleton.instance;
-    const context: Context = new Context('NAME-EVENT');
+    const logger: Logger = new Logger(new Context('NAME-EVENT'));
     ```
-2. In the context give the name of the slash command
-3. Call the level you dans with the `logger`, ex:
+2. In the context give the name of the event
+3. Call the level you want with the `logger`, ex:
    ```typescript
-   logger.info(context, "Message to the log");
+   logger.info("Message to the log");
    ```

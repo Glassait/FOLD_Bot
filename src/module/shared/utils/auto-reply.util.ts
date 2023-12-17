@@ -1,13 +1,12 @@
 import { Collection, Message, User } from 'discord.js';
 import { FeatureSingleton } from '../singleton/feature.singleton';
-import { LoggerSingleton } from '../singleton/logger.singleton';
 import { DiscordId, Reply } from '../types/feature.type';
-import { Context } from './context.class';
+import { Context } from '../classes/context';
 import { SentenceUtil } from './sentence.util';
+import { Logger } from '../classes/logger';
 
 export class AutoReplyUtil {
-    private static readonly logger: LoggerSingleton = LoggerSingleton.instance;
-    private static readonly context: Context = new Context(AutoReplyUtil.name);
+    private static readonly logger: Logger = new Logger(new Context(AutoReplyUtil.name));
 
     public static async autoReply(message: Message): Promise<void> {
         if (message.author.bot) {
@@ -16,7 +15,7 @@ export class AutoReplyUtil {
 
         const mention: Collection<string, User> = message.mentions.users;
 
-        if (mention.size === 0) {
+        if (mention.size === 0 || message.reference || message.content.length > 21) {
             return;
         }
 
@@ -28,11 +27,13 @@ export class AutoReplyUtil {
             return;
         }
 
-        let hasAutoReply: boolean = mention.some((user: User): boolean => autoReply.some((reply: Reply): boolean => reply.activateFor === user.id));
+        let hasAutoReply: boolean = mention.some((user: User): boolean =>
+            autoReply.some((reply: Reply): boolean => reply.activateFor === user.id)
+        );
 
         if (hasAutoReply) {
-            this.logger.trace(AutoReplyUtil.context, `Auto reply send to channel \`${message.channel.id}\` to user \`${message.author.displayName}\``);
-            await message.channel.send(SentenceUtil.getRandomResponse(id));
+            this.logger.trace(`Auto reply send to channel \`${message.channel.id}\` to user \`${message.author.displayName}\``);
+            await message.channel.send({ content: SentenceUtil.getRandomResponse(id), reply: { messageReference: message.id } });
         }
     }
 }

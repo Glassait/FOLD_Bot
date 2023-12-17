@@ -1,12 +1,11 @@
 import { Client } from 'discord.js';
 import { readdirSync } from 'fs';
 import { join } from 'path';
-import { LoggerSingleton } from '../../shared/singleton/logger.singleton';
 import { BotEvent } from '../../shared/types/bot-event.type';
-import { Context } from '../../shared/utils/context.class';
+import { Context } from '../../shared/classes/context';
+import { Logger } from '../../shared/classes/logger';
 
-const logger: LoggerSingleton = LoggerSingleton.instance;
-const context: Context = new Context('EVENT-HANDLER');
+const logger: Logger = new Logger(new Context('EVENT-HANDLER'));
 
 module.exports = async (client: Client): Promise<void> => {
     let eventsDir: string = join(__dirname, '../events');
@@ -17,10 +16,12 @@ module.exports = async (client: Client): Promise<void> => {
 
         const event: BotEvent = require(`${eventsDir}/${file}`).default;
 
-        event.once ? client.once(event.name, (...args: any[]) => event.execute(client, ...args)) : client.on(event.name, (...args: any[]) => event.execute(client, ...args));
+        event.once
+            ? client.once(event.name, (...args: any[]) => event.execute(client, ...args))
+            : client.on(event.name, (...args: any[]) => event.execute(client, ...args));
 
         numberOfEvent++;
-        logger.info(context, `🌠 Successfully loaded event ${event.name}`);
+        logger.info(`🌠 Successfully loaded event ${event.name}`);
     });
-    logger.info(context, `Loaded ${numberOfEvent} events`);
+    logger.info(`Loaded ${numberOfEvent} events`);
 };

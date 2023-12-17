@@ -1,33 +1,38 @@
 import { readFileSync, writeFile } from 'fs';
 import { DiscordId, FeatureType, Reply } from '../types/feature.type';
-import { Context } from '../utils/context.class';
-import { LoggerSingleton } from './logger.singleton';
+import { Context } from '../classes/context';
+import { LoggerDecorator } from '../decorators/loggerDecorator';
+import { Logger } from '../classes/logger';
 
 /**
  * Class used to manage the feature.json file
  * This class implement the Singleton pattern
  */
+@LoggerDecorator
 export class FeatureSingleton extends Context {
     /**
      * The path to the feature.json file
      */
     public readonly path: string = './src/feature.json';
-
     /**
-     * The instance of the logger
+     * Logger instance
+     * @private
+     * @see LoggerDecorator
+     */
+    private readonly logger: Logger;
+    /**
+     * The initial value for the data
      * @private
      */
-    private readonly logger: LoggerSingleton = LoggerSingleton.instance;
+    private readonly INITIAL_VALUE: FeatureType = {
+        version: 2,
+        auto_disconnect: '',
+        auto_reply: [],
+    };
 
     constructor() {
         super(FeatureSingleton);
-        this._data = {
-            version: 2,
-            auto_disconnect: '',
-            auto_reply: [],
-        };
         this.syncFeatureFile();
-        this.logger.trace(this, 'Feature instance initialized');
     }
 
     /**
@@ -43,6 +48,7 @@ export class FeatureSingleton extends Context {
         if (!this._instance) {
             this._instance = new FeatureSingleton();
         }
+        this._instance.logger.trace('Feature instance initialized');
         return this._instance;
     }
 
@@ -50,7 +56,7 @@ export class FeatureSingleton extends Context {
      * The data of the feature.json file
      * @private
      */
-    private readonly _data: FeatureType;
+    private _data: FeatureType = this.INITIAL_VALUE;
 
     /**
      * Getter for {@link _data}
@@ -64,9 +70,11 @@ export class FeatureSingleton extends Context {
      * @param value The new data
      */
     public set data(value: FeatureType) {
-        this._data.version = value.version ?? 2;
-        this._data.auto_disconnect = value.auto_disconnect ?? '';
-        this._data.auto_reply = value.auto_reply ?? [];
+        const data: any = this.INITIAL_VALUE;
+        Object.keys(this.INITIAL_VALUE).forEach((key: string) => {
+            data[key as keyof FeatureType] = value[key as keyof FeatureType] ?? this.INITIAL_VALUE[key as keyof FeatureType];
+        });
+        this._data = data;
 
         this.updateFile();
     }
@@ -98,16 +106,15 @@ export class FeatureSingleton extends Context {
      * @param replyTo The id of the auto-reply target
      */
     public deleteAutoReply(activateFor: DiscordId, replyTo: DiscordId): void {
-        const object: Reply | undefined = this._data.auto_reply.find((value: Reply) => value.activateFor === activateFor && value.replyTo === replyTo);
+        const object: Reply | undefined = this._data.auto_reply.find(
+            (value: Reply) => value.activateFor === activateFor && value.replyTo === replyTo
+        );
         if (!object) {
+            this.logger.warning(`No auto-reply for ${activateFor} to reply to ${replyTo}`);
             return;
         }
 
         const index: number = this._data.auto_reply.indexOf(object);
-
-        if (index < 0) {
-            return;
-        }
 
         this._data.auto_reply.splice(index, 1);
         this.updateFile();
@@ -155,9 +162,9 @@ export class FeatureSingleton extends Context {
     private updateFile(): void {
         writeFile(this.path, JSON.stringify(this._data, null, '\t'), err => {
             if (err) {
-                this.logger.warning(this, `🔄❌ Failed to sync the feature file with error: ${err}`);
-            } else {
-                this.logger.trace(this, 'Feature.json successfully updated');
+                this.logger.warning(`🔄❌ Failed to sync the feature file with error: ${err}`);
+            } else if (this.logger) {
+                this.logger.trace('Feature.json successfully updated');
             }
         });
     }

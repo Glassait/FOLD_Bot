@@ -9,5 +9,5 @@
   "arrowParens": "avoid",
   "htmlWhitespaceSensitivity": "strict",
   "embeddedLanguageFormatting": "auto",
-  "printWidth": 200
+  "printWidth": 140
 }
