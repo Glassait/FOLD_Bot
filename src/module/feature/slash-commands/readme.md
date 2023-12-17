@@ -119,7 +119,7 @@ If you want to add persistent log in to execute of the event, follow the followi
 
     const logger: Logger = new Logger(new Context('NAME-SLASH-COMMAND'));
     ```
-2. In the context give the name of the slash command
+2. In the context give the name of the slash-command
 3. Call the level you want with the `logger`, ex:
    ```typescript
    logger.info("Message to the log");

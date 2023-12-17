@@ -1,6 +1,5 @@
 import { Collection, Message, User } from 'discord.js';
 import { FeatureSingleton } from '../singleton/feature.singleton';
-import { LoggerSingleton } from '../singleton/logger.singleton';
 import { DiscordId, Reply } from '../types/feature.type';
 import { Context } from '../classes/context';
 import { SentenceUtil } from './sentence.util';
@@ -16,7 +15,7 @@ export class AutoReplyUtil {
 
         const mention: Collection<string, User> = message.mentions.users;
 
-        if (mention.size === 0) {
+        if (mention.size === 0 || message.reference || message.content.length > 21) {
             return;
         }
 
@@ -34,7 +33,7 @@ export class AutoReplyUtil {
 
         if (hasAutoReply) {
             this.logger.trace(`Auto reply send to channel \`${message.channel.id}\` to user \`${message.author.displayName}\``);
-            await message.channel.send(SentenceUtil.getRandomResponse(id));
+            await message.channel.send({ content: SentenceUtil.getRandomResponse(id), reply: { messageReference: message.id } });
         }
     }
 }

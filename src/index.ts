@@ -16,7 +16,12 @@ const _feature: FeatureSingleton = FeatureSingleton.instance;
 const inventory: InventorySingleton = InventorySingleton.instance;
 
 const client: Client = new Client({
-    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.GuildMessages],
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildVoiceStates,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent,
+    ],
 });
 
 const handlersDir: string = join(__dirname, './module/feature/handlers');
