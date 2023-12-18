@@ -2,7 +2,7 @@ import { SlashCommandMentionableOption } from '@discordjs/builders';
 import { ChatInputCommandInteraction, GuildMember, PermissionsBitField } from 'discord.js';
 import { FeatureSingleton } from '../../shared/singleton/feature.singleton';
 import { Context } from '../../shared/classes/context';
-import { SlashCommand } from '../../shared/classes/slash-command';
+import { SlashCommand } from './model/slash-command';
 import { UserUtil } from '../../shared/utils/user.util';
 import { Logger } from '../../shared/classes/logger';
 
@@ -31,12 +31,9 @@ export const command: SlashCommand = new SlashCommand(
         }
     },
     [
-        {
-            optionType: 'MentionableOption',
-            base: new SlashCommandMentionableOption()
-                .setName('target')
-                .setDescription("L'utilisateur à déconnecter automatiquement. Laisser vide pour désactiver"),
-        },
+        new SlashCommandMentionableOption()
+            .setName('target')
+            .setDescription("L'utilisateur à déconnecter automatiquement. Laisser vide pour désactiver"),
     ],
     PermissionsBitField.Flags.MoveMembers
 );

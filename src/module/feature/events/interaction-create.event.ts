@@ -2,8 +2,8 @@ import { ChatInputCommandInteraction, Client, Events, Interaction } from 'discor
 import { BotEvent } from '../../shared/types/bot-event.type';
 import { Context } from '../../shared/classes/context';
 import { EnvUtil } from '../../shared/utils/env.util';
-import { SlashCommand } from '../../shared/classes/slash-command';
 import { Logger } from '../../shared/classes/logger';
+import { SlashCommand } from '../slash-commands/model/slash-command';
 
 const logger: Logger = new Logger(new Context('INTERACTION-CREATE-EVENT'));
 

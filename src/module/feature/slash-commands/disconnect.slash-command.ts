@@ -1,11 +1,11 @@
 import { SlashCommandMentionableOption } from '@discordjs/builders';
 import { ChatInputCommandInteraction, GuildMember, PermissionsBitField } from 'discord.js';
 import { Context } from '../../shared/classes/context';
-import { SlashCommand } from '../../shared/classes/slash-command';
+import { SlashCommand } from './model/slash-command';
 import { UserUtil } from '../../shared/utils/user.util';
 import { Logger } from '../../shared/classes/logger';
 
-const logger: Logger = new Logger(new Context('DISCONNECT-SLASh-COMMAND'));
+const logger: Logger = new Logger(new Context('DISCONNECT-SLASH-COMMAND'));
 
 export const command: SlashCommand = new SlashCommand(
     'disconnect',
@@ -18,7 +18,7 @@ export const command: SlashCommand = new SlashCommand(
         }
 
         try {
-            logger.trace(`Disconnect user \`${targetUser.displayName}\``);
+            logger.debug(`Disconnect user \`${targetUser.displayName}\``);
             await targetUser.voice.disconnect();
             await interaction.editReply({
                 content: "L'utilisateur a été déconnecté, c'est méchant mais c'est toi qui décide...",
@@ -31,11 +31,6 @@ export const command: SlashCommand = new SlashCommand(
             return;
         }
     },
-    [
-        {
-            optionType: 'MentionableOption',
-            base: new SlashCommandMentionableOption().setName('target').setDescription("L'utilisateur à déconnecter").setRequired(true),
-        },
-    ],
+    [new SlashCommandMentionableOption().setName('target').setDescription("L'utilisateur à déconnecter").setRequired(true)],
     PermissionsBitField.Flags.MoveMembers
 );

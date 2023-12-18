@@ -53,8 +53,8 @@ export class InventorySingleton extends Context {
     public static get instance(): InventorySingleton {
         if (!this._instance) {
             this._instance = new InventorySingleton();
+            this._instance.logger.trace('Inventory instance initialized');
         }
-        this._instance.logger.trace('Inventory instance initialized');
         return this._instance;
     }
 
