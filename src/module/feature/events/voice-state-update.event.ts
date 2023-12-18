@@ -14,7 +14,7 @@ const event: BotEvent = {
         const feature: FeatureSingleton = FeatureSingleton.instance;
         if (feature.data.auto_disconnect && newState.channelId) {
             const targetUser: GuildMember = await UserUtil.getGuildMemberFromGuild(newState.guild, feature.data.auto_disconnect);
-            logger.trace(`Disconnect user \`${targetUser.displayName}\` because auto-disconnect set for him`);
+            logger.debug(`Disconnect user \`${targetUser.displayName}\` because auto-disconnect set for him`);
             await targetUser.voice.disconnect();
         }
     },

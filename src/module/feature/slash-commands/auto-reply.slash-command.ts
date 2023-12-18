@@ -2,17 +2,17 @@ import { SlashCommandMentionableOption, SlashCommandStringOption } from '@discor
 import { ChatInputCommandInteraction, CommandInteractionOption, GuildMember } from 'discord.js';
 import { FeatureSingleton } from '../../shared/singleton/feature.singleton';
 import { Context } from '../../shared/classes/context';
-import { SlashCommand } from '../../shared/classes/slash-command';
+import { SlashCommandModel } from './model/slash-command.model';
 import { UserUtil } from '../../shared/utils/user.util';
 import { Logger } from '../../shared/classes/logger';
 
 const logger: Logger = new Logger(new Context('AUTO-REPLY-SLASH-COMMAND'));
 
-export const command: SlashCommand = new SlashCommand(
+export const command: SlashCommandModel = new SlashCommandModel(
     'auto-reply',
     "Pour répondre automatiquement lorsqu'une personne vous mention",
     async (interaction: ChatInputCommandInteraction): Promise<void> => {
-        const targetUser: GuildMember | undefined = await UserUtil.getGuildMemberFromInteraction(interaction, 'target', true);
+        const targetUser: GuildMember | undefined = await UserUtil.getGuildMemberFromInteraction(interaction, 'utilisateur', true);
         const option: CommandInteractionOption | null = interaction.options.get('désactiver');
         const feature: FeatureSingleton = FeatureSingleton.instance;
 
@@ -48,19 +48,10 @@ export const command: SlashCommand = new SlashCommand(
         }
     },
     [
-        {
-            optionType: 'MentionableOption',
-            base: new SlashCommandMentionableOption()
-                .setName('target')
-                .setDescription("L'utilisateur à répondre automatiquement.")
-                .setRequired(true),
-        },
-        {
-            optionType: 'StringOption',
-            base: new SlashCommandStringOption()
-                .setName('désactiver')
-                .setDescription("Renseigner pour désactiver la réponse automatique pour l'utilisateur")
-                .setChoices({ name: 'oui', value: 'oui' }),
-        },
+        new SlashCommandMentionableOption().setName('target').setDescription("L'utilisateur à répondre automatiquement.").setRequired(true),
+        new SlashCommandStringOption()
+            .setName('désactiver')
+            .setDescription("Renseigner pour désactiver la réponse automatique pour l'utilisateur")
+            .setChoices({ name: 'oui', value: 'oui' }),
     ]
 );

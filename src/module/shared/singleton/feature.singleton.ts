@@ -47,8 +47,8 @@ export class FeatureSingleton extends Context {
     public static get instance(): FeatureSingleton {
         if (!this._instance) {
             this._instance = new FeatureSingleton();
+            this._instance.logger.trace('Feature instance initialized');
         }
-        this._instance.logger.trace('Feature instance initialized');
         return this._instance;
     }
 

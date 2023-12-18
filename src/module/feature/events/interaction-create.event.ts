@@ -2,12 +2,12 @@ import { ChatInputCommandInteraction, Client, Events, Interaction } from 'discor
 import { BotEvent } from '../../shared/types/bot-event.type';
 import { Context } from '../../shared/classes/context';
 import { EnvUtil } from '../../shared/utils/env.util';
-import { SlashCommand } from '../../shared/classes/slash-command';
 import { Logger } from '../../shared/classes/logger';
+import { SlashCommandModel } from '../slash-commands/model/slash-command.model';
 
 const logger: Logger = new Logger(new Context('INTERACTION-CREATE-EVENT'));
 
-function getCommand(interaction: ChatInputCommandInteraction): SlashCommand | undefined {
+function getCommand(interaction: ChatInputCommandInteraction): SlashCommandModel | undefined {
     return require(`../slash-commands/${interaction.commandName}.slash-command`).command;
 }
 
@@ -15,7 +15,7 @@ const event: BotEvent = {
     name: Events.InteractionCreate,
     once: false,
     async execute(_client: Client, interaction: Interaction): Promise<void> {
-        let command: SlashCommand | undefined;
+        let command: SlashCommandModel | undefined;
 
         if (interaction.isChatInputCommand()) {
             if (EnvUtil.isDev()) {
