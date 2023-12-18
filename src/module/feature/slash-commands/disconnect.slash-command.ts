@@ -1,13 +1,13 @@
 import { SlashCommandMentionableOption } from '@discordjs/builders';
 import { ChatInputCommandInteraction, GuildMember, PermissionsBitField } from 'discord.js';
 import { Context } from '../../shared/classes/context';
-import { SlashCommand } from './model/slash-command';
+import { SlashCommandModel } from './model/slash-command.model';
 import { UserUtil } from '../../shared/utils/user.util';
 import { Logger } from '../../shared/classes/logger';
 
 const logger: Logger = new Logger(new Context('DISCONNECT-SLASH-COMMAND'));
 
-export const command: SlashCommand = new SlashCommand(
+export const command: SlashCommandModel = new SlashCommandModel(
     'disconnect',
     "Pour déconnecter quelqu'un d'un channel vocal",
     async (interaction: ChatInputCommandInteraction): Promise<void> => {

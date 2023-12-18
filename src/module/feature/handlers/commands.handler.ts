@@ -4,7 +4,7 @@ import { join } from 'path';
 import { client_id, token } from '../../../config.json';
 import { Context } from '../../shared/classes/context';
 import { Logger } from '../../shared/classes/logger';
-import { SlashCommand } from '../slash-commands/model/slash-command';
+import { SlashCommandModel } from '../slash-commands/model/slash-command.model';
 
 const logger: Logger = new Logger(new Context('COMMANDS-HANDLER'));
 
@@ -16,7 +16,7 @@ module.exports = async (_client: Client): Promise<void> => {
     readdirSync(slashCommandsDir).forEach((file: string): void => {
         if (!file.endsWith('.ts')) return;
 
-        const command: SlashCommand = require(`${slashCommandsDir}/${file}`).command;
+        const command: SlashCommandModel = require(`${slashCommandsDir}/${file}`).command;
 
         body.push(command.data.toJSON());
         numberOfCommand++;

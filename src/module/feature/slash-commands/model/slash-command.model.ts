@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { OptionMap, OptionType } from './option.type';
+import { OptionMap, OptionType } from './option.model';
 
-export class SlashCommand {
+export class SlashCommandModel {
     private readonly _name: string;
     private readonly _data: SlashCommandBuilder;
     private readonly _execute: (interaction: ChatInputCommandInteraction) => Promise<void>;
