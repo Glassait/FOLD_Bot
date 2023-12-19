@@ -1,11 +1,11 @@
-import { Client } from 'discord.js';
 import { readFileSync, writeFile } from 'fs';
 import { InventoryType, WebSiteState } from '../types/inventory.type';
 import { Context } from '../classes/context';
 import { EnvUtil } from '../utils/env.util';
-import { WebSiteScraper } from '../classes/web-site-scraper';
 import { LoggerDecorator } from '../decorators/loggerDecorator';
 import { Logger } from '../classes/logger';
+import { Client, TextChannel } from 'discord.js';
+import { guild_id } from '../../../config.json';
 
 /**
  * Class used to manage the inventory.json file
@@ -28,7 +28,7 @@ export class InventorySingleton extends Context {
      * The data of the inventory
      * @private
      */
-    private readonly _inventory: InventoryType | undefined;
+    private readonly _inventory: InventoryType;
 
     constructor() {
         super(InventorySingleton);
@@ -61,47 +61,43 @@ export class InventorySingleton extends Context {
     /**
      * Get the website at the index
      * @param index The index of the website
+     * @throws Error If the index is out of bound
      */
-    public getNewsLetter(index: number): WebSiteState | undefined {
-        return this._inventory?.newsLetter.website[index];
+    public getNewsLetterAtIndex(index: number): WebSiteState {
+        let webSiteState = this._inventory.newsLetter.website[index];
+
+        if (!webSiteState) {
+            this.logger.error(`Index out of bound ${index} in newsletter array`);
+            throw new Error(`Index out of bound ${index} in newsletter array`);
+        }
+
+        return webSiteState;
     }
 
     /**
-     * Get the channel id where to send news
+     * Get the channel in the discord server to send the news
      */
-    public getNewsLetterChannel(): string | undefined {
-        return this._inventory?.newsLetter.channel;
+    public async getNewsLetterChannel(client: Client): Promise<TextChannel> {
+        let channel: TextChannel | undefined = <TextChannel>client.channels.cache.get(this._inventory.newsLetter.channel);
+
+        if (!channel) {
+            const g = await client.guilds.fetch(guild_id);
+            return <TextChannel>await g.channels.fetch(this._inventory.newsLetter.channel);
+        }
+
+        return channel;
     }
 
     /**
-     * This method launch the scrapping of the website
-     * @param client
+     * Get the number of newsletter in the inventory
      */
-    public async scrapWebSite(client: Client): Promise<void> {
-        const length: number | undefined = this._inventory?.newsLetter.website.length;
-
-        if (!length) {
-            this.logger.error('Inventory is undefined');
-            return;
-        }
-
-        let index: number = 0;
-        while (true) {
-            const scraper: WebSiteScraper = new WebSiteScraper();
-            scraper.getHtml(index, client);
-            index++;
-
-            if (index >= length) {
-                index = 0;
-            }
-            this.logger.trace('End scrapping, next one in 30 minutes');
-            await new Promise(r => setTimeout(r, 1000 * 60 * 30));
-        }
+    public get numberOfNewsletter(): number {
+        return this._inventory.newsLetter.website.length;
     }
 
     /**
      * Update the last news send by the bot.
-     * Update the inventory.josn file
+     * Update the inventory.json file
      * @param url The new url
      * @param newsLetterName The name of the website
      */

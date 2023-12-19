@@ -1,7 +1,7 @@
 import { Client } from 'discord.js';
 import { readdirSync } from 'fs';
 import { join } from 'path';
-import { BotEvent } from '../../shared/types/bot-event.type';
+import { BotEvent } from '../events/model/bot-event.type';
 import { Context } from '../../shared/classes/context';
 import { Logger } from '../../shared/classes/logger';
 

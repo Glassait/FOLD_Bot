@@ -21,5 +21,12 @@
 				"selector": "article.post"
 			}
 		]
+	},
+	"game": {
+		"trivia": {
+			"limite": 90,
+			"wot_api": "https://api.worldoftanks.eu/wot/encyclopedia/vehicles/?application_id=applicationId&tier=10&language=fr&fields=name%2C+images.big_icon%2C+default_profile.ammo.damage%09&limit=limitNumber",
+			"channel": "1171525891604623472"
+		}
 	}
 }

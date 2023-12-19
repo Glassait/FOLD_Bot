@@ -1,5 +1,5 @@
 import { Client, Events } from 'discord.js';
-import { BotEvent } from '../../shared/types/bot-event.type';
+import { BotEvent } from './model/bot-event.type';
 import { Context } from '../../shared/classes/context';
 import { SentenceUtil } from '../../shared/utils/sentence.util';
 import { Logger } from '../../shared/classes/logger';
