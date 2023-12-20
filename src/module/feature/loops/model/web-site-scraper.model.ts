@@ -2,12 +2,13 @@ import axios, { AxiosInstance } from 'axios';
 import * as cheerio from 'cheerio';
 import { CheerioAPI } from 'cheerio';
 import { Client, EmbedBuilder, TextChannel } from 'discord.js';
-import { InventorySingleton } from '../singleton/inventory.singleton';
-import { WebSiteName, WebSiteState } from '../types/inventory.type';
-import { LoggerDecorator } from '../decorators/loggerDecorator';
-import { Logger } from './logger';
+import { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
+import { WebSiteName, WebSiteState } from '../../../shared/types/inventory.type';
+import { InventoryInjector, LoggerInjector } from '../../../shared/decorators/injector.decorator';
+import { Logger } from '../../../shared/classes/logger';
 
-@LoggerDecorator
+@LoggerInjector
+@InventoryInjector
 export class WebSiteScraper {
     /**
      * The channel for the newsletter
@@ -24,7 +25,7 @@ export class WebSiteScraper {
      * The instance of the inventory
      * @private
      */
-    private readonly inventory: InventorySingleton = InventorySingleton.instance;
+    private readonly inventory: InventorySingleton;
     /**
      * The instance of the logger
      * @private

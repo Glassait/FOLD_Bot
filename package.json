@@ -5,7 +5,9 @@
     "main": "src/index.ts",
     "scripts": {
         "start": "ts-node .",
-        "start:mock": "ts-node . -- DEV"
+        "start:mock": "ts-node . -- DEV",
+        "build": "tsc --build",
+        "clean": "tsc --build --clean"
     },
     "repository": {
         "type": "git",

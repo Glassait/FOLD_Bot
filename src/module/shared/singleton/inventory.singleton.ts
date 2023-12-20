@@ -1,40 +1,39 @@
 import { readFileSync, writeFile } from 'fs';
 import { InventoryType, WebSiteState } from '../types/inventory.type';
-import { Context } from '../classes/context';
 import { EnvUtil } from '../utils/env.util';
-import { LoggerDecorator } from '../decorators/loggerDecorator';
 import { Logger } from '../classes/logger';
 import { Client, TextChannel } from 'discord.js';
 import { guild_id } from '../../../config.json';
+import { Context } from '../classes/context';
 
 /**
  * Class used to manage the inventory.json file
  * This class implement the Singleton pattern
  */
-@LoggerDecorator
-export class InventorySingleton extends Context {
+export class InventorySingleton {
     /**
      * The path to the inventory.json file
      */
     public readonly path: string = './src/inventory.json';
 
     /**
-     * Logger instance
+     * The logger to log thing
      * @private
-     * @see LoggerDecorator
      */
-    private readonly logger: Logger;
+    private readonly logger: Logger = new Logger(new Context(InventorySingleton.name));
     /**
      * The data of the inventory
      * @private
      */
     private readonly _inventory: InventoryType;
 
-    constructor() {
-        super(InventorySingleton);
-
-        const json: Buffer = readFileSync(this.path);
-        this._inventory = JSON.parse(json.toString());
+    /**
+     * Private constructor to respect the singleton pattern
+     * @private
+     * @constructor
+     */
+    private constructor() {
+        this._inventory = JSON.parse(readFileSync(this.path).toString());
 
         if (EnvUtil.isDev() && this._inventory) {
             this._inventory.newsLetter.channel = '1171525891604623472';

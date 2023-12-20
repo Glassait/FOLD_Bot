@@ -1,5 +1,5 @@
 import { Client } from 'discord.js';
-import { WebSiteScraper } from '../../shared/classes/web-site-scraper';
+import { WebSiteScraper } from './model/web-site-scraper.model';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
 import { Logger } from '../../shared/classes/logger';
 import { Context } from '../../shared/classes/context';

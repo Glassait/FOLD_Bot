@@ -1,25 +1,22 @@
 import { readFileSync, writeFile } from 'fs';
 import { DiscordId, FeatureType, Reply } from '../types/feature.type';
-import { Context } from '../classes/context';
-import { LoggerDecorator } from '../decorators/loggerDecorator';
 import { Logger } from '../classes/logger';
+import { Context } from '../classes/context';
 
 /**
  * Class used to manage the feature.json file
  * This class implement the Singleton pattern
  */
-@LoggerDecorator
-export class FeatureSingleton extends Context {
+export class FeatureSingleton {
     /**
      * The path to the feature.json file
      */
     public readonly path: string = './src/feature.json';
     /**
-     * Logger instance
+     * The logger to log thing
      * @private
-     * @see LoggerDecorator
      */
-    private readonly logger: Logger;
+    private readonly logger: Logger = new Logger(new Context(FeatureSingleton.name));
     /**
      * The initial value for the data
      * @private
@@ -30,8 +27,12 @@ export class FeatureSingleton extends Context {
         auto_reply: [],
     };
 
-    constructor() {
-        super(FeatureSingleton);
+    /**
+     * Private constructor to respect the singleton pattern
+     * @private
+     * @constructor
+     */
+    private constructor() {
         this.syncFeatureFile();
     }
 
