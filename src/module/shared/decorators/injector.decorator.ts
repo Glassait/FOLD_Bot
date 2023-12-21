@@ -18,6 +18,10 @@ type Constructor = { new (...args: any[]): any };
  * @example
  * .@LoggerInjector // Add this without the `.`
  * class Test {
+ *      \/**
+ *      * @instance Of the logger
+ *      * @private
+ *      *\/
  *     private readonly logger: Logger // Don't forget to add this for the completion/compiling
  * }
  */
@@ -38,6 +42,10 @@ export function LoggerInjector<T extends Constructor>(base: T): T {
  * @example
  * .@InventoryInjector // Add this without the `.`
  * class Test {
+ *      \/**
+ *      * @instance Of the inventory
+ *      * @private
+ *      *\/
  *     private readonly inventory: InventorySingleton // Don't forget to add this for the completion/compiling
  * }
  */
@@ -58,6 +66,10 @@ export function InventoryInjector<T extends Constructor>(base: T): T {
  * @example
  * .@AxiosInjector // Add this without the `.`
  * class Test {
+ *      \/**
+ *      * @instance Of the axios
+ *      * @private
+ *      *\/
  *     private readonly axios: AxiosInstance // Don't forget to add this for the completion/compiling
  * }
  */

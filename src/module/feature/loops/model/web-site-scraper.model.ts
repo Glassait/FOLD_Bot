@@ -18,17 +18,17 @@ export class WebSiteScraper {
     private channel: TextChannel;
 
     /**
-     * The instance of Axios
+     * @instance Of axios
      * @private
      */
     private readonly axios: AxiosInstance;
     /**
-     * The instance of the inventory
+     * @instance Of the inventory
      * @private
      */
     private readonly inventory: InventorySingleton;
     /**
-     * The instance of the logger
+     * @instance Of the logger
      * @private
      */
     private readonly logger: Logger;

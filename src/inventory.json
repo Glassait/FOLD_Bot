@@ -4,13 +4,13 @@
 		"website": [
 			{
 				"liveUrl": "https://wotexpress.info/",
-				"lastUrl": "https://wotexpress.info/news/mir-tankov/lesta-dobavila-qiwi-v-sposoby-oplaty-tovarov-premi/",
+				"lastUrl": "",
 				"name": "Wot Express",
 				"selector": "a.news-block-row"
 			},
 			{
 				"liveUrl": "https://thedailybounce.net/",
-				"lastUrl": "https://thedailybounce.net/world-of-tanks/holiday-ops-2024-large-boxes-new-premiums-3d-styles-and-more/",
+				"lastUrl": "",
 				"name": "THE DAILY BOUNCE",
 				"selector": "article.archive-image-left"
 			},
@@ -24,8 +24,8 @@
 	},
 	"game": {
 		"trivia": {
-			"limite": 90,
-			"url": "wot/encyclopedia/vehicles/?application_id=applicationId&tier=10&language=fr&fields=name%2C+images.big_icon%2C+default_profile.ammo.damage%09&limit=1&page_no=pageNumber",
+			"limit": 90,
+			"url": "wot/encyclopedia/vehicles/?application_id=applicationId&tier=10&language=fr&fields=name%2C+images.big_icon%2C+default_profile.ammo.damage%2C+default_profile.ammo.type&limit=1&page_no=pageNumber",
 			"channel": "1171525891604623472"
 		}
 	}

@@ -120,6 +120,7 @@ export class InventorySingleton {
      * @param client
      */
     public async getChannelForTrivia(client: Client): Promise<TextChannel> {
+        this.logger.trace('Channel instance fetch for the trivia game');
         return await this.fetchChannel(client, this._inventory.game.trivia.channel);
     }
 
