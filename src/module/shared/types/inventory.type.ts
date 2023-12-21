@@ -20,12 +20,12 @@ export type NewsLetter = { channel: string; website: WebSiteState[] };
 /**
  * Defined the type for the trivia game
  */
-export type TriviaType = { channel: string; wot_api: string; limite: number };
+export type TriviaType = { channel: string; url: string; limite: number };
 
 /**
  * Defined the inventory.json file architecture
  */
 export type InventoryType = {
     newsLetter: NewsLetter;
-    game: { [key: string]: TriviaType };
+    game: { trivia: TriviaType };
 };

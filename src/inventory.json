@@ -1,16 +1,16 @@
 {
 	"newsLetter": {
-		"channel": "1177006853318779002",
+		"channel": "1171525891604623472",
 		"website": [
 			{
 				"liveUrl": "https://wotexpress.info/",
-				"lastUrl": "",
+				"lastUrl": "https://wotexpress.info/news/wot/sobytiya/novogodnee-nastuplenie/2024/novogodniy-kalendar/den-21-novogodniy-kalendar-v-world-of-tanks/",
 				"name": "Wot Express",
 				"selector": "a.news-block-row"
 			},
 			{
 				"liveUrl": "https://thedailybounce.net/",
-				"lastUrl": "",
+				"lastUrl": "https://thedailybounce.net/world-of-tanks/holiday-ops-2024-large-boxes-new-premiums-3d-styles-and-more/",
 				"name": "THE DAILY BOUNCE",
 				"selector": "article.archive-image-left"
 			},
@@ -24,8 +24,8 @@
 	},
 	"game": {
 		"trivia": {
-			"limite": 90,
-			"wot_api": "https://api.worldoftanks.eu/wot/encyclopedia/vehicles/?application_id=applicationId&tier=10&language=fr&fields=name%2C+images.big_icon%2C+default_profile.ammo.damage%09&limit=limitNumber",
+			"limite": 23,
+			"url": "wot/encyclopedia/vehicles/?application_id=applicationId&tier=10&language=fr&fields=name%2C+images.big_icon%2C+default_profile.ammo.damage%09&limit=4&page_no=pageNumber",
 			"channel": "1171525891604623472"
 		}
 	}

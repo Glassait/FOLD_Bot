@@ -84,12 +84,14 @@ export class SentenceUtil {
     }
 
     /**
-     * Return a random number
+     * Return a random number between 0 and {@link max}
      * @param max The max number of the randomness
+     * @param min The min number of the randomness
      * @private
+     * @default max = 1
+     * @default min = 0
      */
-    private static getRandomNumber(max?: number): number {
-        max = max || 1;
-        return Math.floor(Math.random() * max);
+    public static getRandomNumber(max: number = 1, min: number = 0): number {
+        return Math.floor(Math.random() * (max - min + 1) + min);
     }
 }

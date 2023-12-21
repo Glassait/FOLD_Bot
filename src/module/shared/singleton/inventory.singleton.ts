@@ -1,5 +1,5 @@
 import { readFileSync, writeFile } from 'fs';
-import { InventoryType, WebSiteState } from '../types/inventory.type';
+import { InventoryType, TriviaType, WebSiteState } from '../types/inventory.type';
 import { EnvUtil } from '../utils/env.util';
 import { Logger } from '../classes/logger';
 import { Client, TextChannel } from 'discord.js';
@@ -28,6 +28,12 @@ export class InventorySingleton {
     private readonly _inventory: InventoryType;
 
     /**
+     * The id of the dev channel
+     * @private
+     */
+    private readonly DEV_CHANNEL = '1171525891604623472';
+
+    /**
      * Private constructor to respect the singleton pattern
      * @private
      * @constructor
@@ -36,7 +42,8 @@ export class InventorySingleton {
         this._inventory = JSON.parse(readFileSync(this.path).toString());
 
         if (EnvUtil.isDev() && this._inventory) {
-            this._inventory.newsLetter.channel = '1171525891604623472';
+            this._inventory.newsLetter.channel = this.DEV_CHANNEL;
+            this._inventory.game.trivia.channel = this.DEV_CHANNEL;
         }
     }
 
@@ -77,14 +84,7 @@ export class InventorySingleton {
      * Get the channel in the discord server to send the news
      */
     public async getNewsLetterChannel(client: Client): Promise<TextChannel> {
-        let channel: TextChannel | undefined = <TextChannel>client.channels.cache.get(this._inventory.newsLetter.channel);
-
-        if (!channel) {
-            const g = await client.guilds.fetch(guild_id);
-            return <TextChannel>await g.channels.fetch(this._inventory.newsLetter.channel);
-        }
-
-        return channel;
+        return await this.fetchChannel(client, this._inventory.newsLetter.channel);
     }
 
     /**
@@ -101,11 +101,6 @@ export class InventorySingleton {
      * @param newsLetterName The name of the website
      */
     public updateLastUrlOfWebsite(url: string, newsLetterName: string): void {
-        if (!this._inventory) {
-            this.logger.error('No inventory found !');
-            return;
-        }
-
         const webSite: WebSiteState | undefined = this._inventory.newsLetter.website.find(
             (value: WebSiteState): boolean => value.name === newsLetterName
         );
@@ -121,6 +116,30 @@ export class InventorySingleton {
     }
 
     /**
+     * Get the channel for the trivia game
+     * @param client
+     */
+    public async getChannelForTrivia(client: Client): Promise<TextChannel> {
+        return await this.fetchChannel(client, this._inventory.game.trivia.channel);
+    }
+
+    /**
+     * Get the trivia information from the inventory
+     */
+    public get trivia(): TriviaType {
+        return this._inventory.game.trivia;
+    }
+
+    /**
+     * Update the trivia information with the new value and update the json file
+     * @param trivia The new value
+     */
+    public set trivia(trivia: TriviaType) {
+        this._inventory.game.trivia = trivia;
+        this.updateFile();
+    }
+
+    /**
      * Method to update the inventory.json file
      * @private
      */
@@ -132,5 +151,22 @@ export class InventorySingleton {
                 this.logger.trace('Inventory successfully updated');
             }
         });
+    }
+
+    /**
+     * Get the text channel from the cache and if is not load fetch it from the guild manager
+     * @param client The client of the bot
+     * @param id The id of the channel
+     * @private
+     */
+    private async fetchChannel(client: Client, id: string): Promise<TextChannel> {
+        let channel: TextChannel | undefined = <TextChannel>client.channels.cache.get(id);
+
+        if (!channel) {
+            const g = await client.guilds.fetch(guild_id);
+            return <TextChannel>await g.channels.fetch(id);
+        }
+
+        return channel;
     }
 }
