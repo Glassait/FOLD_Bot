@@ -1,6 +1,7 @@
 import { ActivityType } from 'discord.js';
 import { DiscordId } from '../types/feature.type';
 import { EnvUtil } from './env.util';
+import { RandomUtil } from './random.util';
 
 /**
  * Utils for sentence
@@ -71,7 +72,7 @@ export class SentenceUtil {
      * @param id The id to put in the response
      */
     public static getRandomResponse(id: DiscordId): string {
-        return this.response[this.getRandomNumber(this.response.length)].replace('discordId', id);
+        return this.response[RandomUtil.getRandomNumber(this.response.length)].replace('discordId', id);
     }
 
     /**
@@ -80,18 +81,6 @@ export class SentenceUtil {
     public static getRandomStatus(): any {
         return EnvUtil.isDev()
             ? [ActivityType.Custom, 'Entrain de ce faire toucher le code']
-            : this.status[this.getRandomNumber(this.status.length)];
-    }
-
-    /**
-     * Return a random number between 0 and {@link max}
-     * @param max The max number of the randomness
-     * @param min The min number of the randomness
-     * @private
-     * @default max = 1
-     * @default min = 0
-     */
-    public static getRandomNumber(max: number = 1, min: number = 0): number {
-        return Math.floor(Math.random() * (max - min + 1) + min);
+            : this.status[RandomUtil.getRandomNumber(this.status.length)];
     }
 }

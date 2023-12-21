@@ -4,7 +4,7 @@
 		"website": [
 			{
 				"liveUrl": "https://wotexpress.info/",
-				"lastUrl": "https://wotexpress.info/news/wot/sobytiya/novogodnee-nastuplenie/2024/novogodniy-kalendar/den-21-novogodniy-kalendar-v-world-of-tanks/",
+				"lastUrl": "https://wotexpress.info/news/mir-tankov/lesta-dobavila-qiwi-v-sposoby-oplaty-tovarov-premi/",
 				"name": "Wot Express",
 				"selector": "a.news-block-row"
 			},
@@ -24,8 +24,8 @@
 	},
 	"game": {
 		"trivia": {
-			"limite": 23,
-			"url": "wot/encyclopedia/vehicles/?application_id=applicationId&tier=10&language=fr&fields=name%2C+images.big_icon%2C+default_profile.ammo.damage%09&limit=4&page_no=pageNumber",
+			"limite": 90,
+			"url": "wot/encyclopedia/vehicles/?application_id=applicationId&tier=10&language=fr&fields=name%2C+images.big_icon%2C+default_profile.ammo.damage%09&limit=1&page_no=pageNumber",
 			"channel": "1171525891604623472"
 		}
 	}
