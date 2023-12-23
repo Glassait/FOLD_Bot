@@ -6,8 +6,8 @@ import { TriviaGameModel } from './model/trivia-game.model';
 
 module.exports = async (client: Client): Promise<void> => {
     const logger: Logger = new Logger(new Context('TRIVIA-LOOP'));
-    const triviaGame = new TriviaGameModel();
-    await triviaGame.fetchChannel(client);
+    const triviaGame: TriviaGameModel = new TriviaGameModel();
+    await triviaGame.fetchMandatory(client);
 
     logger.info('🔁 Trivia game initialized');
     let index: number = 0;
@@ -26,7 +26,7 @@ module.exports = async (client: Client): Promise<void> => {
         await triviaGame.collectAnswer();
 
         await EnvUtil.sleep(triviaGame.MAX_TIME);
-        logger.trace('🎮 Trivia game end');
+        logger.info('🎮 Trivia game end');
         await triviaGame.sendAnswerToChannel();
     }
     logger.error('🔁 Trivia loop end');

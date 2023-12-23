@@ -1,3 +1,6 @@
+/**
+ * Definition of the architecture and data get when the call failed
+ */
 export type TankopediaVehiclesError = {
     status: 'error';
     error: {
@@ -8,14 +11,20 @@ export type TankopediaVehiclesError = {
     };
 };
 
+/**
+ * Data given for the vehicle
+ */
 export type VehicleData = {
     images: { big_icon: string };
     name: string;
     default_profile: {
-        ammo: { damage: number[] }[];
+        ammo: { damage: number[]; type: string }[];
     };
 };
 
+/**
+ * Definition of the architecture and data get from the tankopedia api call when the call succeed
+ */
 export type TankopediaVehiclesSuccess = {
     status: 'ok';
     meta: {
@@ -30,4 +39,7 @@ export type TankopediaVehiclesSuccess = {
     };
 };
 
+/**
+ * Global type for the tankopedia api call
+ */
 export type TankopediaVehicle = TankopediaVehiclesError | TankopediaVehiclesSuccess;

@@ -5,6 +5,7 @@ import { Logger } from '../classes/logger';
 import { Client, TextChannel } from 'discord.js';
 import { guild_id } from '../../../config.json';
 import { Context } from '../classes/context';
+import {FileUtil} from "../utils/file.util";
 
 /**
  * Class used to manage the inventory.json file
@@ -112,7 +113,8 @@ export class InventorySingleton {
 
         const index: number = this._inventory.newsLetter.website.indexOf(webSite);
         this._inventory.newsLetter.website[index].lastUrl = url;
-        this.updateFile();
+        FileUtil.writeIntoJson(this.path, this._inventory);
+        // this.updateFile();
     }
 
     /**
@@ -137,21 +139,7 @@ export class InventorySingleton {
      */
     public set trivia(trivia: TriviaType) {
         this._inventory.game.trivia = trivia;
-        this.updateFile();
-    }
-
-    /**
-     * Method to update the inventory.json file
-     * @private
-     */
-    private updateFile(): void {
-        writeFile(this.path, JSON.stringify(this._inventory, null, '\t'), err => {
-            if (err) {
-                this.logger.warning(`🔄❌ Failed to sync the inventory file with error: ${err}`);
-            } else if (this.logger) {
-                this.logger.trace('Inventory successfully updated');
-            }
-        });
+        FileUtil.writeIntoJson(this.path, this._inventory);
     }
 
     /**

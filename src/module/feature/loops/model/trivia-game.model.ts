@@ -1,4 +1,4 @@
-import { InventoryInjector, LoggerInjector } from '../../../shared/decorators/injector.decorator';
+import { InventoryInjector, LoggerInjector, StatisticInjector } from '../../../shared/decorators/injector.decorator';
 import { Logger } from '../../../shared/classes/logger';
 import { TriviaType } from '../../../shared/types/inventory.type';
 import {
@@ -17,9 +17,17 @@ import { InventorySingleton } from '../../../shared/singleton/inventory.singleto
 import { RandomUtil } from '../../../shared/utils/random.util';
 import { TankopediaVehiclesSuccess, VehicleData } from './wot-api.type';
 import { WotApiModel } from './wot-api.model';
+import { StatisticSingleton } from 'src/module/shared/singleton/statistic.singleton';
+import {
+    MonthlyTriviaOverallStatisticType,
+    MonthlyTriviaPlayerStatisticType,
+    TriviaPlayerStatisticType,
+    TriviaStatisticType,
+} from '../../../shared/types/statistic.type';
 
 @LoggerInjector
 @InventoryInjector
+@StatisticInjector
 export class TriviaGameModel {
     /**
      * The data for the trivia
@@ -55,13 +63,29 @@ export class TriviaGameModel {
      * Follow the player answer
      * @private
      */
-    private playerAnswer: { [key: string]: any } = {};
+    private playerAnswer: {
+        [key: string]: {
+            responseTime: number;
+            response: string[];
+            interaction: ButtonInteraction<'cached'>;
+        };
+    } = {};
+    /**
+     * The tracking variable for the trivia game
+     * @private
+     */
+    private triviaStats: TriviaStatisticType;
 
     /**
-     * The play time
+     * Define the max play time
      */
     public readonly MAX_TIME: number = 1000 * 60;
 
+    /**
+     * This field defined the separator for the id of the button for the response
+     * @private
+     */
+    private readonly SEPARATOR: string = '#';
     /**
      * The medal for the player
      * @private
@@ -91,15 +115,23 @@ export class TriviaGameModel {
      * The embed for the game result
      * @private
      */
-    private readonly answerEmbed = new EmbedBuilder().setTitle('Trivia Game : RÉSULTAT').setColor(Colors.Green);
+    private readonly answerEmbed: EmbedBuilder = new EmbedBuilder().setTitle('Trivia Game : RÉSULTAT').setColor(Colors.Green);
+    /**
+     * @instance Of the axios
+     * @private
+     */
+    private readonly statisticSingleton: StatisticSingleton;
 
     /**
-     * Fetch the instance of the text channel
+     * Fetch the instance of the text channel,
+     * Initialize the trivia from {@link InventorySingleton},
+     * Initialize the trivia statistic from the {@link StatisticSingleton}
      * @param client The client instance of the bot
      */
-    public async fetchChannel(client: Client): Promise<void> {
+    public async fetchMandatory(client: Client): Promise<void> {
         this.channel = await this.inventory.getChannelForTrivia(client);
         this.trivia = this.inventory.trivia;
+        this.triviaStats = this.statisticSingleton.trivia;
     }
 
     /**
@@ -108,15 +140,15 @@ export class TriviaGameModel {
      */
     public async fetchTanks(): Promise<void> {
         this.logger.trace('Start fetching tanks');
-        const pages: number[] = RandomUtil.getArrayWithRandomNumber(4, this.trivia.limite, 1);
+        const pages: number[] = RandomUtil.getArrayWithRandomNumber(4, this.trivia.limit, 1);
         const tankopediaResponses: TankopediaVehiclesSuccess[] = [];
 
         for (const page of pages) {
             tankopediaResponses.push(await this.wotApi.fetchApi(this.trivia.url.replace('pageNumber', String(page))));
         }
 
-        if (tankopediaResponses[0].meta.count !== this.trivia.limite) {
-            this.trivia.limite = tankopediaResponses[0].meta.page_total;
+        if (tankopediaResponses[0].meta.count !== this.trivia.limit) {
+            this.trivia.limit = tankopediaResponses[0].meta.page_total;
             this.inventory.trivia = this.trivia;
         }
 
@@ -125,30 +157,41 @@ export class TriviaGameModel {
             return data;
         }, []);
 
-        this.logger.trace('Tank for game selected');
         this.datum = this.allTanks[RandomUtil.getRandomNumber(this.allTanks.length - 1)];
+        this.logger.trace(`Tank for game selected : \`${this.datum.name}\``);
     }
 
     /**
      * Send the game message to the channel
      */
     public async sendMessageToChannel(): Promise<void> {
+        // TODO UPDATE THE RULL WITH THE FACT THAT MULTIPLE TANKS CAN HAVE THE SAME AMMO
         this.startGameEmbed.setFields(
             {
                 name: ' Règle du jeu',
-                value: "Les règles sont simple :\n\t - 1 alpha,\n- 4 chars tier X,\n- 1 bonne réponse,\n- 1 minute.\n**⚠️ Ce n'est pas forcèment le dernier canon utilisé !**",
+                value: "Les règles sont simple :\n\t - ✏ 1 obus,\n- 🚗 4 chars  tier X (⚠️Quand 2 ou plusieurs chars on le même obus, tous ces chars sont des bonnes responses),\n- ✔ 1 bonne réponse ,\n- 🕒 1 minute.\n**⚠️ Ce n'est pas forcèment le dernier canon utilisé !**",
             },
             {
-                name: 'Alpha du char :',
-                value: `\`${this.datum.default_profile.ammo[0].damage[1]}\``,
+                name: 'Obus :',
+                value: `\`${this.datum.default_profile.ammo[0].type} ${this.datum.default_profile.ammo[0].damage[1]}\``,
                 inline: true,
             }
         );
 
-        const row = this.allTanks.reduce((rowBuilder: ActionRowBuilder<ButtonBuilder>, data: VehicleData) => {
-            rowBuilder.addComponents(new ButtonBuilder().setCustomId(data.name).setLabel(data.name).setStyle(ButtonStyle.Primary));
-            return rowBuilder;
-        }, new ActionRowBuilder<ButtonBuilder>());
+        const row: ActionRowBuilder<ButtonBuilder> = this.allTanks.reduce(
+            (rowBuilder: ActionRowBuilder<ButtonBuilder>, data: VehicleData) => {
+                rowBuilder.addComponents(
+                    new ButtonBuilder()
+                        .setCustomId(
+                            `${data.name}${this.SEPARATOR}${data.default_profile.ammo[0].damage[1]}${this.SEPARATOR}${data.default_profile.ammo[0].type}`
+                        )
+                        .setLabel(data.name)
+                        .setStyle(ButtonStyle.Primary)
+                );
+                return rowBuilder;
+            },
+            new ActionRowBuilder<ButtonBuilder>()
+        );
 
         this.gameMessage = await this.channel.send({
             content: '@here',
@@ -172,10 +215,13 @@ export class TriviaGameModel {
                 this.logger.trace(`${interaction.user.username} answer to the trivia game with : \`${interaction.customId}\``);
                 this.playerAnswer[interaction.user.username] = {
                     responseTime: Date.now() - this.timer,
-                    response: interaction.customId,
+                    response: interaction.customId.split(this.SEPARATOR),
                     interaction: interaction,
                 };
-                await interaction.reply({ ephemeral: true, content: `Ta réponse \`${interaction.customId}\` à bien été pris en compte !` });
+                await interaction.reply({
+                    ephemeral: true,
+                    content: `Ta réponse \`${interaction.customId.split(this.SEPARATOR)[0]}\` à bien été pris en compte !`,
+                });
             });
     }
 
@@ -183,27 +229,112 @@ export class TriviaGameModel {
      * Update the game message to show the answer and display top 3 players
      */
     public async sendAnswerToChannel(): Promise<void> {
-        const playerResponseArray = Object.entries(this.playerAnswer).sort(
+        const playersResponse: [string, any][] = Object.entries(this.playerAnswer).sort(
             (a: [string, any], b: [string, any]) => a[1].responseTime - b[1].responseTime
         );
 
         this.answerEmbed.setImage(this.datum.images.big_icon).setDescription(`Le char à deviner était : \`${this.datum.name}\``);
+        const otherAnswer: string[] = ['Les autres bonnes réponses sont :'];
+        this.allTanks.forEach((vehicle: VehicleData): void => {
+            if (
+                vehicle.name !== this.datum.name &&
+                vehicle.default_profile.ammo[0].type === this.datum.default_profile.ammo[0].type &&
+                vehicle.default_profile.ammo[0].damage[1] === this.datum.default_profile.ammo[0].damage[1]
+            ) {
+                otherAnswer.push(vehicle.name);
+            }
+        });
+        this.answerEmbed.setFields([]);
+        if (otherAnswer.length > 1) {
+            this.answerEmbed.setFields({ name: 'Autre bonne réponses :', value: otherAnswer.join('\n') });
+        }
 
-        let description = playerResponseArray.length > 0 ? '' : "Aucun joueur n'a envoyé de réponse !";
+        let description: string = playersResponse.length > 0 ? '' : "Aucun joueur n'a envoyé de réponse !";
 
         for (let i = 0; i < 3; i++) {
-            if (playerResponseArray[i] && playerResponseArray[i][1].response === this.datum.name) {
-                description += `${this.MEDAL[i]} ${playerResponseArray[i][0]} en ${
-                    playerResponseArray[i][1].responseTime / 1000
-                } secondes\n`;
+            if (playersResponse[i] && this.isGoodAnswer(playersResponse[i])) {
+                description += `${this.MEDAL[i]} ${playersResponse[i][0]} en ${playersResponse[i][1].responseTime / 1000} secondes\n`;
             }
         }
 
-        const playerEmbed = new EmbedBuilder()
+        const playerEmbed: EmbedBuilder = new EmbedBuilder()
             .setTitle('Joueurs')
             .setDescription(description)
-            .setColor(playerResponseArray.length === 0 ? Colors.Red : Colors.Gold);
+            .setColor(playersResponse.length === 0 ? Colors.Red : Colors.Gold);
 
         await this.gameMessage.edit({ embeds: [this.answerEmbed, playerEmbed], components: [] });
+
+        this.updateStatistic(playersResponse);
+    }
+
+    /**
+     * Check is the answer of the player is the good one.
+     * Check the aplha and the type of ammunition
+     * @param playerResponse The player response
+     * @private
+     * @todo Add the fact that the answer can be on multiple tanks
+     */
+    private isGoodAnswer(playerResponse: [string, any]) {
+        return (
+            playerResponse[1].response.includes(String(this.datum.default_profile.ammo[0].damage[1])) &&
+            playerResponse[1].response.includes(this.datum.default_profile.ammo[0].type)
+        );
+    }
+
+    /**
+     * Update the trivia game statistic
+     * @param responses The response of all the players
+     * @private
+     */
+    private updateStatistic(responses: [string, any][]): void {
+        const overall: MonthlyTriviaOverallStatisticType = this.triviaStats.overall[this.statisticSingleton.currentMonth] ?? {
+            number_of_game: 0,
+            game_without_participation: 0,
+        };
+
+        overall.number_of_game++;
+
+        if (responses.length === 0) {
+            overall.game_without_participation++;
+        }
+        this.triviaStats.overall[this.statisticSingleton.currentMonth] = overall;
+
+        responses.forEach((response: [string, any]): void => {
+            const player: TriviaPlayerStatisticType = this.triviaStats.player[response[0]] ?? {};
+
+            const playerStat: MonthlyTriviaPlayerStatisticType = player[this.statisticSingleton.currentMonth]
+                ? player[this.statisticSingleton.currentMonth]
+                : { elo: 0, right_answer: 0, win_strick: 0, answer_time: [], participation: 0 };
+            playerStat.participation++;
+
+            if (this.isGoodAnswer(response)) {
+                playerStat.answer_time.push(response[1].responseTime);
+                playerStat.right_answer++;
+                playerStat.win_strick++;
+            } else {
+                playerStat.win_strick = 0;
+            }
+
+            playerStat.elo = this.calculateElo(playerStat, response);
+
+            player[this.statisticSingleton.currentMonth] = playerStat;
+            this.triviaStats.player[response[0]] = player;
+        });
+
+        this.statisticSingleton.trivia = this.triviaStats;
+    }
+
+    /**
+     * Calculate the elo of the player.
+     * @param playerStat The stats of the player
+     * @param response The response of the player
+     * @private
+     */
+    private calculateElo(playerStat: MonthlyTriviaPlayerStatisticType, response: [string, any]): number {
+        if (this.isGoodAnswer(response)) {
+            return playerStat.elo + 1;
+        }
+        const elo: number = playerStat.elo - 1;
+        return elo < 0 ? 0 : elo;
     }
 }

@@ -19,7 +19,7 @@ export class RandomUtil {
      */
     public static getArrayWithRandomNumber(length: number = 1, max: number = 1, min: number = 0, allowRepeat?: boolean): number[] {
         return new Array(length).fill(undefined).reduce((previousValue: number[], _currentValue: any): number[] => {
-            let randomNumber = this.getRandomNumber(max, min);
+            let randomNumber: number = this.getRandomNumber(max, min);
             while (!allowRepeat && previousValue.includes(randomNumber)) {
                 randomNumber = this.getRandomNumber(max, min);
             }

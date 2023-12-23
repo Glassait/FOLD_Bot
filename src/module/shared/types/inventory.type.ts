@@ -20,7 +20,7 @@ export type NewsLetter = { channel: string; website: WebSiteState[] };
 /**
  * Defined the type for the trivia game
  */
-export type TriviaType = { channel: string; url: string; limite: number };
+export type TriviaType = { channel: string; url: string; limit: number };
 
 /**
  * Defined the inventory.json file architecture
