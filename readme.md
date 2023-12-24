@@ -104,8 +104,6 @@ This project need node v18.16.0 or higher
 -   [x] Create Sequence diagram and wiki on github [(#36)](https://github.com/Glassait/freePuntosBot/issues/36)
 -   [ ] ~~Translation for Wot express~~ (Closed because pay service)
 -   [x] Upgrade autoReply (without IA)
--   [ ] ROULETTE [(#32)](https://github.com/Glassait/freePuntosBot/issues/32)
--   [ ] REPLAY ANALYSE [(#31)](https://github.com/Glassait/freePuntosBot/issues/31)
 -   [x] MINI JEU TRIVIA [(#30)](https://github.com/Glassait/freePuntosBot/issues/30)
 
 See the [open issues](https://github.com/Glassait/freePuntosBot/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement) for a full list of proposed features (and known issues).
@@ -132,9 +130,12 @@ Use this space to list resources you find helpful and would like to give credit 
 
 ## Changelog
 
-### 1.3.0
+### 2.0.0
 
 -   Create this changelog :)
+-   Create the trivia game
+-   Optimise the decorator
+-   Clean code
 
 ### 1.2.1
 

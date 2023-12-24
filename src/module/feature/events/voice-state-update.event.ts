@@ -1,6 +1,6 @@
 import { Client, Events, GuildMember, VoiceState } from 'discord.js';
 import { FeatureSingleton } from '../../shared/singleton/feature.singleton';
-import { BotEvent } from './model/bot-event.type';
+import { BotEvent } from './types/bot-event.type';
 import { Context } from '../../shared/classes/context';
 import { UserUtil } from '../../shared/utils/user.util';
 import { Logger } from '../../shared/classes/logger';

@@ -64,6 +64,10 @@ export class StatisticSingleton {
         return this._data.trivia;
     }
 
+    /**
+     * Setter for the trivia game's statistic
+     * @param trivia
+     */
     public set trivia(trivia: TriviaStatisticType) {
         this._data.trivia = trivia;
         FileUtil.writeIntoJson(this.path, this._data);

@@ -1,11 +1,12 @@
-import { AxiosInstance } from 'axios';
+import { AxiosInstance, AxiosResponse } from 'axios';
 import * as cheerio from 'cheerio';
 import { CheerioAPI } from 'cheerio';
 import { Client, EmbedBuilder, TextChannel } from 'discord.js';
 import { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
-import { WebSiteName, WebSiteState } from '../../../shared/types/inventory.type';
 import { AxiosInjector, InventoryInjector, LoggerInjector } from '../../../shared/decorators/injector.decorator';
 import { Logger } from '../../../shared/classes/logger';
+import { WebsiteNameEnum } from '../enums/website-name.enum';
+import { WebSiteState } from '../../../shared/types/inventory.type';
 
 @LoggerInjector
 @InventoryInjector
@@ -50,7 +51,7 @@ export class WebSiteScraper {
         this.logger.trace(`⛏️ Start scrapping ${newsLetter.name}`);
 
         try {
-            const response = await this.axios.get(newsLetter.liveUrl);
+            const response: AxiosResponse<any> = await this.axios.get(newsLetter.liveUrl);
             this.logger.trace(`⛏️ Html get for scrapping`);
             await this.getLastNews(response.data, newsLetter);
         } catch (e) {
@@ -65,7 +66,7 @@ export class WebSiteScraper {
      */
     public async getLastNews(html: string, webSiteState: WebSiteState): Promise<void> {
         const $: CheerioAPI = cheerio.load(html);
-        if (webSiteState.name === WebSiteName.WOT_EXPRESS) {
+        if (webSiteState.name === WebsiteNameEnum.WOT_EXPRESS) {
             const links: any[] = $(webSiteState.selector).get();
             const index: number = links.indexOf(links.find(value => value.attribs.href == webSiteState.lastUrl));
 
@@ -76,7 +77,7 @@ export class WebSiteScraper {
                     await this.wotExpress(links, i, webSiteState);
                 }
             }
-        } else if (webSiteState.name === WebSiteName.THE_DAILY_BOUNCE) {
+        } else if (webSiteState.name === WebsiteNameEnum.THE_DAILY_BOUNCE) {
             let containers: any[] = $(webSiteState.selector).get();
             const links: any[] = $(`${webSiteState.selector} div.read-img a`).get();
             let index: number = links.indexOf(links.find(value => value.attribs.href == webSiteState.lastUrl));
@@ -88,7 +89,7 @@ export class WebSiteScraper {
                     await this.dailyBounce(containers, links, i, $, webSiteState);
                 }
             }
-        } else if (webSiteState.name === WebSiteName.THE_ARMORED_PATROL) {
+        } else if (webSiteState.name === WebsiteNameEnum.THE_ARMORED_PATROL) {
             let containers: any[] = $(webSiteState.selector).get();
             let index: number = containers.indexOf(
                 containers.find(value => value.children[1].children[1].children[0].attribs.href == webSiteState.lastUrl)
@@ -126,7 +127,7 @@ export class WebSiteScraper {
 
     /**
      * Scrap the wot express website
-     * @param links All the balise if the html containing the news url
+     * @param links All the tags of the html containing the news url
      * @param index The index of the url
      * @param webSiteState The website
      */
@@ -143,7 +144,7 @@ export class WebSiteScraper {
     /**
      * Scrap the daily bounce website
      * @param containers The html container
-     * @param links All the balise if the html containing the news url
+     * @param links All the tags of the html containing the news url
      * @param index The index of the url
      * @param $ The cheerio api
      * @param webSiteState The website

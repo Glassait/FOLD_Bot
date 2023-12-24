@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, Client, Events, Interaction } from 'discord.js';
-import { BotEvent } from './model/bot-event.type';
+import { BotEvent } from './types/bot-event.type';
 import { Context } from '../../shared/classes/context';
 import { EnvUtil } from '../../shared/utils/env.util';
 import { Logger } from '../../shared/classes/logger';

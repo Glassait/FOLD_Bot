@@ -63,7 +63,7 @@ export class SentenceUtil {
         [ActivityType.Watching, 'Le HE de 2021 sur les Chief'],
         [ActivityType.Watching, 'Les artys avec des AP'],
         [ActivityType.Watching, 'Un réacteur nucléaire en pleine fusion'],
-        [ActivityType.Competing, 'Dominer le monde avec GPT pour '],
+        [ActivityType.Competing, 'Dominer le monde avec GPT'],
         [ActivityType.Custom, 'Inchabouda'],
     ];
 

@@ -1,5 +1,5 @@
 import { Client, Events, Message } from 'discord.js';
-import { BotEvent } from './model/bot-event.type';
+import { BotEvent } from './types/bot-event.type';
 import { AutoReplyUtil } from '../../shared/utils/auto-reply.util';
 import { EnvUtil } from '../../shared/utils/env.util';
 

@@ -3,6 +3,7 @@ import { Logger } from '../../shared/classes/logger';
 import { Context } from '../../shared/classes/context';
 import { EnvUtil } from '../../shared/utils/env.util';
 import { TriviaGameModel } from './model/trivia-game.model';
+import { RandomUtil } from '../../shared/utils/random.util';
 
 module.exports = async (client: Client): Promise<void> => {
     const logger: Logger = new Logger(new Context('TRIVIA-LOOP'));
@@ -12,7 +13,7 @@ module.exports = async (client: Client): Promise<void> => {
     logger.info('🔁 Trivia game initialized');
     let index: number = 0;
     while (index !== -1) {
-        // await EnvUtil.sleep(1000 * 60 * 2); // new Promise(r => setTimeout(r, 1000 * 60 * 2 /** SentenceUtil.getRandomNumber(1000 * 60 * 60 * 4, 1000 * 60 * 5  60)*/));
+        await EnvUtil.sleep(RandomUtil.getRandomNumber(1000 * 60 * 60 * 4, 1000 * 60 * 60));
 
         logger.info('🎮 Trivia game start');
         try {

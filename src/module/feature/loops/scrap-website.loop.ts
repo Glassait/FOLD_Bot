@@ -7,7 +7,7 @@ import { Context } from '../../shared/classes/context';
 module.exports = async (client: Client): Promise<void> => {
     const logger: Logger = new Logger(new Context('SCRAP-WEBSITE-LOOP'));
     const length: number = InventorySingleton.instance.numberOfNewsletter;
-    const webSiteScraper = new WebSiteScraper();
+    const webSiteScraper: WebSiteScraper = new WebSiteScraper();
     await webSiteScraper.fetchChannel(client);
 
     logger.info('🔁 Web scraping initialized');

@@ -1,5 +1,5 @@
 import { SlashCommandMentionableOption, SlashCommandStringOption } from '@discordjs/builders';
-import { SlashCommandBuilder, SlashCommandSubcommandBuilder } from 'discord.js';
+import { SlashCommandBuilder } from 'discord.js';
 
 /**
  * Define all slash commands options used.

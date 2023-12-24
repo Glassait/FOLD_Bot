@@ -7,7 +7,11 @@ import { application_id_wot } from '../../../../config.json';
 @LoggerInjector
 @AxiosInjector
 export class WotApiModel {
-    private readonly WOT_API = 'https://api.worldoftanks.eu/';
+    /**
+     * The base url for the wot api
+     * @private
+     */
+    private readonly WOT_API: string = 'https://api.worldoftanks.eu/';
 
     /**
      * The axios instance
@@ -22,12 +26,12 @@ export class WotApiModel {
 
     /**
      * Call the World of Tanks api with the following url
-     * @param url The url to call
+     * @param url The url to call, this url will be added the base WoT api
      * @throws Error When the answer is in error
      */
-    public async fetchApi(url: string): Promise<TankopediaVehiclesSuccess> {
+    public async fetchTankopediaApi(url: string): Promise<TankopediaVehiclesSuccess> {
         url = this.WOT_API + url.replace('applicationId', application_id_wot);
-        this.logger.trace(`🪖 Fetching wot api with url ${url}`);
+        this.logger.trace(`💂 Fetching wot api with url ${url}`);
 
         const data: TankopediaVehicle = (await this.axios.get(url)).data;
 

@@ -131,7 +131,7 @@ export class TriviaGameModel {
     }
 
     /**
-     * Call tha WoT api to fetch the 4 tanks for the game
+     * Call the WoT api to fetch the 4 tanks for the game
      * @throws Error if fetching send error
      */
     public async fetchTanks(): Promise<void> {
@@ -140,7 +140,7 @@ export class TriviaGameModel {
         const tankopediaResponses: TankopediaVehiclesSuccess[] = [];
 
         for (const page of pages) {
-            tankopediaResponses.push(await this.wotApi.fetchApi(this.trivia.url.replace('pageNumber', String(page))));
+            tankopediaResponses.push(await this.wotApi.fetchTankopediaApi(this.trivia.url.replace('pageNumber', String(page))));
         }
 
         if (tankopediaResponses[0].meta.count !== this.trivia.limit) {
@@ -188,13 +188,15 @@ export class TriviaGameModel {
             embeds: [this.startGameEmbed],
             components: [row],
         });
+        this.logger.trace('Trivia game message send to the guild');
         this.timer = Date.now();
     }
 
     /**
-     * Collect the play answer during the play time
+     * Collect the player answer during the play time
      */
     public async collectAnswer(): Promise<void> {
+        this.logger.trace('Collecting player answer start');
         this.playerAnswer = {};
         this.gameMessage
             .createMessageComponentCollector({
@@ -223,6 +225,7 @@ export class TriviaGameModel {
      * Update the game message to show the answer and display top 3 players
      */
     public async sendAnswerToChannel(): Promise<void> {
+        this.logger.trace('Collect answer end. Start calculating the scores');
         const playersResponse: [string, any][] = Object.entries(this.playerAnswer).sort(
             (a: [string, any], b: [string, any]) => a[1].responseTime - b[1].responseTime
         );
@@ -259,6 +262,7 @@ export class TriviaGameModel {
             .setColor(playersResponse.length === 0 ? Colors.Red : Colors.Gold);
 
         await this.gameMessage.edit({ embeds: [this.answerEmbed, playerEmbed], components: [] });
+        this.logger.trace('Game message update with answer and top 3 players');
 
         this.updateStatistic(playersResponse);
     }
@@ -273,7 +277,7 @@ export class TriviaGameModel {
     }
 
     /**
-     * This methode check if there are another tanks that have the same shell (damage and type)
+     * This method check if there are another tanks that have the same shell (damage and type)
      * @param playerResponse The answer of the player
      * @private
      */
@@ -298,6 +302,7 @@ export class TriviaGameModel {
      * @private
      */
     private updateStatistic(responses: [string, any][]): void {
+        this.logger.trace('Start updating the overall statistics');
         const overall: MonthlyTriviaOverallStatisticType = this.triviaStats.overall[this.statisticSingleton.currentMonth] ?? {
             number_of_game: 0,
             game_without_participation: 0,
@@ -310,7 +315,9 @@ export class TriviaGameModel {
         }
         this.triviaStats.overall[this.statisticSingleton.currentMonth] = overall;
 
+        this.logger.trace("Start updating the player's statistics");
         responses.forEach((response: [string, any]): void => {
+            this.logger.trace(`Start updating ${response[0]} statistic`);
             const player: TriviaPlayerStatisticType = this.triviaStats.player[response[0]] ?? {};
 
             const playerStat: MonthlyTriviaPlayerStatisticType = player[this.statisticSingleton.currentMonth]
@@ -323,15 +330,18 @@ export class TriviaGameModel {
                 playerStat.right_answer++;
                 playerStat.win_strick++;
                 response[1].interaction.editReply({ content: 'Ta réponse était la bonne :)' });
+                this.logger.trace(`Player ${response[0]} found the right answer`);
             } else {
                 playerStat.win_strick = 0;
                 response[1].interaction.editReply({ content: "Ta réponse n'était pas la bonne :(" });
+                this.logger.trace(`Player ${response[0]} failed to find the right answer`);
             }
 
             playerStat.elo = this.calculateElo(playerStat, response);
 
             player[this.statisticSingleton.currentMonth] = playerStat;
             this.triviaStats.player[response[0]] = player;
+            this.logger.trace(`End updating ${response[0]} statistic`);
         });
 
         this.statisticSingleton.trivia = this.triviaStats;

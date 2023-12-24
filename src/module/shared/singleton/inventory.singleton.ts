@@ -1,11 +1,11 @@
-import { readFileSync, writeFile } from 'fs';
+import { readFileSync } from 'fs';
 import { InventoryType, TriviaType, WebSiteState } from '../types/inventory.type';
 import { EnvUtil } from '../utils/env.util';
 import { Logger } from '../classes/logger';
 import { Client, TextChannel } from 'discord.js';
 import { guild_id } from '../../../config.json';
 import { Context } from '../classes/context';
-import {FileUtil} from "../utils/file.util";
+import { FileUtil } from '../utils/file.util';
 
 /**
  * Class used to manage the inventory.json file
@@ -114,7 +114,6 @@ export class InventorySingleton {
         const index: number = this._inventory.newsLetter.website.indexOf(webSite);
         this._inventory.newsLetter.website[index].lastUrl = url;
         FileUtil.writeIntoJson(this.path, this._inventory);
-        // this.updateFile();
     }
 
     /**

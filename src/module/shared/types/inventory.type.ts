@@ -1,13 +1,4 @@
 /**
- * All the name of the website
- */
-export enum WebSiteName {
-    WOT_EXPRESS = 'Wot Express',
-    THE_DAILY_BOUNCE = 'THE DAILY BOUNCE',
-    THE_ARMORED_PATROL = 'The Armored Patrol',
-}
-
-/**
  * Defined the website type, used in the newsletter type
  */
 export type WebSiteState = { liveUrl: string; lastUrl: string; name: string; selector: string };
