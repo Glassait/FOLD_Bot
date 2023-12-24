@@ -49,10 +49,10 @@ export class SentenceUtil {
         '<@discordId>',
         'Moi aussi de peux ping, <@discordId>',
     ];
-    private static status = [
+    private static status: [ActivityType, string][] = [
         [ActivityType.Playing, 'Imagine un monde sans Bady'],
         [ActivityType.Playing, 'Imagine un monde sans Jeff'],
-        [ActivityType.Playing, 'Une artys en 2018'],
+        [ActivityType.Playing, 'WoT avec une arty en 2018'],
         [ActivityType.Listening, 'Jeff dire de la merde h24'],
         [ActivityType.Listening, 'Bady mentir à longueur de journée'],
         [ActivityType.Listening, 'Amiral rager'],

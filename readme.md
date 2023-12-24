@@ -89,7 +89,7 @@ This project need node v18.16.0 or higher
     npm install
     ```
 3. Contact me on discord to get the token for the bot
-4. If you want to test the bot, contact me for shutting down the prod bot and run :
+4. If you want to test the bot run ce following command :
     ```sh
      npm run start:mock
     ```

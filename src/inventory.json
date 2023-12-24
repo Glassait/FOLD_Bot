@@ -1,32 +1,32 @@
 {
-  "newsLetter": {
-    "channel": "1171525891604623472",
-    "website": [
-      {
-        "liveUrl": "https://wotexpress.info/",
-        "lastUrl": "",
-        "name": "Wot Express",
-        "selector": "a.news-block-row"
-      },
-      {
-        "liveUrl": "https://thedailybounce.net/",
-        "lastUrl": "",
-        "name": "THE DAILY BOUNCE",
-        "selector": "article.archive-image-left"
-      },
-      {
-        "liveUrl": "https://thearmoredpatrol.com/category/world-of-tanks/",
-        "lastUrl": "",
-        "name": "The Armored Patrol",
-        "selector": "article.post"
-      }
-    ]
-  },
-  "game": {
-    "trivia": {
-      "limit": 90,
-      "url": "wot/encyclopedia/vehicles/?application_id=applicationId&tier=10&language=fr&fields=name%2C+images.big_icon%2C+default_profile.ammo.damage%2C+default_profile.ammo.type&limit=1&page_no=pageNumber",
-      "channel": "1171525891604623472"
+    "newsLetter": {
+        "channel": "1177006853318779002",
+        "website": [
+            {
+                "liveUrl": "https://wotexpress.info/",
+                "lastUrl": "",
+                "name": "Wot Express",
+                "selector": "a.news-block-row"
+            },
+            {
+                "liveUrl": "https://thedailybounce.net/",
+                "lastUrl": "",
+                "name": "THE DAILY BOUNCE",
+                "selector": "article.archive-image-left"
+            },
+            {
+                "liveUrl": "https://thearmoredpatrol.com/category/world-of-tanks/",
+                "lastUrl": "",
+                "name": "The Armored Patrol",
+                "selector": "article.post"
+            }
+        ]
+    },
+    "game": {
+        "trivia": {
+            "limit": 90,
+            "url": "wot/encyclopedia/vehicles/?application_id=applicationId&tier=10&language=fr&fields=name%2C+images.big_icon%2C+default_profile.ammo.damage%2C+default_profile.ammo.type&limit=1&page_no=pageNumber",
+            "channel": "1171525891604623472"
+        }
     }
-  }
 }

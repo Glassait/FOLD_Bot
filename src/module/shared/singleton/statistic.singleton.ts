@@ -2,6 +2,7 @@ import { Logger } from '../classes/logger';
 import { Context } from '../classes/context';
 import { StatisticType, TriviaStatisticType } from '../types/statistic.type';
 import { FileUtil } from '../utils/file.util';
+import { readFileSync } from 'fs';
 
 /**
  * This class keep track of the statistics for the different games
@@ -42,18 +43,19 @@ export class StatisticSingleton {
             player: {},
         },
     };
+    /**
+     * The statistic
+     * @private
+     */
+    private readonly _data: StatisticType = this.INITIAL_VALUE;
 
     /**
      * Private constructor to respect singleton pattern
      * @private
      */
-    private constructor() {}
-
-    /**
-     * The statistic
-     * @private
-     */
-    private _data: StatisticType = this.INITIAL_VALUE;
+    private constructor() {
+        this._data = JSON.parse(readFileSync(this.path).toString());
+    }
 
     /**
      * Getter for the trivia game's statistic

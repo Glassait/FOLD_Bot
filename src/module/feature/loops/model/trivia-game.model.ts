@@ -15,7 +15,7 @@ import {
 } from 'discord.js';
 import { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
 import { RandomUtil } from '../../../shared/utils/random.util';
-import { TankopediaVehiclesSuccess, VehicleData } from './wot-api.type';
+import { TankopediaVehiclesSuccess, VehicleData } from '../types/wot-api.type';
 import { WotApiModel } from './wot-api.model';
 import { StatisticSingleton } from 'src/module/shared/singleton/statistic.singleton';
 import {
@@ -24,6 +24,7 @@ import {
     TriviaPlayerStatisticType,
     TriviaStatisticType,
 } from '../../../shared/types/statistic.type';
+import { ShellEnum } from '../enums/shell.enum';
 
 @LoggerInjector
 @InventoryInjector
@@ -66,7 +67,7 @@ export class TriviaGameModel {
     private playerAnswer: {
         [key: string]: {
             responseTime: number;
-            response: string[];
+            response: string;
             interaction: ButtonInteraction<'cached'>;
         };
     } = {};
@@ -81,11 +82,6 @@ export class TriviaGameModel {
      */
     public readonly MAX_TIME: number = 1000 * 60;
 
-    /**
-     * This field defined the separator for the id of the button for the response
-     * @private
-     */
-    private readonly SEPARATOR: string = '#';
     /**
      * The medal for the player
      * @private
@@ -165,7 +161,6 @@ export class TriviaGameModel {
      * Send the game message to the channel
      */
     public async sendMessageToChannel(): Promise<void> {
-        // TODO UPDATE THE RULL WITH THE FACT THAT MULTIPLE TANKS CAN HAVE THE SAME AMMO
         this.startGameEmbed.setFields(
             {
                 name: ' Règle du jeu',
@@ -173,21 +168,16 @@ export class TriviaGameModel {
             },
             {
                 name: 'Obus :',
-                value: `\`${this.datum.default_profile.ammo[0].type} ${this.datum.default_profile.ammo[0].damage[1]}\``,
+                value: `\`${ShellEnum[this.datum.default_profile.ammo[0].type as keyof typeof ShellEnum]} ${
+                    this.datum.default_profile.ammo[0].damage[1]
+                }\``,
                 inline: true,
             }
         );
 
         const row: ActionRowBuilder<ButtonBuilder> = this.allTanks.reduce(
             (rowBuilder: ActionRowBuilder<ButtonBuilder>, data: VehicleData) => {
-                rowBuilder.addComponents(
-                    new ButtonBuilder()
-                        .setCustomId(
-                            `${data.name}${this.SEPARATOR}${data.default_profile.ammo[0].damage[1]}${this.SEPARATOR}${data.default_profile.ammo[0].type}`
-                        )
-                        .setLabel(data.name)
-                        .setStyle(ButtonStyle.Primary)
-                );
+                rowBuilder.addComponents(new ButtonBuilder().setCustomId(`${data.name}`).setLabel(data.name).setStyle(ButtonStyle.Primary));
                 return rowBuilder;
             },
             new ActionRowBuilder<ButtonBuilder>()
@@ -212,15 +202,19 @@ export class TriviaGameModel {
                 time: this.MAX_TIME,
             })
             .on('collect', async (interaction: ButtonInteraction<'cached'>): Promise<void> => {
-                this.logger.trace(`${interaction.user.username} answer to the trivia game with : \`${interaction.customId}\``);
+                this.logger.trace(
+                    `${interaction.member.nickname ?? interaction.user.displayName} answer to the trivia game with : \`${
+                        interaction.customId
+                    }\``
+                );
                 this.playerAnswer[interaction.user.username] = {
                     responseTime: Date.now() - this.timer,
-                    response: interaction.customId.split(this.SEPARATOR),
+                    response: interaction.customId,
                     interaction: interaction,
                 };
                 await interaction.reply({
                     ephemeral: true,
-                    content: `Ta réponse \`${interaction.customId.split(this.SEPARATOR)[0]}\` à bien été pris en compte !`,
+                    content: `Ta réponse \`${interaction.customId}\` à bien été pris en compte !`,
                 });
             });
     }
@@ -257,6 +251,8 @@ export class TriviaGameModel {
             }
         }
 
+        description = description ? description : "Aucun joueur n'a trouvé la bonne réponse !";
+
         const playerEmbed: EmbedBuilder = new EmbedBuilder()
             .setTitle('Joueurs')
             .setDescription(description)
@@ -269,15 +265,30 @@ export class TriviaGameModel {
 
     /**
      * Check is the answer of the player is the good one.
-     * Check the aplha and the type of ammunition
      * @param playerResponse The player response
      * @private
-     * @todo Add the fact that the answer can be on multiple tanks
      */
-    private isGoodAnswer(playerResponse: [string, any]) {
+    private isGoodAnswer(playerResponse: [string, any]): boolean {
+        return playerResponse[1].response === this.datum.name || this.isAnotherTanks(playerResponse);
+    }
+
+    /**
+     * This methode check if there are another tanks that have the same shell (damage and type)
+     * @param playerResponse The answer of the player
+     * @private
+     */
+    private isAnotherTanks(playerResponse: [string, any]): boolean {
+        const vehicle: VehicleData | undefined = this.allTanks.find(
+            (vehicle: VehicleData): boolean => vehicle.name === playerResponse[1].response
+        );
+
+        if (!vehicle) {
+            return false;
+        }
+
         return (
-            playerResponse[1].response.includes(String(this.datum.default_profile.ammo[0].damage[1])) &&
-            playerResponse[1].response.includes(this.datum.default_profile.ammo[0].type)
+            vehicle.default_profile.ammo[0].type === this.datum.default_profile.ammo[0].type &&
+            vehicle.default_profile.ammo[0].damage[1] === this.datum.default_profile.ammo[0].damage[1]
         );
     }
 
@@ -306,13 +317,15 @@ export class TriviaGameModel {
                 ? player[this.statisticSingleton.currentMonth]
                 : { elo: 0, right_answer: 0, win_strick: 0, answer_time: [], participation: 0 };
             playerStat.participation++;
+            playerStat.answer_time.push(response[1].responseTime);
 
             if (this.isGoodAnswer(response)) {
-                playerStat.answer_time.push(response[1].responseTime);
                 playerStat.right_answer++;
                 playerStat.win_strick++;
+                response[1].interaction.editReply({ content: 'Ta réponse était la bonne :)' });
             } else {
                 playerStat.win_strick = 0;
+                response[1].interaction.editReply({ content: "Ta réponse n'était pas la bonne :(" });
             }
 
             playerStat.elo = this.calculateElo(playerStat, response);

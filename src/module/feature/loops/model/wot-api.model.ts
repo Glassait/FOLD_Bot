@@ -1,7 +1,7 @@
 import { AxiosInstance } from 'axios';
 import { AxiosInjector, LoggerInjector } from '../../../shared/decorators/injector.decorator';
 import { Logger } from '../../../shared/classes/logger';
-import { TankopediaVehicle, TankopediaVehiclesSuccess } from './wot-api.type';
+import { TankopediaVehicle, TankopediaVehiclesSuccess } from '../types/wot-api.type';
 import { application_id_wot } from '../../../../config.json';
 
 @LoggerInjector
