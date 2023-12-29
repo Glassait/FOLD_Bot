@@ -354,10 +354,13 @@ export class TriviaGameModel {
      * @private
      */
     private calculateElo(playerStat: MonthlyTriviaPlayerStatisticType, response: [string, any]): number {
+        let K: number = 1 / (response[1].responseTime / 10000) * (playerStat.win_strick + 1);
+        let Ea: number = 1 / (1 + Math.pow(10, playerStat.elo / 400));
+        let Ro: number = 0;
         if (this.isGoodAnswer(response)) {
-            return playerStat.elo + 1;
+            Ro = 1;
         }
-        const elo: number = playerStat.elo - 1;
+        const elo: number = playerStat.elo + K * (Ro - Ea);
         return elo < 0 ? 0 : elo;
     }
 }
