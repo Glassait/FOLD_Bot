@@ -22,7 +22,7 @@ module.exports = async (client: Client): Promise<void> => {
     while (index !== -1) {
         targetDate.setHours(targetDate.getHours() + 2, 0, 0, 0);
         time = targetDate.getTime() - startDate.getTime();
-        // await EnvUtil.sleep(time);
+        await EnvUtil.sleep(time);
 
         logger.info('🎮 Trivia game start');
         try {

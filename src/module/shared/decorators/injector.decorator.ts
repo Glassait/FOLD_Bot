@@ -9,7 +9,7 @@ const logger: Logger = new Logger(new Context('Injector'));
 /**
  * Base type to define a class
  */
-type Constructor = { new (...args: any[]): any };
+type Constructor = new (...args: any[]) => any;
 
 /**
  * Inject the logger in the class. Doesn't work on static class (need constructor)
