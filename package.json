@@ -5,7 +5,9 @@
     "main": "src/index.ts",
     "scripts": {
         "start": "ts-node .",
-        "start:mock": "ts-node . -- DEV"
+        "start:mock": "ts-node . -- DEV",
+        "build": "tsc --build",
+        "clean": "tsc --build --clean"
     },
     "repository": {
         "type": "git",
@@ -31,7 +33,7 @@
         "ts-node": "^10.9.2"
     },
     "devDependencies": {
-        "@types/node": "^20.10.4",
+        "@types/node": "^20.10.5",
         "prettier": "^3.0.3",
         "typescript": "^5.3.3"
     }

@@ -2,18 +2,12 @@ import { Client, GatewayIntentBits } from 'discord.js';
 import { readdirSync } from 'fs';
 import { join } from 'path';
 import { token } from './config.json';
-import { FeatureSingleton } from './module/shared/singleton/feature.singleton';
-import { InventorySingleton } from './module/shared/singleton/inventory.singleton';
-import { LoggerSingleton } from './module/shared/singleton/logger.singleton';
 import { Context } from './module/shared/classes/context';
+import { Logger } from './module/shared/classes/logger';
 
-const logger: LoggerSingleton = LoggerSingleton.instance;
-const context: Context = new Context('INDEX');
+const logger: Logger = new Logger(new Context('INDEX'));
 
-logger.debug(context, '🤖 Bot is starting...');
-
-const _feature: FeatureSingleton = FeatureSingleton.instance;
-const inventory: InventorySingleton = InventorySingleton.instance;
+logger.debug('🤖 Bot is starting...');
 
 const client: Client = new Client({
     intents: [
@@ -34,14 +28,18 @@ readdirSync(handlersDir).forEach((handler: string): void => {
 
 client.login(token).then((value: string): void => {
     if (value) {
-        logger.debug(context, 'The bot is ready to kick some ass');
+        logger.debug('The bot is ready to kick some ass');
     } else {
-        logger.error(context, 'Failed to connect');
+        logger.error('Failed to connect');
     }
 });
 
+const loopsDir: string = join(__dirname, './module/feature/loops');
+
 setTimeout((): void => {
-    (async (): Promise<void> => {
-        await inventory.scrapWebSite(client);
-    })();
+    readdirSync(loopsDir).forEach((loop: string): void => {
+        if (!loop.endsWith('.ts')) return;
+
+        require(`${loopsDir}/${loop}`)(client);
+    });
 }, 500);

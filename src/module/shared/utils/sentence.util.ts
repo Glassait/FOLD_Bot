@@ -1,6 +1,7 @@
 import { ActivityType } from 'discord.js';
 import { DiscordId } from '../types/feature.type';
 import { EnvUtil } from './env.util';
+import { RandomUtil } from './random.util';
 
 /**
  * Utils for sentence
@@ -48,10 +49,10 @@ export class SentenceUtil {
         '<@discordId>',
         'Moi aussi de peux ping, <@discordId>',
     ];
-    private static status = [
+    private static status: [ActivityType, string][] = [
         [ActivityType.Playing, 'Imagine un monde sans Bady'],
         [ActivityType.Playing, 'Imagine un monde sans Jeff'],
-        [ActivityType.Playing, 'Une artys en 2018'],
+        [ActivityType.Playing, 'WoT avec une arty en 2018'],
         [ActivityType.Listening, 'Jeff dire de la merde h24'],
         [ActivityType.Listening, 'Bady mentir à longueur de journée'],
         [ActivityType.Listening, 'Amiral rager'],
@@ -61,8 +62,8 @@ export class SentenceUtil {
         [ActivityType.Watching, 'Un bot contre un bot'],
         [ActivityType.Watching, 'Le HE de 2021 sur les Chief'],
         [ActivityType.Watching, 'Les artys avec des AP'],
-        [ActivityType.Competing, 'Avec GPT pour dominer le monde'],
-        [ActivityType.Streaming, 'Un réacteur nucléaire en plein fusion'],
+        [ActivityType.Watching, 'Un réacteur nucléaire en pleine fusion'],
+        [ActivityType.Competing, 'Dominer le monde avec GPT'],
         [ActivityType.Custom, 'Inchabouda'],
     ];
 
@@ -71,7 +72,7 @@ export class SentenceUtil {
      * @param id The id to put in the response
      */
     public static getRandomResponse(id: DiscordId): string {
-        return this.response[this.getRandomNumber(this.response.length)].replace('discordId', id);
+        return this.response[RandomUtil.getRandomNumber(this.response.length)].replace('discordId', id);
     }
 
     /**
@@ -80,16 +81,6 @@ export class SentenceUtil {
     public static getRandomStatus(): any {
         return EnvUtil.isDev()
             ? [ActivityType.Custom, 'Entrain de ce faire toucher le code']
-            : this.status[this.getRandomNumber(this.status.length)];
-    }
-
-    /**
-     * Return a random number
-     * @param max The max number of the randomness
-     * @private
-     */
-    private static getRandomNumber(max?: number): number {
-        max = max || 1;
-        return Math.floor(Math.random() * max);
+            : this.status[RandomUtil.getRandomNumber(this.status.length)];
     }
 }

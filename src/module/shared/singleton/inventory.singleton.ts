@@ -1,43 +1,50 @@
-import { Client } from 'discord.js';
-import { readFileSync, writeFile } from 'fs';
-import { InventoryType, WebSiteState } from '../types/inventory.type';
-import { Context } from '../classes/context';
+import { readFileSync } from 'fs';
+import { InventoryType, TriviaType, WebSiteState } from '../types/inventory.type';
 import { EnvUtil } from '../utils/env.util';
-import { WebSiteScraper } from '../classes/web-site-scraper';
-import { LoggerDecorator } from '../decorators/loggerDecorator';
 import { Logger } from '../classes/logger';
+import { Client, TextChannel } from 'discord.js';
+import { guild_id } from '../../../config.json';
+import { Context } from '../classes/context';
+import { FileUtil } from '../utils/file.util';
 
 /**
  * Class used to manage the inventory.json file
  * This class implement the Singleton pattern
  */
-@LoggerDecorator
-export class InventorySingleton extends Context {
+export class InventorySingleton {
     /**
      * The path to the inventory.json file
      */
     public readonly path: string = './src/inventory.json';
 
     /**
-     * Logger instance
+     * The logger to log thing
      * @private
-     * @see LoggerDecorator
      */
-    private readonly logger: Logger;
+    private readonly logger: Logger = new Logger(new Context(InventorySingleton.name));
     /**
      * The data of the inventory
      * @private
      */
-    private readonly _inventory: InventoryType | undefined;
+    private readonly _inventory: InventoryType;
 
-    constructor() {
-        super(InventorySingleton);
+    /**
+     * The id of the dev channel
+     * @private
+     */
+    private readonly DEV_CHANNEL = '1171525891604623472';
 
-        const json: Buffer = readFileSync(this.path);
-        this._inventory = JSON.parse(json.toString());
+    /**
+     * Private constructor to respect the singleton pattern
+     * @private
+     * @constructor
+     */
+    private constructor() {
+        this._inventory = JSON.parse(readFileSync(this.path).toString());
 
         if (EnvUtil.isDev() && this._inventory) {
-            this._inventory.newsLetter.channel = '1171525891604623472';
+            this._inventory.newsLetter.channel = this.DEV_CHANNEL;
+            this._inventory.game.trivia.channel = this.DEV_CHANNEL;
         }
     }
 
@@ -61,56 +68,40 @@ export class InventorySingleton extends Context {
     /**
      * Get the website at the index
      * @param index The index of the website
+     * @throws Error If the index is out of bound
      */
-    public getNewsLetter(index: number): WebSiteState | undefined {
-        return this._inventory?.newsLetter.website[index];
+    public getNewsLetterAtIndex(index: number): WebSiteState {
+        let webSiteState = this._inventory.newsLetter.website[index];
+
+        if (!webSiteState) {
+            this.logger.error(`Index out of bound ${index} in newsletter array`);
+            throw new Error(`Index out of bound ${index} in newsletter array`);
+        }
+
+        return webSiteState;
     }
 
     /**
-     * Get the channel id where to send news
+     * Get the channel in the discord server to send the news
      */
-    public getNewsLetterChannel(): string | undefined {
-        return this._inventory?.newsLetter.channel;
+    public async getNewsLetterChannel(client: Client): Promise<TextChannel> {
+        return await this.fetchChannel(client, this._inventory.newsLetter.channel);
     }
 
     /**
-     * This method launch the scrapping of the website
-     * @param client
+     * Get the number of newsletter in the inventory
      */
-    public async scrapWebSite(client: Client): Promise<void> {
-        const length: number | undefined = this._inventory?.newsLetter.website.length;
-
-        if (!length) {
-            this.logger.error('Inventory is undefined');
-            return;
-        }
-
-        let index: number = 0;
-        while (true) {
-            const scraper: WebSiteScraper = new WebSiteScraper();
-            scraper.getHtml(index, client);
-            index++;
-
-            if (index >= length) {
-                index = 0;
-            }
-            this.logger.trace('End scrapping, next one in 30 minutes');
-            await new Promise(r => setTimeout(r, 1000 * 60 * 30));
-        }
+    public get numberOfNewsletter(): number {
+        return this._inventory.newsLetter.website.length;
     }
 
     /**
      * Update the last news send by the bot.
-     * Update the inventory.josn file
+     * Update the inventory.json file
      * @param url The new url
      * @param newsLetterName The name of the website
      */
     public updateLastUrlOfWebsite(url: string, newsLetterName: string): void {
-        if (!this._inventory) {
-            this.logger.error('No inventory found !');
-            return;
-        }
-
         const webSite: WebSiteState | undefined = this._inventory.newsLetter.website.find(
             (value: WebSiteState): boolean => value.name === newsLetterName
         );
@@ -122,20 +113,48 @@ export class InventorySingleton extends Context {
 
         const index: number = this._inventory.newsLetter.website.indexOf(webSite);
         this._inventory.newsLetter.website[index].lastUrl = url;
-        this.updateFile();
+        FileUtil.writeIntoJson(this.path, this._inventory);
     }
 
     /**
-     * Method to update the inventory.json file
+     * Get the channel for the trivia game
+     * @param client
+     */
+    public async getChannelForTrivia(client: Client): Promise<TextChannel> {
+        this.logger.trace('Channel instance fetch for the trivia game');
+        return await this.fetchChannel(client, this._inventory.game.trivia.channel);
+    }
+
+    /**
+     * Get the trivia information from the inventory
+     */
+    public get trivia(): TriviaType {
+        return this._inventory.game.trivia;
+    }
+
+    /**
+     * Update the trivia information with the new value and update the json file
+     * @param trivia The new value
+     */
+    public set trivia(trivia: TriviaType) {
+        this._inventory.game.trivia = trivia;
+        FileUtil.writeIntoJson(this.path, this._inventory);
+    }
+
+    /**
+     * Get the text channel from the cache and if is not load fetch it from the guild manager
+     * @param client The client of the bot
+     * @param id The id of the channel
      * @private
      */
-    private updateFile(): void {
-        writeFile(this.path, JSON.stringify(this._inventory, null, '\t'), err => {
-            if (err) {
-                this.logger.warning(`🔄❌ Failed to sync the inventory file with error: ${err}`);
-            } else if (this.logger) {
-                this.logger.trace('Inventory successfully updated');
-            }
-        });
+    private async fetchChannel(client: Client, id: string): Promise<TextChannel> {
+        let channel: TextChannel | undefined = <TextChannel>client.channels.cache.get(id);
+
+        if (!channel) {
+            const g = await client.guilds.fetch(guild_id);
+            return <TextChannel>await g.channels.fetch(id);
+        }
+
+        return channel;
     }
 }
