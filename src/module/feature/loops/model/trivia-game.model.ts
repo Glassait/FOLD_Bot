@@ -164,7 +164,7 @@ export class TriviaGameModel {
         this.startGameEmbed.setFields(
             {
                 name: ' Règle du jeu',
-                value: "Les règles sont simples :\n\t - ✏ 1 obus,\n- 🚗 4 chars  tier X (⚠️Quand 2 ou plusieurs chars on le même obus, tous ces chars sont des bonnes réponses),\n- ✔ 1 bonne réponse ,\n- 🕒 1 minute.\n**⚠️ Ce n'est pas forcèment le dernier canon utilisé !**",
+                value: "Les règles sont simples :\n\t - ✏ 1 obus,\n- 🚗 4 chars  tier X,\n- ✔ 1 bonne réponse (⚠️Quand 2 ou plusieurs chars on le même obus, tous ces chars sont des bonnes réponses),\n- 🕒 1 minute.\n**⚠️ Ce n'est pas forcèment le dernier canon utilisé !**",
             },
             {
                 name: 'Obus :',
