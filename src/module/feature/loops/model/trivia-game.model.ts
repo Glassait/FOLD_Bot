@@ -164,7 +164,7 @@ export class TriviaGameModel {
         this.startGameEmbed.setFields(
             {
                 name: ' Règle du jeu',
-                value: "Les règles sont simple :\n\t - ✏ 1 obus,\n- 🚗 4 chars  tier X (⚠️Quand 2 ou plusieurs chars on le même obus, tous ces chars sont des bonnes responses),\n- ✔ 1 bonne réponse ,\n- 🕒 1 minute.\n**⚠️ Ce n'est pas forcèment le dernier canon utilisé !**",
+                value: "Les règles sont simples :\n\t - ✏ 1 obus,\n- 🚗 4 chars  tier X (⚠️Quand 2 ou plusieurs chars on le même obus, tous ces chars sont des bonnes réponses),\n- ✔ 1 bonne réponse ,\n- 🕒 1 minute.\n**⚠️ Ce n'est pas forcèment le dernier canon utilisé !**",
             },
             {
                 name: 'Obus :',
@@ -254,7 +254,7 @@ export class TriviaGameModel {
             }
         }
 
-        description = description ? description : "Aucun joueur n'a trouvé la bonne réponse !";
+        description = description || "Aucun joueur n'a trouvé la bonne réponse !";
 
         const playerEmbed: EmbedBuilder = new EmbedBuilder()
             .setTitle('Joueurs')
@@ -320,9 +320,13 @@ export class TriviaGameModel {
             this.logger.trace(`Start updating ${response[0]} statistic`);
             const player: TriviaPlayerStatisticType = this.triviaStats.player[response[0]] ?? {};
 
-            const playerStat: MonthlyTriviaPlayerStatisticType = player[this.statisticSingleton.currentMonth]
-                ? player[this.statisticSingleton.currentMonth]
-                : { elo: 0, right_answer: 0, win_strick: 0, answer_time: [], participation: 0 };
+            const playerStat: MonthlyTriviaPlayerStatisticType = player[this.statisticSingleton.currentMonth] ?? {
+                elo: 0,
+                right_answer: 0,
+                win_strick: 0,
+                answer_time: [],
+                participation: 0,
+            };
             playerStat.participation++;
             playerStat.answer_time.push(response[1].responseTime);
 
@@ -354,13 +358,16 @@ export class TriviaGameModel {
      * @private
      */
     private calculateElo(playerStat: MonthlyTriviaPlayerStatisticType, response: [string, any]): number {
-        let K: number = 1 / (response[1].responseTime / 10000) * (playerStat.win_strick + 1);
-        let Ea: number = 1 / (1 + Math.pow(10, playerStat.elo / 400));
-        let Ro: number = 0;
+        let gain = -Math.floor(60 * Math.exp(0.0001 * playerStat.elo));
         if (this.isGoodAnswer(response)) {
-            Ro = 1;
+            gain = Math.floor(60 * Math.exp(-0.0001 * playerStat.elo));
+
+            if (response[1].responseTime <= 10000) {
+                gain += Math.floor((gain / 3) * ((10000 - response[1].responseTime) / 10000));
+            }
         }
-        const elo: number = playerStat.elo + K * (Ro - Ea);
-        return elo < 0 ? 0 : elo;
+
+        const newElo: number = playerStat.elo + gain;
+        return newElo < 0 ? 0 : newElo;
     }
 }
