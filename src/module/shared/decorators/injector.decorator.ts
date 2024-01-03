@@ -99,7 +99,7 @@ export function AxiosInjector<T extends Constructor>(base: T): T {
  * }
  */
 export function StatisticInjector<T extends Constructor>(base: T): T {
-    logger.trace(`Axios injected for ${base.name}`);
+    logger.trace(`Statistic injected for ${base.name}`);
     return {
         [base.name]: class extends base {
             statisticSingleton: StatisticSingleton = StatisticSingleton.instance;
