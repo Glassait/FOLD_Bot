@@ -10,7 +10,7 @@ module.exports = async (client: Client): Promise<void> => {
     await triviaGame.fetchMandatory(client);
     const getNextHour = (): number => {
         const now = new Date();
-        for (const hour of [18, 20, 22, 0]) {
+        for (const hour of [19, 21, 23, 1]) {
             if (hour > now.getHours() || (hour === now.getHours() && now.getMinutes() < 30)) {
                 return hour;
             }
