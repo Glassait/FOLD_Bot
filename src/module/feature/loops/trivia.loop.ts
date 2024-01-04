@@ -20,17 +20,22 @@ module.exports = async (client: Client): Promise<void> => {
 
     logger.info('🔁 Trivia game initialized');
 
-    const startDate: Date = new Date();
+    let startDate: Date = new Date();
     const targetDate: Date = new Date();
     targetDate.setHours(16, 30, 0, 0);
 
     const time = targetDate.getTime() - startDate.getTime();
+    logger.debug(`Sleeping until ${targetDate.toLocaleString('fr-FR')}, (in milliseconds ${time}`);
     await EnvUtil.sleep(time > 0 ? time : 0);
 
     let index: number = 0;
     while (index !== -1) {
         logger.debug('🔁 Trivia loop start');
+        startDate = new Date();
         targetDate.setHours(getNextHour(), 30, 0, 0);
+        logger.debug(
+            `Sleeping until ${targetDate.toLocaleString('fr-FR')}, (in milliseconds ${targetDate.getTime() - startDate.getTime()}`
+        );
         await EnvUtil.sleep(targetDate.getTime() - startDate.getTime());
 
         logger.info('🎮 Trivia game start');
