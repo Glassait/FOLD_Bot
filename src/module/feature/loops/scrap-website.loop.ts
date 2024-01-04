@@ -3,6 +3,7 @@ import { WebSiteScraper } from './model/web-site-scraper.model';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
 import { Logger } from '../../shared/classes/logger';
 import { Context } from '../../shared/classes/context';
+import { EnvUtil } from '../../shared/utils/env.util';
 
 module.exports = async (client: Client): Promise<void> => {
     const logger: Logger = new Logger(new Context('SCRAP-WEBSITE-LOOP'));
@@ -14,8 +15,8 @@ module.exports = async (client: Client): Promise<void> => {
     let index: number = 0;
     while (index !== -1) {
         await webSiteScraper.scrapWebsiteAtIndex(index);
-        index = index >= length ? 0 : index + 1;
+        index = index >= length - 1 ? 0 : index + 1;
         logger.trace('End scrapping, next one in 30 minutes');
-        await new Promise(r => setTimeout(r, 1000 * 60 * 30));
+        await EnvUtil.sleep(1000 * 60 * 30);
     }
 };

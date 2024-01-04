@@ -26,15 +26,15 @@
     },
     "homepage": "https://github.com/Glassait/freePuntosBot#readme",
     "dependencies": {
-        "@discordjs/voice": "^0.16.0",
-        "axios": "^1.6.2",
-        "cheerio": "^1.0.0-rc.12",
-        "discord.js": "^14.14.1",
-        "ts-node": "^10.9.2"
+        "@discordjs/voice": "0.16.0",
+        "axios": "1.6.2",
+        "cheerio": "1.0.0-rc.12",
+        "discord.js": "14.14.1",
+        "ts-node": "10.9.2"
     },
     "devDependencies": {
-        "@types/node": "^20.10.5",
-        "prettier": "^3.0.3",
-        "typescript": "^5.3.3"
+        "@types/node": "20.10.6",
+        "prettier": "3.0.3",
+        "typescript": "5.3.3"
     }
 }
