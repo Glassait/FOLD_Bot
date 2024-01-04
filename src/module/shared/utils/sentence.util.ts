@@ -72,7 +72,7 @@ export class SentenceUtil {
      * @param id The id to put in the response
      */
     public static getRandomResponse(id: DiscordId): string {
-        return this.response[RandomUtil.getRandomNumber(this.response.length)].replace('discordId', id);
+        return this.response[RandomUtil.getRandomNumber(this.response.length - 1)].replace('discordId', id);
     }
 
     /**
@@ -81,6 +81,6 @@ export class SentenceUtil {
     public static getRandomStatus(): any {
         return EnvUtil.isDev()
             ? [ActivityType.Custom, 'Entrain de ce faire toucher le code']
-            : this.status[RandomUtil.getRandomNumber(this.status.length)];
+            : this.status[RandomUtil.getRandomNumber(this.status.length - 1)];
     }
 }
