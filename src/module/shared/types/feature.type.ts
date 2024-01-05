@@ -1,5 +1,5 @@
 /**
- * Way to refer to dicord id
+ * Way to refer to discord id
  */
 export type DiscordId = string; // NOSONAR
 
@@ -9,10 +9,24 @@ export type DiscordId = string; // NOSONAR
 export type Reply = { activateFor: DiscordId; replyTo: DiscordId };
 
 /**
+ * Define the World of tank clan for the recrutement
+ */
+export type Clan = { id: string; name: string };
+
+/**
  * Defined the architecture of the feature.json file
  */
 export type FeatureType = {
-    version: number;
+    /**
+     * The user to auto-disconnect
+     */
     auto_disconnect: DiscordId;
+    /**
+     * The list of auto-reply
+     */
     auto_reply: Reply[];
+    /**
+     * The list of clan to watch
+     */
+    watch_clan: Clan[];
 };
