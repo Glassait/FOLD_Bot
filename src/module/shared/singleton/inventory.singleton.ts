@@ -142,6 +142,15 @@ export class InventorySingleton {
     }
 
     /**
+     * Get the channel for the fold recrutement
+     * @param client
+     */
+    public async getChannelForFoldRecrutement(client: Client): Promise<TextChannel> {
+        this.logger.trace('Channel instance fetch for the fold recrutement');
+        return await this.fetchChannel(client, this._inventory.fold_recrutement.channel);
+    }
+
+    /**
      * Get the text channel from the cache and if is not load fetch it from the guild manager
      * @param client The client of the bot
      * @param id The id of the channel
