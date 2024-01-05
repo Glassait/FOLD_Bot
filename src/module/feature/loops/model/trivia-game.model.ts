@@ -224,6 +224,7 @@ export class TriviaGameModel {
                 time: this.MAX_TIME,
             })
             .on('collect', async (interaction: ButtonInteraction<'cached'>): Promise<void> => {
+                await interaction.deferReply({ ephemeral: true });
                 this.logger.trace(
                     `${interaction.member.nickname ?? interaction.user.displayName} answer to the trivia game with : \`${
                         interaction.customId
@@ -234,8 +235,7 @@ export class TriviaGameModel {
                     response: interaction.customId,
                     interaction: interaction,
                 };
-                await interaction.reply({
-                    ephemeral: true,
+                await interaction.editReply({
                     content: `Ta réponse \`${interaction.customId}\` à bien été pris en compte !`,
                 });
             });
