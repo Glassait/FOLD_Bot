@@ -8,50 +8,32 @@ module.exports = async (client: Client): Promise<void> => {
     const logger: Logger = new Logger(new Context('TRIVIA-LOOP'));
     const triviaGame: TriviaGameModel = new TriviaGameModel();
     await triviaGame.fetchMandatory(client);
-    const getNextHour = (): number => {
-        const now = new Date();
-        for (const hour of [19, 21, 23, 1]) {
-            if (hour > now.getHours() || (hour === now.getHours() && now.getMinutes() < 30)) {
-                return hour;
-            }
-        }
-        return 0;
-    };
 
     logger.info('🔁 Trivia game initialized');
-
-    let startDate: Date = new Date();
-    const targetDate: Date = new Date();
-    targetDate.setHours(16, 30, 0, 0);
-
-    const time = targetDate.getTime() - startDate.getTime();
-    logger.debug(`Sleeping until ${targetDate.toLocaleString('fr-FR')}, (in milliseconds ${time}`);
-    await EnvUtil.sleep(time > 0 ? time : 0);
-
-    let index: number = 0;
-    while (index !== -1) {
+    for (const hour of [19, 20, 21]) {
         logger.debug('🔁 Trivia loop start');
-        startDate = new Date();
-        targetDate.setHours(getNextHour(), 30, 0, 0);
-        logger.debug(
-            `Sleeping until ${targetDate.toLocaleString('fr-FR')}, (in milliseconds ${targetDate.getTime() - startDate.getTime()}`
-        );
-        await EnvUtil.sleep(targetDate.getTime() - startDate.getTime());
+        const startDate = new Date();
+        const targetDate = new Date();
+        targetDate.setHours(hour, 30, 0, 0);
+        const time = targetDate.getTime() - startDate.getTime();
 
-        logger.info('🎮 Trivia game start');
-        try {
-            await triviaGame.fetchTanks();
-        } catch (e) {
-            logger.error(`Error during trivia loop : ${e}`);
-            index = -1;
+        if (time > 0) {
+            await EnvUtil.sleep(time);
+
+            logger.info('🎮 Trivia game start');
+            try {
+                await triviaGame.fetchTanks();
+            } catch (e) {
+                logger.error(`Error during trivia loop : ${e}`);
+            }
+
+            await triviaGame.sendMessageToChannel();
+            await triviaGame.collectAnswer();
+
+            await EnvUtil.sleep(triviaGame.MAX_TIME);
+            logger.info('🎮 Trivia game end');
+            await triviaGame.sendAnswerToChannel();
         }
-
-        await triviaGame.sendMessageToChannel();
-        await triviaGame.collectAnswer();
-
-        await EnvUtil.sleep(triviaGame.MAX_TIME);
-        logger.info('🎮 Trivia game end');
-        await triviaGame.sendAnswerToChannel();
     }
-    logger.error('🔁 Trivia loop end');
+    logger.debug('🔁 Trivia loop end');
 };

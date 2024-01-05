@@ -130,6 +130,14 @@ Use this space to list resources you find helpful and would like to give credit 
 
 ## Changelog
 
+### 2.0.1
+
+-   Fix date in trivia game
+-   Rework loop in trivia game
+-   Set trivia game time to 5 min and add countdown
+-   Add more logs
+-   Trivia game only send to 18h30, 19h30 and 20h30
+
 ### 2.0.0
 
 -   Create this changelog :)

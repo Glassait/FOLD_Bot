@@ -25,104 +25,121 @@ import {
     TriviaStatisticType,
 } from '../../../shared/types/statistic.type';
 import { ShellEnum } from '../enums/shell.enum';
+import { TimeEnum } from '../../../shared/enums/time.enum';
+import { TimeUtil } from '../../../shared/utils/time.util';
 
+/**
+ * This class is responsible for managing the trivia game.
+ */
 @LoggerInjector
 @InventoryInjector
 @StatisticInjector
 export class TriviaGameModel {
     /**
-     * The data for the trivia
+     * The information fetch from the inventory
      * @private
      */
     private trivia: TriviaType;
     /**
-     * @instance Of the discord text channel
+     * Channel where the trivia game is being played.
      * @private
      */
     private channel: TextChannel;
     /**
-     * All the tanks for the game
+     * Array of all tanks used in the trivia game.
      * @private
      */
     private allTanks: VehicleData[];
     /**
-     * The selected tanks
+     * Tank selected for the current trivia game.
      * @private
      */
     private datum: VehicleData;
     /**
-     * The message send
+     * Message containing the trivia game components.
      * @private
      */
     private gameMessage: Message<true>;
     /**
-     * The timer of the game
+     * Timestamp when the trivia game started.
      * @private
      */
     private timer: number;
     /**
-     * Follow the player answer
+     * Mapping of players and their answers.
      * @private
      */
     private playerAnswer: {
         [key: string]: {
+            /**
+             * Time taken by the player to answer the trivia question.
+             */
             responseTime: number;
+            /**
+             * Answer given by the player.
+             */
             response: string;
+            /**
+             * Discord interaction used to submit the answer.
+             */
             interaction: ButtonInteraction<'cached'>;
         };
     } = {};
     /**
-     * The tracking variable for the trivia game
+     * Trivia statistics.
      * @private
      */
     private triviaStats: TriviaStatisticType;
 
     /**
-     * Define the max play time
+     * Maximum time allowed for a player to answer the trivia question.
      */
-    public readonly MAX_TIME: number = 1000 * 60;
+    public readonly MAX_TIME: number = TimeEnum.MINUTE * 5;
 
     /**
-     * The medal for the player
+     * Medals to be awarded to the top 3 players.
      * @private
      */
     private readonly MEDAL: string[] = ['🥇', '🥈', '🥉'];
     /**
-     * @instance Of the logger
+     * @instance of the logger.
      * @private
      */
     private readonly logger: Logger;
     /**
-     * @instance Of the inventory
+     * @instance of the inventory service.
      * @private
      */
     private readonly inventory: InventorySingleton;
     /**
-     * @instance Of the wot api
+     * @instance of the WoT API service.
      * @private
      */
     private readonly wotApi: WotApiModel = new WotApiModel();
     /**
-     * The embed for the start game message
+     * @instance of the statistic service.
+     * @private
+     */
+    private readonly statisticSingleton: StatisticSingleton;
+    /**
+     * Embed used to display information about the trivia game.
      * @private
      */
     private readonly startGameEmbed: EmbedBuilder = new EmbedBuilder().setTitle('Trivia Game').setColor(Colors.Aqua);
     /**
-     * The embed for the game result
+     * Embed used to display the answer to the trivia question and the top 3 players.
      * @private
      */
     private readonly answerEmbed: EmbedBuilder = new EmbedBuilder().setTitle('Trivia Game : RÉSULTAT').setColor(Colors.Green);
     /**
-     * @instance Of the axios
+     * The max time to give bonus elo to the player
      * @private
      */
-    private readonly statisticSingleton: StatisticSingleton;
+    private readonly responseTimeLimit = TimeEnum.SECONDE * 10;
 
     /**
-     * Fetch the instance of the text channel,
-     * Initialize the trivia from {@link InventorySingleton},
-     * Initialize the trivia statistic from the {@link StatisticSingleton}
-     * @param client The client instance of the bot
+     * Fetches the necessary services and initializes the model.
+     * @param client Discord client.
      */
     public async fetchMandatory(client: Client): Promise<void> {
         this.channel = await this.inventory.getChannelForTrivia(client);
@@ -131,8 +148,7 @@ export class TriviaGameModel {
     }
 
     /**
-     * Call the WoT api to fetch the 4 tanks for the game
-     * @throws Error if fetching send error
+     * Fetches the tanks to be used in the trivia game.
      */
     public async fetchTanks(): Promise<void> {
         this.logger.trace('Start fetching tanks');
@@ -158,13 +174,17 @@ export class TriviaGameModel {
     }
 
     /**
-     * Send the game message to the channel
+     * Sends a message to the trivia game channel with information about the game and the selected tank.
      */
     public async sendMessageToChannel(): Promise<void> {
+        const target = new Date();
+        target.setMinutes(target.getMinutes() + this.MAX_TIME / TimeEnum.MINUTE);
         this.startGameEmbed.setFields(
             {
                 name: ' Règle du jeu',
-                value: "Les règles sont simples :\n\t - ✏ 1 obus,\n- 🚗 4 chars  tier X,\n- ✔ 1 bonne réponse (⚠️Quand 2 ou plusieurs chars on le même obus, tous ces chars sont des bonnes réponses),\n- 🕒 1 minute.\n**⚠️ Ce n'est pas forcèment le dernier canon utilisé !**",
+                value: `Les règles sont simples :\n\t - ✏ 1 obus,\n- 🚗 4 chars  tier X,\n- ✔ 1 bonne réponse (⚠️Quand 2 ou plusieurs chars on le même obus, tous ces chars sont des bonnes réponses),\n- 🕒 ${
+                    this.MAX_TIME / TimeEnum.MINUTE
+                } minutes (fini <t:${TimeUtil.convertToUnix(target)}:R>).\n**⚠️ Ce n'est pas forcèment le dernier canon utilisé !**`,
             },
             {
                 name: 'Obus :',
@@ -193,7 +213,7 @@ export class TriviaGameModel {
     }
 
     /**
-     * Collect the player answer during the play time
+     * Collects the answers from the players.
      */
     public async collectAnswer(): Promise<void> {
         this.logger.trace('Collecting player answer start');
@@ -222,7 +242,7 @@ export class TriviaGameModel {
     }
 
     /**
-     * Update the game message to show the answer and display top 3 players
+     * Sends the answer to the trivia game channel and updates the player statistics.
      */
     public async sendAnswerToChannel(): Promise<void> {
         this.logger.trace('Collect answer end. Start calculating the scores');
@@ -250,7 +270,7 @@ export class TriviaGameModel {
 
         for (let i = 0; i < 3; i++) {
             if (playersResponse[i] && this.isGoodAnswer(playersResponse[i])) {
-                description += `${this.MEDAL[i]} ${playersResponse[i][0]} en ${playersResponse[i][1].responseTime / 1000} secondes\n`;
+                description += `${this.MEDAL[i]} ${playersResponse[i][0]} en ${this.calculateResponseTime(playersResponse[i])}\n`;
             }
         }
 
@@ -268,9 +288,19 @@ export class TriviaGameModel {
     }
 
     /**
-     * Check is the answer of the player is the good one.
-     * @param playerResponse The player response
-     * @private
+     * Calculates the time taken by the player to answer the trivia question.
+     * @param playersResponse - Array of players and their responses.
+     * @returns The time taken by the player to answer the trivia question.
+     */
+    private calculateResponseTime(playersResponse: [string, any]): string {
+        const sec = playersResponse[1].responseTime / TimeEnum.SECONDE;
+        return sec > 60 ? `${Math.floor(sec / 60)}:${Math.round(sec % 60)} minutes` : `${sec.toFixed(2)} secondes`;
+    }
+
+    /**
+     * Checks if the player's answer is correct.
+     * @param playerResponse - The player's response.
+     * @returns `true` if the player's answer is correct, `false` otherwise.
      */
     private isGoodAnswer(playerResponse: [string, any]): boolean {
         return playerResponse[1].response === this.datum.name || this.isAnotherTanks(playerResponse);
@@ -278,7 +308,7 @@ export class TriviaGameModel {
 
     /**
      * This method check if there are another tanks that have the same shell (damage and type)
-     * @param playerResponse The answer of the player
+     * @param playerResponse - The answer of the player
      * @private
      */
     private isAnotherTanks(playerResponse: [string, any]): boolean {
@@ -297,9 +327,8 @@ export class TriviaGameModel {
     }
 
     /**
-     * Update the trivia game statistic
-     * @param responses The response of all the players
-     * @private
+     * Updates the overall and player statistics for the trivia game.
+     * @param responses - Array of players and their responses.
      */
     private updateStatistic(responses: [string, any][]): void {
         this.logger.trace('Start updating the overall statistics');
@@ -352,18 +381,18 @@ export class TriviaGameModel {
     }
 
     /**
-     * Calculate the elo of the player.
-     * @param playerStat The stats of the player
-     * @param response The response of the player
-     * @private
+     * Calculates the new ELO score based on the player's previous score and the response.
+     * @param playerStat - The player's previous score.
+     * @param response - The player's response.
+     * @returns  The new ELO score.
      */
     private calculateElo(playerStat: MonthlyTriviaPlayerStatisticType, response: [string, any]): number {
         let gain = -Math.floor(60 * Math.exp(0.0001 * playerStat.elo));
         if (this.isGoodAnswer(response)) {
             gain = Math.floor(60 * Math.exp(-0.0001 * playerStat.elo));
 
-            if (response[1].responseTime <= 10000) {
-                gain += Math.floor((gain / 3) * ((10000 - response[1].responseTime) / 10000));
+            if (response[1].responseTime <= this.responseTimeLimit) {
+                gain += Math.floor((gain / 3) * ((this.responseTimeLimit - response[1].responseTime) / this.responseTimeLimit));
             }
         }
 
