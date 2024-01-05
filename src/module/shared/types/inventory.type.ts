@@ -19,4 +19,8 @@ export type TriviaType = { channel: string; url: string; limit: number };
 export type InventoryType = {
     newsLetter: NewsLetter;
     game: { trivia: TriviaType };
+    fold_recrutement: {
+        channel: string;
+        [key: string]: string;
+    };
 };

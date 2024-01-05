@@ -10,11 +10,12 @@ module.exports = async (client: Client): Promise<void> => {
     await triviaGame.fetchMandatory(client);
 
     logger.info('🔁 Trivia game initialized');
-    for (const hour of [19, 20, 21]) {
+    for (const hour of [18, 19, 20, 21]) {
         logger.debug('🔁 Trivia loop start');
         const startDate = new Date();
         const targetDate = new Date();
         targetDate.setHours(hour, 30, 0, 0);
+        logger.info(`🎮 Trivia loop start at ${targetDate}`);
         const time = targetDate.getTime() - startDate.getTime();
 
         if (time > 0) {

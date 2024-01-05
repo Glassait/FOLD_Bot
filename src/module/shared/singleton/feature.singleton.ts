@@ -1,39 +1,41 @@
-import { readFileSync, writeFile } from 'fs';
-import { DiscordId, FeatureType, Reply } from '../types/feature.type';
+import { readFileSync } from 'fs';
+import { Clan, DiscordId, FeatureType, Reply } from '../types/feature.type';
 import { Logger } from '../classes/logger';
 import { Context } from '../classes/context';
+import { FileUtil } from '../utils/file.util';
 
-/**
- * Class used to manage the feature.json file
- * This class implement the Singleton pattern
- */
 export class FeatureSingleton {
+    //region PRIVATE READONLY FIELDS
     /**
-     * The path to the feature.json file
+     * The path to the feature configuration file.
      */
-    public readonly path: string = './src/feature.json';
+    private readonly path: string = './src/feature.json';
     /**
-     * The logger to log thing
-     * @private
+     * @instance of the logger
      */
     private readonly logger: Logger = new Logger(new Context(FeatureSingleton.name));
     /**
-     * The initial value for the data
-     * @private
+     * The initial value of the feature configuration.
      */
     private readonly INITIAL_VALUE: FeatureType = {
-        version: 2,
         auto_disconnect: '',
         auto_reply: [],
+        watch_clan: [],
     };
+    //endregion
 
-    /**
-     * Private constructor to respect the singleton pattern
-     * @private
-     * @constructor
-     */
     private constructor() {
-        this.syncFeatureFile();
+        try {
+            const json: Buffer = readFileSync(this.path);
+
+            if (json.toString() && json.toString().length > 0) {
+                this.data = JSON.parse(json.toString());
+            } else {
+                this.data = this._data;
+            }
+        } catch (e) {
+            FileUtil.writeIntoJson(this.path, this._data);
+        }
     }
 
     /**
@@ -54,57 +56,85 @@ export class FeatureSingleton {
     }
 
     /**
-     * The data of the feature.json file
-     * @private
+     * The current feature configuration.
      */
     private _data: FeatureType = this.INITIAL_VALUE;
 
     /**
-     * Getter for {@link _data}
+     * Gets the current feature configuration.
      */
     public get data(): FeatureType {
         return this._data;
     }
 
     /**
-     * Setter for {@link _data}, each time used update the feature.json file
-     * @param value The new data
+     * Sets the feature configuration.
+     * @param value The new feature configuration.
      */
     public set data(value: FeatureType) {
         const data: any = this.INITIAL_VALUE;
-        Object.keys(this.INITIAL_VALUE).forEach((key: string) => {
+        Object.keys(this.INITIAL_VALUE).forEach((key: string): void => {
             data[key as keyof FeatureType] = value[key as keyof FeatureType] ?? this.INITIAL_VALUE[key as keyof FeatureType];
         });
         this._data = data;
-
-        this.updateFile();
+        FileUtil.writeIntoJson(this.path, this._data);
     }
 
     /**
-     * Methode to set the `auto_disconnect` field in the data.
-     * Update the feature.json file
-     * @param targetId The id of the target
+     * Sets the auto-disconnect target.
+     * @param targetId The ID of the user to auto-disconnect.
      */
     public set autoDisconnect(targetId: DiscordId) {
         this._data.auto_disconnect = targetId;
-        this.updateFile();
+        FileUtil.writeIntoJson(this.path, this._data);
     }
 
     /**
-     * Add the new auto-reply register to the array.
-     * Update the feature.json file
-     * @param item The new auto-reply
+     * Gets the list of clans to watch.
      */
-    public pushAutoReply(item: Reply): void {
-        this._data.auto_reply.push(item);
-        this.updateFile();
+    public get clans(): Clan[] {
+        return this._data.watch_clan;
     }
 
     /**
-     * Delete an auto-reply form the data
-     * Update the feature.json file
-     * @param activateFor The user id
-     * @param replyTo The id of the auto-reply target
+     * Adds a clan to the list of clans to watch.
+     * @param clan The clan to add.
+     */
+    public addClan(clan: Clan): boolean {
+        clan.id = clan.id.trim().replace(/["']/g, '');
+        clan.name = clan.name.trim().replace(/["']/g, '');
+        if (this._data.watch_clan.filter((value: Clan) => (value.id = clan.id))) {
+            return false;
+        }
+
+        this._data.watch_clan.push(clan);
+        FileUtil.writeIntoJson(this.path, this._data);
+
+        return true;
+    }
+
+    /**
+     * Removes a clan from the list of clans to watch.
+     * @param clanID The clan to remove.
+     */
+    public removeClan(clanID: string): void {
+        this._data.watch_clan = this._data.watch_clan.filter((c: Clan): boolean => c.id !== clanID);
+        FileUtil.writeIntoJson(this.path, this._data);
+    }
+
+    /**
+     * Adds an auto-reply rule.
+     * @param item The auto-reply rule to add.
+     */
+    public addAutoReply(item: Reply): void {
+        this._data.auto_reply.push(item);
+        FileUtil.writeIntoJson(this.path, this._data);
+    }
+
+    /**
+     * Deletes an auto-reply rule.
+     * @param activateFor The ID of the user that triggers the auto-reply.
+     * @param replyTo The ID of the user that the auto-reply is sent to.
      */
     public deleteAutoReply(activateFor: DiscordId, replyTo: DiscordId): void {
         const object: Reply | undefined = this._data.auto_reply.find(
@@ -118,55 +148,23 @@ export class FeatureSingleton {
         const index: number = this._data.auto_reply.indexOf(object);
 
         this._data.auto_reply.splice(index, 1);
-        this.updateFile();
+        FileUtil.writeIntoJson(this.path, this._data);
     }
 
     /**
-     * Get all the auto-reply who the user is mention
-     * @param replyTo The id of the user
+     * Gets the auto-replies for a specific user.
+     * @param replyTo The ID of the user.
      */
     public getArrayFromReplyTo(replyTo: DiscordId): Reply[] {
         return this._data.auto_reply.filter((value: Reply): boolean => value.replyTo === replyTo);
     }
 
     /**
-     * Check if the user already have an auto-reply for the target
-     * @param activateFor The id if the user
-     * @param replyTo The id of the target
+     * Checks if an auto-reply rule exists for a specific user.
+     * @param activateFor The ID of the user that triggers the auto-reply.
+     * @param replyTo The ID of the user that the auto-reply is sent to.
      */
     public hasAutoReplyTo(activateFor: DiscordId, replyTo: DiscordId): boolean {
         return this._data.auto_reply.some((value: Reply) => value.activateFor === activateFor && value.replyTo === replyTo);
-    }
-
-    /**
-     * Read the feature.json file and set the data
-     * @private
-     */
-    private syncFeatureFile(): void {
-        try {
-            const json: Buffer = readFileSync(this.path);
-
-            if (json.toString() && json.toString().length > 0) {
-                this.data = JSON.parse(json.toString());
-            } else {
-                this.data = this._data;
-            }
-        } catch (e) {
-            this.updateFile();
-        }
-    }
-
-    /**
-     * Update the feature.json file with the new data
-     * @private
-     */
-    private updateFile(): void {
-        writeFile(this.path, JSON.stringify(this._data, null, '\t'), err => {
-            if (err) {
-                this.logger.warning(`🔄❌ Failed to sync the feature file with error: ${err}`);
-            } else if (this.logger) {
-                this.logger.trace('Feature.json successfully updated');
-            }
-        });
     }
 }

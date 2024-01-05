@@ -30,7 +30,7 @@ export const command: SlashCommandModel = new SlashCommandModel(
             }
 
             logger.info(`AutoReply activated for \`${interaction.user.displayName}\` to reply to \`${targetUser.displayName}\``);
-            feature.pushAutoReply({ activateFor: interaction.user.id, replyTo: targetUser.id });
+            feature.addAutoReply({ activateFor: interaction.user.id, replyTo: targetUser.id });
             await interaction.editReply({
                 content: `Réponse automatique mis en place pour <@${targetUser.id}>`,
             });

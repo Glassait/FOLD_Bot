@@ -45,6 +45,7 @@ export class InventorySingleton {
         if (EnvUtil.isDev() && this._inventory) {
             this._inventory.newsLetter.channel = this.DEV_CHANNEL;
             this._inventory.game.trivia.channel = this.DEV_CHANNEL;
+            this._inventory.fold_recrutement.channel = this.DEV_CHANNEL;
         }
     }
 
@@ -142,6 +143,15 @@ export class InventorySingleton {
     }
 
     /**
+     * Get the channel for the fold recrutement
+     * @param client
+     */
+    public async getChannelForFoldRecrutement(client: Client): Promise<TextChannel> {
+        this.logger.trace('Channel instance fetch for the fold recrutement');
+        return await this.fetchChannel(client, this._inventory.fold_recrutement.channel);
+    }
+
+    /**
      * Get the text channel from the cache and if is not load fetch it from the guild manager
      * @param client The client of the bot
      * @param id The id of the channel
@@ -156,5 +166,34 @@ export class InventorySingleton {
         }
 
         return channel;
+    }
+
+    /**
+     * Update the last time a clan joined the fold recrutement.
+     * Update the inventory.json file
+     * @param clanID The ID of the clan
+     * @param timestamp The timestamp of the last join
+     */
+    public updateLastClan(clanID: string, timestamp: string): void {
+        this._inventory.fold_recrutement[clanID] = timestamp;
+        FileUtil.writeIntoJson(this.path, this._inventory);
+    }
+
+    /**
+     * Get the last time a clan joined the fold recrutement.
+     * @param clanID The ID of the clan
+     * @returns The timestamp of the last join
+     */
+    public getLastClan(clanID: string): string {
+        return this._inventory.fold_recrutement[clanID];
+    }
+
+    /**
+     * Delete a clan from the fold recrutement
+     * @param clanID The ID of the clan
+     */
+    public deleteClan(clanID: string): void {
+        delete this._inventory.fold_recrutement[clanID];
+        FileUtil.writeIntoJson(this.path, this._inventory);
     }
 }
