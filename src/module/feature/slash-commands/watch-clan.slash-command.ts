@@ -24,7 +24,7 @@ export const command: SlashCommandModel = new SlashCommandModel(
 
             logger.info(added ? `Clan ${id.value} added to the clan to watch` : `Clan ${id.value} already exists`);
             await interaction.editReply({
-                content: added ? 'Le clan a bien été ajouté ! Le clan sera observé a partir de demain :)' : 'Le clan existe déjà',
+                content: added ? 'Le clan a bien été ajouté ! Le clan sera observé a partir de demain :)' : 'Le clan existe déjà !',
             });
         } else if (id) {
             feature.removeClan(<string>id.value);
@@ -32,14 +32,6 @@ export const command: SlashCommandModel = new SlashCommandModel(
 
             logger.info(`Clan ${id.value} removed from the clan to watch`);
             await interaction.editReply({ content: 'Le clan a bien été supprimé !' });
-        } else {
-            logger.info('Clan list displayed');
-            await interaction.editReply({
-                content:
-                    feature.clans.reduce((previousValue: string, clan: Clan): string => {
-                        return `${previousValue}\nClan : \`${clan.name}\` - id : \`${clan.id}\``;
-                    }, '') || "Aucun clan n'est enregistré",
-            });
         }
     },
     [
@@ -58,7 +50,6 @@ export const command: SlashCommandModel = new SlashCommandModel(
             .addStringOption((builder: SlashCommandStringOption) =>
                 builder.setName('id').setDescription("L'id du clan à supprimer").setRequired(true)
             ),
-        new SlashCommandSubcommandBuilder().setName('list').setDescription('Liste des clans à observer'),
     ],
     PermissionsBitField.Flags.KickMembers
 );

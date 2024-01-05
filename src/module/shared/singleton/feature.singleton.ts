@@ -90,20 +90,13 @@ export class FeatureSingleton {
     }
 
     /**
-     * Gets the list of clans to watch.
-     */
-    public get clans(): Clan[] {
-        return this._data.watch_clan;
-    }
-
-    /**
      * Adds a clan to the list of clans to watch.
      * @param clan The clan to add.
      */
     public addClan(clan: Clan): boolean {
         clan.id = clan.id.trim().replace(/["']/g, '');
         clan.name = clan.name.trim().replace(/["']/g, '');
-        if (!this._data.watch_clan.filter((value: Clan) => (value.id = clan.id))) {
+        if (this._data.watch_clan.filter((value: Clan): boolean => value.id === clan.id).length > 0) {
             return false;
         }
 
