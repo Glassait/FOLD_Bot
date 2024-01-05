@@ -26,6 +26,6 @@ export class EnvUtil {
      */
     public static async sleep(time: number): Promise<void> {
         this.logger.debug('😴 Sleeping for ' + time / 1000 + ' s');
-        await new Promise(r => setTimeout(r, time));
+        await new Promise(r => setTimeout(r, time < 0 ? 0 : time));
     }
 }

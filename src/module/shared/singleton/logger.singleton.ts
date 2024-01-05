@@ -66,7 +66,7 @@ export class LoggerSingleton extends Context {
      * @param msg The message of the TRACE
      */
     public trace(context: Context, msg: string): void {
-        console.debug(`〰: ${msg}`);
+        console.debug(`✎ : ${msg}`);
         this.addToLog('TRACE', 'gray', context.context, msg);
     }
 
@@ -76,7 +76,7 @@ export class LoggerSingleton extends Context {
      * @param msg The message of the DEBUG
      */
     public debug(context: Context, msg: string): void {
-        console.debug(`🔧: ${msg}`);
+        console.debug(`🔧 : ${msg}`);
         this.addToLog('DEBUG', 'grey', context.context, msg);
     }
 
@@ -86,7 +86,7 @@ export class LoggerSingleton extends Context {
      * @param msg The message of the INFO
      */
     public info(context: Context, msg: string): void {
-        console.info(`🛈: ${msg}`);
+        console.info(`🛈 : ${msg}`);
         this.addToLog('INFO', 'green', context.context, msg);
     }
 
@@ -96,7 +96,7 @@ export class LoggerSingleton extends Context {
      * @param msg The message of the WARNING
      */
     public warning(context: Context, msg: string): void {
-        console.warn(`⚠️: ${msg}`);
+        console.warn(`⚠️ : ${msg}`);
         this.addToLog('WARNING', 'orange', context.context, msg);
     }
 
@@ -106,7 +106,7 @@ export class LoggerSingleton extends Context {
      * @param msg The message of the ERROR
      */
     public error(context: Context, msg: string): void {
-        console.error(`🚨: ${msg}`);
+        console.error(`🚨 : ${msg}`);
         this.addToLog('ERROR', 'red', context.context, msg);
     }
 
