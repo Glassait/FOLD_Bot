@@ -3,7 +3,7 @@ import { Logger } from '../../../shared/classes/logger';
 import { AxiosInstance } from 'axios';
 import { ClanActivity, FoldRecrutementType, LeaveClanActivity, Players } from '../types/fold-recrutement.type';
 import { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
-import { Client, Colors, EmbedBuilder, TextChannel } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Client, Colors, EmbedBuilder, TextChannel } from 'discord.js';
 import { EnvUtil } from '../../../shared/utils/env.util';
 import { TimeEnum } from '../../../shared/enums/time.enum';
 import { Clan } from '../../../shared/types/feature.type';
@@ -18,6 +18,11 @@ export class FoldRecrutementModel {
      */
     private readonly url: string = 'https://eu.wargaming.net/clans/wot/clanID/newsfeed/api/events/?date_until=today&offset=3600';
     /**
+     * The base url for the image
+     * @private
+     */
+    private readonly image: string = 'https://eu.wargaming.net/clans/media/clans/emblems/cl_605/clanID/emblem_64x64.png';
+    /**
      * The base url of tomatoGG
      * @private
      */
@@ -26,8 +31,17 @@ export class FoldRecrutementModel {
      * The base url of WoT
      * @private
      */
-    private readonly wot: string =
-        'https://eu.wargaming.net/clans/wot/search/#wgsearch&type=accounts&search=name&account_id=id&limit=10&accounts-battle_type=random&accounts-expanded=id';
+    private readonly wot: string = 'https://worldoftanks.eu/fr/community/accounts/id-name/';
+    /**
+     * The base url of Wot Life
+     * @private
+     */
+    private readonly wotLife: string = 'https://fr.wot-life.com/eu/player/name-id/';
+    /**
+     * The limite date to not take player
+     * @private
+     */
+    private limiteDate: Date = new Date('2024-01-05T00:00:00');
     /**
      * @instance Of the logger
      * @private
@@ -78,7 +92,7 @@ export class FoldRecrutementModel {
      */
     public async sendMessageToChannelFromExtractedPlayer(clan: Clan): Promise<void> {
         let extracted: LeaveClanActivity[] = this.data.items.filter(
-            (item: ClanActivity): boolean => item.subtype === 'leave_clan'
+            (item: ClanActivity): boolean => item.subtype === 'leave_clan' && new Date(item.created_at) > this.limiteDate
         ) as unknown as LeaveClanActivity[];
 
         const lastClan = this.inventory.getLastClan(clan.id);
@@ -106,32 +120,52 @@ export class FoldRecrutementModel {
 
         this.logger.debug(`${datum.length} players leaves the clan`);
 
-        for (const player of datum) {
-            const embed: EmbedBuilder = new EmbedBuilder()
-                .setTitle('Nouveau joueur pouvant être recruté')
-                .setFields(
-                    {
-                        name: 'Joueur & clan',
-                        value: `\`${player.name}\` du clan \`${clan.name}\``,
-                    },
-                    {
-                        name: 'Site WoT',
-                        value: this.wot.replace('name', player.name).replace(/id/g, String(player.id)),
-                    },
-                    {
-                        name: 'Site tomatoGG',
-                        value: this.tomato.replace('name', player.name).replace('id', String(player.id)),
-                    }
-                )
-                .setColor(Colors.Blurple);
+        if (datum.length > 0) {
+            const embed = new EmbedBuilder()
+                .setColor(Colors.Fuchsia)
+                .setTitle(clan.name)
+                .setThumbnail(this.image.replace('clanID', clan.id))
+                .setDescription("Il semblerai qu'il y ait des joueurs qu'ont quitté le clan.")
+                .setFields({ name: 'Nombre de joueurs quittés', value: datum.length.toString() });
 
-            await this.channel.send({
-                embeds: [embed],
-            });
-
-            await EnvUtil.sleep(TimeEnum.MINUTE);
+            await this.channel.send({ embeds: [embed] });
         }
 
-        this.inventory.updateLastClan(clan.id, extracted[0].created_at);
+        for (const player of datum) {
+            const embedPlayer: EmbedBuilder = new EmbedBuilder()
+                .setTitle('Nouveau joueur pouvant être recruté')
+                .setDescription(`Le joueur suivant \`${player.name}\` a quitté \`${clan.name}\``)
+                .setColor(Colors.Blurple);
+
+            const wotButton = new ButtonBuilder()
+                .setURL(this.wot.replace('name', player.name).replace('id', String(player.id)))
+                .setLabel('Site de WoT')
+                .setStyle(ButtonStyle.Link);
+
+            const tomatoButton = new ButtonBuilder()
+                .setURL(this.tomato.replace('name', player.name).replace('id', String(player.id)))
+                .setLabel('Site de TomatoGG')
+                .setStyle(ButtonStyle.Link);
+
+            const wotLifeButton = new ButtonBuilder()
+                .setURL(this.wotLife.replace('name', player.name).replace('id', String(player.id)))
+                .setLabel('Site de Wot Life')
+                .setStyle(ButtonStyle.Link);
+
+            const row = new ActionRowBuilder<ButtonBuilder>().setComponents(wotButton, tomatoButton, wotLifeButton);
+
+            await this.channel.send({
+                embeds: [embedPlayer],
+                components: [row],
+            });
+
+            if (datum.length > 1) {
+                await EnvUtil.sleep(TimeEnum.MINUTE);
+            }
+        }
+
+        if (extracted[0]) {
+            this.inventory.updateLastClan(clan.id, extracted[0].created_at);
+        }
     }
 }

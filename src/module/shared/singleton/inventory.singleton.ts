@@ -187,4 +187,13 @@ export class InventorySingleton {
     public getLastClan(clanID: string): string {
         return this._inventory.fold_recrutement[clanID];
     }
+
+    /**
+     * Delete a clan from the fold recrutement
+     * @param clanID The ID of the clan
+     */
+    public deleteClan(clanID: string): void {
+        delete this._inventory.fold_recrutement[clanID];
+        FileUtil.writeIntoJson(this.path, this._inventory);
+    }
 }

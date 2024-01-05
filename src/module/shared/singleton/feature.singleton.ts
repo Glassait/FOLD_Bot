@@ -100,17 +100,25 @@ export class FeatureSingleton {
      * Adds a clan to the list of clans to watch.
      * @param clan The clan to add.
      */
-    public addClan(clan: Clan): void {
+    public addClan(clan: Clan): boolean {
+        clan.id = clan.id.trim().replace(/["']/, '');
+        clan.name = clan.name.trim().replace(/["']/, '');
+        if (this._data.watch_clan.filter((value: Clan) => (value.id = clan.id))) {
+            return false;
+        }
+
         this._data.watch_clan.push(clan);
         FileUtil.writeIntoJson(this.path, this._data);
+
+        return true;
     }
 
     /**
      * Removes a clan from the list of clans to watch.
-     * @param clan The clan to remove.
+     * @param clanID The clan to remove.
      */
-    public removeClan(clan: Clan): void {
-        this._data.watch_clan = this._data.watch_clan.filter((c: Clan): boolean => c.id !== clan.id);
+    public removeClan(clanID: string): void {
+        this._data.watch_clan = this._data.watch_clan.filter((c: Clan): boolean => c.id !== clanID);
         FileUtil.writeIntoJson(this.path, this._data);
     }
 

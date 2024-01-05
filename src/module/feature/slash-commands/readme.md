@@ -39,9 +39,9 @@ In the folder you will find all the slash command of the bot.
 
     ```typescript
     import { ChatInputCommandInteraction } from 'discord.js';
-    import { SlashCommand } from './model/slash-command';
+    import { SlashCommandModel } from './model/slash-command.model';
 
-    export const command: SlashCommand = new SlashCommand(
+    export const command: SlashCommandModel = new SlashCommandModel(
         'name',
         'description',
         async (interaction: ChatInputCommandInteraction): Promise<void> => {
@@ -66,9 +66,9 @@ Example: The option allow the user to pass people of the discord server.
 ```typescript
 import { SlashCommandMentionableOption } from '@discordjs/builders';
 import { ChatInputCommandInteraction } from 'discord.js';
-import { SlashCommand } from './model/slash-command';
+import { SlashCommandModel } from './model/slash-command.model';
 
-export const command: SlashCommand = new SlashCommand(
+export const command: SlashCommandModel = new SlashCommandModel(
     'ban',
     'Ban user',
     async (interaction: ChatInputCommandInteraction): Promise<void> => {
@@ -90,9 +90,9 @@ Example: Only people who can move user and higher can use this command.
 
 ```typescript
 import { ChatInputCommandInteraction, PermissionsBitField } from 'discord.js';
-import { SlashCommand } from './model/slash-command';
+import { SlashCommandModel } from './model/slash-command.model';
 
-export const command: SlashCommand = new SlashCommand(
+export const command: SlashCommandModel = new SlashCommandModel(
     'move',
     'Move the user',
     async (interaction: ChatInputCommandInteraction): Promise<void> => {
