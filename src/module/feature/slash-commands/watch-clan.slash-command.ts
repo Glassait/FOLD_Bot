@@ -4,7 +4,10 @@ import { SlashCommandStringOption } from '@discordjs/builders';
 import { FeatureSingleton } from '../../shared/singleton/feature.singleton';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
 import { Clan } from '../../shared/types/feature.type';
+import { Logger } from '../../shared/classes/logger';
+import { Context } from '../../shared/classes/context';
 
+const logger: Logger = new Logger(new Context('NAME-SLASH-COMMAND'));
 const feature: FeatureSingleton = FeatureSingleton.instance;
 const inventory: InventorySingleton = InventorySingleton.instance;
 
@@ -19,6 +22,7 @@ export const command: SlashCommandModel = new SlashCommandModel(
         if (id && name) {
             const added = feature.addClan({ id: <string>id.value, name: <string>name.value });
 
+            logger.info(added ? `Clan ${id.value} added to the clan to watch` : `Clan ${id.value} already exists`);
             await interaction.editReply({
                 content: added ? 'Le clan a bien été ajouté ! Le clan sera observé a partir de demain :)' : 'Le clan existe déjà',
             });
@@ -26,8 +30,10 @@ export const command: SlashCommandModel = new SlashCommandModel(
             feature.removeClan(<string>id.value);
             inventory.deleteClan(<string>id.value);
 
+            logger.info(`Clan ${id.value} removed from the clan to watch`);
             await interaction.editReply({ content: 'Le clan a bien été supprimé !' });
         } else {
+            logger.info('Clan list displayed');
             await interaction.editReply({
                 content: feature.clans.reduce((previousValue: string, clan: Clan): string => {
                     return `${previousValue}\nClan : \`${clan.name}\` - id : \`${clan.id}\``;

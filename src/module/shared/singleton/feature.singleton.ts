@@ -101,8 +101,8 @@ export class FeatureSingleton {
      * @param clan The clan to add.
      */
     public addClan(clan: Clan): boolean {
-        clan.id = clan.id.trim().replace(/["']/, '');
-        clan.name = clan.name.trim().replace(/["']/, '');
+        clan.id = clan.id.trim().replace(/["']/g, '');
+        clan.name = clan.name.trim().replace(/["']/g, '');
         if (this._data.watch_clan.filter((value: Clan) => (value.id = clan.id))) {
             return false;
         }
