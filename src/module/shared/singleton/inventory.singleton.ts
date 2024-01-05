@@ -45,6 +45,7 @@ export class InventorySingleton {
         if (EnvUtil.isDev() && this._inventory) {
             this._inventory.newsLetter.channel = this.DEV_CHANNEL;
             this._inventory.game.trivia.channel = this.DEV_CHANNEL;
+            this._inventory.fold_recrutement.channel = this.DEV_CHANNEL;
         }
     }
 
@@ -165,5 +166,25 @@ export class InventorySingleton {
         }
 
         return channel;
+    }
+
+    /**
+     * Update the last time a clan joined the fold recrutement.
+     * Update the inventory.json file
+     * @param clanID The ID of the clan
+     * @param timestamp The timestamp of the last join
+     */
+    public updateLastClan(clanID: string, timestamp: string): void {
+        this._inventory.fold_recrutement[clanID] = timestamp;
+        FileUtil.writeIntoJson(this.path, this._inventory);
+    }
+
+    /**
+     * Get the last time a clan joined the fold recrutement.
+     * @param clanID The ID of the clan
+     * @returns The timestamp of the last join
+     */
+    public getLastClan(clanID: string): string {
+        return this._inventory.fold_recrutement[clanID];
     }
 }

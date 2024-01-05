@@ -21,5 +21,6 @@ export type InventoryType = {
     game: { trivia: TriviaType };
     fold_recrutement: {
         channel: string;
+        [key: string]: string;
     };
 };
