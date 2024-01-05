@@ -41,7 +41,7 @@ export class FoldRecrutementModel {
      * The limite date to not take player
      * @private
      */
-    private limiteDate: Date = new Date('2024-01-05T00:00:00');
+    private limiteDate: Date = new Date('2024-01-03T00:00:00');
     /**
      * @instance Of the logger
      * @private
@@ -68,6 +68,11 @@ export class FoldRecrutementModel {
      * @private
      */
     private channel: TextChannel;
+    /**
+     * The total number of players who leaved there clan
+     * @private
+     */
+    private totalNumberOfPlayers: number = 0;
 
     /**
      * Fetch the mandatory information form the inventory
@@ -128,6 +133,8 @@ export class FoldRecrutementModel {
                 .setDescription("Il semblerai qu'il y ait des joueurs qu'ont quitté le clan.")
                 .setFields({ name: 'Nombre de joueurs quittés', value: datum.length.toString() });
 
+            this.totalNumberOfPlayers += datum.length;
+
             await this.channel.send({ embeds: [embed] });
         }
 
@@ -167,5 +174,21 @@ export class FoldRecrutementModel {
         if (extracted[0]) {
             this.inventory.updateLastClan(clan.id, extracted[0].created_at);
         }
+    }
+
+    /**
+     * Send the footer of the message
+     */
+    public async sendFooter(): Promise<void> {
+        if (this.totalNumberOfPlayers === 0) {
+            return;
+        }
+
+        const embed = new EmbedBuilder()
+            .setColor(Colors.Yellow)
+            .setTitle('Nombre total de joueurs ayant quitté leur clan')
+            .setDescription(`Un total de \`${this.totalNumberOfPlayers}\` joueur(s) qui ont quitté(s) leur clan`);
+
+        await this.channel.send({ embeds: [embed] });
     }
 }

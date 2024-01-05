@@ -18,5 +18,6 @@ module.exports = async (client: Client): Promise<void> => {
         await recrutement.sendMessageToChannelFromExtractedPlayer(clan);
         logger.info(`🔁 End fold-Recrutement loop for ${clan.name}`);
     }
+    await recrutement.sendFooter();
     logger.info('🔁 End fold-Recrutement loop');
 };
