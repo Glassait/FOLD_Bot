@@ -47,7 +47,7 @@ If you want to add persistent log in to execute of the event, follow the followi
 1. Add the logger and the context to the file 
     ```typescript
     import { Logger } from '../../shared/classes/logger';
-    import { Context } from '../../../utils/context.class';
+    import { Context } from '../../shared/classes/context';
 
     const logger: Logger = new Logger(new Context('NAME-EVENT'));
     ```
