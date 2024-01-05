@@ -35,9 +35,10 @@ export const command: SlashCommandModel = new SlashCommandModel(
         } else {
             logger.info('Clan list displayed');
             await interaction.editReply({
-                content: feature.clans.reduce((previousValue: string, clan: Clan): string => {
-                    return `${previousValue}\nClan : \`${clan.name}\` - id : \`${clan.id}\``;
-                }, ''),
+                content:
+                    feature.clans.reduce((previousValue: string, clan: Clan): string => {
+                        return `${previousValue}\nClan : \`${clan.name}\` - id : \`${clan.id}\``;
+                    }, '') || "Aucun clan n'est enregistré",
             });
         }
     },
