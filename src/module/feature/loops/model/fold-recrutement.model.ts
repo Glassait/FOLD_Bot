@@ -137,7 +137,7 @@ export class FoldRecrutementModel {
                 .setTitle(clan.name)
                 .setThumbnail(this.image.replace('clanID', clan.id))
                 .setDescription("Il semblerai qu'il y ait des joueurs qu'ont quitté le clan.")
-                .setFields({ name: 'Nombre de joueurs quittés', value: datum.length.toString() });
+                .setFields({ name: 'Nombre de départ', value: `\`${datum.length.toString()}\`` });
 
             this.totalNumberOfPlayers += datum.length;
             embeds.push(embed);
