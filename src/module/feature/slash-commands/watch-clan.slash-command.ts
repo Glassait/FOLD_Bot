@@ -3,7 +3,6 @@ import { SlashCommandModel } from './model/slash-command.model';
 import { SlashCommandStringOption } from '@discordjs/builders';
 import { FeatureSingleton } from '../../shared/singleton/feature.singleton';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
-import { Clan } from '../../shared/types/feature.type';
 import { Logger } from '../../shared/classes/logger';
 import { Context } from '../../shared/classes/context';
 
@@ -21,6 +20,7 @@ export const command: SlashCommandModel = new SlashCommandModel(
 
         if (id && name) {
             const added = feature.addClan({ id: <string>id.value, name: <string>name.value });
+            inventory.updateLastClan(<string>id.value, new Date().toISOString());
 
             logger.info(added ? `Clan ${id.value} added to the clan to watch` : `Clan ${id.value} already exists`);
             await interaction.editReply({
@@ -37,7 +37,9 @@ export const command: SlashCommandModel = new SlashCommandModel(
     [
         new SlashCommandSubcommandBuilder()
             .setName('add')
-            .setDescription('Ajoute un clan à la liste des clans à observer')
+            .setDescription(
+                'Ajoute un clan à la liste des clans à observer. Toutes les activités avant ce moment ne seront pas observable !'
+            )
             .addStringOption((builder: SlashCommandStringOption) =>
                 builder.setName('id').setDescription("L'id du clan à observer").setRequired(true)
             )
