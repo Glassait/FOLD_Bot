@@ -7,6 +7,8 @@ import { AxiosInjector, InventoryInjector, LoggerInjector } from '../../../share
 import { Logger } from '../../../shared/classes/logger';
 import { WebsiteNameEnum } from '../enums/website-name.enum';
 import { WebSiteState } from '../../../shared/types/inventory.type';
+import { TimeEnum } from '../../../shared/enums/time.enum';
+import { EnvUtil } from '../../../shared/utils/env.util';
 
 @LoggerInjector
 @InventoryInjector
@@ -75,6 +77,7 @@ export class WebSiteScraper {
             } else if (index > 0) {
                 for (let i = index - 1; i >= 1; i--) {
                     await this.wotExpress(links, i, webSiteState);
+                    await EnvUtil.sleep(TimeEnum.MINUTE);
                 }
             }
         } else if (webSiteState.name === WebsiteNameEnum.THE_DAILY_BOUNCE) {
@@ -87,6 +90,7 @@ export class WebSiteScraper {
             } else if (index > 0) {
                 for (let i = index - 1; i >= 0; i--) {
                     await this.dailyBounce(containers, links, i, $, webSiteState);
+                    await EnvUtil.sleep(TimeEnum.MINUTE);
                 }
             }
         } else if (webSiteState.name === WebsiteNameEnum.THE_ARMORED_PATROL) {
@@ -100,6 +104,7 @@ export class WebSiteScraper {
             } else if (index > 0) {
                 for (let i = index - 1; i >= 0; i--) {
                     await this.armoredPatrol(containers, i, $, webSiteState);
+                    await EnvUtil.sleep(TimeEnum.MINUTE);
                 }
             }
         }
