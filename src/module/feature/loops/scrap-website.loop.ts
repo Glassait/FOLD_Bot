@@ -4,6 +4,7 @@ import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
 import { Logger } from '../../shared/classes/logger';
 import { Context } from '../../shared/classes/context';
 import { EnvUtil } from '../../shared/utils/env.util';
+import { TimeEnum } from '../../shared/enums/time.enum';
 
 module.exports = async (client: Client): Promise<void> => {
     const logger: Logger = new Logger(new Context('SCRAP-WEBSITE-LOOP'));
@@ -17,6 +18,6 @@ module.exports = async (client: Client): Promise<void> => {
         await webSiteScraper.scrapWebsiteAtIndex(index);
         index = index >= length - 1 ? 0 : index + 1;
         logger.trace('End scrapping, next one in 30 minutes');
-        await EnvUtil.sleep(1000 * 60 * 30);
+        await EnvUtil.sleep(TimeEnum.MINUTE * 30);
     }
 };

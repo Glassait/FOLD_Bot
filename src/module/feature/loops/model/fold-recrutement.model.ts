@@ -149,17 +149,17 @@ export class FoldRecrutementModel {
                 .setDescription(`Le joueur suivant \`${player.name}\` a quitté \`${clan.name}\``)
                 .setFields(
                     {
-                        name: 'Site de Wot',
+                        name: 'Portail de Wot',
                         value: `[Redirection ↗️](${this.wot.replace('name', player.name).replace('id', String(player.id))})`,
                         inline: true,
                     },
                     {
-                        name: 'Site de TomatoGG',
+                        name: 'TomatoGG',
                         value: `[Redirection ↗️](${this.tomato.replace('name', player.name).replace('id', String(player.id))})`,
                         inline: true,
                     },
                     {
-                        name: 'Site de Wot Life',
+                        name: 'Wot Life',
                         value: `[Redirection ↗️](${this.wotLife.replace('name', player.name).replace('id', String(player.id))})`,
                         inline: true,
                     }
