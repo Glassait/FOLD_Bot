@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync, writeFile } from 'fs';
 import { Context } from '../classes/context';
+import { EmojiEnum } from '../enums/emoji.enum';
 
 /**
  * Class used to manage the persistence of the log
@@ -43,6 +44,56 @@ export class LoggerSingleton extends Context {
     }
 
     /**
+     * Write TRACE log in the file
+     * @param context The context of the TRACE
+     * @param msg The message of the TRACE
+     */
+    public trace(context: Context, msg: string): void {
+        console.debug(`${EmojiEnum.TRACE} : ${msg}`);
+        this.addToLog('TRACE', 'gray', context.context, msg);
+    }
+
+    /**
+     * Write DEBUG log in the file
+     * @param context The context of the DEBUG
+     * @param msg The message of the DEBUG
+     */
+    public debug(context: Context, msg: string): void {
+        console.debug(`${EmojiEnum.DEBUG} : ${msg}`);
+        this.addToLog('DEBUG', 'grey', context.context, msg);
+    }
+
+    /**
+     * Write INFO log in the file
+     * @param context The context of the INFO
+     * @param msg The message of the INFO
+     */
+    public info(context: Context, msg: string): void {
+        console.info(`${EmojiEnum.INFO} : ${msg}`);
+        this.addToLog('INFO', 'green', context.context, msg);
+    }
+
+    /**
+     * Write WARNING log in the file
+     * @param context The context of the WARNING
+     * @param msg The message of the WARNING
+     */
+    public warning(context: Context, msg: string): void {
+        console.warn(`${EmojiEnum.WARNING} : ${msg}`);
+        this.addToLog('WARNING', 'orange', context.context, msg);
+    }
+
+    /**
+     * Write ERROR log in the file
+     * @param context The context of the ERROR
+     * @param msg The message of the ERROR
+     */
+    public error(context: Context, msg: string): void {
+        console.error(`${EmojiEnum.ERROR} : ${msg}`);
+        this.addToLog('ERROR', 'red', EmojiEnum.ERROR + context.context, msg);
+    }
+
+    /**
      * Create the log directory and file
      * @private
      */
@@ -56,58 +107,8 @@ export class LoggerSingleton extends Context {
                 this.error(this, err.message);
                 throw err;
             }
-            this.info(this, '📁 Log file created');
+            this.info(this, `${EmojiEnum.FILE} Log file created`);
         });
-    }
-
-    /**
-     * Write TRACE log in the file
-     * @param context The context of the TRACE
-     * @param msg The message of the TRACE
-     */
-    public trace(context: Context, msg: string): void {
-        console.debug(`✎ : ${msg}`);
-        this.addToLog('TRACE', 'gray', context.context, msg);
-    }
-
-    /**
-     * Write DEBUG log in the file
-     * @param context The context of the DEBUG
-     * @param msg The message of the DEBUG
-     */
-    public debug(context: Context, msg: string): void {
-        console.debug(`🔧 : ${msg}`);
-        this.addToLog('DEBUG', 'grey', context.context, msg);
-    }
-
-    /**
-     * Write INFO log in the file
-     * @param context The context of the INFO
-     * @param msg The message of the INFO
-     */
-    public info(context: Context, msg: string): void {
-        console.info(`🛈 : ${msg}`);
-        this.addToLog('INFO', 'green', context.context, msg);
-    }
-
-    /**
-     * Write WARNING log in the file
-     * @param context The context of the WARNING
-     * @param msg The message of the WARNING
-     */
-    public warning(context: Context, msg: string): void {
-        console.warn(`⚠️ : ${msg}`);
-        this.addToLog('WARNING', 'orange', context.context, msg);
-    }
-
-    /**
-     * Write ERROR log in the file
-     * @param context The context of the ERROR
-     * @param msg The message of the ERROR
-     */
-    public error(context: Context, msg: string): void {
-        console.error(`🚨 : ${msg}`);
-        this.addToLog('ERROR', 'red', context.context, msg);
     }
 
     /**

@@ -3,7 +3,7 @@ import { Logger } from '../../../shared/classes/logger';
 import { AxiosInstance } from 'axios';
 import { ClanActivity, FoldRecrutementType, LeaveClanActivity, Players } from '../types/fold-recrutement.type';
 import { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Client, Colors, EmbedBuilder, TextChannel } from 'discord.js';
+import { Client, Colors, EmbedBuilder, TextChannel } from 'discord.js';
 import { EnvUtil } from '../../../shared/utils/env.util';
 import { TimeEnum } from '../../../shared/enums/time.enum';
 import { Clan } from '../../../shared/types/feature.type';
@@ -41,7 +41,7 @@ export class FoldRecrutementModel {
      * The limite date to not take player
      * @private
      */
-    private limiteDate: Date = new Date('2024-01-03T00:00:00');
+    private limiteDate: Date = new Date('2024-01-05T00:00:00');
     /**
      * @instance Of the logger
      * @private
@@ -73,6 +73,11 @@ export class FoldRecrutementModel {
      * @private
      */
     private totalNumberOfPlayers: number = 0;
+    /**
+     * Count the numbers of message send
+     * @private
+     */
+    private crossposted: number = 0;
 
     /**
      * Fetch the mandatory information form the inventory
@@ -111,7 +116,7 @@ export class FoldRecrutementModel {
         }
 
         const datum: Players[] = extracted.reduce((players: Players[], currentValue: LeaveClanActivity) => {
-            currentValue.accounts_ids.reduce((players1: Players[], id: number) => {
+            /*NOSONAR*/ currentValue.accounts_ids.reduce((players1: Players[], id: number) => {
                 players1.push({
                     name: currentValue.accounts_info[String(id)].name,
                     id: id,
@@ -125,6 +130,7 @@ export class FoldRecrutementModel {
 
         this.logger.debug(`${datum.length} players leaves the clan`);
 
+        let embeds: EmbedBuilder[] = [];
         if (datum.length > 0) {
             const embed = new EmbedBuilder()
                 .setColor(Colors.Fuchsia)
@@ -134,41 +140,45 @@ export class FoldRecrutementModel {
                 .setFields({ name: 'Nombre de joueurs quittés', value: datum.length.toString() });
 
             this.totalNumberOfPlayers += datum.length;
-
-            await this.channel.send({ embeds: [embed] });
+            embeds.push(embed);
         }
 
         for (const player of datum) {
             const embedPlayer: EmbedBuilder = new EmbedBuilder()
                 .setTitle('Nouveau joueur pouvant être recruté')
                 .setDescription(`Le joueur suivant \`${player.name}\` a quitté \`${clan.name}\``)
+                .setFields(
+                    {
+                        name: 'Site de Wot',
+                        value: `[Redirection ↗️](${this.wot.replace('name', player.name).replace('id', String(player.id))})`,
+                        inline: true,
+                    },
+                    {
+                        name: 'Site de TomatoGG',
+                        value: `[Redirection ↗️](${this.tomato.replace('name', player.name).replace('id', String(player.id))})`,
+                        inline: true,
+                    },
+                    {
+                        name: 'Site de Wot Life',
+                        value: `[Redirection ↗️](${this.wotLife.replace('name', player.name).replace('id', String(player.id))})`,
+                        inline: true,
+                    }
+                )
                 .setColor(Colors.Blurple);
 
-            const wotButton = new ButtonBuilder()
-                .setURL(this.wot.replace('name', player.name).replace('id', String(player.id)))
-                .setLabel('Site de WoT')
-                .setStyle(ButtonStyle.Link);
+            embeds.push(embedPlayer);
 
-            const tomatoButton = new ButtonBuilder()
-                .setURL(this.tomato.replace('name', player.name).replace('id', String(player.id)))
-                .setLabel('Site de TomatoGG')
-                .setStyle(ButtonStyle.Link);
+            if (embeds.length >= 10) {
+                await this.sendEmbedToChannel(embeds);
+                embeds = [];
 
-            const wotLifeButton = new ButtonBuilder()
-                .setURL(this.wotLife.replace('name', player.name).replace('id', String(player.id)))
-                .setLabel('Site de Wot Life')
-                .setStyle(ButtonStyle.Link);
-
-            const row = new ActionRowBuilder<ButtonBuilder>().setComponents(wotButton, tomatoButton, wotLifeButton);
-
-            await this.channel.send({
-                embeds: [embedPlayer],
-                components: [row],
-            });
-
-            if (datum.length > 1) {
-                await EnvUtil.sleep(TimeEnum.MINUTE);
+                if (datum.length > 9) {
+                    await EnvUtil.sleep(TimeEnum.MINUTE);
+                }
             }
+        }
+        if (embeds.length > 0) {
+            await this.sendEmbedToChannel(embeds);
         }
 
         if (extracted[0]) {
@@ -188,7 +198,27 @@ export class FoldRecrutementModel {
             .setColor(Colors.Yellow)
             .setTitle('Nombre total de joueurs ayant quitté leur clan')
             .setDescription(`Un total de \`${this.totalNumberOfPlayers}\` joueur(s) qui ont quitté(s) leur clan`);
-
+        await this.checkNumberOfMessageCrossposted();
+        await EnvUtil.sleep(TimeEnum.MINUTE);
         await this.channel.send({ embeds: [embed] });
+        this.crossposted++;
+    }
+
+    /**
+     * Send the embeds to the channel
+     * @param embeds The embeds to send
+     */
+    private async sendEmbedToChannel(embeds: EmbedBuilder[]): Promise<void> {
+        await this.checkNumberOfMessageCrossposted();
+        await this.channel.send({ embeds: [...embeds] });
+        this.crossposted++;
+    }
+
+    private async checkNumberOfMessageCrossposted(): Promise<void> {
+        if (this.crossposted >= 9) {
+            this.logger.warning('Number of messages crossposted exceeded the limit');
+            await EnvUtil.sleep(TimeEnum.HOUR);
+            this.crossposted = 0;
+        }
     }
 }
