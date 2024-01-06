@@ -37,9 +37,7 @@ export const command: SlashCommandModel = new SlashCommandModel(
     [
         new SlashCommandSubcommandBuilder()
             .setName('add')
-            .setDescription(
-                'Ajoute un clan à la liste des clans à observer. Toutes les activités avant ce moment ne seront pas observable !'
-            )
+            .setDescription('Ajoute un clan à la liste des clans à observer.')
             .addStringOption((builder: SlashCommandStringOption) =>
                 builder.setName('id').setDescription("L'id du clan à observer").setRequired(true)
             )
