@@ -36,6 +36,10 @@ import { TimeUtil } from '../../../shared/utils/time.util';
 @StatisticInjector
 export class TriviaGameModel {
     /**
+     * Maximum time allowed for a player to answer the trivia question.
+     */
+    public readonly MAX_TIME: number = TimeEnum.MINUTE * 5;
+    /**
      * The information fetch from the inventory
      * @private
      */
@@ -90,12 +94,6 @@ export class TriviaGameModel {
      * @private
      */
     private triviaStats: TriviaStatisticType;
-
-    /**
-     * Maximum time allowed for a player to answer the trivia question.
-     */
-    public readonly MAX_TIME: number = TimeEnum.MINUTE * 5;
-
     /**
      * Medals to be awarded to the top 3 players.
      * @private
@@ -224,20 +222,24 @@ export class TriviaGameModel {
                 time: this.MAX_TIME,
             })
             .on('collect', async (interaction: ButtonInteraction<'cached'>): Promise<void> => {
-                await interaction.deferReply({ ephemeral: true });
-                this.logger.trace(
-                    `${interaction.member.nickname ?? interaction.user.displayName} answer to the trivia game with : \`${
-                        interaction.customId
-                    }\``
-                );
-                this.playerAnswer[interaction.user.username] = {
-                    responseTime: Date.now() - this.timer,
-                    response: interaction.customId,
-                    interaction: interaction,
-                };
-                await interaction.editReply({
-                    content: `Ta réponse \`${interaction.customId}\` à bien été pris en compte !`,
-                });
+                try {
+                    await interaction.deferReply({ ephemeral: true });
+                    this.logger.trace(
+                        `${interaction.member.nickname ?? interaction.user.displayName} answer to the trivia game with : \`${
+                            interaction.customId
+                        }\``
+                    );
+                    this.playerAnswer[interaction.user.username] = {
+                        responseTime: Date.now() - this.timer,
+                        response: interaction.customId,
+                        interaction: interaction,
+                    };
+                    await interaction.editReply({
+                        content: `Ta réponse \`${interaction.customId}\` à bien été pris en compte !`,
+                    });
+                } catch (e) {
+                    this.logger.error(`Error during collection of answer${e}`);
+                }
             });
     }
 
