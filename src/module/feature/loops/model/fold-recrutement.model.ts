@@ -4,8 +4,6 @@ import { AxiosInstance } from 'axios';
 import { ClanActivity, FoldRecrutementType, LeaveClanActivity, Players } from '../types/fold-recrutement.type';
 import { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
 import { Client, Colors, EmbedBuilder, TextChannel } from 'discord.js';
-import { EnvUtil } from '../../../shared/utils/env.util';
-import { TimeEnum } from '../../../shared/enums/time.enum';
 import { Clan } from '../../../shared/types/feature.type';
 
 @LoggerInjector
@@ -73,11 +71,6 @@ export class FoldRecrutementModel {
      * @private
      */
     private totalNumberOfPlayers: number = 0;
-    /**
-     * Count the numbers of message send
-     * @private
-     */
-    private crossposted: number = 0;
 
     /**
      * Fetch the mandatory information form the inventory
@@ -130,7 +123,6 @@ export class FoldRecrutementModel {
 
         this.logger.debug(`${datum.length} players leaves the clan`);
 
-        let embeds: EmbedBuilder[] = [];
         if (datum.length > 0) {
             const embed = new EmbedBuilder()
                 .setColor(Colors.Fuchsia)
@@ -140,7 +132,7 @@ export class FoldRecrutementModel {
                 .setFields({ name: 'Nombre de départ', value: `\`${datum.length.toString()}\`` });
 
             this.totalNumberOfPlayers += datum.length;
-            embeds.push(embed);
+            await this.channel.send({ embeds: [embed] });
         }
 
         for (const player of datum) {
@@ -166,19 +158,7 @@ export class FoldRecrutementModel {
                 )
                 .setColor(Colors.Blurple);
 
-            embeds.push(embedPlayer);
-
-            if (embeds.length >= 10) {
-                await this.sendEmbedToChannel(embeds);
-                embeds = [];
-
-                if (datum.length > 9) {
-                    await EnvUtil.sleep(TimeEnum.MINUTE);
-                }
-            }
-        }
-        if (embeds.length > 0) {
-            await this.sendEmbedToChannel(embeds);
+            await this.channel.send({ embeds: [embedPlayer] });
         }
 
         if (extracted[0]) {
@@ -198,27 +178,6 @@ export class FoldRecrutementModel {
             .setColor(Colors.Yellow)
             .setTitle('Nombre total de joueurs ayant quitté leur clan')
             .setDescription(`Un total de \`${this.totalNumberOfPlayers}\` joueur(s) qui ont quitté(s) leur clan`);
-        await this.checkNumberOfMessageCrossposted();
-        await EnvUtil.sleep(TimeEnum.MINUTE);
         await this.channel.send({ embeds: [embed] });
-        this.crossposted++;
-    }
-
-    /**
-     * Send the embeds to the channel
-     * @param embeds The embeds to send
-     */
-    private async sendEmbedToChannel(embeds: EmbedBuilder[]): Promise<void> {
-        await this.checkNumberOfMessageCrossposted();
-        await this.channel.send({ embeds: [...embeds] });
-        this.crossposted++;
-    }
-
-    private async checkNumberOfMessageCrossposted(): Promise<void> {
-        if (this.crossposted >= 9) {
-            this.logger.warning('Number of messages crossposted exceeded the limit');
-            await EnvUtil.sleep(TimeEnum.HOUR);
-            this.crossposted = 0;
-        }
     }
 }
