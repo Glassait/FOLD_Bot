@@ -1,6 +1,9 @@
 {
 	"newsLetter": {
-		"channel": "1177006853318779002",
+		"channel": {
+			"guild": "840375560785231962",
+			"id": "1177006853318779002"
+		},
 		"website": [
 			{
 				"liveUrl": "https://wotexpress.info/",
@@ -26,10 +29,22 @@
 		"trivia": {
 			"limit": 90,
 			"url": "wot/encyclopedia/vehicles/?application_id=applicationId&tier=10&language=fr&fields=name%2C+images.big_icon%2C+default_profile.ammo.damage%2C+default_profile.ammo.type&limit=1&page_no=pageNumber",
-			"channel": "1191868924304838656"
+			"channel": {
+				"guild": "840375560785231962",
+				"id": "1191868924304838656"
+			}
 		}
 	},
 	"fold_recrutement": {
-		"channel": "1192589206145466468"
+		"channel": {
+			"guild": "1184852469164027976",
+			"id": "1192589349225771058"
+		}
+	},
+	"commands": {
+		"watch-clan": ["1184852469164027976"],
+		"disconnect": ["840375560785231962"],
+		"auto-reply": ["840375560785231962"],
+		"auto-disconnect": ["840375560785231962"]
 	}
 }

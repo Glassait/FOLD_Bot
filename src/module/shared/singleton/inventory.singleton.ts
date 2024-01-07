@@ -1,11 +1,11 @@
 import { readFileSync } from 'fs';
-import { InventoryType, TriviaType, WebSiteState } from '../types/inventory.type';
+import { Channel, InventoryType, TriviaType, WebSiteState } from '../types/inventory.type';
 import { EnvUtil } from '../utils/env.util';
 import { Logger } from '../classes/logger';
 import { Client, TextChannel } from 'discord.js';
-import { guild_id } from '../../../config.json';
 import { Context } from '../classes/context';
 import { FileUtil } from '../utils/file.util';
+import { DiscordId } from '../types/feature.type';
 
 /**
  * Class used to manage the inventory.json file
@@ -32,7 +32,7 @@ export class InventorySingleton {
      * The id of the dev channel
      * @private
      */
-    private readonly DEV_CHANNEL = '1171525891604623472';
+    private readonly DEV_CHANNEL: Channel = { guild: '840375560785231962', id: '1171525891604623472' };
 
     /**
      * Private constructor to respect the singleton pattern
@@ -67,6 +67,29 @@ export class InventorySingleton {
     }
 
     /**
+     * Get the number of newsletter in the inventory
+     */
+    public get numberOfNewsletter(): number {
+        return this._inventory.newsLetter.website.length;
+    }
+
+    /**
+     * Get the trivia information from the inventory
+     */
+    public get trivia(): TriviaType {
+        return this._inventory.game.trivia;
+    }
+
+    /**
+     * Update the trivia information with the new value and update the json file
+     * @param trivia The new value
+     */
+    public set trivia(trivia: TriviaType) {
+        this._inventory.game.trivia = trivia;
+        FileUtil.writeIntoJson(this.path, this._inventory);
+    }
+
+    /**
      * Get the website at the index
      * @param index The index of the website
      * @throws Error If the index is out of bound
@@ -87,13 +110,6 @@ export class InventorySingleton {
      */
     public async getNewsLetterChannel(client: Client): Promise<TextChannel> {
         return await this.fetchChannel(client, this._inventory.newsLetter.channel);
-    }
-
-    /**
-     * Get the number of newsletter in the inventory
-     */
-    public get numberOfNewsletter(): number {
-        return this._inventory.newsLetter.website.length;
     }
 
     /**
@@ -127,45 +143,12 @@ export class InventorySingleton {
     }
 
     /**
-     * Get the trivia information from the inventory
-     */
-    public get trivia(): TriviaType {
-        return this._inventory.game.trivia;
-    }
-
-    /**
-     * Update the trivia information with the new value and update the json file
-     * @param trivia The new value
-     */
-    public set trivia(trivia: TriviaType) {
-        this._inventory.game.trivia = trivia;
-        FileUtil.writeIntoJson(this.path, this._inventory);
-    }
-
-    /**
      * Get the channel for the fold recrutement
      * @param client
      */
     public async getChannelForFoldRecrutement(client: Client): Promise<TextChannel> {
         this.logger.trace('Channel instance fetch for the fold recrutement');
         return await this.fetchChannel(client, this._inventory.fold_recrutement.channel);
-    }
-
-    /**
-     * Get the text channel from the cache and if is not load fetch it from the guild manager
-     * @param client The client of the bot
-     * @param id The id of the channel
-     * @private
-     */
-    private async fetchChannel(client: Client, id: string): Promise<TextChannel> {
-        let channel: TextChannel | undefined = <TextChannel>client.channels.cache.get(id);
-
-        if (!channel) {
-            const g = await client.guilds.fetch(guild_id);
-            return <TextChannel>await g.channels.fetch(id);
-        }
-
-        return channel;
     }
 
     /**
@@ -185,7 +168,7 @@ export class InventorySingleton {
      * @returns The timestamp of the last join
      */
     public getLastClan(clanID: string): string {
-        return this._inventory.fold_recrutement[clanID];
+        return this._inventory.fold_recrutement[clanID] as string;
     }
 
     /**
@@ -195,5 +178,38 @@ export class InventorySingleton {
     public deleteClan(clanID: string): void {
         delete this._inventory.fold_recrutement[clanID];
         FileUtil.writeIntoJson(this.path, this._inventory);
+    }
+
+    /**
+     * Get the commands registered in the inventory
+     * @param name The name of the command
+     * @returns The list of the discord id
+     */
+    public getCommands(name: string): DiscordId[] {
+        const command = this._inventory.commands[name];
+
+        if (!command) {
+            throw new Error(`No command found with name ${name}`);
+        }
+
+        return command;
+    }
+
+    /**
+     * Get the text channel from the cache and if is not load fetch it from the guild manager
+     * @param client The Discord.js client.
+     * @param channel The channel information.
+     * @returns The Discord channel.
+     * @private
+     */
+    private async fetchChannel(client: Client, channel: Channel): Promise<TextChannel> {
+        let chan: TextChannel | undefined = <TextChannel>client.channels.cache.get(channel.id);
+
+        if (!chan) {
+            const g = await client.guilds.fetch(channel.guild);
+            return <TextChannel>await g.channels.fetch(channel.id);
+        }
+
+        return chan;
     }
 }

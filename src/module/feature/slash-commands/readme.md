@@ -51,7 +51,8 @@ In the folder you will find all the slash command of the bot.
     ```
 
 3. Fill the name, description and execute part
-4. Congrats the new slash command will be available, the registering of the command is automatic in the handler `commands.handler.ts`
+4. In the inventory.json add the new slash-command name and the array of guildID
+5. Congrats the new slash-command will be available, the registering of the command is automatic in the handler `commands.handler.ts`
 
 ## ⚙️ Options & Permission
 
