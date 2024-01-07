@@ -27,6 +27,7 @@ import {
 import { ShellEnum } from '../enums/shell.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
 import { TimeUtil } from '../../../shared/utils/time.util';
+import { PlayerAnswer } from '../types/trivia-game.type';
 
 /**
  * This class is responsible for managing the trivia game.
@@ -39,6 +40,7 @@ export class TriviaGameModel {
      * Maximum time allowed for a player to answer the trivia question.
      */
     public readonly MAX_TIME: number = TimeEnum.MINUTE * 5;
+
     /**
      * The information fetch from the inventory
      * @private
@@ -73,27 +75,13 @@ export class TriviaGameModel {
      * Mapping of players and their answers.
      * @private
      */
-    private playerAnswer: {
-        [key: string]: {
-            /**
-             * Time taken by the player to answer the trivia question.
-             */
-            responseTime: number;
-            /**
-             * Answer given by the player.
-             */
-            response: string;
-            /**
-             * Discord interaction used to submit the answer.
-             */
-            interaction: ButtonInteraction<'cached'>;
-        };
-    } = {};
+    private playerAnswer: { [key: string]: PlayerAnswer } = {};
     /**
      * Trivia statistics.
      * @private
      */
     private triviaStats: TriviaStatisticType;
+
     /**
      * Medals to be awarded to the top 3 players.
      * @private
@@ -248,8 +236,8 @@ export class TriviaGameModel {
      */
     public async sendAnswerToChannel(): Promise<void> {
         this.logger.trace('Collect answer end. Start calculating the scores');
-        const playersResponse: [string, any][] = Object.entries(this.playerAnswer).sort(
-            (a: [string, any], b: [string, any]) => a[1].responseTime - b[1].responseTime
+        const playersResponse: [string, PlayerAnswer][] = Object.entries(this.playerAnswer).sort(
+            (a: [string, PlayerAnswer], b: [string, PlayerAnswer]) => a[1].responseTime - b[1].responseTime
         );
 
         this.answerEmbed.setImage(this.datum.images.big_icon).setDescription(`Le char à deviner était : \`${this.datum.name}\``);
@@ -270,9 +258,13 @@ export class TriviaGameModel {
 
         let description: string = playersResponse.length > 0 ? '' : "Aucun joueur n'a envoyé de réponse !";
 
+        const goodAnswer: [string, PlayerAnswer][] = playersResponse.filter((value: [string, PlayerAnswer]): boolean =>
+            this.isGoodAnswer(value)
+        );
+
         for (let i = 0; i < 3; i++) {
-            if (playersResponse[i] && this.isGoodAnswer(playersResponse[i])) {
-                description += `${this.MEDAL[i]} ${playersResponse[i][0]} en ${this.calculateResponseTime(playersResponse[i])}\n`;
+            if (goodAnswer[i]) {
+                description += `${this.MEDAL[i]} ${goodAnswer[i][0]} en ${this.calculateResponseTime(goodAnswer[i])}\n`;
             }
         }
 
@@ -286,34 +278,34 @@ export class TriviaGameModel {
         await this.gameMessage.edit({ embeds: [this.answerEmbed, playerEmbed], components: [] });
         this.logger.trace('Game message update with answer and top 3 players');
 
-        this.updateStatistic(playersResponse);
+        await this.updateStatistic(playersResponse);
     }
 
     /**
      * Calculates the time taken by the player to answer the trivia question.
-     * @param playersResponse - Array of players and their responses.
+     * @param playersResponse Array of players and their responses.
      * @returns The time taken by the player to answer the trivia question.
      */
-    private calculateResponseTime(playersResponse: [string, any]): string {
+    private calculateResponseTime(playersResponse: [string, PlayerAnswer]): string {
         const sec = playersResponse[1].responseTime / TimeEnum.SECONDE;
         return sec > 60 ? `${Math.floor(sec / 60)}:${Math.round(sec % 60)} minutes` : `${sec.toFixed(2)} secondes`;
     }
 
     /**
      * Checks if the player's answer is correct.
-     * @param playerResponse - The player's response.
+     * @param playerResponse The player's response.
      * @returns `true` if the player's answer is correct, `false` otherwise.
      */
-    private isGoodAnswer(playerResponse: [string, any]): boolean {
+    private isGoodAnswer(playerResponse: [string, PlayerAnswer]): boolean {
         return playerResponse[1].response === this.datum.name || this.isAnotherTanks(playerResponse);
     }
 
     /**
      * This method check if there are another tanks that have the same shell (damage and type)
-     * @param playerResponse - The answer of the player
+     * @param playerResponse The answer of the player
      * @private
      */
-    private isAnotherTanks(playerResponse: [string, any]): boolean {
+    private isAnotherTanks(playerResponse: [string, PlayerAnswer]): boolean {
         const vehicle: VehicleData | undefined = this.allTanks.find(
             (vehicle: VehicleData): boolean => vehicle.name === playerResponse[1].response
         );
@@ -330,9 +322,9 @@ export class TriviaGameModel {
 
     /**
      * Updates the overall and player statistics for the trivia game.
-     * @param responses - Array of players and their responses.
+     * @param responses Array of players and their responses.
      */
-    private updateStatistic(responses: [string, any][]): void {
+    private async updateStatistic(responses: [string, PlayerAnswer][]): Promise<void> {
         this.logger.trace('Start updating the overall statistics');
         const overall: MonthlyTriviaOverallStatisticType = this.triviaStats.overall[this.statisticSingleton.currentMonth] ?? {
             number_of_game: 0,
@@ -347,7 +339,8 @@ export class TriviaGameModel {
         this.triviaStats.overall[this.statisticSingleton.currentMonth] = overall;
 
         this.logger.trace("Start updating the player's statistics");
-        responses.forEach((response: [string, any]): void => {
+
+        for (const response of responses) {
             this.logger.trace(`Start updating ${response[0]} statistic`);
             const player: TriviaPlayerStatisticType = this.triviaStats.player[response[0]] ?? {};
 
@@ -361,32 +354,49 @@ export class TriviaGameModel {
             playerStat.participation++;
             playerStat.answer_time.push(response[1].responseTime);
 
+            const oldElo = playerStat.elo;
+            playerStat.elo = this.calculateElo(playerStat, response);
+
             if (this.isGoodAnswer(response)) {
                 playerStat.right_answer++;
                 playerStat.win_strick++;
-                response[1].interaction.editReply({ content: 'Ta réponse était la bonne :)' });
+                await response[1].interaction.editReply({
+                    content: `Tu as eu la bonne réponse, bravo :clap:.\nTon nouvelle elo est : \`${playerStat.elo}\` (modification de \`${
+                        playerStat.elo - oldElo
+                    }\`)`,
+                });
                 this.logger.trace(`Player ${response[0]} found the right answer`);
             } else {
                 playerStat.win_strick = 0;
-                response[1].interaction.editReply({ content: "Ta réponse n'était pas la bonne :(" });
+                const tank = this.allTanks.find((tank: VehicleData): boolean => tank.name === response[1].response);
+
+                if (!tank) {
+                    return;
+                }
+
+                await response[1].interaction.editReply({
+                    content: `Tu n'as pas eu la bonne réponse !.\nLe char \`${tank.name}\` a pour obus \`${
+                        ShellEnum[tank.default_profile.ammo[0].type as keyof typeof ShellEnum]
+                    }\` avec un aplha de \`${tank.default_profile.ammo[0].damage[1]}\`.\nTon nouvelle elo est : \`${
+                        playerStat.elo
+                    }\` (modification de \`${playerStat.elo - oldElo}\`)`,
+                });
                 this.logger.trace(`Player ${response[0]} failed to find the right answer`);
             }
-
-            playerStat.elo = this.calculateElo(playerStat, response);
 
             player[this.statisticSingleton.currentMonth] = playerStat;
             this.triviaStats.player[response[0]] = player;
             this.logger.trace(`End updating ${response[0]} statistic`);
-        });
+        }
 
         this.statisticSingleton.trivia = this.triviaStats;
     }
 
     /**
      * Calculates the new ELO score based on the player's previous score and the response.
-     * @param playerStat - The player's previous score.
-     * @param response - The player's response.
-     * @returns  The new ELO score.
+     * @param playerStat The player's previous score.
+     * @param response The player's response.
+     * @returns The new ELO score.
      */
     private calculateElo(playerStat: MonthlyTriviaPlayerStatisticType, response: [string, any]): number {
         let gain = -Math.floor(60 * Math.exp(0.0001 * playerStat.elo));

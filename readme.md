@@ -130,6 +130,15 @@ Use this space to list resources you find helpful and would like to give credit 
 
 ## Changelog
 
+### 2.2.0
+
+-   Pass bot to multi guild support
+
+### 2.1.0
+
+-   Watch clan to detect leaving player
+-   send message to change when leaving player detected
+
 ### 2.0.1
 
 -   Fix date in trivia game
