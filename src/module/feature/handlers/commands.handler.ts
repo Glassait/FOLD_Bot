@@ -12,7 +12,6 @@ module.exports = async (_client: Client): Promise<void> => {
     const inventory: InventorySingleton = InventorySingleton.instance;
     const slashCommandsDir: string = join(__dirname, '../slash-commands');
     const body: { [key: Snowflake]: RESTPostAPIChatInputApplicationCommandsJSONBody[] } = {};
-    let numberOfCommand: number = 0;
 
     readdirSync(slashCommandsDir).forEach((file: string): void => {
         if (!file.endsWith('.ts')) return;
@@ -23,7 +22,6 @@ module.exports = async (_client: Client): Promise<void> => {
             guild.push(command.data.toJSON());
             body[value] = guild;
         });
-        numberOfCommand++;
 
         logger.info(`🔥 Successfully loaded command ${command.name}`);
     });
@@ -36,7 +34,7 @@ module.exports = async (_client: Client): Promise<void> => {
                 body: entry[1],
             });
 
-            logger.debug(`Successfully reloaded application ${numberOfCommand} slash-commands for guild ${entry[0]}`);
+            logger.debug(`Successfully reloaded application ${entry[1].length} slash-commands for guild ${entry[0]}`);
         } catch (error) {
             logger.error(`${error}`);
         }
