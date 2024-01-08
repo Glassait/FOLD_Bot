@@ -1,6 +1,6 @@
 import { AxiosInjector, InventoryInjector, LoggerInjector } from '../../../shared/decorators/injector.decorator';
 import { Logger } from '../../../shared/classes/logger';
-import { AxiosInstance } from 'axios';
+import { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 import { ClanActivity, FoldRecrutementType, LeaveClanActivity, Players } from '../types/fold-recrutement.type';
 import { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
 import { Client, Colors, EmbedBuilder, TextChannel } from 'discord.js';
@@ -36,11 +36,6 @@ export class FoldRecrutementModel {
      */
     private readonly wotLife: string = 'https://fr.wot-life.com/eu/player/name-id/';
     /**
-     * The limite date to not take player
-     * @private
-     */
-    private limiteDate: Date = new Date('2024-01-05T00:00:00');
-    /**
      * @instance Of the logger
      * @private
      */
@@ -57,10 +52,10 @@ export class FoldRecrutementModel {
     private readonly inventory: InventorySingleton;
 
     /**
-     * The data fetch form the Wargaming api
+     * The limite date to not take player
      * @private
      */
-    private data: FoldRecrutementType;
+    private limiteDate: Date = new Date('2024-01-05T00:00:00');
     /**
      * The channel to send the leaving player inside
      * @private
@@ -82,19 +77,35 @@ export class FoldRecrutementModel {
 
     /**
      * Fetch the activity of the clan
-     * @param clanId The id of the clan²
+     * @param clan The clan to fetch information
      */
-    public async fetchClanActivity(clanId: string): Promise<void> {
-        const url = this.url.replace('clanID', clanId).replace('today', new Date().toISOString().slice(0, 19));
-        this.logger.info(`Fetching activity of the clan with url: ${url}`);
-        this.data = (await this.axios.get(url)).data;
+    public async fetchClanActivity(clan: Clan): Promise<void> {
+        const url = this.url.replace('clanID', clan.id).replace('today', new Date().toISOString().slice(0, 19));
+        this.logger.debug(`Fetching activity of the clan with url: ${url}`);
+        this.axios
+            .get(url)
+            .then((response: AxiosResponse<FoldRecrutementType, any>): void => {
+                this.logger.debug('Fetching activity of the clan end successfully');
+                this.sendMessageToChannelFromExtractedPlayer(clan, response.data)
+                    .then((): void => {
+                        this.logger.debug('Send message to channel end successfully');
+                    })
+                    .catch(reason => {
+                        this.logger.error(`Send message to channel failed: ${reason}`);
+                    });
+            })
+            .catch((error: AxiosError): void => {
+                this.logger.error(`Fetching activity of the clan failed with error \`${error.status}\` and message \`${error.message}\``);
+            });
     }
 
     /**
      * Extracts players who left the clan and sends a message with their information in the channel
+     * @param clan The clan to extract players from
+     * @param data The data of the activity of the clan
      */
-    public async sendMessageToChannelFromExtractedPlayer(clan: Clan): Promise<void> {
-        let extracted: LeaveClanActivity[] = this.data.items.filter(
+    public async sendMessageToChannelFromExtractedPlayer(clan: Clan, data: FoldRecrutementType): Promise<void> {
+        let extracted: LeaveClanActivity[] = data.items.filter(
             (item: ClanActivity): boolean => item.subtype === 'leave_clan' && new Date(item.created_at) > this.limiteDate
         ) as unknown as LeaveClanActivity[];
 

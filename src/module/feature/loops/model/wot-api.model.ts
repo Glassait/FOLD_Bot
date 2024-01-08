@@ -12,14 +12,13 @@ export class WotApiModel {
      * @private
      */
     private readonly WOT_API: string = 'https://api.worldoftanks.eu/';
-
     /**
-     * The axios instance
+     * @instance of axios
      * @private
      */
     private readonly axios: AxiosInstance;
     /**
-     * The logger instance
+     * @instance of the logger
      * @private
      */
     private readonly logger: Logger;

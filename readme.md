@@ -130,6 +130,13 @@ Use this space to list resources you find helpful and would like to give credit 
 
 ## Changelog
 
+### 2.2.1
+
+-   Rework axios to use more catch
+-   Update config for axios
+-   Add waiting on clan if too much fetch
+-   Update decorator doc
+
 ### 2.2.0
 
 -   Pass bot to multi guild support

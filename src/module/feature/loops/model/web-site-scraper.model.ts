@@ -1,4 +1,4 @@
-import { AxiosInstance, AxiosResponse } from 'axios';
+import { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 import * as cheerio from 'cheerio';
 import { CheerioAPI } from 'cheerio';
 import { Client, EmbedBuilder, TextChannel } from 'discord.js';
@@ -52,13 +52,21 @@ export class WebSiteScraper {
         const newsLetter: WebSiteState = this.inventory.getNewsLetterAtIndex(index);
         this.logger.trace(`⛏️ Start scrapping ${newsLetter.name}`);
 
-        try {
-            const response: AxiosResponse<any> = await this.axios.get(newsLetter.liveUrl);
-            this.logger.trace(`⛏️ Html get for scrapping`);
-            await this.getLastNews(response.data, newsLetter);
-        } catch (e) {
-            this.logger.error(`${e}`);
-        }
+        this.axios
+            .get(newsLetter.liveUrl)
+            .then((response: AxiosResponse<string, any>): void => {
+                this.logger.debug('Fetching newsletter end successfully');
+                this.getLastNews(response.data, newsLetter)
+                    .then((): void => {
+                        this.logger.debug('Scraping newsletter end successfully');
+                    })
+                    .catch(reason => {
+                        this.logger.error(`Scrapping newsletter failed: ${reason}`);
+                    });
+            })
+            .catch((error: AxiosError): void => {
+                this.logger.error(`Fetching newsletter failed with error \`${error.status}\` and message \`${error.message}\``);
+            });
     }
 
     /**

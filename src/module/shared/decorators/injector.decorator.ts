@@ -3,6 +3,8 @@ import { Context } from '../classes/context';
 import { InventorySingleton } from '../singleton/inventory.singleton';
 import axios, { AxiosInstance } from 'axios';
 import { StatisticSingleton } from '../singleton/statistic.singleton';
+import { TimeEnum } from '../enums/time.enum';
+import https from 'https';
 
 const logger: Logger = new Logger(new Context('Injector'));
 
@@ -16,15 +18,7 @@ type Constructor = new (...args: any[]) => any;
  * @param base The class to inject inside
  * @constructor
  * @see https://github.com/microsoft/TypeScript/issues/37157 For more information about the class decorator
- * @example
- * .@LoggerInjector // Add this without the `.`
- * class Test {
- *      \/**
- *      * @instance Of the logger class
- *      * @private
- *      *\/
- *     private readonly logger: Logger // Don't forget to add this for the completion/compiling
- * }
+ * @mandatory private readonly logger: Logger;
  */
 export function LoggerInjector<T extends Constructor>(base: T): T {
     logger.trace(`Logger injected for ${base.name}`);
@@ -40,15 +34,7 @@ export function LoggerInjector<T extends Constructor>(base: T): T {
  * @param base The class to inject inside
  * @constructor
  * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator
- * @example
- * .@InventoryInjector // Add this without the `.`
- * class Test {
- *      \/**
- *      * @instance Of the inventory class
- *      * @private
- *      *\/
- *     private readonly inventory: InventorySingleton // Don't forget to add this for the completion/compiling
- * }
+ * @mandatory private readonly inventory: InventorySingleton;
  */
 export function InventoryInjector<T extends Constructor>(base: T): T {
     logger.trace(`Inventory injected for ${base.name}`);
@@ -64,21 +50,17 @@ export function InventoryInjector<T extends Constructor>(base: T): T {
  * @param base The class to inject inside
  * @constructor
  * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator@example
- * @example
- * .@AxiosInjector // Add this without the `.`
- * class Test {
- *      \/**
- *      * @instance Of the axios
- *      * @private
- *      *\/
- *     private readonly axios: AxiosInstance // Don't forget to add this for the completion/compiling
- * }
+ * @mandatory private readonly axios: AxiosInstance;
  */
 export function AxiosInjector<T extends Constructor>(base: T): T {
     logger.trace(`Axios injected for ${base.name}`);
     return {
         [base.name]: class extends base {
-            axios: AxiosInstance = axios.create();
+            axios: AxiosInstance = axios.create({
+                timeout: TimeEnum.MINUTE,
+                httpAgent: new https.Agent({ keepAlive: true, timeout: TimeEnum.MINUTE }),
+                headers: { 'Content-Type': 'application/json;' },
+            });
         },
     }[base.name];
 }
@@ -88,15 +70,7 @@ export function AxiosInjector<T extends Constructor>(base: T): T {
  * @param base The class to inject inside
  * @constructor
  * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator@example
- * @example
- * .@StatisticInjector // Add this without the `.`
- * class Test {
- *      \/**
- *      * @instance Of the statistic class
- *      * @private
- *      *\/
- *     private readonly statisticSingleton: StatisticSingleton // Don't forget to add this for the completion/compiling
- * }
+ * @mandatory private readonly statisticSingleton: StatisticSingleton;
  */
 export function StatisticInjector<T extends Constructor>(base: T): T {
     logger.trace(`Statistic injected for ${base.name}`);
