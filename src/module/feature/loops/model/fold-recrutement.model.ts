@@ -1,6 +1,6 @@
 import { AxiosInjector, InventoryInjector, LoggerInjector } from '../../../shared/decorators/injector.decorator';
 import { Logger } from '../../../shared/classes/logger';
-import { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
+import { AxiosInstance } from 'axios';
 import { ClanActivity, FoldRecrutementType, LeaveClanActivity, Players } from '../types/fold-recrutement.type';
 import { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
 import { Client, Colors, EmbedBuilder, TextChannel } from 'discord.js';
@@ -82,21 +82,12 @@ export class FoldRecrutementModel {
     public async fetchClanActivity(clan: Clan): Promise<void> {
         const url = this.url.replace('clanID', clan.id).replace('today', new Date().toISOString().slice(0, 19));
         this.logger.debug(`Fetching activity of the clan with url: ${url}`);
-        this.axios
-            .get(url)
-            .then((response: AxiosResponse<FoldRecrutementType, any>): void => {
-                this.logger.debug('Fetching activity of the clan end successfully');
-                this.sendMessageToChannelFromExtractedPlayer(clan, response.data)
-                    .then((): void => {
-                        this.logger.debug('Send message to channel end successfully');
-                    })
-                    .catch(reason => {
-                        this.logger.error(`Send message to channel failed: ${reason}`);
-                    });
-            })
-            .catch((error: AxiosError): void => {
-                this.logger.error(`Fetching activity of the clan failed with error \`${error.status}\` and message \`${error.message}\``);
-            });
+
+        try {
+            return await this.sendMessageToChannelFromExtractedPlayer(clan, (await this.axios.get(url)).data);
+        } catch (error) {
+            this.logger.error(`An error occurred while fetching the activity of the clan: ${error}`);
+        }
     }
 
     /**
