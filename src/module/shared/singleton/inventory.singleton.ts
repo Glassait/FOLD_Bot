@@ -45,7 +45,7 @@ export class InventorySingleton {
         if (EnvUtil.isDev() && this._inventory) {
             this._inventory.newsLetter.channel = this.DEV_CHANNEL;
             this._inventory.game.trivia.channel = this.DEV_CHANNEL;
-            this._inventory.fold_recrutement.channel = this.DEV_CHANNEL;
+            this._inventory.fold_recruitment.channel = this.DEV_CHANNEL;
         }
     }
 
@@ -143,40 +143,40 @@ export class InventorySingleton {
     }
 
     /**
-     * Get the channel for the fold recrutement
+     * Get the channel for the fold recruitment
      * @param client
      */
-    public async getChannelForFoldRecrutement(client: Client): Promise<TextChannel> {
-        this.logger.trace('Channel instance fetch for the fold recrutement');
-        return await this.fetchChannel(client, this._inventory.fold_recrutement.channel);
+    public async getChannelForFoldRecruitment(client: Client): Promise<TextChannel> {
+        this.logger.trace('Channel instance fetch for the fold recruitment');
+        return await this.fetchChannel(client, this._inventory.fold_recruitment.channel);
     }
 
     /**
-     * Update the last time a clan joined the fold recrutement.
+     * Update the last time a clan joined the fold recruitment.
      * Update the inventory.json file
      * @param clanID The ID of the clan
      * @param timestamp The timestamp of the last join
      */
     public updateLastClan(clanID: string, timestamp: string): void {
-        this._inventory.fold_recrutement[clanID] = timestamp;
+        this._inventory.fold_recruitment[clanID] = timestamp;
         FileUtil.writeIntoJson(this.path, this._inventory);
     }
 
     /**
-     * Get the last time a clan joined the fold recrutement.
+     * Get the last time a clan joined the fold recruitment.
      * @param clanID The ID of the clan
      * @returns The timestamp of the last join
      */
     public getLastClan(clanID: string): string {
-        return this._inventory.fold_recrutement[clanID] as string;
+        return this._inventory.fold_recruitment[clanID] as string;
     }
 
     /**
-     * Delete a clan from the fold recrutement
+     * Delete a clan from the fold recruitment
      * @param clanID The ID of the clan
      */
     public deleteClan(clanID: string): void {
-        delete this._inventory.fold_recrutement[clanID];
+        delete this._inventory.fold_recruitment[clanID];
         FileUtil.writeIntoJson(this.path, this._inventory);
     }
 
@@ -193,6 +193,14 @@ export class InventorySingleton {
         }
 
         return command;
+    }
+
+    /**
+     * Get the value of a feature in the fold recruitment
+     * @param feature The feature to retrieve
+     */
+    public getFeatureFlippingRecruitment(feature: 'header_clan' | 'footer_message'): boolean {
+        return this._inventory.fold_recruitment.feature[feature];
     }
 
     /**

@@ -9,7 +9,7 @@ export type DiscordId = string; // NOSONAR
 export type Reply = { activateFor: DiscordId; replyTo: DiscordId };
 
 /**
- * Define the World of tank clan for the recrutement
+ * Define the World of tank clan for the recruitment
  */
 export type Clan = { id: string; name: string };
 

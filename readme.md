@@ -130,6 +130,11 @@ Use this space to list resources you find helpful and would like to give credit 
 
 ## Changelog
 
+### 2.2.2
+
+-   Add feature flipping for the header message of clan during the recruitment
+-   Add feature flipping for the end message of the recruitment
+
 ### 2.2.1
 
 -   Rework axios to use more catch

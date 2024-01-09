@@ -1,7 +1,7 @@
 import { AxiosInjector, InventoryInjector, LoggerInjector } from '../../../shared/decorators/injector.decorator';
 import { Logger } from '../../../shared/classes/logger';
 import { AxiosInstance } from 'axios';
-import { ClanActivity, FoldRecrutementType, LeaveClanActivity, Players } from '../types/fold-recrutement.type';
+import { ClanActivity, FoldRecruitmentType, LeaveClanActivity, Players } from '../types/fold-recruitment.type';
 import { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
 import { Client, Colors, EmbedBuilder, TextChannel } from 'discord.js';
 import { Clan } from '../../../shared/types/feature.type';
@@ -9,7 +9,7 @@ import { Clan } from '../../../shared/types/feature.type';
 @LoggerInjector
 @AxiosInjector
 @InventoryInjector
-export class FoldRecrutementModel {
+export class FoldRecruitmentModel {
     /**
      * The base url for the wargaming
      * @private
@@ -72,7 +72,7 @@ export class FoldRecrutementModel {
      * @param client
      */
     public async fetchMandatory(client: Client): Promise<void> {
-        this.channel = await this.inventory.getChannelForFoldRecrutement(client);
+        this.channel = await this.inventory.getChannelForFoldRecruitment(client);
     }
 
     /**
@@ -95,7 +95,7 @@ export class FoldRecrutementModel {
      * @param clan The clan to extract players from
      * @param data The data of the activity of the clan
      */
-    public async sendMessageToChannelFromExtractedPlayer(clan: Clan, data: FoldRecrutementType): Promise<void> {
+    public async sendMessageToChannelFromExtractedPlayer(clan: Clan, data: FoldRecruitmentType): Promise<void> {
         let extracted: LeaveClanActivity[] = data.items.filter(
             (item: ClanActivity): boolean => item.subtype === 'leave_clan' && new Date(item.created_at) > this.limiteDate
         ) as unknown as LeaveClanActivity[];
@@ -125,7 +125,7 @@ export class FoldRecrutementModel {
 
         this.logger.debug(`${datum.length} players leaves the clan`);
 
-        if (datum.length > 0) {
+        if (this.inventory.getFeatureFlippingRecruitment('header_clan') && datum.length > 0) {
             const embed = new EmbedBuilder()
                 .setColor(Colors.Fuchsia)
                 .setTitle(clan.name)
@@ -133,9 +133,9 @@ export class FoldRecrutementModel {
                 .setDescription("Il semblerai qu'il y ait des joueurs qu'ont quitté le clan.")
                 .setFields({ name: 'Nombre de départ', value: `\`${datum.length.toString()}\`` });
 
-            this.totalNumberOfPlayers += datum.length;
             await this.channel.send({ embeds: [embed] });
         }
+        this.totalNumberOfPlayers += datum.length;
 
         for (const player of datum) {
             const embedPlayer: EmbedBuilder = new EmbedBuilder()
@@ -172,7 +172,7 @@ export class FoldRecrutementModel {
      * Send the footer of the message
      */
     public async sendFooter(): Promise<void> {
-        if (this.totalNumberOfPlayers === 0) {
+        if (!this.inventory.getFeatureFlippingRecruitment('footer_message') || this.totalNumberOfPlayers === 0) {
             return;
         }
 
