@@ -17,7 +17,6 @@ module.exports = async (client: Client): Promise<void> => {
     while (index !== -1) {
         await webSiteScraper.scrapWebsiteAtIndex(index);
         index = index >= length - 1 ? 0 : index + 1;
-        logger.trace('End scrapping, next one in 30 minutes');
         await EnvUtil.sleep(TimeEnum.MINUTE * 30);
     }
 };

@@ -10,4 +10,5 @@ export enum EmojiEnum {
     DEBUG = '🔧',
     TRACE = '✎',
     FILE = '📁',
+    MINE = '⛏',
 }
