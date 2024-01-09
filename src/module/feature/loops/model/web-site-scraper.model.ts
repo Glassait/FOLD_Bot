@@ -9,6 +9,7 @@ import { WebsiteNameEnum } from '../enums/website-name.enum';
 import { WebSiteState } from '../../../shared/types/inventory.type';
 import { TimeEnum } from '../../../shared/enums/time.enum';
 import { EnvUtil } from '../../../shared/utils/env.util';
+import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 
 @LoggerInjector
 @InventoryInjector
@@ -50,22 +51,24 @@ export class WebSiteScraper {
      */
     public async scrapWebsiteAtIndex(index: number): Promise<void> {
         const newsLetter: WebSiteState = this.inventory.getNewsLetterAtIndex(index);
-        this.logger.trace(`⛏️ Start scrapping ${newsLetter.name}`);
+        this.logger.trace(`${EmojiEnum.MINE} Start scrapping ${newsLetter.name}`);
 
         this.axios
             .get(newsLetter.liveUrl)
             .then((response: AxiosResponse<string, any>): void => {
-                this.logger.debug('Fetching newsletter end successfully');
+                this.logger.debug(`Fetching newsletter for \`${newsLetter.name}\` end successfully`);
                 this.getLastNews(response.data, newsLetter)
                     .then((): void => {
-                        this.logger.debug('Scraping newsletter end successfully');
+                        this.logger.debug(`Scraping newsletter \`${newsLetter.name}\` end successfully`);
                     })
                     .catch(reason => {
-                        this.logger.error(`Scrapping newsletter failed: ${reason}`);
+                        this.logger.error(`Scrapping newsletter for \`${newsLetter.name}\` failed: ${reason}`);
                     });
             })
             .catch((error: AxiosError): void => {
-                this.logger.error(`Fetching newsletter failed with error \`${error.status}\` and message \`${error.message}\``);
+                this.logger.error(
+                    `Fetching newsletter for \`${newsLetter.name}\` failed with error \`${error.status}\` and message \`${error.message}\``
+                );
             });
     }
 
@@ -116,6 +119,7 @@ export class WebSiteScraper {
                 }
             }
         }
+        this.logger.trace(`${EmojiEnum.MINE} End scrapping for \`${webSiteState.name}\``);
     }
 
     /**

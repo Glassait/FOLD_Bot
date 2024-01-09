@@ -12,12 +12,6 @@
 				"selector": "a.news-block-row"
 			},
 			{
-				"liveUrl": "https://thedailybounce.net/",
-				"lastUrl": "",
-				"name": "THE DAILY BOUNCE",
-				"selector": "article.archive-image-left"
-			},
-			{
 				"liveUrl": "https://thearmoredpatrol.com/category/world-of-tanks/",
 				"lastUrl": "",
 				"name": "The Armored Patrol",
