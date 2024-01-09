@@ -11,4 +11,5 @@ export enum EmojiEnum {
     TRACE = '✎',
     FILE = '📁',
     MINE = '⛏',
+    MALE = '🙍‍♂️',
 }

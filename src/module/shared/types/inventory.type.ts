@@ -26,9 +26,13 @@ export type TriviaType = { channel: Channel; url: string; limit: number };
 export type InventoryType = {
     newsLetter: NewsLetter;
     game: { trivia: TriviaType };
-    fold_recrutement: {
+    fold_recruitment: {
+        feature: {
+            header_clan: boolean;
+            footer_message: boolean;
+        };
         channel: Channel;
-        [key: string]: string | Channel;
+        [key: string]: string | any;
     };
     commands: {
         [key: string]: DiscordId[];

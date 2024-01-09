@@ -81,7 +81,7 @@ export type ClanActivity = JoinClanActivity | LeaveClanActivity | ChangeRoleClan
 /**
  * Architecture of the type for the clan event api
  */
-export type FoldRecrutementType = {
+export type FoldRecruitmentType = {
     _meta_: {
         until_date: string;
         collection: 'items';

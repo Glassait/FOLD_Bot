@@ -2,24 +2,24 @@ import { Client } from 'discord.js';
 import { Logger } from '../../shared/classes/logger';
 import { Context } from '../../shared/classes/context';
 import { FeatureSingleton } from '../../shared/singleton/feature.singleton';
-import { FoldRecrutementModel } from './model/fold-recrutement.model';
+import { FoldRecruitmentModel } from './model/fold-recruitment.model';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
 import { EnvUtil } from '../../shared/utils/env.util';
 import { TimeEnum } from '../../shared/enums/time.enum';
 
-const logger: Logger = new Logger(new Context('Fold-Recrutement-LOOP'));
+const logger: Logger = new Logger(new Context('Fold-Recruitment-LOOP'));
 
 module.exports = async (client: Client): Promise<void> => {
     const feature: FeatureSingleton = FeatureSingleton.instance;
-    const recrutement: FoldRecrutementModel = new FoldRecrutementModel();
-    await recrutement.fetchMandatory(client);
+    const recruitmentModel: FoldRecruitmentModel = new FoldRecruitmentModel();
+    await recruitmentModel.fetchMandatory(client);
     let numberOfClans: number = 0;
 
-    logger.info(`${EmojiEnum.LOOP} Start fold-Recrutement loop`);
+    logger.info(`${EmojiEnum.LOOP} Start recruitment loop`);
     for (const clan of feature.clans) {
-        logger.info(`${EmojiEnum.LOOP} Start fold-Recrutement loop for ${clan.name}`);
-        await recrutement.fetchClanActivity(clan);
-        logger.info(`${EmojiEnum.LOOP} End fold-Recrutement loop for ${clan.name}`);
+        logger.info(`${EmojiEnum.MALE} Start recruitment for ${clan.name}`);
+        await recruitmentModel.fetchClanActivity(clan);
+        logger.info(`${EmojiEnum.MALE} End recruitment for ${clan.name}`);
 
         numberOfClans++;
         if (numberOfClans >= 30) {
@@ -27,6 +27,6 @@ module.exports = async (client: Client): Promise<void> => {
             numberOfClans = 0;
         }
     }
-    await recrutement.sendFooter();
-    logger.info(`${EmojiEnum.LOOP} End fold-Recrutement loop`);
+    await recruitmentModel.sendFooter();
+    logger.info(`${EmojiEnum.LOOP} End recruitment loop`);
 };
