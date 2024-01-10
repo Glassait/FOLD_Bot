@@ -1,6 +1,6 @@
 import { Logger } from '../classes/logger';
 import { Context } from '../classes/context';
-import { StatisticType, TriviaStatisticType } from '../types/statistic.type';
+import { MonthlyTriviaPlayerStatisticType, StatisticType, TriviaPlayerStatisticType, TriviaStatisticType } from '../types/statistic.type';
 import { FileUtil } from '../utils/file.util';
 import { readFileSync } from 'fs';
 
@@ -18,13 +18,6 @@ export class StatisticSingleton {
      * @private
      */
     private path: string = './src/statistic.json';
-
-    /**
-     * The instance of the class, used for the singleton pattern
-     * @private
-     */
-    private static _instance: StatisticSingleton;
-
     /**
      * The logger to log thing
      * @private
@@ -38,7 +31,7 @@ export class StatisticSingleton {
     private readonly INITIAL_VALUE: StatisticType = {
         version: 1,
         trivia: {
-            version: 1,
+            version: 2,
             overall: {},
             player: {},
         },
@@ -55,6 +48,36 @@ export class StatisticSingleton {
      */
     private constructor() {
         this._data = JSON.parse(readFileSync(this.path).toString());
+
+        if (this._data.trivia.version < this.INITIAL_VALUE.trivia.version) {
+            this._data.trivia.version = this.INITIAL_VALUE.trivia.version;
+            Object.entries(this._data.trivia.player).forEach((player: [string, TriviaPlayerStatisticType]): void => {
+                Object.entries(player[1]).forEach((month: [string, MonthlyTriviaPlayerStatisticType]): void => {
+                    month[1].win_strick = {
+                        current: month[1].win_strick as number,
+                        max: month[1].win_strick as number,
+                    };
+                });
+            });
+            FileUtil.writeIntoJson(this.path, this._data);
+        }
+    }
+
+    /**
+     * The instance of the class, used for the singleton pattern
+     * @private
+     */
+    private static _instance: StatisticSingleton;
+
+    /**
+     * Getter for the {@link _instance}
+     */
+    public static get instance(): StatisticSingleton {
+        if (!this._instance) {
+            this._instance = new StatisticSingleton();
+            this._instance.logger.trace('Inventory instance initialized');
+        }
+        return this._instance;
     }
 
     /**
@@ -74,13 +97,11 @@ export class StatisticSingleton {
     }
 
     /**
-     * Getter for the {@link _instance}
+     * Getter for the trivia game's player statistic's
+     * @param playerId The id of the player
+     * @return The statistic of the player
      */
-    public static get instance(): StatisticSingleton {
-        if (!this._instance) {
-            this._instance = new StatisticSingleton();
-            this._instance.logger.trace('Inventory instance initialized');
-        }
-        return this._instance;
+    public getPlayerStatistic(playerId: string): TriviaPlayerStatisticType {
+        return this._data.trivia.player[playerId];
     }
 }
