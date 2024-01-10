@@ -347,7 +347,7 @@ export class TriviaGameModel {
             const playerStat: MonthlyTriviaPlayerStatisticType = player[this.statisticSingleton.currentMonth] ?? {
                 elo: 0,
                 right_answer: 0,
-                win_strick: 0,
+                win_strick: { current: 0, max: 0 },
                 answer_time: [],
                 participation: 0,
             };
@@ -357,9 +357,12 @@ export class TriviaGameModel {
             const oldElo = playerStat.elo;
             playerStat.elo = this.calculateElo(playerStat, response);
 
+            const winStrick = playerStat.win_strick as { current: number; max: number };
             if (this.isGoodAnswer(response)) {
                 playerStat.right_answer++;
-                playerStat.win_strick++;
+                winStrick.current++;
+                winStrick.max = Math.max(winStrick.current, winStrick.max);
+
                 await response[1].interaction.editReply({
                     content: `Tu as eu la bonne réponse, bravo :clap:.\nTon nouvelle elo est : \`${playerStat.elo}\` (modification de \`${
                         playerStat.elo - oldElo
@@ -367,7 +370,7 @@ export class TriviaGameModel {
                 });
                 this.logger.trace(`Player ${response[0]} found the right answer`);
             } else {
-                playerStat.win_strick = 0;
+                winStrick.current = 0;
                 const tank = this.allTanks.find((tank: VehicleData): boolean => tank.name === response[1].response);
 
                 if (!tank) {

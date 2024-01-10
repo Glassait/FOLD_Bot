@@ -15,31 +15,31 @@ const event: BotEvent = {
     name: Events.InteractionCreate,
     once: false,
     async execute(_client: Client, interaction: Interaction): Promise<void> {
-        let command: SlashCommandModel | undefined;
+        if (!interaction.isChatInputCommand()) {
+            return;
+        }
 
-        if (interaction.isChatInputCommand()) {
-            if (EnvUtil.isDev()) {
-                await interaction.reply({
-                    content:
-                        "Je suis actuellement entrain d'être améliorer par mon créateur, cette commande ne fonctionne pas !\nMerci d'éssayer plus tard :)",
-                    ephemeral: true,
-                });
-                return;
-            }
+        if (EnvUtil.isDev()) {
+            await interaction.reply({
+                content:
+                    "Je suis actuellement entrain d'être améliorer par mon créateur, cette commande ne fonctionne pas !\nMerci d'éssayer plus tard :)",
+                ephemeral: true,
+            });
+            return;
+        }
 
-            command = getCommand(interaction);
+        const command: SlashCommandModel | undefined = getCommand(interaction);
 
-            if (!command) {
-                logger.error(`No slash commands matching \`${interaction.commandName}\` was found.`);
-                return;
-            }
+        if (!command) {
+            logger.error(`No slash commands matching \`${interaction.commandName}\` was found.`);
+            return;
+        }
 
-            try {
-                logger.trace(`Chat input command received : \`${command.name}\``);
-                await command.execute(interaction);
-            } catch (error) {
-                logger.error(`${error}`);
-            }
+        try {
+            logger.trace(`Chat input command received : \`${command.name}\``);
+            await command.execute(interaction);
+        } catch (error) {
+            logger.error(`${error}`);
         }
     },
 };

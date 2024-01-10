@@ -21,7 +21,7 @@ export type MonthlyTriviaPlayerStatisticType = {
     participation: number;
     right_answer: number;
     answer_time: number[];
-    win_strick: number;
+    win_strick: { current: number; max: number } | number;
 };
 
 /**

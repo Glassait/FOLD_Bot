@@ -15,43 +15,6 @@
 </div>
 </header>
 
-<br><br>
-
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li>
-      <a href="#🛠-languages-and-tools-🛠">🛠️ Languages and Tools 🛠️</a>
-    </li>
-    <li>
-        <a href="#getting-started">Getting Started</a>
-        <ul>
-            <li>
-                <a href="#prerequisites">Prerequisites</a>
-            </li>
-            <li>
-                <a href="#installation">Installation</a>
-            </li>
-        </ul>
-    </li>
-    <li>
-        <a href="#contributing">Contributing</a>    
-    </li>
-    <li>
-        <a href="#roadmap">Roadmap</a>    
-    </li>
-    <li>
-        <a href="#contributing">Contributing</a>    
-    </li>
-    <li>
-        <a href="#acknowledgments">Acknowledgments</a>    
-    </li>
-    <li>
-        <a href="#changelog">Changelog</a>    
-    </li>
-  </ol>
-</details>
-
 ---
 
 ## 🛠️ Languages and Tools 🛠️
@@ -129,6 +92,11 @@ Use this space to list resources you find helpful and would like to give credit 
 -   [Readme template](https://github.com/othneildrew/Best-README-Template/blob/master/README.md?plain=1)
 
 ## Changelog
+
+### 2.2.3
+
+-   Add trivia statistics command to visualise the player statistics for each month of participation
+-   Change win strick type to add current number of win strick and max number of win strick
 
 ### 2.2.2
 
