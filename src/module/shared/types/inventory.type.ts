@@ -18,7 +18,19 @@ export type NewsLetter = { channel: Channel; website: WebSiteState[] };
 /**
  * Defined the type for the trivia game
  */
-export type TriviaType = { channel: Channel; url: string; limit: number };
+export type TriviaType = { channel: Channel; url: string; limit: number; schedule: number[] };
+
+/**
+ * The architecture to describe the recruitment
+ */
+export type Fold_recruitment = {
+    feature: {
+        header_clan: boolean;
+        footer_message: boolean;
+    };
+    channel: Channel;
+    [key: string]: string | any;
+};
 
 /**
  * Defined the inventory.json file architecture
@@ -26,14 +38,7 @@ export type TriviaType = { channel: Channel; url: string; limit: number };
 export type InventoryType = {
     newsLetter: NewsLetter;
     game: { trivia: TriviaType };
-    fold_recruitment: {
-        feature: {
-            header_clan: boolean;
-            footer_message: boolean;
-        };
-        channel: Channel;
-        [key: string]: string | any;
-    };
+    fold_recruitment: Fold_recruitment;
     commands: {
         [key: string]: DiscordId[];
     };

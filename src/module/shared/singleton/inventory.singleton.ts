@@ -90,6 +90,15 @@ export class InventorySingleton {
     }
 
     /**
+     * Get the schedule of the trivia game
+     *
+     * @return The schedule of the trivia game
+     */
+    public get triviaSchedule(): number[] {
+        return this._inventory.game.trivia.schedule;
+    }
+
+    /**
      * Get the website at the index
      * @param index The index of the website
      * @throws Error If the index is out of bound
