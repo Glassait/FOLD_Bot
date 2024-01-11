@@ -211,20 +211,43 @@ export class TriviaGameModel {
             })
             .on('collect', async (interaction: ButtonInteraction<'cached'>): Promise<void> => {
                 try {
-                    await interaction.deferReply({ ephemeral: true });
                     this.logger.trace(
                         `${interaction.member.nickname ?? interaction.user.displayName} answer to the trivia game with : \`${
                             interaction.customId
                         }\``
                     );
-                    this.playerAnswer[interaction.user.username] = {
-                        responseTime: Date.now() - this.timer,
-                        response: interaction.customId,
-                        interaction: interaction,
-                    };
-                    await interaction.editReply({
-                        content: `Ta réponse \`${interaction.customId}\` à bien été pris en compte !`,
-                    });
+
+                    if (this.playerAnswer[interaction.user.username]) {
+                        if (this.playerAnswer[interaction.user.username].response === interaction.customId) {
+                            await this.playerAnswer[interaction.user.username].interaction.editReply({
+                                content: `Ta réponse \`${interaction.customId}\` à bien été pris en compte !\nTu as déjà cliqué sur cette réponse !`,
+                            });
+                        } else {
+                            this.playerAnswer[interaction.user.username] = {
+                                responseTime: Date.now() - this.timer,
+                                response: interaction.customId,
+                                interaction: this.playerAnswer[interaction.user.username].interaction,
+                            };
+
+                            await this.playerAnswer[interaction.user.username].interaction.editReply({
+                                content: `Ta réponse \`${interaction.customId}\` à bien été pris en compte !`,
+                            });
+                        }
+
+                        await interaction.deferUpdate();
+                    } else {
+                        await interaction.deferReply({ ephemeral: true });
+
+                        this.playerAnswer[interaction.user.username] = {
+                            responseTime: Date.now() - this.timer,
+                            response: interaction.customId,
+                            interaction: interaction,
+                        };
+
+                        await interaction.editReply({
+                            content: `Ta réponse \`${interaction.customId}\` à bien été pris en compte !`,
+                        });
+                    }
                 } catch (e) {
                     this.logger.error(`Error during collection of answer${e}`);
                 }

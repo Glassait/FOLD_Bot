@@ -18,10 +18,10 @@ module.exports = async (client: Client): Promise<void> => {
         const targetDate = new Date();
         targetDate.setHours(hour, 30, 0, 0);
         logger.info(`🎮 Trivia loop start at ${targetDate}`);
-        const time = targetDate.getTime() - startDate.getTime();
+        const time = 1; // targetDate.getTime() - startDate.getTime();
 
         if (time > 0) {
-            await EnvUtil.sleep(time);
+            // await EnvUtil.sleep(time);
 
             logger.info('🎮 Trivia game start');
             try {
