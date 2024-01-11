@@ -378,7 +378,7 @@ export class TriviaGameModel {
                 }
 
                 await response[1].interaction.editReply({
-                    content: `Tu n'as pas eu la bonne réponse !.\nLe char \`${tank.name}\` a pour obus \`${
+                    content: `Tu n'as pas eu la bonne réponse !.\nLe char \`${tank.name}\` a un obus \`${
                         ShellEnum[tank.default_profile.ammo[0].type as keyof typeof ShellEnum]
                     }\` avec un aplha de \`${tank.default_profile.ammo[0].damage[1]}\`.\nTon nouvelle elo est : \`${
                         playerStat.elo
