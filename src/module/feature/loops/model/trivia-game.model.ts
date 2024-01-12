@@ -301,7 +301,7 @@ export class TriviaGameModel {
         await this.gameMessage.edit({ embeds: [this.answerEmbed, playerEmbed], components: [] });
         this.logger.trace('Game message update with answer and top 3 players');
 
-        await this.updateStatistic(playersResponse);
+        await this.updateStatistic(playersResponse, goodAnswer);
     }
 
     /**
@@ -317,7 +317,7 @@ export class TriviaGameModel {
     /**
      * Checks if the player's answer is correct.
      * @param playerResponse The player's response.
-     * @returns `true` if the player's answer is correct, `false` otherwise.
+     * @returns true if the player's answer is correct, false otherwise.
      */
     private isGoodAnswer(playerResponse: [string, PlayerAnswer]): boolean {
         return playerResponse[1].response === this.datum.name || this.isAnotherTanks(playerResponse);
@@ -326,6 +326,7 @@ export class TriviaGameModel {
     /**
      * This method check if there are another tanks that have the same shell (damage and type)
      * @param playerResponse The answer of the player
+     * @return true if there are another tanks that have the same shell (damage and type), false otherwise
      * @private
      */
     private isAnotherTanks(playerResponse: [string, PlayerAnswer]): boolean {
@@ -346,8 +347,9 @@ export class TriviaGameModel {
     /**
      * Updates the overall and player statistics for the trivia game.
      * @param responses Array of players and their responses.
+     * @param goodAnswer Array of players and their good answers.
      */
-    private async updateStatistic(responses: [string, PlayerAnswer][]): Promise<void> {
+    private async updateStatistic(responses: [string, PlayerAnswer][], goodAnswer: [string, PlayerAnswer][]): Promise<void> {
         this.logger.trace('Start updating the overall statistics');
         const overall: MonthlyTriviaOverallStatisticType = this.triviaStats.overall[this.statisticSingleton.currentMonth] ?? {
             number_of_game: 0,
@@ -377,11 +379,14 @@ export class TriviaGameModel {
             playerStat.participation++;
             playerStat.answer_time.push(response[1].responseTime);
 
+            const isGoodAnswer = goodAnswer.find((value: [string, PlayerAnswer]): boolean => value[0] === response[0]);
+
             const oldElo = playerStat.elo;
-            playerStat.elo = this.calculateElo(playerStat, response);
+            playerStat.elo = this.calculateElo(playerStat, response, isGoodAnswer ? goodAnswer.indexOf(isGoodAnswer) + 1 : -1);
 
             const winStrick = playerStat.win_strick as { current: number; max: number };
-            if (this.isGoodAnswer(response)) {
+
+            if (isGoodAnswer) {
                 playerStat.right_answer++;
                 winStrick.current++;
                 winStrick.max = Math.max(winStrick.current, winStrick.max);
@@ -422,15 +427,16 @@ export class TriviaGameModel {
      * Calculates the new ELO score based on the player's previous score and the response.
      * @param playerStat The player's previous score.
      * @param response The player's response.
+     * @param index The index of the good answer.
      * @returns The new ELO score.
      */
-    private calculateElo(playerStat: MonthlyTriviaPlayerStatisticType, response: [string, any]): number {
-        let gain = -Math.floor(60 * Math.exp(0.0001 * playerStat.elo));
-        if (this.isGoodAnswer(response)) {
-            gain = Math.floor(60 * Math.exp(-0.0001 * playerStat.elo));
+    private calculateElo(playerStat: MonthlyTriviaPlayerStatisticType, response: [string, any], index: number): number {
+        let gain = -Math.floor(25 * Math.exp(0.001 * playerStat.elo));
+        if (index >= 1) {
+            gain = Math.floor((50 / (index * 0.5)) * Math.exp(-0.001 * playerStat.elo));
 
             if (response[1].responseTime <= this.responseTimeLimit) {
-                gain += Math.floor((gain / 3) * ((this.responseTimeLimit - response[1].responseTime) / this.responseTimeLimit));
+                gain += Math.floor(gain * 0.25);
             }
         }
 

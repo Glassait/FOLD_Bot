@@ -1,6 +1,6 @@
 import { Logger } from '../classes/logger';
 import { Context } from '../classes/context';
-import { MonthlyTriviaPlayerStatisticType, StatisticType, TriviaPlayerStatisticType, TriviaStatisticType } from '../types/statistic.type';
+import { StatisticType, TriviaPlayerStatisticType, TriviaStatisticType } from '../types/statistic.type';
 import { FileUtil } from '../utils/file.util';
 import { readFileSync } from 'fs';
 
@@ -48,19 +48,6 @@ export class StatisticSingleton {
      */
     private constructor() {
         this._data = JSON.parse(readFileSync(this.path).toString());
-
-        if (this._data.trivia.version < this.INITIAL_VALUE.trivia.version) {
-            this._data.trivia.version = this.INITIAL_VALUE.trivia.version;
-            Object.entries(this._data.trivia.player).forEach((player: [string, TriviaPlayerStatisticType]): void => {
-                Object.entries(player[1]).forEach((month: [string, MonthlyTriviaPlayerStatisticType]): void => {
-                    month[1].win_strick = {
-                        current: month[1].win_strick as number,
-                        max: month[1].win_strick as number,
-                    };
-                });
-            });
-            FileUtil.writeIntoJson(this.path, this._data);
-        }
     }
 
     /**
