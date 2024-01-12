@@ -5,6 +5,7 @@ import { ClanActivity, FoldRecruitmentType, LeaveClanActivity, Players } from '.
 import { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
 import { Client, Colors, EmbedBuilder, TextChannel } from 'discord.js';
 import { Clan } from '../../../shared/types/feature.type';
+import { FoldRecruitmentEnum } from '../enums/fold-recruitment.enum';
 
 @LoggerInjector
 @AxiosInjector
@@ -24,17 +25,17 @@ export class FoldRecruitmentModel {
      * The base url of tomatoGG
      * @private
      */
-    private readonly tomato: string = 'https://tomato.gg/stats/EU/name%3Did';
+    private readonly tomato: string = `https://tomato.gg/stats/EU/${FoldRecruitmentEnum.NAME}%3D${FoldRecruitmentEnum.ID}`;
     /**
      * The base url of WoT
      * @private
      */
-    private readonly wot: string = 'https://worldoftanks.eu/fr/community/accounts/id-name/';
+    private readonly wot: string = `https://worldoftanks.eu/fr/community/accounts/${FoldRecruitmentEnum.ID}-${FoldRecruitmentEnum.NAME}/`;
     /**
      * The base url of Wot Life
      * @private
      */
-    private readonly wotLife: string = 'https://fr.wot-life.com/eu/player/name-id/';
+    private readonly wotLife: string = `https://fr.wot-life.com/eu/player/${FoldRecruitmentEnum.NAME}-${FoldRecruitmentEnum.ID}/`;
     /**
      * @instance Of the logger
      * @private
@@ -144,17 +145,23 @@ export class FoldRecruitmentModel {
                 .setFields(
                     {
                         name: 'Portail de Wot',
-                        value: `[Redirection ↗️](${this.wot.replace('name', player.name).replace('id', String(player.id))})`,
+                        value: `[Redirection ↗️](${this.wot
+                            .replace(FoldRecruitmentEnum.NAME, player.name)
+                            .replace(FoldRecruitmentEnum.ID, String(player.id))})`,
                         inline: true,
                     },
                     {
                         name: 'TomatoGG',
-                        value: `[Redirection ↗️](${this.tomato.replace('name', player.name).replace('id', String(player.id))})`,
+                        value: `[Redirection ↗️](${this.tomato
+                            .replace(FoldRecruitmentEnum.NAME, player.name)
+                            .replace(FoldRecruitmentEnum.ID, String(player.id))})`,
                         inline: true,
                     },
                     {
                         name: 'Wot Life',
-                        value: `[Redirection ↗️](${this.wotLife.replace('name', player.name).replace('id', String(player.id))})`,
+                        value: `[Redirection ↗️](${this.wotLife
+                            .replace(FoldRecruitmentEnum.NAME, player.name)
+                            .replace(FoldRecruitmentEnum.ID, String(player.id))})`,
                         inline: true,
                     }
                 )
