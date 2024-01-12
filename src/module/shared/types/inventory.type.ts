@@ -18,7 +18,7 @@ export type NewsLetter = { channel: Channel; website: WebSiteState[] };
 /**
  * Defined the type for the trivia game
  */
-export type TriviaType = { channel: Channel; url: string; limit: number; schedule: number[] };
+export type TriviaType = { channel: Channel; url: string; limit: number; schedule: number[]; last_tank_page: number[] };
 
 /**
  * The architecture to describe the recruitment

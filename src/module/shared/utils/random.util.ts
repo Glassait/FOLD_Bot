@@ -15,12 +15,19 @@ export class RandomUtil {
      * @param [max=1] The max for the random number, include
      * @param [min=0] The min for the ransom number, include
      * @param [allowRepeat] If the array can contains same value multiple times
+     * @param [forbidden] The forbidden number to not add in the array
      * @return The array fill with random number
      */
-    public static getArrayWithRandomNumber(length: number = 1, max: number = 1, min: number = 0, allowRepeat?: boolean): number[] {
+    public static getArrayWithRandomNumber(
+        length: number = 1,
+        max: number = 1,
+        min: number = 0,
+        allowRepeat?: boolean,
+        forbidden?: number[]
+    ): number[] {
         return new Array(length).fill(undefined).reduce((previousValue: number[], _currentValue: any): number[] => {
             let randomNumber: number = this.getRandomNumber(max, min);
-            while (!allowRepeat && previousValue.includes(randomNumber)) {
+            while ((!allowRepeat && previousValue.includes(randomNumber)) || forbidden?.includes(randomNumber)) {
                 randomNumber = this.getRandomNumber(max, min);
             }
             previousValue.push(randomNumber);

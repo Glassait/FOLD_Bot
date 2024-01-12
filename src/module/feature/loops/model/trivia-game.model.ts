@@ -138,8 +138,13 @@ export class TriviaGameModel {
      */
     public async fetchTanks(): Promise<void> {
         this.logger.trace('Start fetching tanks');
-        const pages: number[] = RandomUtil.getArrayWithRandomNumber(4, this.trivia.limit, 1);
+        const pages: number[] = RandomUtil.getArrayWithRandomNumber(4, this.trivia.limit, 1, false, this.inventory.triviaLastPage);
         const tankopediaResponses: TankopediaVehiclesSuccess[] = [];
+
+        this.inventory.triviaLastPage = [
+            ...this.inventory.triviaLastPage.slice(this.inventory.triviaLastPage.length >= 8 ? 4 : 0),
+            ...pages,
+        ];
 
         for (const page of pages) {
             tankopediaResponses.push(await this.wotApi.fetchTankopediaApi(this.trivia.url.replace('pageNumber', String(page))));

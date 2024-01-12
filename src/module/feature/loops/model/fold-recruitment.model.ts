@@ -25,7 +25,7 @@ export class FoldRecruitmentModel {
      * The base url of tomatoGG
      * @private
      */
-    private readonly tomato: string = `https://tomato.gg/stats/EU/${FoldRecruitmentEnum.NAME}%3D${FoldRecruitmentEnum.ID}`;
+    private readonly tomato: string = `https://tomato.gg/stats/EU/${FoldRecruitmentEnum.NAME}=${FoldRecruitmentEnum.ID}`;
     /**
      * The base url of WoT
      * @private
