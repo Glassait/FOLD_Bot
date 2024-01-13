@@ -90,6 +90,33 @@ export class InventorySingleton {
     }
 
     /**
+     * Get the schedule of the trivia game
+     *
+     * @return The schedule of the trivia game
+     */
+    public get triviaSchedule(): number[] {
+        return this._inventory.game.trivia.schedule;
+    }
+
+    /**
+     * Get the last page used for the trivia game
+     *
+     * @return The last page used for the trivia game
+     */
+    public get triviaLastPage(): number[] {
+        return this._inventory.game.trivia.last_tank_page;
+    }
+
+    /**
+     * Set the last page used for the trivia game
+     * @param lastPage The last page used for the trivia game
+     */
+    public set triviaLastPage(lastPage: number[]) {
+        this._inventory.game.trivia.last_tank_page = lastPage;
+        FileUtil.writeIntoJson(this.path, this._inventory);
+    }
+
+    /**
      * Get the website at the index
      * @param index The index of the website
      * @throws Error If the index is out of bound

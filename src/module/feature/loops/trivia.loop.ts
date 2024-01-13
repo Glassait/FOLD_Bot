@@ -3,14 +3,16 @@ import { Logger } from '../../shared/classes/logger';
 import { Context } from '../../shared/classes/context';
 import { EnvUtil } from '../../shared/utils/env.util';
 import { TriviaGameModel } from './model/trivia-game.model';
+import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
 
 module.exports = async (client: Client): Promise<void> => {
     const logger: Logger = new Logger(new Context('TRIVIA-LOOP'));
     const triviaGame: TriviaGameModel = new TriviaGameModel();
+    const inventory: InventorySingleton = InventorySingleton.instance;
     await triviaGame.fetchMandatory(client);
 
     logger.info('🔁 Trivia game initialized');
-    for (const hour of [17, 18, 19, 20]) {
+    for (const hour of inventory.triviaSchedule) {
         logger.debug('🔁 Trivia loop start');
         const startDate = new Date();
         const targetDate = new Date();

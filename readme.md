@@ -93,6 +93,15 @@ Use this space to list resources you find helpful and would like to give credit 
 
 ## Changelog
 
+### 2.2.4
+
+-   Put trivia schedule in inventory
+-   Fix wording lose trivia
+-   Make collector check same answer in trivia game
+-   Update formula for elo
+-   Fix replacement when player have id in name
+-   Trivia game doesn't give same tanks every round
+
 ### 2.2.3
 
 -   Add trivia statistics command to visualise the player statistics for each month of participation
