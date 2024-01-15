@@ -3,9 +3,10 @@ import { AxiosInjector, LoggerInjector } from '../../../shared/decorators/inject
 import { Logger } from '../../../shared/classes/logger';
 import { TankopediaVehicle, TankopediaVehiclesSuccess } from '../types/wot-api.type';
 import { application_id_wot } from '../../../../config.json';
+import { TimeEnum } from '../../../shared/enums/time.enum';
 
 @LoggerInjector
-@AxiosInjector()
+@AxiosInjector(TimeEnum.SECONDE * 30)
 export class WotApiModel {
     /**
      * The base url for the wot api
@@ -22,6 +23,11 @@ export class WotApiModel {
      * @private
      */
     private readonly logger: Logger;
+    /**
+     * The maximum number of try when fetching vehicule's data
+     * @private
+     */
+    private readonly maxNumberOfTry = 5;
 
     /**
      * Call the World of Tanks api with the following url
@@ -32,7 +38,13 @@ export class WotApiModel {
         url = this.WOT_API + url.replace('applicationId', application_id_wot);
         this.logger.trace(`💂 Fetching wot api with url ${url}`);
 
-        const data: TankopediaVehicle = (await this.axios.get(url)).data;
+        let numberOfTry = 0;
+        let data: TankopediaVehicle;
+
+        do {
+            data = (await this.axios.get(url)).data;
+            numberOfTry++;
+        } while (!data && numberOfTry < this.maxNumberOfTry);
 
         if (!data || data.status === 'error') {
             throw new Error(`${!data ? data : JSON.stringify(data.error)}`);
