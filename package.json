@@ -1,6 +1,6 @@
 {
     "name": "freepuntosbot",
-    "version": "2.2.4-1",
+    "version": "2.2.4-2",
     "description": "A bot for the free puntos discord server",
     "main": "src/index.ts",
     "scripts": {
