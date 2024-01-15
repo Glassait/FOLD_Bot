@@ -5,7 +5,7 @@ import { TankopediaVehicle, TankopediaVehiclesSuccess } from '../types/wot-api.t
 import { application_id_wot } from '../../../../config.json';
 
 @LoggerInjector
-@AxiosInjector
+@AxiosInjector()
 export class WotApiModel {
     /**
      * The base url for the wot api
