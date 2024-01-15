@@ -5,6 +5,7 @@ import axios, { AxiosInstance } from 'axios';
 import { StatisticSingleton } from '../singleton/statistic.singleton';
 import { TimeEnum } from '../enums/time.enum';
 import https from 'https';
+import http from 'http';
 
 const logger: Logger = new Logger(new Context('Injector'));
 
@@ -18,10 +19,10 @@ type Constructor = new (...args: any[]) => any;
  * @param base The class to inject inside
  * @constructor
  * @see https://github.com/microsoft/TypeScript/issues/37157 For more information about the class decorator
- * @mandatory private readonly logger: Logger;
+ * @in-class private readonly logger: Logger;
  */
 export function LoggerInjector<T extends Constructor>(base: T): T {
-    logger.trace(`Logger injected for ${base.name}`);
+    logger.trace(`Logger injected for \`${base.name}\``);
     return {
         [base.name]: class extends base {
             logger: Logger = new Logger(new Context(base.name));
@@ -34,10 +35,10 @@ export function LoggerInjector<T extends Constructor>(base: T): T {
  * @param base The class to inject inside
  * @constructor
  * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator
- * @mandatory private readonly inventory: InventorySingleton;
+ * @in-class private readonly inventory: InventorySingleton;
  */
 export function InventoryInjector<T extends Constructor>(base: T): T {
-    logger.trace(`Inventory injected for ${base.name}`);
+    logger.trace(`Inventory injected for \`${base.name}\``);
     return {
         [base.name]: class extends base {
             inventory: InventorySingleton = InventorySingleton.instance;
@@ -47,22 +48,25 @@ export function InventoryInjector<T extends Constructor>(base: T): T {
 
 /**
  * Inject the inventory instance in the class. Doesn't work on static class (need constructor)
- * @param base The class to inject inside
+ * @param [timeout=TimeEnum.Minute] The timeout of
  * @constructor
  * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator@example
- * @mandatory private readonly axios: AxiosInstance;
+ * @in-class private readonly axios: AxiosInstance;
  */
-export function AxiosInjector<T extends Constructor>(base: T): T {
-    logger.trace(`Axios injected for ${base.name}`);
-    return {
-        [base.name]: class extends base {
-            axios: AxiosInstance = axios.create({
-                timeout: TimeEnum.MINUTE,
-                httpAgent: new https.Agent({ keepAlive: true, timeout: TimeEnum.MINUTE }),
-                headers: { 'Content-Type': 'application/json;' },
-            });
-        },
-    }[base.name];
+export function AxiosInjector<T extends Constructor>(timeout: number = TimeEnum.MINUTE): (base: T) => T {
+    return function (base: T): T {
+        logger.trace(`Axios injected for \`${base.name}\` with a timeout of \`${timeout}\`ms`);
+        return {
+            [base.name]: class extends base {
+                axios: AxiosInstance = axios.create({
+                    timeout: TimeEnum.MINUTE,
+                    headers: { 'Content-Type': 'application/json;' },
+                    httpAgent: new http.Agent({ keepAlive: true, timeout: timeout }),
+                    httpsAgent: new https.Agent({ keepAlive: true, timeout: timeout }),
+                });
+            },
+        }[base.name];
+    };
 }
 
 /**
@@ -70,10 +74,10 @@ export function AxiosInjector<T extends Constructor>(base: T): T {
  * @param base The class to inject inside
  * @constructor
  * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator@example
- * @mandatory private readonly statisticSingleton: StatisticSingleton;
+ * @in-class private readonly statisticSingleton: StatisticSingleton;
  */
 export function StatisticInjector<T extends Constructor>(base: T): T {
-    logger.trace(`Statistic injected for ${base.name}`);
+    logger.trace(`Statistic injected for \`${base.name}\``);
     return {
         [base.name]: class extends base {
             statisticSingleton: StatisticSingleton = StatisticSingleton.instance;

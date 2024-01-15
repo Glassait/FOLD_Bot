@@ -13,7 +13,7 @@ import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 
 @LoggerInjector
 @InventoryInjector
-@AxiosInjector
+@AxiosInjector(TimeEnum.SECONDE * 10)
 export class WebSiteScraper {
     /**
      * The channel for the newsletter

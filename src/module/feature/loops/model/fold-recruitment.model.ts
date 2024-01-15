@@ -6,9 +6,10 @@ import { InventorySingleton } from '../../../shared/singleton/inventory.singleto
 import { Client, Colors, EmbedBuilder, TextChannel } from 'discord.js';
 import { Clan } from '../../../shared/types/feature.type';
 import { FoldRecruitmentEnum } from '../enums/fold-recruitment.enum';
+import { TimeEnum } from '../../../shared/enums/time.enum';
 
 @LoggerInjector
-@AxiosInjector
+@AxiosInjector(TimeEnum.SECONDE * 30)
 @InventoryInjector
 export class FoldRecruitmentModel {
     /**
