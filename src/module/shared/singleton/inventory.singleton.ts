@@ -194,7 +194,7 @@ export class InventorySingleton {
      * @param clanID The ID of the clan
      * @returns The timestamp of the last join
      */
-    public getLastClan(clanID: string): string {
+    public getLastActivityOfClan(clanID: string): string {
         return this._inventory.fold_recruitment[clanID] as string;
     }
 
