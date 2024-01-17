@@ -5,7 +5,7 @@ import { ClanActivity, FoldRecruitmentType, LeaveClanActivity, Players } from '.
 import { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
 import { Client, Colors, EmbedBuilder, TextChannel } from 'discord.js';
 import { Clan } from '../../../shared/types/feature.type';
-import { FoldRecruitmentEnum } from '../enums/fold-recruitment.enum';
+import { FoldRecruitmentEnum, WotClanActivity } from '../enums/fold-recruitment.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
 
 @LoggerInjector
@@ -98,19 +98,12 @@ export class FoldRecruitmentModel {
      * @param data The data of the activity of the clan
      */
     public async sendMessageToChannelFromExtractedPlayer(clan: Clan, data: FoldRecruitmentType): Promise<void> {
-        let extracted: LeaveClanActivity[] = data.items.filter(
-            (item: ClanActivity): boolean => item.subtype === 'leave_clan' && new Date(item.created_at) > this.limiteDate
+        const extracted: LeaveClanActivity[] = data.items.filter(
+            (item: ClanActivity): boolean =>
+                item.subtype === WotClanActivity.LEAVE_CLAN &&
+                new Date(item.created_at) > this.limiteDate &&
+                new Date(item.created_at) > new Date(this.inventory.getLastActivityOfClan(clan.id))
         ) as unknown as LeaveClanActivity[];
-
-        const lastClan = this.inventory.getLastClan(clan.id);
-        if (lastClan) {
-            const last = extracted.find((value: LeaveClanActivity): boolean => value.created_at === lastClan);
-
-            if (last) {
-                const index = extracted.indexOf(last);
-                extracted = extracted.slice(0, index);
-            }
-        }
 
         const datum: Players[] = extracted.reduce((players: Players[], currentValue: LeaveClanActivity) => {
             /*NOSONAR*/ currentValue.accounts_ids.reduce((players1: Players[], id: number) => {

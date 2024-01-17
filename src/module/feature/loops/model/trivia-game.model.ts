@@ -216,18 +216,22 @@ export class TriviaGameModel {
             })
             .on('collect', async (interaction: ButtonInteraction<'cached'>): Promise<void> => {
                 try {
-                    this.logger.trace(
-                        `${interaction.member.nickname ?? interaction.user.displayName} answer to the trivia game with : \`${
-                            interaction.customId
-                        }\``
-                    );
-
+                    let hasAlreadyAnswer: boolean = false;
                     if (this.playerAnswer[interaction.user.username]) {
+                        hasAlreadyAnswer = true;
+                        await interaction.deferUpdate();
+                    } else {
+                        await interaction.deferReply({ ephemeral: true });
+                    }
+
+                    let changedAnswer: boolean = false;
+                    if (hasAlreadyAnswer) {
                         if (this.playerAnswer[interaction.user.username].response === interaction.customId) {
                             await this.playerAnswer[interaction.user.username].interaction.editReply({
                                 content: `Ta réponse \`${interaction.customId}\` à bien été pris en compte !\nTu as déjà cliqué sur cette réponse !`,
                             });
                         } else {
+                            changedAnswer = true;
                             this.playerAnswer[interaction.user.username] = {
                                 responseTime: Date.now() - this.timer,
                                 response: interaction.customId,
@@ -238,11 +242,7 @@ export class TriviaGameModel {
                                 content: `Ta réponse \`${interaction.customId}\` à bien été pris en compte !`,
                             });
                         }
-
-                        await interaction.deferUpdate();
                     } else {
-                        await interaction.deferReply({ ephemeral: true });
-
                         this.playerAnswer[interaction.user.username] = {
                             responseTime: Date.now() - this.timer,
                             response: interaction.customId,
@@ -253,6 +253,8 @@ export class TriviaGameModel {
                             content: `Ta réponse \`${interaction.customId}\` à bien été pris en compte !`,
                         });
                     }
+
+                    this.logCollect(hasAlreadyAnswer, changedAnswer, interaction);
                 } catch (e) {
                     this.logger.error(`Error during collection of answer${e}`);
                 }
@@ -447,5 +449,22 @@ export class TriviaGameModel {
 
         const newElo: number = playerStat.elo + gain;
         return newElo < 0 ? 0 : newElo;
+    }
+
+    /**
+     * This method manage the log write when a player use trivia button
+     * @param alreadyAnswer If the player already answer
+     * @param changedAnswer If the player changed his answer
+     * @param interaction The interaction
+     */
+    private logCollect(alreadyAnswer: boolean, changedAnswer: boolean, interaction: ButtonInteraction<'cached'>): void {
+        let action: string = 'answered';
+        if (alreadyAnswer) {
+            action = changedAnswer ? 'changed his answer' : 'already answered';
+        }
+
+        this.logger.trace(
+            `${interaction.member?.nickname ?? interaction.user.displayName} ${action} to the trivia game with: \`${interaction.customId}\``
+        );
     }
 }
