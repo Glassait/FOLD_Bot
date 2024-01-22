@@ -33,6 +33,7 @@ const event: BotEvent = {
 
         const today = new Date();
         if (today.getDate() === 1) {
+            logger.info('First of the month, preparation of the trivia month message');
             const channel: TextChannel = await inventory.getChannelForTrivia(client);
 
             const month = new Date();
@@ -142,6 +143,7 @@ const event: BotEvent = {
                     "Merci d'avoir participé tout au long de ce mois. Si vous avez des feedbacks à me faire (positif ou négatif) je suis preneur (❤️ω❤️)"
                 );
 
+            logger.info('Sending trivia month message...');
             await channel.send({
                 content: '@here',
                 embeds: [embedInt, embedScoreboard, embedQuick, embedSlow, embedWinStrick, embedOverall, embedFeedback],
