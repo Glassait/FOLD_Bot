@@ -93,6 +93,10 @@ Use this space to list resources you find helpful and would like to give credit 
 
 ## Changelog
 
+### 2.2.6
+
+-   Add two hours for the fold recruitment
+
 ### 2.2.5
 
 -   Add message of the month for the trivia game
