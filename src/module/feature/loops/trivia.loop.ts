@@ -24,11 +24,7 @@ module.exports = async (client: Client): Promise<void> => {
             await EnvUtil.sleep(time);
 
             logger.info('🎮 Trivia game start');
-            try {
-                await triviaGame.fetchTanks();
-            } catch (e) {
-                logger.error(`Error during trivia loop : ${e}`);
-            }
+            await triviaGame.fetchTanks();
 
             await triviaGame.sendMessageToChannel();
             await triviaGame.collectAnswer();
