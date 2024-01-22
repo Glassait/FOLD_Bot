@@ -93,6 +93,10 @@ Use this space to list resources you find helpful and would like to give credit 
 
 ## Changelog
 
+### 2.2.5
+
+-   Add message of the month for the trivia game
+
 ### 2.2.4
 
 -   Put trivia schedule in inventory
