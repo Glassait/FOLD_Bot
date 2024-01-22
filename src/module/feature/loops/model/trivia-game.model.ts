@@ -28,6 +28,7 @@ import { ShellEnum } from '../enums/shell.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
 import { TimeUtil } from '../../../shared/utils/time.util';
 import { PlayerAnswer } from '../types/trivia-game.type';
+import { MEDAL } from '../../../shared/utils/variables.util';
 
 /**
  * This class is responsible for managing the trivia game.
@@ -82,11 +83,6 @@ export class TriviaGameModel {
      */
     private triviaStats: TriviaStatisticType;
 
-    /**
-     * Medals to be awarded to the top 3 players.
-     * @private
-     */
-    private readonly MEDAL: string[] = ['🥇', '🥈', '🥉'];
     /**
      * @instance of the logger.
      * @private
@@ -294,7 +290,7 @@ export class TriviaGameModel {
 
         for (let i = 0; i < 3; i++) {
             if (goodAnswer[i]) {
-                description += `${this.MEDAL[i]} ${goodAnswer[i][0]} en ${this.calculateResponseTime(goodAnswer[i])}\n`;
+                description += `${MEDAL[i]} ${goodAnswer[i][0]} en ${this.calculateResponseTime(goodAnswer[i])}\n`;
             }
         }
 
