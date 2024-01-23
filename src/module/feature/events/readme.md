@@ -2,19 +2,7 @@
 
 # Events
 
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li>
-      <a href="#create-new-events">Create new events</a>
-    </li>
-    <li>
-        <a href="#log">Log</a>    
-    </li>
-  </ol>
-</details>
-
-In the folder you will find all the events of the bot.
+In this folder you will find all the events of the bot.
 
 ##  Create new events
 
@@ -25,20 +13,18 @@ In the folder you will find all the events of the bot.
 2. Use the following template
     ```typescript
     import { Client, Events, Interaction } from 'discord.js';
-    import { BotEvent } from '../../shared/types/bot-event.type';
+    import { BotEvent } from './types/bot-event.type';
    
-    const event: BotEvent = {
+    export const event: BotEvent = {
         name: undefined, // The name of the event, used Events
-        once: undefined, // If the event is only executer once
+        once: undefined, // If the event is only executer once, this parameter is optional
         async execute(_client: Client, interaction: Interaction): Promise<void> {
             // Code to execute when event is raised
         },
     };
-   
-    export default event;
     ```
-3. Fill the name with `Events`, once and execute part
-4. Congrats the new events will be available, the registering of the event is automatic in the handler `event.handler.ts`
+3. Fill the name with `Events`, once (optional) and execute part. More information in the [BotEvent type](./types/bot-event.type.ts)
+4. Congrats the new events will be available. No more action are required to  register the event because it's automatic in the handler [event.handler.ts](../handlers/event.handler.ts)
 
 ## Log
 
@@ -52,7 +38,7 @@ If you want to add persistent log in to execute of the event, follow the followi
     const logger: Logger = new Logger(new Context('NAME-EVENT'));
     ```
 2. In the context give the name of the event
-3. Call the level you want with the `logger`, ex:
+3. Call the level you want with the [logger](../../shared/classes/logger.ts), ex: 
    ```typescript
    logger.info("Message to the log");
    ```

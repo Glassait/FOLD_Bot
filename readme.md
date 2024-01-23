@@ -62,12 +62,9 @@ This project need node v18.16.0 or higher
 
 ## Roadmap
 
--   [x] Update Architecture [(#36)](https://github.com/Glassait/freePuntosBot/issues/36)
--   [x] Add more readme [(#36)](https://github.com/Glassait/freePuntosBot/issues/36)
--   [x] Create Sequence diagram and wiki on github [(#36)](https://github.com/Glassait/freePuntosBot/issues/36)
--   [ ] ~~Translation for Wot express~~ (Closed because pay service)
--   [x] Upgrade autoReply (without IA)
--   [x] MINI JEU TRIVIA [(#30)](https://github.com/Glassait/freePuntosBot/issues/30)
+-   [x] Better handle of overall error
+-   [ ] Make trivia games uses the second canon on tanks that have multiple canon
+-   [ ] Used chained catch to better handle
 
 See the [open issues](https://github.com/Glassait/freePuntosBot/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement) for a full list of proposed features (and known issues).
 <br>
@@ -96,10 +93,12 @@ Use this space to list resources you find helpful and would like to give credit 
 ### 2.2.6
 
 -   Add two hours for the fold recruitment
+-   Update the [BotEvent](src/module/feature/events/types/bot-event.type.ts) type to allow auto-completion
+-   Update the event architecture by removing `export default event`, more info in [readme](src/module/feature/events/readme.md)
 
 ### 2.2.5
 
--   Add message of the month for the trivia game
+-   Add message of the month for the trivia game ([ready.event](src/module/feature/events/ready.event.ts))
 
 ### 2.2.4
 

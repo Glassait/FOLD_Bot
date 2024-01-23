@@ -9,7 +9,7 @@ import { TriviaPlayerStatisticType, TriviaStatisticType } from '../../shared/typ
 import { MEDAL } from '../../shared/utils/variables.util';
 import { TimeEnum } from '../../shared/enums/time.enum';
 
-const event: BotEvent = {
+export const event: BotEvent = {
     name: Events.ClientReady,
     once: true,
     async execute(client: Client): Promise<void> {
@@ -151,5 +151,3 @@ const event: BotEvent = {
         }
     },
 };
-
-export default event;
