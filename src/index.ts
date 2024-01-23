@@ -43,3 +43,11 @@ setTimeout((): void => {
         require(`${loopsDir}/${loop}`)(client);
     });
 }, 500);
+
+/**
+ * Code to tracked API Errors
+ * @see https://discordjs.guide/popular-topics/errors.html#how-to-diagnose-api-errors
+ */
+process.on('unhandledRejection', error => {
+    logger.error(`Unhandled promise rejection: ${error}`);
+});

@@ -11,9 +11,8 @@ function getCommand(interaction: ChatInputCommandInteraction): SlashCommandModel
     return require(`../slash-commands/${interaction.commandName}.slash-command`).command;
 }
 
-const event: BotEvent = {
+export const event: BotEvent = {
     name: Events.InteractionCreate,
-    once: false,
     async execute(_client: Client, interaction: Interaction): Promise<void> {
         if (!interaction.isChatInputCommand()) {
             return;
@@ -43,5 +42,3 @@ const event: BotEvent = {
         }
     },
 };
-
-export default event;

@@ -14,14 +14,14 @@ module.exports = async (client: Client): Promise<void> => {
     readdirSync(eventsDir).forEach((file: string): void => {
         if (!file.endsWith('.ts')) return;
 
-        const event: BotEvent = require(`${eventsDir}/${file}`).default;
+        const event: BotEvent = require(`${eventsDir}/${file}`).event;
 
         event.once
-            ? client.once(event.name, (...args: any[]) => event.execute(client, ...args))
-            : client.on(event.name, (...args: any[]) => event.execute(client, ...args));
+            ? client.once(event.name.toString(), (...args: any[]) => event.execute(client, ...args))
+            : client.on(event.name.toString(), (...args: any[]) => event.execute(client, ...args));
 
         numberOfEvent++;
-        logger.info(`🌠 Successfully loaded event ${event.name}`);
+        logger.info(`🌠 Successfully loaded event ${event.name} as \`${event.once ? 'temporary' : 'permanent'}\` listener !`);
     });
     logger.info(`Loaded ${numberOfEvent} events`);
 };

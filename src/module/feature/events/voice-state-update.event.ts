@@ -7,9 +7,8 @@ import { Logger } from '../../shared/classes/logger';
 
 const logger: Logger = new Logger(new Context('VOICE-STATE-UPDATE-EVENT'));
 
-const event: BotEvent = {
+export const event: BotEvent = {
     name: Events.VoiceStateUpdate,
-    once: false,
     async execute(_client: Client, _oldState: VoiceState, newState: VoiceState): Promise<void> {
         const feature: FeatureSingleton = FeatureSingleton.instance;
         if (feature.data.auto_disconnect && newState.channelId) {
@@ -19,5 +18,3 @@ const event: BotEvent = {
         }
     },
 };
-
-export default event;
