@@ -13,7 +13,7 @@ module.exports = async (client: Client): Promise<void> => {
     const recruitmentModel: FoldRecruitmentModel = new FoldRecruitmentModel();
     await recruitmentModel.fetchMandatory(client);
 
-    for (const hour of [10, 19]) {
+    for (const hour of [9, 18]) {
         const startDate = new Date();
         const targetDate = new Date();
         targetDate.setHours(hour, 0, 0, 0);
