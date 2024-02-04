@@ -2,7 +2,7 @@ import { AxiosInstance } from 'axios';
 import { AxiosInjector, LoggerInjector } from '../../../shared/decorators/injector.decorator';
 import { Logger } from '../../../shared/classes/logger';
 import { TankopediaVehicle, TankopediaVehiclesSuccess } from '../types/wot-api.type';
-import { application_id_wot } from '../../../../config.json';
+import { application_id_wot } from '../../../core/config.json';
 import { TimeEnum } from '../../../shared/enums/time.enum';
 
 @LoggerInjector
@@ -24,7 +24,7 @@ export class WotApiModel {
      */
     private readonly logger: Logger;
     /**
-     * The maximum number of try when fetching vehicule's data
+     * The maximum number of try when fetching vehicle's data
      * @private
      */
     private readonly maxNumberOfTry = 5;

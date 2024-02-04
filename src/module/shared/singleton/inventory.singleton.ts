@@ -15,7 +15,7 @@ export class InventorySingleton {
     /**
      * The path to the inventory.json file
      */
-    public readonly path: string = './src/inventory.json';
+    public readonly path: string = './src/module/core/inventory.json';
 
     /**
      * The logger to log thing
