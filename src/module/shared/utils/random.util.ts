@@ -27,7 +27,10 @@ export class RandomUtil {
     ): number[] {
         return new Array(length).fill(undefined).reduce((previousValue: number[], _currentValue: any): number[] => {
             let randomNumber: number = this.getRandomNumber(max, min);
-            while ((!allowRepeat && previousValue.includes(randomNumber)) || forbidden?.includes(randomNumber)) {
+            while (
+                (!allowRepeat && previousValue.includes(randomNumber)) ||
+                (forbidden?.length !== 0 && forbidden?.includes(randomNumber))
+            ) {
                 randomNumber = this.getRandomNumber(max, min);
             }
             previousValue.push(randomNumber);
