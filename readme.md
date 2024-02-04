@@ -95,6 +95,8 @@ Use this space to list resources you find helpful and would like to give credit 
 -   Add two hours for the fold recruitment
 -   Update the [BotEvent](src/module/feature/events/types/bot-event.type.ts) type to allow auto-completion
 -   Update the event architecture by removing `export default event`, more info in [readme](src/module/feature/events/readme.md)
+-   Move json to [core](src/module/core)
+-   Removed SPG from trivia game
 
 ### 2.2.5
 
