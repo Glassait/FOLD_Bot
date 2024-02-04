@@ -17,7 +17,7 @@ export class StatisticSingleton {
      * The path to the statistic file
      * @private
      */
-    private path: string = './src/statistic.json';
+    private path: string = './src/module/core/statistic.json';
     /**
      * The logger to log thing
      * @private

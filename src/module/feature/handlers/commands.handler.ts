@@ -1,7 +1,7 @@
 import { Client, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, Routes, Snowflake } from 'discord.js';
 import { readdirSync } from 'fs';
 import { join } from 'path';
-import { client_id, token } from '../../../config.json';
+import { client_id, token } from '../../core/config.json';
 import { Context } from '../../shared/classes/context';
 import { Logger } from '../../shared/classes/logger';
 import { SlashCommandModel } from '../slash-commands/model/slash-command.model';

@@ -1,7 +1,7 @@
 import { Client, GatewayIntentBits } from 'discord.js';
 import { readdirSync } from 'fs';
 import { join } from 'path';
-import { token } from './config.json';
+import { token } from './module/core/config.json';
 import { Context } from './module/shared/classes/context';
 import { Logger } from './module/shared/classes/logger';
 

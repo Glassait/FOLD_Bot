@@ -9,7 +9,7 @@ export class FeatureSingleton {
     /**
      * The path to the feature configuration file.
      */
-    private readonly path: string = './src/feature.json';
+    private readonly path: string = './src/module/core/feature.json';
     /**
      * @instance of the logger
      */
