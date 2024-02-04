@@ -15,7 +15,7 @@ import {
 } from 'discord.js';
 import { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
 import { RandomUtil } from '../../../shared/utils/random.util';
-import { TankopediaVehiclesSuccess, VehicleData } from '../types/wot-api.type';
+import { Ammo, TankopediaVehiclesSuccess, VehicleData } from '../types/wot-api.type';
 import { WotApiModel } from './wot-api.model';
 import { StatisticSingleton } from 'src/module/shared/singleton/statistic.singleton';
 import {
@@ -37,11 +37,14 @@ import { MEDAL } from '../../../shared/utils/variables.util';
 @InventoryInjector
 @StatisticInjector
 export class TriviaGameModel {
+    //region PUBLIC READONLY
     /**
      * Maximum time allowed for a player to answer the trivia question.
      */
     public readonly MAX_TIME: number = TimeEnum.MINUTE * 5;
+    //endregion
 
+    //region PRIVATE
     /**
      * The information fetch from the inventory
      * @private
@@ -61,7 +64,7 @@ export class TriviaGameModel {
      * Tank selected for the current trivia game.
      * @private
      */
-    private datum: VehicleData;
+    private datum: { tank: VehicleData; ammoIndex: number; isPen: boolean };
     /**
      * Message containing the trivia game components.
      * @private
@@ -82,7 +85,9 @@ export class TriviaGameModel {
      * @private
      */
     private triviaStats: TriviaStatisticType;
+    //endregion
 
+    //region PRIVATE READONLY
     /**
      * @instance of the logger.
      * @private
@@ -118,6 +123,7 @@ export class TriviaGameModel {
      * @private
      */
     private readonly responseTimeLimit = TimeEnum.SECONDE * 10;
+    //endregion
 
     /**
      * Fetches the necessary services and initializes the model.
@@ -138,7 +144,7 @@ export class TriviaGameModel {
         const tankopediaResponses: TankopediaVehiclesSuccess[] = [];
 
         this.inventory.triviaLastPage = [
-            ...this.inventory.triviaLastPage.slice(this.inventory.triviaLastPage.length >= 8 ? 4 : 0),
+            ...this.inventory.triviaLastPage.slice(this.inventory.triviaLastPage.length >= 12 ? 4 : 0),
             ...pages,
         ];
 
@@ -156,8 +162,17 @@ export class TriviaGameModel {
             return data;
         }, []);
 
-        this.datum = this.allTanks[RandomUtil.getRandomNumber(this.allTanks.length - 1)];
-        this.logger.trace(`Tank for game selected : \`${this.datum.name}\``);
+        this.datum = {
+            tank: this.allTanks[RandomUtil.getRandomNumber(this.allTanks.length - 1)],
+            ammoIndex: RandomUtil.getRandomNumber(),
+            isPen: RandomUtil.getRandomNumber() !== 0,
+        };
+
+        this.logger.trace(
+            `Tank for game selected : \`${this.datum.tank.name}\`, the ammo type is : ${
+                this.datum.ammoIndex ? '`GOLD`' : '`NORMAL`'
+            } and the question is for ${this.datum.isPen ? '`penetration`' : '`damage`'}`
+        );
     }
 
     /**
@@ -166,18 +181,19 @@ export class TriviaGameModel {
     public async sendMessageToChannel(): Promise<void> {
         const target = new Date();
         target.setMinutes(target.getMinutes() + this.MAX_TIME / TimeEnum.MINUTE);
+        const ammo: Ammo = this.datum.tank.default_profile.ammo[this.datum.ammoIndex];
         this.startGameEmbed.setFields(
             {
                 name: ' Règle du jeu',
-                value: `Les règles sont simples :\n\t - ✏ 1 obus,\n- 🚗 4 chars  tier X,\n- ✔ 1 bonne réponse (⚠️Quand 2 ou plusieurs chars on le même obus, tous ces chars sont des bonnes réponses),\n- 🕒 ${
+                value: `Les règles sont simples :\n\t - ✏ 1 obus (dégât ou pénétration, normal ou gold),\n- 🚗 4 chars  tier X,\n- ✔ 1 bonne réponse (⚠️Quand 2 ou plusieurs chars on le même obus, tous ces chars sont des bonnes réponses),\n- 🕒 ${
                     this.MAX_TIME / TimeEnum.MINUTE
                 } minutes (fini <t:${TimeUtil.convertToUnix(target)}:R>).\n**⚠️ Ce n'est pas forcèment le dernier canon utilisé !**`,
             },
             {
-                name: 'Obus :',
-                value: `\`${ShellEnum[this.datum.default_profile.ammo[0].type as keyof typeof ShellEnum]} ${
-                    this.datum.default_profile.ammo[0].damage[1]
-                }\``,
+                name: `Obus-${this.datum.isPen ? 'Penetration' : 'Dégât'} :`,
+                value: `\`${ShellEnum[ammo.type as keyof typeof ShellEnum]} ${this.datum.isPen ? ammo.penetration[1] : ammo.damage[1]}\` (${
+                    this.datum.isPen ? 'penetration' : 'dégât'
+                })`,
                 inline: true,
             }
         );
@@ -266,14 +282,14 @@ export class TriviaGameModel {
             (a: [string, PlayerAnswer], b: [string, PlayerAnswer]) => a[1].responseTime - b[1].responseTime
         );
 
-        this.answerEmbed.setImage(this.datum.images.big_icon).setDescription(`Le char à deviner était : \`${this.datum.name}\``);
+        this.answerEmbed.setImage(this.datum.tank.images.big_icon).setDescription(`Le char à deviner était : \`${this.datum.tank.name}\``);
         const otherAnswer: string[] = ['Les autres bonnes réponses sont :'];
+
+        const ammo: Ammo = this.datum.tank.default_profile.ammo[this.datum.ammoIndex];
+
         this.allTanks.forEach((vehicle: VehicleData): void => {
-            if (
-                vehicle.name !== this.datum.name &&
-                vehicle.default_profile.ammo[0].type === this.datum.default_profile.ammo[0].type &&
-                vehicle.default_profile.ammo[0].damage[1] === this.datum.default_profile.ammo[0].damage[1]
-            ) {
+            const vehicleAmmo: Ammo = vehicle.default_profile.ammo[this.datum.ammoIndex];
+            if (vehicle.name !== this.datum.tank.name && vehicleAmmo.type === ammo.type && this.checkVehicleAmmoDetail(vehicleAmmo, ammo)) {
                 otherAnswer.push(vehicle.name);
             }
         });
@@ -299,12 +315,26 @@ export class TriviaGameModel {
         const playerEmbed: EmbedBuilder = new EmbedBuilder()
             .setTitle('Joueurs')
             .setDescription(description)
-            .setColor(playersResponse.length === 0 ? Colors.Red : Colors.Gold);
+            .setColor(goodAnswer.length === 0 ? Colors.Red : Colors.Gold);
 
         await this.gameMessage.edit({ embeds: [this.answerEmbed, playerEmbed], components: [] });
         this.logger.trace('Game message update with answer and top 3 players');
 
         await this.updateStatistic(playersResponse, goodAnswer);
+    }
+
+    /**
+     * Check if the vehicle ammo is the same as the datum ammo.
+     * @param vehicleAmmo The vehicle ammo
+     * @param ammo The datum ammo
+     * @return true if the vehicle ammo is the same (penetration or damage), false otherwise
+     * @private
+     */
+    private checkVehicleAmmoDetail(vehicleAmmo: Ammo, ammo: Ammo): boolean {
+        if (this.datum.isPen) {
+            return vehicleAmmo.penetration[1] === ammo.penetration[1];
+        }
+        return vehicleAmmo.damage[1] === ammo.damage[1];
     }
 
     /**
@@ -323,7 +353,7 @@ export class TriviaGameModel {
      * @returns true if the player's answer is correct, false otherwise.
      */
     private isGoodAnswer(playerResponse: [string, PlayerAnswer]): boolean {
-        return playerResponse[1].response === this.datum.name || this.isAnotherTanks(playerResponse);
+        return playerResponse[1].response === this.datum.tank.name || this.isAnotherTanks(playerResponse);
     }
 
     /**
@@ -341,10 +371,9 @@ export class TriviaGameModel {
             return false;
         }
 
-        return (
-            vehicle.default_profile.ammo[0].type === this.datum.default_profile.ammo[0].type &&
-            vehicle.default_profile.ammo[0].damage[1] === this.datum.default_profile.ammo[0].damage[1]
-        );
+        const vehicleAmmo: Ammo = vehicle.default_profile.ammo[0];
+        const ammo: Ammo = this.datum.tank.default_profile.ammo[this.datum.ammoIndex];
+        return vehicleAmmo.type === ammo.type && this.checkVehicleAmmoDetail(vehicleAmmo, ammo);
     }
 
     /**
@@ -354,17 +383,7 @@ export class TriviaGameModel {
      */
     private async updateStatistic(responses: [string, PlayerAnswer][], goodAnswer: [string, PlayerAnswer][]): Promise<void> {
         this.logger.trace('Start updating the overall statistics');
-        const overall: MonthlyTriviaOverallStatisticType = this.triviaStats.overall[this.statisticSingleton.currentMonth] ?? {
-            number_of_game: 0,
-            game_without_participation: 0,
-        };
-
-        overall.number_of_game++;
-
-        if (responses.length === 0) {
-            overall.game_without_participation++;
-        }
-        this.triviaStats.overall[this.statisticSingleton.currentMonth] = overall;
+        this.updateOverallStatistic(responses);
 
         this.logger.trace("Start updating the player's statistics");
 
@@ -424,6 +443,30 @@ export class TriviaGameModel {
         }
 
         this.statisticSingleton.trivia = this.triviaStats;
+    }
+
+    /**
+     * Update the overall stats
+     * @param responses the answer list
+     * @private
+     */
+    private updateOverallStatistic(responses: [string, PlayerAnswer][]): void {
+        const overall: MonthlyTriviaOverallStatisticType = this.triviaStats.overall[this.statisticSingleton.currentMonth] ?? {
+            number_of_game: 0,
+            game_without_participation: 0,
+            unique_tanks: [],
+        };
+
+        overall.number_of_game++;
+
+        if (responses.length === 0) {
+            overall.game_without_participation++;
+        }
+        if (overall.unique_tanks && !overall.unique_tanks.includes(this.datum.tank.name)) {
+            overall.unique_tanks.push(this.datum.tank.name);
+        }
+
+        this.triviaStats.overall[this.statisticSingleton.currentMonth] = overall;
     }
 
     /**

@@ -4,6 +4,7 @@
 export type MonthlyTriviaOverallStatisticType = {
     number_of_game: number;
     game_without_participation: number;
+    unique_tanks?: string[];
 };
 
 /**
