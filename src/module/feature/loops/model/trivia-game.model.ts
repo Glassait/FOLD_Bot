@@ -167,6 +167,7 @@ export class TriviaGameModel {
             ammoIndex: RandomUtil.getRandomNumber(),
             isPen: RandomUtil.getRandomNumber() !== 0,
         };
+
         this.logger.trace(
             `Tank for game selected : \`${this.datum.tank.name}\`, the ammo type is : ${
                 this.datum.ammoIndex ? '`GOLD`' : '`NORMAL`'
@@ -382,17 +383,7 @@ export class TriviaGameModel {
      */
     private async updateStatistic(responses: [string, PlayerAnswer][], goodAnswer: [string, PlayerAnswer][]): Promise<void> {
         this.logger.trace('Start updating the overall statistics');
-        const overall: MonthlyTriviaOverallStatisticType = this.triviaStats.overall[this.statisticSingleton.currentMonth] ?? {
-            number_of_game: 0,
-            game_without_participation: 0,
-        };
-
-        overall.number_of_game++;
-
-        if (responses.length === 0) {
-            overall.game_without_participation++;
-        }
-        this.triviaStats.overall[this.statisticSingleton.currentMonth] = overall;
+        this.updateOverallStatistic(responses);
 
         this.logger.trace("Start updating the player's statistics");
 
@@ -452,6 +443,30 @@ export class TriviaGameModel {
         }
 
         this.statisticSingleton.trivia = this.triviaStats;
+    }
+
+    /**
+     * Update the overall stats
+     * @param responses the answer list
+     * @private
+     */
+    private updateOverallStatistic(responses: [string, PlayerAnswer][]): void {
+        const overall: MonthlyTriviaOverallStatisticType = this.triviaStats.overall[this.statisticSingleton.currentMonth] ?? {
+            number_of_game: 0,
+            game_without_participation: 0,
+            unique_tanks: [],
+        };
+
+        overall.number_of_game++;
+
+        if (responses.length === 0) {
+            overall.game_without_participation++;
+        }
+        if (overall.unique_tanks && !overall.unique_tanks.includes(this.datum.tank.name)) {
+            overall.unique_tanks.push(this.datum.tank.name);
+        }
+
+        this.triviaStats.overall[this.statisticSingleton.currentMonth] = overall;
     }
 
     /**

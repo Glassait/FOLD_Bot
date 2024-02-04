@@ -74,7 +74,7 @@ export function AxiosInjector<T extends Constructor>(timeout: number = TimeEnum.
  * @param base The class to inject inside
  * @constructor
  * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator@example
- * @in-class private readonly statisticSingleton: StatisticSingleton;
+ * @in-class private readonly statistic: StatisticSingleton;
  */
 export function StatisticInjector<T extends Constructor>(base: T): T {
     logger.trace(`Statistic injected for \`${base.name}\``);

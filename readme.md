@@ -97,6 +97,8 @@ Use this space to list resources you find helpful and would like to give credit 
 -   Update the event architecture by removing `export default event`, more info in [readme](src/module/feature/events/readme.md)
 -   Move json to [core](src/module/core)
 -   Removed SPG from trivia game
+-   Model for trivia month message and new overall statistic
+-   Add gold ammo and penetration to the trivia game
 
 ### 2.2.5
 

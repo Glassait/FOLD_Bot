@@ -31,7 +31,7 @@ export class StatisticSingleton {
     private readonly INITIAL_VALUE: StatisticType = {
         version: 1,
         trivia: {
-            version: 2,
+            version: 3,
             overall: {},
             player: {},
         },
@@ -48,6 +48,9 @@ export class StatisticSingleton {
      */
     private constructor() {
         this._data = JSON.parse(readFileSync(this.path).toString());
+
+        this._data.version = this.INITIAL_VALUE.version;
+        this._data.trivia.version = this.INITIAL_VALUE.trivia.version;
     }
 
     /**
