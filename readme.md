@@ -90,6 +90,12 @@ Use this space to list resources you find helpful and would like to give credit 
 
 ## Changelog
 
+### 2.2.7
+
+-   Method to generate schedule for loop
+-   Add schedule for fold recruitment
+-   Schedule for loop take hour and minute
+
 ### 2.2.6
 
 -   Add two hours for the fold recruitment
