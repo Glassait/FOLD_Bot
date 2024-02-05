@@ -90,11 +90,12 @@ export class InventorySingleton {
     }
 
     /**
-     * Get the schedule of the trivia game
+     * Get the schedule of the trivia game.
+     * The value need to be parsed to extract the hours and the minutes
      *
      * @return The schedule of the trivia game
      */
-    public get triviaSchedule(): number[] {
+    public get triviaSchedule(): string[] {
         return this._inventory.game.trivia.schedule;
     }
 
@@ -114,6 +115,16 @@ export class InventorySingleton {
     public set triviaLastPage(lastPage: number[]) {
         this._inventory.game.trivia.last_tank_page = lastPage;
         FileUtil.writeIntoJson(this.path, this._inventory);
+    }
+
+    /**
+     * Get the schedule for the fold recruitment.
+     * The value need to be parsed to extract the hours and the minutes
+     *
+     * @return The schedule of the fold recruitment
+     */
+    public get foldSchedule(): string[] {
+        return this._inventory.fold_recruitment.schedule;
     }
 
     /**
