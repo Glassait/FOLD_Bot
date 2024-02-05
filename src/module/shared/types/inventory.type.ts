@@ -18,7 +18,7 @@ export type NewsLetter = { channel: Channel; website: WebSiteState[] };
 /**
  * Defined the type for the trivia game
  */
-export type TriviaType = { channel: Channel; url: string; limit: number; schedule: number[]; last_tank_page: number[] };
+export type TriviaType = { channel: Channel; url: string; limit: number; schedule: string[]; last_tank_page: number[] };
 
 /**
  * The architecture to describe the recruitment
@@ -29,7 +29,8 @@ export type Fold_recruitment = {
         footer_message: boolean;
     };
     channel: Channel;
-    [key: string]: string | any;
+    schedule: string[];
+    [key: string]: string | any; // NOSONAR
 };
 
 /**

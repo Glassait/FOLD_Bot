@@ -23,6 +23,7 @@
 			"header_clan": false,
 			"footer_message": false
 		},
+		"schedule": [],
 		"channel": {
 			"guild": "1184852469164027976",
 			"id": "1192589349225771058"
