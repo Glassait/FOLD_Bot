@@ -102,7 +102,7 @@ export class FeatureSingleton {
      */
     public addClan(clan: Clan): boolean {
         clan.id = clan.id.trim().replace(/["']/g, '');
-        clan.name = clan.name.trim().replace(/["']/g, '');
+        clan.name = clan.name.trim().replace(/["']/g, '').toUpperCase();
         if (this._data.watch_clan.filter((value: Clan): boolean => value.id === clan.id).length > 0) {
             return false;
         }
@@ -114,12 +114,32 @@ export class FeatureSingleton {
     }
 
     /**
-     * Removes a clan from the list of clans to watch.
-     * @param clanID The clan to remove.
+     * Removes a clan from the list of watched clans based on its ID or name.
+     *
+     * @param {string} clanIdOrName - The ID or name of the clan to be removed.
+     * @returns {boolean} - Returns `true` if the clan was successfully removed, and `false` if the clan was not found in the list.
+     *
+     * @public
+     *
+     * @example
+     * // Example usage:
+     * const clanIdOrName = 'MyClan';
+     * const isRemoved = FeatureSingleton.removeClan(clanIdOrName);
+     * if (isRemoved) {
+     *   console.log(`${clanIdOrName} has been removed from the watched clans.`);
+     * } else {
+     *   console.log(`${clanIdOrName} was not found in the watched clans.`);
+     * }
      */
-    public removeClan(clanID: string): void {
-        this._data.watch_clan = this._data.watch_clan.filter((c: Clan): boolean => c.id !== clanID);
+    public removeClan(clanIdOrName: string): boolean {
+        clanIdOrName = clanIdOrName.trim().replace(/["']/g, '').toUpperCase();
+        if (this._data.watch_clan.filter((c: Clan): boolean => c.id === clanIdOrName || c.name === clanIdOrName).length === 0) {
+            return false;
+        }
+        this._data.watch_clan = this._data.watch_clan.filter((c: Clan): boolean => c.id !== clanIdOrName || c.name !== clanIdOrName);
         FileUtil.writeIntoJson(this.path, this._data);
+
+        return true;
     }
 
     /**
