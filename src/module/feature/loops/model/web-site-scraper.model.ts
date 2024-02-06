@@ -21,21 +21,11 @@ export class WebSiteScraper {
      */
     private channel: TextChannel;
 
-    /**
-     * @instance Of axios
-     * @private
-     */
+    //region INJECTION
     private readonly axios: AxiosInstance;
-    /**
-     * @instance Of the inventory
-     * @private
-     */
     private readonly inventory: InventorySingleton;
-    /**
-     * @instance Of the logger
-     * @private
-     */
     private readonly logger: Logger;
+    //endregion
 
     /**
      * Fetch the channel for the newsletter
@@ -123,12 +113,13 @@ export class WebSiteScraper {
     }
 
     /**
-     * Scrap the Armored Patrol website
-     * @param containers The html container
-     * @param index The index of the url of the news
-     * @param $ The cheerio api
-     * @param webSiteState The website
-     * @private
+     * Asynchronous function for processing Armored Patrol data.
+     *
+     * @param {any[]} containers - An array of container elements.
+     * @param {number} index - The index of the current container being processed.
+     * @param {CheerioAPI} $ - The Cheerio instance for HTML parsing.
+     * @param {WebSiteState} webSiteState - The website state object.
+     * @returns {Promise<void>} - A Promise that resolves after processing the Armored Patrol data.
      */
     private async armoredPatrol(containers: any[], index: number, $: CheerioAPI, webSiteState: WebSiteState): Promise<void> {
         const link: any = $(`article#${containers[index].attribs.id} a`).get()[0];
@@ -143,10 +134,12 @@ export class WebSiteScraper {
     }
 
     /**
-     * Scrap the wot express website
-     * @param links All the tags of the html containing the news url
-     * @param index The index of the url
-     * @param webSiteState The website
+     * Asynchronous function for processing WOT Express data.
+     *
+     * @param {any[]} links - An array of link elements.
+     * @param {number} index - The index of the current link being processed.
+     * @param {WebSiteState} webSiteState - The website state object.
+     * @returns {Promise<void>} - A Promise that resolves after processing the WOT Express data.
      */
     private async wotExpress(links: any[], index: number, webSiteState: WebSiteState): Promise<void> {
         await this.sendNews(
@@ -159,16 +152,19 @@ export class WebSiteScraper {
     }
 
     /**
-     * Scrap the daily bounce website
-     * @param containers The html container
-     * @param links All the tags of the html containing the news url
-     * @param index The index of the url
-     * @param $ The cheerio api
-     * @param webSiteState The website
+     * Asynchronous function for processing daily bounce data.
+     *
+     * @param {any[]} containers - An array of container elements.
+     * @param {any[]} links - An array of link elements.
+     * @param {number} index - The index of the current container and link being processed.
+     * @param {CheerioAPI} $ - The Cheerio instance for HTML parsing.
+     * @param {WebSiteState} webSiteState - The website state object.
+     * @returns {Promise<void>} - A Promise that resolves after processing the daily bounce data.
      */
     private async dailyBounce(containers: any[], links: any[], index: number, $: CheerioAPI, webSiteState: WebSiteState): Promise<void> {
         const title: any = $(`${webSiteState.selector}#${containers[index].attribs.id} div.read-title a`).get()[0];
         const description: any = $(`${webSiteState.selector}#${containers[index].attribs.id} div.post-description p`).get()[0];
+
         await this.sendNews(
             links[index].attribs.href,
             title.children[0].data,
@@ -179,16 +175,24 @@ export class WebSiteScraper {
     }
 
     /**
-     * Send the news to the channel
-     * @param url The url of the news
-     * @param title The title of the news
-     * @param description The description of the news
-     * @param webSiteState The website of the news
-     * @param image The image of the news
+     * Asynchronous function for sending news to a Discord channel.
+     *
+     * @param {string} url - The URL associated with the news.
+     * @param {string} title - The title of the news.
+     * @param {string} description - The description of the news.
+     * @param {WebSiteState} webSiteState - The website state object.
+     * @param {string} [image] - The optional image URL associated with the news.
+     * @returns {Promise<void>} - A Promise that resolves after sending the news.
      */
     private async sendNews(url: string, title: string, description: string, webSiteState: WebSiteState, image?: string): Promise<void> {
-        this.logger.debug(`📨 Sending news on channel ${this.channel.name} for the web site ${webSiteState.name}, with the url ${url}`);
         this.inventory.updateLastUrlOfWebsite(url, webSiteState.name);
+
+        if (this.checkHrefContainBanWord(url)) {
+            this.logger.debug(`${EmojiEnum.TRASH} \`${url}\` contains ban words !`);
+            return;
+        }
+
+        this.logger.debug(`📨 Sending news on channel ${this.channel.name} for the web site ${webSiteState.name}, with the url ${url}`);
         const embed: EmbedBuilder = new EmbedBuilder().setTitle(title).setDescription(description).setURL(url);
 
         if (image) {
@@ -196,5 +200,15 @@ export class WebSiteScraper {
         }
 
         await this.channel.send({ embeds: [embed] });
+    }
+
+    /**
+     * Checks if the given href contains any banned words.
+     *
+     * @param {string} href - The href to be checked.
+     * @returns {boolean} - Returns `true` if the href contains any banned word, otherwise returns `false`.
+     */
+    private checkHrefContainBanWord(href: string): boolean {
+        return this.inventory.banWords.some((banWord: string): boolean => href.includes(banWord));
     }
 }
