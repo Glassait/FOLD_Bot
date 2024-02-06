@@ -13,7 +13,7 @@ function getCommand(interaction: ChatInputCommandInteraction): SlashCommandModel
 
 export const event: BotEvent = {
     name: Events.InteractionCreate,
-    async execute(_client: Client, interaction: Interaction): Promise<void> {
+    async execute(client: Client, interaction: Interaction): Promise<void> {
         if (!interaction.isChatInputCommand()) {
             return;
         }
@@ -36,7 +36,7 @@ export const event: BotEvent = {
 
         try {
             logger.trace(`Chat input command received : \`${command.name}\``);
-            await command.execute(interaction);
+            await command.execute(interaction, client);
         } catch (error) {
             logger.error(`${error}`);
         }

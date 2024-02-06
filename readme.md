@@ -96,6 +96,7 @@ Use this space to list resources you find helpful and would like to give credit 
 -   Add schedule for fold recruitment
 -   Schedule for loop take hour and minute
 -   [Command watch clan](src/module/feature/slash-commands/watch-clan.slash-command.ts) remove now accept name of clan in addition of id
+-   Watch commands (add/remove) now send message in channel
 
 ### 2.2.6
 
