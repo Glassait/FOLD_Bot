@@ -97,8 +97,19 @@ export class FeatureSingleton {
     }
 
     /**
-     * Adds a clan to the list of clans to watch.
-     * @param clan The clan to add.
+     * Adds a clan to the list of watched clans.
+     *
+     * @param {Clan} clan - The clan object to be added, containing at least 'id' and 'name' properties.
+     * @returns {boolean} - Returns `true` if the clan was successfully added, and `false` if the clan with the same ID already exists in the list.
+     *
+     * @example
+     * const newClan = { id: '123', name: 'MyClan' };
+     * const isAdded = YourClass.addClan(newClan);
+     * if (isAdded) {
+     *   console.log(`${newClan.name} has been added to the watched clans.`);
+     * } else {
+     *   console.log(`A clan with ID ${newClan.id} already exists in the watched clans.`);
+     * }
      */
     public addClan(clan: Clan): boolean {
         clan.id = clan.id.trim().replace(/["']/g, '');
@@ -117,29 +128,28 @@ export class FeatureSingleton {
      * Removes a clan from the list of watched clans based on its ID or name.
      *
      * @param {string} clanIdOrName - The ID or name of the clan to be removed.
-     * @returns {boolean} - Returns `true` if the clan was successfully removed, and `false` if the clan was not found in the list.
-     *
-     * @public
+     * @returns {Clan[]} - Returns an array containing the removed clan objects if successfully removed, and an empty array if the clan was not found in the list.
      *
      * @example
-     * // Example usage:
      * const clanIdOrName = 'MyClan';
-     * const isRemoved = FeatureSingleton.removeClan(clanIdOrName);
-     * if (isRemoved) {
+     * const removedClans = FeatureSingleton.removeClan(clanIdOrName);
+     * if (removedClans.length > 0) {
      *   console.log(`${clanIdOrName} has been removed from the watched clans.`);
+     *   console.log('Removed Clan Details:', removedClans);
      * } else {
      *   console.log(`${clanIdOrName} was not found in the watched clans.`);
      * }
      */
-    public removeClan(clanIdOrName: string): boolean {
+    public removeClan(clanIdOrName: string): Clan[] {
         clanIdOrName = clanIdOrName.trim().replace(/["']/g, '').toUpperCase();
-        if (this._data.watch_clan.filter((c: Clan): boolean => c.id === clanIdOrName || c.name === clanIdOrName).length === 0) {
-            return false;
+        const filter: Clan[] = this._data.watch_clan.filter((c: Clan): boolean => c.id === clanIdOrName || c.name === clanIdOrName);
+        if (filter.length === 0) {
+            return [];
         }
-        this._data.watch_clan = this._data.watch_clan.filter((c: Clan): boolean => c.id !== clanIdOrName || c.name !== clanIdOrName);
+        this._data.watch_clan = this._data.watch_clan.filter((c: Clan): boolean => c.id !== clanIdOrName && c.name !== clanIdOrName);
         FileUtil.writeIntoJson(this.path, this._data);
 
-        return true;
+        return filter;
     }
 
     /**

@@ -12,11 +12,7 @@ export class TimeUtil {
      * @param {Date} date - The Date object to be converted.
      * @returns {number} - The Unix timestamp representing the input date in seconds.
      *
-     * @static
-     * @public
-     *
      * @example
-     * // Example usage:
      * const inputDate = new Date('2024-02-05T12:30:00Z');
      * const unixTimestamp = TimeUtil.convertToUnix(inputDate);
      * console.log(unixTimestamp); // Output: 1704641400
@@ -33,12 +29,7 @@ export class TimeUtil {
      * @param {() => Promise<void>} callback - The callback function to be executed at each scheduled interval.
      * @returns {Promise<void>} - A Promise that resolves when all scheduled intervals are completed.
      *
-     * @async
-     * @static
-     * @public
-     *
      * @example
-     * // Example usage:
      * const scheduler = ['12:00', '15:30', '18:45'];
      * const loopName = 'MyLoop';
      * const callback = async () => {

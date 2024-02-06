@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { ChatInputCommandInteraction, Client, SlashCommandBuilder } from 'discord.js';
 import { OptionMap, OptionType } from '../types/option.type';
 
 /**
@@ -19,12 +19,12 @@ export class SlashCommandModel {
      * The callback to execute when the slash-command is used
      * @private
      */
-    private readonly _execute: (interaction: ChatInputCommandInteraction) => Promise<void>;
+    private readonly _execute: (interaction: ChatInputCommandInteraction, client?: Client) => Promise<void>;
 
     constructor(
         name: string,
         description: string,
-        execute: (interaction: ChatInputCommandInteraction) => Promise<void>,
+        execute: (interaction: ChatInputCommandInteraction, client?: Client) => Promise<void>,
         option?: OptionType[],
         permission?: bigint
     ) {
@@ -58,7 +58,7 @@ export class SlashCommandModel {
     /**
      * Getter for {@link execute}
      */
-    public get execute(): (interaction: ChatInputCommandInteraction) => Promise<void> {
+    public get execute(): (interaction: ChatInputCommandInteraction, client?: Client) => Promise<void> {
         return this._execute;
     }
 }
