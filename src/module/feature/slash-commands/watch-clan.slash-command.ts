@@ -6,7 +6,7 @@ import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
 import { Logger } from '../../shared/classes/logger';
 import { Context } from '../../shared/classes/context';
 
-const logger: Logger = new Logger(new Context('NAME-SLASH-COMMAND'));
+const logger: Logger = new Logger(new Context('WATCH-CLAN-SLASH-COMMAND'));
 const feature: FeatureSingleton = FeatureSingleton.instance;
 const inventory: InventorySingleton = InventorySingleton.instance;
 
@@ -60,7 +60,7 @@ export const command: SlashCommandModel = new SlashCommandModel(
             .setName('remove')
             .setDescription('Supprime un clan de la liste des clans à observer')
             .addStringOption((builder: SlashCommandStringOption) =>
-                builder.setName('id ou name').setDescription("L'id ou name du clan à supprimer").setRequired(true)
+                builder.setName('id-ou-name').setDescription("L'id ou name du clan à supprimer").setRequired(true)
             ),
     ],
     PermissionsBitField.Flags.KickMembers

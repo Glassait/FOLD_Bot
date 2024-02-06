@@ -92,9 +92,10 @@ Use this space to list resources you find helpful and would like to give credit 
 
 ### 2.2.7
 
--   Method to generate schedule for loop
+-   Method to generate schedule for loop ([forLoopTimeSleep](src/module/shared/utils/time.util.ts))
 -   Add schedule for fold recruitment
 -   Schedule for loop take hour and minute
+-   [Command watch clan](src/module/feature/slash-commands/watch-clan.slash-command.ts) remove now accept name of clan in addition of id
 
 ### 2.2.6
 
