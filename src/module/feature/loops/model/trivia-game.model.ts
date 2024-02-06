@@ -190,9 +190,9 @@ export class TriviaGameModel {
                 } minutes (fini <t:${TimeUtil.convertToUnix(target)}:R>).\n**⚠️ Ce n'est pas forcèment le dernier canon utilisé !**`,
             },
             {
-                name: `Obus-${this.datum.isPen ? 'Penetration' : 'Dégât'} :`,
+                name: `Obus-${this.datum.isPen ? 'Pénétration' : 'Dégât'} :`,
                 value: `\`${ShellEnum[ammo.type as keyof typeof ShellEnum]} ${this.datum.isPen ? ammo.penetration[1] : ammo.damage[1]}\` (${
-                    this.datum.isPen ? 'penetration' : 'dégât'
+                    this.datum.isPen ? 'pénétration' : 'dégât'
                 })`,
                 inline: true,
             }
