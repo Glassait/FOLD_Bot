@@ -97,6 +97,7 @@ Use this space to list resources you find helpful and would like to give credit 
 -   Schedule for loop take hour and minute
 -   [Command watch clan](src/module/feature/slash-commands/watch-clan.slash-command.ts) remove now accept name of clan in addition of id
 -   Watch commands (add/remove) now send message in channel
+-   Add in inventory ban words for news. Check the href of news and 
 
 ### 2.2.6
 

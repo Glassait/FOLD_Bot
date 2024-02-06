@@ -128,6 +128,15 @@ export class InventorySingleton {
     }
 
     /**
+     * Getter for the array of banned words used in the newsletter.
+     *
+     * @returns {string[]} - An array of banned words for the newsletter.
+     */
+    public get banWords(): string[] {
+        return this._inventory.newsLetter.banWords;
+    }
+
+    /**
      * Get the website at the index
      * @param index The index of the website
      * @throws Error If the index is out of bound
