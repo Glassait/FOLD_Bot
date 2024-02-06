@@ -24,7 +24,7 @@ import {
     TriviaPlayerStatisticType,
     TriviaStatisticType,
 } from '../../../shared/types/statistic.type';
-import { ShellEnum } from '../enums/shell.enum';
+import { ShellEnum, ShellType } from '../enums/shell.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
 import { TimeUtil } from '../../../shared/utils/time.util';
 import { PlayerAnswer } from '../types/trivia-game.type';
@@ -170,7 +170,7 @@ export class TriviaGameModel {
 
         this.logger.trace(
             `Tank for game selected : \`${this.datum.tank.name}\`, the ammo type is : ${
-                this.datum.ammoIndex ? '`GOLD`' : '`NORMAL`'
+                this.datum.ammoIndex ? `\`${ShellType.GOLD}\`` : `\`${ShellType.NORMAL}\``
             } and the question is for ${this.datum.isPen ? '`penetration`' : '`damage`'}`
         );
     }
@@ -377,9 +377,11 @@ export class TriviaGameModel {
     }
 
     /**
-     * Updates the overall and player statistics for the trivia game.
-     * @param responses Array of players and their responses.
-     * @param goodAnswer Array of players and their good answers.
+     * Asynchronous function for updating trivia statistics based on player responses.
+     *
+     * @param {[string, PlayerAnswer][]} responses - Array of player responses, where each element is a tuple [playerId, playerAnswer].
+     * @param {[string, PlayerAnswer][]} goodAnswer - Array of correct player responses, where each element is a tuple [playerId, playerAnswer].
+     * @returns {Promise<void>} - A Promise that resolves after updating the trivia statistics.
      */
     private async updateStatistic(responses: [string, PlayerAnswer][], goodAnswer: [string, PlayerAnswer][]): Promise<void> {
         this.logger.trace('Start updating the overall statistics');
@@ -387,59 +389,10 @@ export class TriviaGameModel {
 
         this.logger.trace("Start updating the player's statistics");
 
-        for (const response of responses) {
-            this.logger.trace(`Start updating ${response[0]} statistic`);
-            const player: TriviaPlayerStatisticType = this.triviaStats.player[response[0]] ?? {};
-
-            const playerStat: MonthlyTriviaPlayerStatisticType = player[this.statisticSingleton.currentMonth] ?? {
-                elo: 0,
-                right_answer: 0,
-                win_strick: { current: 0, max: 0 },
-                answer_time: [],
-                participation: 0,
-            };
-            playerStat.participation++;
-            playerStat.answer_time.push(response[1].responseTime);
-
-            const isGoodAnswer = goodAnswer.find((value: [string, PlayerAnswer]): boolean => value[0] === response[0]);
-
-            const oldElo = playerStat.elo;
-            playerStat.elo = this.calculateElo(playerStat, response, isGoodAnswer ? goodAnswer.indexOf(isGoodAnswer) + 1 : -1);
-
-            const winStrick = playerStat.win_strick as { current: number; max: number };
-
-            if (isGoodAnswer) {
-                playerStat.right_answer++;
-                winStrick.current++;
-                winStrick.max = Math.max(winStrick.current, winStrick.max);
-
-                await response[1].interaction.editReply({
-                    content: `Tu as eu la bonne réponse, bravo :clap:.\nTon nouvelle elo est : \`${playerStat.elo}\` (modification de \`${
-                        playerStat.elo - oldElo
-                    }\`)`,
-                });
-                this.logger.trace(`Player ${response[0]} found the right answer`);
-            } else {
-                winStrick.current = 0;
-                const tank = this.allTanks.find((tank: VehicleData): boolean => tank.name === response[1].response);
-
-                if (!tank) {
-                    return;
-                }
-
-                await response[1].interaction.editReply({
-                    content: `Tu n'as pas eu la bonne réponse !\nLe char \`${tank.name}\` a un obus \`${
-                        ShellEnum[tank.default_profile.ammo[0].type as keyof typeof ShellEnum]
-                    }\` avec un aplha de \`${tank.default_profile.ammo[0].damage[1]}\`.\nTon nouvelle elo est : \`${
-                        playerStat.elo
-                    }\` (modification de \`${playerStat.elo - oldElo}\`)`,
-                });
-                this.logger.trace(`Player ${response[0]} failed to find the right answer`);
-            }
-
-            player[this.statisticSingleton.currentMonth] = playerStat;
-            this.triviaStats.player[response[0]] = player;
-            this.logger.trace(`End updating ${response[0]} statistic`);
+        for (const [playerId, playerAnswer] of responses) {
+            this.logger.trace(`Start updating ${playerId} statistic`);
+            await this.updatePlayerStatistic(playerId, playerAnswer, goodAnswer);
+            this.logger.trace(`End updating ${playerId} statistic`);
         }
 
         this.statisticSingleton.trivia = this.triviaStats;
@@ -470,24 +423,24 @@ export class TriviaGameModel {
     }
 
     /**
-     * Calculates the new ELO score based on the player's previous score and the response.
-     * @param playerStat The player's previous score.
-     * @param response The player's response.
-     * @param index The index of the good answer.
-     * @returns The new ELO score.
+     * Calculates and returns the new Elo rating for a player based on their statistics and performance.
+     *
+     * @param {MonthlyTriviaPlayerStatisticType} playerStat - The player's monthly statistic object.
+     * @param {PlayerAnswer} playerAnswer - The player's answer object.
+     * @param {number} index - The index of the correct answer in the list.
+     * @returns {number} - The new Elo rating for the player.
      */
-    private calculateElo(playerStat: MonthlyTriviaPlayerStatisticType, response: [string, any], index: number): number {
+    private calculateElo(playerStat: MonthlyTriviaPlayerStatisticType, playerAnswer: PlayerAnswer, index: number): number {
         let gain = -Math.floor(25 * Math.exp(0.001 * playerStat.elo));
         if (index >= 1) {
             gain = Math.floor((50 / (index * 0.5)) * Math.exp(-0.001 * playerStat.elo));
 
-            if (response[1].responseTime <= this.responseTimeLimit) {
+            if (playerAnswer.responseTime <= this.responseTimeLimit) {
                 gain += Math.floor(gain * 0.25);
             }
         }
 
-        const newElo: number = playerStat.elo + gain;
-        return newElo < 0 ? 0 : newElo;
+        return Math.max(0, playerStat.elo + gain);
     }
 
     /**
@@ -505,5 +458,112 @@ export class TriviaGameModel {
         this.logger.trace(
             `${interaction.member?.nickname ?? interaction.user.displayName} ${action} to the trivia game with: \`${interaction.customId}\``
         );
+    }
+
+    /**
+     * Updates the statistics for a specific player.
+     *
+     * @param {string} playerId - The ID of the player.
+     * @param {PlayerAnswer} playerAnswer - The player's answer object.
+     * @param {[string, PlayerAnswer][]} goodAnswer - Array of correct player responses, where each element is a tuple [playerId, playerAnswer].
+     */
+    private async updatePlayerStatistic(playerId: string, playerAnswer: PlayerAnswer, goodAnswer: [string, PlayerAnswer][]): Promise<void> {
+        const player: TriviaPlayerStatisticType = this.triviaStats.player[playerId] ?? {};
+
+        const playerStat: MonthlyTriviaPlayerStatisticType = player[this.statisticSingleton.currentMonth] ?? {
+            elo: 0,
+            right_answer: 0,
+            win_strick: { current: 0, max: 0 },
+            answer_time: [],
+            participation: 0,
+        };
+        playerStat.participation++;
+        playerStat.answer_time.push(playerAnswer.responseTime);
+
+        const isGoodAnswer = goodAnswer.find((value: [string, PlayerAnswer]): boolean => value[0] === playerId);
+
+        const oldElo = playerStat.elo;
+        playerStat.elo = this.calculateElo(playerStat, playerAnswer, isGoodAnswer ? goodAnswer.indexOf(isGoodAnswer) + 1 : -1);
+
+        const winStrick = playerStat.win_strick as { current: number; max: number };
+
+        if (isGoodAnswer) {
+            await this.handleGoodAnswer(playerStat, winStrick, playerAnswer, oldElo, playerId);
+        } else {
+            await this.handleWrongAnswer(playerStat, winStrick, playerAnswer, oldElo, playerId);
+        }
+
+        player[this.statisticSingleton.currentMonth] = playerStat;
+        this.triviaStats.player[playerId] = player;
+    }
+
+    /**
+     * Handles the scenario when the player gives a correct answer.
+     *
+     * @param {MonthlyTriviaPlayerStatisticType} playerStat - The player's monthly statistic object.
+     * @param {{ current: number; max: number }} winStrick - The player's win streak object.
+     * @param {PlayerAnswer} playerAnswer - The player's answer object.
+     * @param {number} oldElo - The player's old Elo value.
+     * @param {string} playerId - The ID of the player.
+     *
+     * @private
+     */
+    private async handleGoodAnswer(
+        playerStat: MonthlyTriviaPlayerStatisticType,
+        winStrick: {
+            current: number;
+            max: number;
+        },
+        playerAnswer: PlayerAnswer,
+        oldElo: number,
+        playerId: string
+    ): Promise<void> {
+        playerStat.right_answer++;
+        winStrick.current++;
+        winStrick.max = Math.max(winStrick.current, winStrick.max);
+
+        await playerAnswer.interaction.editReply({
+            content: `Tu as eu la bonne réponse, bravo :clap:.\nTon nouvelle elo est : \`${playerStat.elo}\` (modification de \`${
+                playerStat.elo - oldElo
+            }\`)`,
+        });
+        this.logger.trace(`Player ${playerId} found the right answer`);
+    }
+
+    /**
+     * Handles the scenario when the player gives a wrong answer.
+     *
+     * @param {string} playerId - The ID of the player.
+     * @param {PlayerAnswer} playerAnswer - The player's answer object.
+     * @param {MonthlyTriviaPlayerStatisticType} playerStat - The player's monthly statistic object.
+     * @param {{ current: number; max: number }} winStrick - The player's win streak object.
+     * @param {number} oldElo - The player's old Elo value.
+     */
+    private async handleWrongAnswer(
+        playerStat: MonthlyTriviaPlayerStatisticType,
+        winStrick: {
+            current: number;
+            max: number;
+        },
+        playerAnswer: PlayerAnswer,
+        oldElo: number,
+        playerId: string
+    ): Promise<void> {
+        winStrick.current = 0;
+        const tank = this.allTanks.find((tank: VehicleData): boolean => tank.name === playerAnswer.response);
+
+        if (!tank) {
+            return;
+        }
+
+        const ammo = tank.default_profile.ammo[this.datum.ammoIndex];
+        await playerAnswer.interaction.editReply({
+            content: `Tu n'as pas eu la bonne réponse !\nLe char \`${tank.name}\` a un obus ${
+                this.datum.ammoIndex ? ShellType.GOLD : ShellType.NORMAL
+            } \`${ShellEnum[ammo.type as keyof typeof ShellEnum]}\` avec ${this.datum.isPen ? 'une pénétration' : 'un alha'} de \`${
+                this.datum.isPen ? ammo.penetration[1] : ammo.damage[1]
+            }\`.\nTon nouvelle elo est : \`${playerStat.elo}\` (modification de \`${playerStat.elo - oldElo}\`)`,
+        });
+        this.logger.trace(`Player ${playerId} failed to find the right answer`);
     }
 }
