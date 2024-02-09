@@ -38,7 +38,7 @@ export const event: BotEvent = {
             logger.trace(`Chat input command received : \`${command.name}\``);
             await command.execute(interaction, client);
         } catch (error) {
-            logger.error(`${error}`);
+            logger.error(`${error}`, error);
         }
     },
 };

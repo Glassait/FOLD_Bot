@@ -90,6 +90,7 @@ export class LoggerSingleton extends Context {
      */
     public error(context: Context, msg: string): void {
         console.error(`${EmojiEnum.ERROR} : ${msg}`);
+        console.trace();
         this.addToLog('ERROR', 'red', EmojiEnum.ERROR + context.context, msg);
     }
 

@@ -36,7 +36,7 @@ module.exports = async (_client: Client): Promise<void> => {
 
             logger.debug(`Successfully reloaded application ${entry[1].length} slash-commands for guild ${entry[0]}`);
         } catch (error) {
-            logger.error(`${error}`);
+            logger.error(`${error}`, error);
         }
     }
 };

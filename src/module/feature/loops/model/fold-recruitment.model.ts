@@ -88,7 +88,7 @@ export class FoldRecruitmentModel {
         try {
             return await this.sendMessageToChannelFromExtractedPlayer(clan, (await this.axios.get(url)).data);
         } catch (error) {
-            this.logger.error(`An error occurred while fetching the activity of the clan: ${error}`);
+            this.logger.error(`An error occurred while fetching the activity of the clan: ${error}`, error);
         }
     }
 
