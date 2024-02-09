@@ -8,6 +8,6 @@ const logger: Logger = new Logger(new Context('NAME-EVENT'));
 export const event: BotEvent = {
     name: Events.ShardError,
     async execute(_client: Client, error: Error): Promise<void> {
-        logger.error(`${error}`);
+        logger.error(`${error}`, error);
     },
 };

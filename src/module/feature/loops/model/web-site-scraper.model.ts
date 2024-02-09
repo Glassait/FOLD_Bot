@@ -57,7 +57,8 @@ export class WebSiteScraper {
             })
             .catch((error: AxiosError): void => {
                 this.logger.error(
-                    `Fetching newsletter for \`${newsLetter.name}\` failed with error \`${error.status}\` and message \`${error.message}\``
+                    `Fetching newsletter for \`${newsLetter.name}\` failed with error \`${error.status}\` and message \`${error.message}\``,
+                    error
                 );
             });
     }

@@ -57,11 +57,28 @@ export class Logger {
     }
 
     /**
-     * Log ERROR
-     * @param msg The message of the ERROR
-     * @see LoggerSingleton#Error
+     * Logs an error message along with an optional error stack trace.
+     *
+     * @param {string} msg - The error message to be logged.
+     * @param {Error | string | any} [error] - Optional error object or additional error information.
      */
-    public error(msg: string): void {
-        this.logger.error(this.context, msg);
+    public error(msg: string, error?: Error | string | any): void {
+        this.logger.error(this.context, `${msg}${error ? '\n' + this.getErrorDetails(error) : ''}`);
+    }
+
+    /**
+     * Retrieves the details of the error, including the stack trace.
+     *
+     * @param {Error | string | any} error - The error object or information.
+     * @returns {string} - The formatted error details.
+     */
+    private getErrorDetails(error: Error | string | any): string {
+        if (error instanceof Error) {
+            return error.stack ?? error.message;
+        } else if (typeof error === 'string') {
+            return error;
+        } else {
+            return JSON.stringify(error);
+        }
     }
 }

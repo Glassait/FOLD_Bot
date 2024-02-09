@@ -24,7 +24,7 @@ export const command: SlashCommandModel = new SlashCommandModel(
                 content: "L'utilisateur a été déconnecté, c'est méchant mais c'est toi qui décide...",
             });
         } catch (error) {
-            logger.error(`Error when disconnecting: ${error}`);
+            logger.error(`Error when disconnecting: ${error}`, error);
             await interaction.editReply({
                 content: `Il y a eu un problème au moment de déconnecté ${targetUser.displayName}, erreur: ${error}`,
             });

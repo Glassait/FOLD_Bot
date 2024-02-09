@@ -267,8 +267,8 @@ export class TriviaGameModel {
                     }
 
                     this.logCollect(hasAlreadyAnswer, changedAnswer, interaction);
-                } catch (e) {
-                    this.logger.error(`Error during collection of answer${e}`);
+                } catch (error) {
+                    this.logger.error(`Error during collection of answer${error}`, error);
                 }
             });
     }
