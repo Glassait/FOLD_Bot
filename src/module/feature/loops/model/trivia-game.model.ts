@@ -371,7 +371,7 @@ export class TriviaGameModel {
             return false;
         }
 
-        const vehicleAmmo: Ammo = vehicle.default_profile.ammo[0];
+        const vehicleAmmo: Ammo = vehicle.default_profile.ammo[this.datum.ammoIndex];
         const ammo: Ammo = this.datum.tank.default_profile.ammo[this.datum.ammoIndex];
         return vehicleAmmo.type === ammo.type && this.checkVehicleAmmoDetail(vehicleAmmo, ammo);
     }
