@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from 'discord.js';
+import { AutocompleteInteraction, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { OptionMap, OptionType } from '../types/option.type';
 import { CallbackCommand } from '../types/command.type';
 
@@ -22,13 +22,13 @@ export class SlashCommandModel {
      * The callback function to be executed when the slash command is invoked.
      * @private
      */
-    private readonly _execute: CallbackCommand;
+    private readonly _execute: CallbackCommand<ChatInputCommandInteraction>;
 
     /**
      * The callback function for slash command autocompletion.
      * @private
      */
-    private readonly _autocomplete: CallbackCommand;
+    private readonly _autocomplete: CallbackCommand<AutocompleteInteraction>;
 
     /**
      * Creates a new instance of SlashCommandModel.
@@ -43,9 +43,9 @@ export class SlashCommandModel {
     constructor(
         name: string,
         description: string,
-        execute: CallbackCommand,
+        execute: CallbackCommand<ChatInputCommandInteraction>,
         optional: {
-            autocomplete?: CallbackCommand;
+            autocomplete?: CallbackCommand<AutocompleteInteraction>;
             option?: OptionType[];
             permission?: bigint;
         } = {}
@@ -87,7 +87,7 @@ export class SlashCommandModel {
      * Gets the callback function to be executed when the slash command is invoked.
      * @returns {CallbackCommand} - The callback function for execution.
      */
-    public get execute(): CallbackCommand {
+    public get execute(): CallbackCommand<ChatInputCommandInteraction> {
         return this._execute;
     }
 
@@ -95,7 +95,7 @@ export class SlashCommandModel {
      * Gets the callback function for slash command autocompletion.
      * @returns {CallbackCommand} - The callback function for autocompletion.
      */
-    public get autocomplete(): CallbackCommand {
+    public get autocomplete(): CallbackCommand<AutocompleteInteraction> {
         return this._autocomplete;
     }
 }

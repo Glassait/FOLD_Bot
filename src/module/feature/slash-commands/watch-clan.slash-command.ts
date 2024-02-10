@@ -1,4 +1,5 @@
 import {
+    AutocompleteInteraction,
     ChatInputCommandInteraction,
     Client,
     Colors,
@@ -109,9 +110,26 @@ export const command: SlashCommandModel = new SlashCommandModel(
                 .setName(MAPPING.REMOVE.name)
                 .setDescription('Supprime un clan de la liste des clans à observer')
                 .addStringOption((builder: SlashCommandStringOption) =>
-                    builder.setName(MAPPING.REMOVE.optionsName[0]).setDescription("L'id ou name du clan à supprimer").setRequired(true)
+                    builder
+                        .setName(MAPPING.REMOVE.optionsName[0])
+                        .setDescription("L'id ou name du clan à supprimer")
+                        .setRequired(true)
+                        .setAutocomplete(true)
                 ),
         ],
         permission: PermissionsBitField.Flags.KickMembers,
+        autocomplete: async (interaction: AutocompleteInteraction): Promise<void> => {
+            const focusedOption = interaction.options.getFocused(true);
+
+            const filtered = feature.clans.filter(
+                (clan: Clan) => clan.id.includes(focusedOption.value) || clan.name.includes(focusedOption.value)
+            );
+
+            await interaction.respond(
+                filtered
+                    .map((clan: Clan): { name: string; value: string } => ({ name: `${clan.name} | ${clan.id}`, value: clan.name }))
+                    .slice(0, 24)
+            );
+        },
     }
 );
