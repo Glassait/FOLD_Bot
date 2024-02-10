@@ -47,11 +47,16 @@ export const command: SlashCommandModel = new SlashCommandModel(
             });
         }
     },
-    [
-        new SlashCommandMentionableOption().setName('target').setDescription("L'utilisateur à répondre automatiquement.").setRequired(true),
-        new SlashCommandStringOption()
-            .setName('désactiver')
-            .setDescription("Renseigner pour désactiver la réponse automatique pour l'utilisateur")
-            .setChoices({ name: 'oui', value: 'oui' }),
-    ]
+    {
+        option: [
+            new SlashCommandMentionableOption()
+                .setName('target')
+                .setDescription("L'utilisateur à répondre automatiquement.")
+                .setRequired(true),
+            new SlashCommandStringOption()
+                .setName('désactiver')
+                .setDescription("Renseigner pour désactiver la réponse automatique pour l'utilisateur")
+                .setChoices({ name: 'oui', value: 'oui' }),
+        ],
+    }
 );

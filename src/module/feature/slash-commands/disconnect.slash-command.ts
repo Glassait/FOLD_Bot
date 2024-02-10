@@ -31,6 +31,8 @@ export const command: SlashCommandModel = new SlashCommandModel(
             return;
         }
     },
-    [new SlashCommandMentionableOption().setName('target').setDescription("L'utilisateur à déconnecter").setRequired(true)],
-    PermissionsBitField.Flags.MoveMembers
+    {
+        option: [new SlashCommandMentionableOption().setName('target').setDescription("L'utilisateur à déconnecter").setRequired(true)],
+        permission: PermissionsBitField.Flags.MoveMembers,
+    }
 );
