@@ -290,6 +290,7 @@ export class TriviaGameModel {
         this.allTanks.forEach((vehicle: VehicleData): void => {
             const vehicleAmmo: Ammo = vehicle.default_profile.ammo[this.datum.ammoIndex];
             if (vehicle.name !== this.datum.tank.name && vehicleAmmo.type === ammo.type && this.checkVehicleAmmoDetail(vehicleAmmo, ammo)) {
+                this.logger.trace(`Another tank has the same shell \`${vehicle.name}\``);
                 otherAnswer.push(vehicle.name);
             }
         });
@@ -390,9 +391,9 @@ export class TriviaGameModel {
         this.logger.trace("Start updating the player's statistics");
 
         for (const [playerId, playerAnswer] of responses) {
-            this.logger.trace(`Start updating ${playerId} statistic`);
+            this.logger.trace(`Start updating \`${playerId}\` statistic`);
             await this.updatePlayerStatistic(playerId, playerAnswer, goodAnswer);
-            this.logger.trace(`End updating ${playerId} statistic`);
+            this.logger.trace(`End updating \`${playerId}\` statistic`);
         }
 
         this.statisticSingleton.trivia = this.triviaStats;
@@ -527,7 +528,7 @@ export class TriviaGameModel {
                 playerStat.elo - oldElo
             }\`)`,
         });
-        this.logger.trace(`Player ${playerId} found the right answer`);
+        this.logger.trace(`Player \`${playerId}\` found the right answer`);
     }
 
     /**
@@ -564,6 +565,6 @@ export class TriviaGameModel {
                 this.datum.isPen ? ammo.penetration[1] : ammo.damage[1]
             }\`.\nTon nouvelle elo est : \`${playerStat.elo}\` (modification de \`${playerStat.elo - oldElo}\`)`,
         });
-        this.logger.trace(`Player ${playerId} failed to find the right answer`);
+        this.logger.trace(`Player \`${playerId}\` failed to find the right answer`);
     }
 }
