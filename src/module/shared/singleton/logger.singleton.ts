@@ -84,13 +84,13 @@ export class LoggerSingleton extends Context {
     }
 
     /**
-     * Write ERROR log in the file
-     * @param context The context of the ERROR
-     * @param msg The message of the ERROR
+     * Logs an error message and adds it to the log with the specified context.
+     *
+     * @param {Context} context - The context associated with the error.
+     * @param {string} msg - The error message to be logged.
      */
     public error(context: Context, msg: string): void {
         console.error(`${EmojiEnum.ERROR} : ${msg}`);
-        console.trace();
         this.addToLog('ERROR', 'red', EmojiEnum.ERROR + context.context, msg);
     }
 

@@ -1,64 +1,101 @@
-import { ChatInputCommandInteraction, Client, SlashCommandBuilder } from 'discord.js';
+import { AutocompleteInteraction, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { OptionMap, OptionType } from '../types/option.type';
+import { CallbackCommand } from '../types/command.type';
 
 /**
- * This class is used to build slash-command and make it easy to register
+ * Represents a model for a slash command.
  */
 export class SlashCommandModel {
     /**
-     * The name of the slash-command
+     * The name of the slash command.
      * @private
      */
     private readonly _name: string;
+
     /**
-     * The discord js slash-command
+     * The slash command data.
      * @private
      */
     private readonly _data: SlashCommandBuilder;
+
     /**
-     * The callback to execute when the slash-command is used
+     * The callback function to be executed when the slash command is invoked.
      * @private
      */
-    private readonly _execute: (interaction: ChatInputCommandInteraction, client?: Client) => Promise<void>;
+    private readonly _execute: CallbackCommand<ChatInputCommandInteraction>;
 
+    /**
+     * The callback function for slash command autocompletion.
+     * @private
+     */
+    private readonly _autocomplete: CallbackCommand<AutocompleteInteraction>;
+
+    /**
+     * Creates a new instance of SlashCommandModel.
+     * @param {string} name - The name of the slash command.
+     * @param {string} description - The description of the slash command.
+     * @param {CallbackCommand} execute - The callback function to be executed.
+     * @param {object} [optional={}] - Optional configuration parameters.
+     * @param {CallbackCommand} optional.autocomplete - The callback function for autocompletion.
+     * @param {OptionType[]} optional.option - An array of option types.
+     * @param {bigint} optional.permission - The default member permissions for the slash command.
+     */
     constructor(
         name: string,
         description: string,
-        execute: (interaction: ChatInputCommandInteraction, client?: Client) => Promise<void>,
-        option?: OptionType[],
-        permission?: bigint
+        execute: CallbackCommand<ChatInputCommandInteraction>,
+        optional: {
+            autocomplete?: CallbackCommand<AutocompleteInteraction>;
+            option?: OptionType[];
+            permission?: bigint;
+        } = {}
     ) {
         this._name = name;
         this._data = new SlashCommandBuilder().setName(name).setDescription(description);
 
-        if (option) {
-            option.forEach((value: OptionType): void => OptionMap[value.constructor.name](value, this._data));
+        if (optional.option) {
+            optional.option.forEach((value: OptionType): void => OptionMap[value.constructor.name](value, this._data));
         }
 
-        if (permission) {
-            this._data.setDefaultMemberPermissions(permission);
+        if (optional.permission) {
+            this._data.setDefaultMemberPermissions(optional.permission);
+        }
+
+        if (optional.autocomplete) {
+            this._autocomplete = optional.autocomplete;
         }
         this._execute = execute;
     }
 
     /**
-     * Getter for {@link name}
+     * Gets the name of the slash command.
+     * @returns {string} - The name of the slash command.
      */
     public get name(): string {
         return this._name;
     }
 
     /**
-     * Getter for {@link data}
+     * Gets the slash command data.
+     * @returns {SlashCommandBuilder} - The slash command data.
      */
     public get data(): SlashCommandBuilder {
         return this._data;
     }
 
     /**
-     * Getter for {@link execute}
+     * Gets the callback function to be executed when the slash command is invoked.
+     * @returns {CallbackCommand} - The callback function for execution.
      */
-    public get execute(): (interaction: ChatInputCommandInteraction, client?: Client) => Promise<void> {
+    public get execute(): CallbackCommand<ChatInputCommandInteraction> {
         return this._execute;
+    }
+
+    /**
+     * Gets the callback function for slash command autocompletion.
+     * @returns {CallbackCommand} - The callback function for autocompletion.
+     */
+    public get autocomplete(): CallbackCommand<AutocompleteInteraction> {
+        return this._autocomplete;
     }
 }

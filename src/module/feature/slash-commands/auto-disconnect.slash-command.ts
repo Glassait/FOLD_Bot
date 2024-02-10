@@ -30,10 +30,12 @@ export const command: SlashCommandModel = new SlashCommandModel(
             });
         }
     },
-    [
-        new SlashCommandMentionableOption()
-            .setName('target')
-            .setDescription("L'utilisateur à déconnecter automatiquement. Laisser vide pour désactiver"),
-    ],
-    PermissionsBitField.Flags.MoveMembers
+    {
+        option: [
+            new SlashCommandMentionableOption()
+                .setName('target')
+                .setDescription("L'utilisateur à déconnecter automatiquement. Laisser vide pour désactiver"),
+        ],
+        permission: PermissionsBitField.Flags.MoveMembers,
+    }
 );
