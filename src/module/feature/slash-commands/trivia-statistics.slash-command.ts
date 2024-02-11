@@ -51,7 +51,7 @@ export const command: SlashCommandModel = new SlashCommandModel(
                 const stats = playerStats[i.values[0]];
 
                 const embed = new EmbedBuilder()
-                    .setTitle(`Statistiques pour le mois ${i.values[0]}`)
+                    .setTitle(`Statistiques pour le mois de ${i.values[0]}`)
                     .setColor(Colors.LuminousVividPink)
                     .setDescription('Voici les statistiques demandées')
                     .setFields(

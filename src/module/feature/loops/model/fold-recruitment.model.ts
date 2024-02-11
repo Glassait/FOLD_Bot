@@ -1,4 +1,4 @@
-import { AxiosInjector, InventoryInjector, LoggerInjector } from '../../../shared/decorators/injector.decorator';
+import { AxiosInjector, InventoryInjector, LoggerInjector, StatisticInjector } from '../../../shared/decorators/injector.decorator';
 import { Logger } from '../../../shared/classes/logger';
 import { AxiosInstance } from 'axios';
 import { ClanActivity, FoldRecruitmentType, LeaveClanActivity, Players } from '../types/fold-recruitment.type';
@@ -7,10 +7,12 @@ import { Client, Colors, EmbedBuilder, TextChannel } from 'discord.js';
 import { Clan } from '../../../shared/types/feature.type';
 import { FoldRecruitmentEnum, WotClanActivity } from '../enums/fold-recruitment.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
+import { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
 
 @LoggerInjector
 @AxiosInjector(TimeEnum.SECONDE * 30)
 @InventoryInjector
+@StatisticInjector
 export class FoldRecruitmentModel {
     /**
      * The base url for the wargaming
@@ -37,21 +39,13 @@ export class FoldRecruitmentModel {
      * @private
      */
     private readonly wotLife: string = `https://fr.wot-life.com/eu/player/${FoldRecruitmentEnum.NAME}-${FoldRecruitmentEnum.ID}/`;
-    /**
-     * @instance Of the logger
-     * @private
-     */
+
+    //region INJECTION
     private readonly logger: Logger;
-    /**
-     * @instance Of the axios
-     * @private
-     */
     private readonly axios: AxiosInstance;
-    /**
-     * @instance Of the inventory
-     * @private
-     */
     private readonly inventory: InventorySingleton;
+    private readonly statistic: StatisticSingleton;
+    //endregion
 
     /**
      * The limite date to not take player
@@ -65,7 +59,6 @@ export class FoldRecruitmentModel {
     private channel: TextChannel;
     /**
      * The total number of players who leaved there clan
-     * @private
      */
     private totalNumberOfPlayers: number = 0;
 
@@ -165,7 +158,8 @@ export class FoldRecruitmentModel {
         }
 
         if (extracted[0]) {
-            this.inventory.updateLastClan(clan.id, extracted[0].created_at);
+            this.inventory.updateLastCheckForClan(clan.id, extracted[0].created_at);
+            this.statistic.updateClanStatistics(clan.id, datum.length);
         }
     }
 

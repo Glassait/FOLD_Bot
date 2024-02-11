@@ -5,15 +5,15 @@ import { Context } from '../classes/context';
 import { FileUtil } from '../utils/file.util';
 
 export class FeatureSingleton {
+    //region INJECTOR
+    private readonly logger: Logger = new Logger(new Context(FeatureSingleton.name));
+    //endregion
+
     //region PRIVATE READONLY FIELDS
     /**
      * The path to the feature configuration file.
      */
     private readonly path: string = './src/module/core/feature.json';
-    /**
-     * @instance of the logger
-     */
-    private readonly logger: Logger = new Logger(new Context(FeatureSingleton.name));
     /**
      * The initial value of the feature configuration.
      */
@@ -38,14 +38,22 @@ export class FeatureSingleton {
         }
     }
 
+    //region SINGLETON
     /**
      * The instance of the class, used for the singleton pattern
-     * @private
      */
     private static _instance: FeatureSingleton | undefined;
 
     /**
-     * Getter for {@link _instance}
+     * Gets the singleton instance of the FeatureSingleton class, initializing it if not already created.
+     *
+     * @returns {FeatureSingleton} - The singleton instance of the FeatureSingleton class.
+     *
+     * @example
+     * ```typescript
+     * const featureInstance = FeatureSingleton.instance;
+     * console.log(featureInstance instanceof FeatureSingleton); // true
+     * ```
      */
     public static get instance(): FeatureSingleton {
         if (!this._instance) {
@@ -54,7 +62,9 @@ export class FeatureSingleton {
         }
         return this._instance;
     }
+    //endregion
 
+    //region DATA
     /**
      * The current feature configuration.
      */
@@ -79,7 +89,9 @@ export class FeatureSingleton {
         this._data = data;
         FileUtil.writeIntoJson(this.path, this._data);
     }
+    //endregion
 
+    //region AUTO-DISCONNECT
     /**
      * Sets the auto-disconnect target.
      * @param targetId The ID of the user to auto-disconnect.
@@ -88,7 +100,9 @@ export class FeatureSingleton {
         this._data.auto_disconnect = targetId;
         FileUtil.writeIntoJson(this.path, this._data);
     }
+    //endregion
 
+    //region FOLD-RECRUITMENT
     /**
      * Gets the list of clans to watch.
      */
@@ -151,7 +165,9 @@ export class FeatureSingleton {
 
         return filter;
     }
+    //endregion
 
+    //region AUTO-REPLY
     /**
      * Adds an auto-reply rule.
      * @param item The auto-reply rule to add.
@@ -197,4 +213,5 @@ export class FeatureSingleton {
     public hasAutoReplyTo(activateFor: DiscordId, replyTo: DiscordId): boolean {
         return this._data.auto_reply.some((value: Reply) => value.activateFor === activateFor && value.replyTo === replyTo);
     }
+    //endregion
 }

@@ -14,11 +14,11 @@ module.exports = async (client: Client): Promise<void> => {
     const recruitmentModel: FoldRecruitmentModel = new FoldRecruitmentModel();
     await recruitmentModel.fetchMandatory(client);
 
-    await TimeUtil.forLoopTimeSleep(inventory.foldSchedule, `${EmojiEnum.LOOP} Recruitment Loop`, async (): Promise<void> => {
+    await TimeUtil.forLoopTimeSleep(inventory.foldSchedule, `${EmojiEnum.LOOP} Recruitment`, async (): Promise<void> => {
         for (const clan of feature.clans) {
-            logger.info(`${EmojiEnum.MALE} Start recruitment for ${clan.name}`);
+            logger.debug(`${EmojiEnum.MALE} Start recruitment for ${clan.name}`);
             await recruitmentModel.fetchClanActivity(clan);
-            logger.info(`${EmojiEnum.MALE} End recruitment for ${clan.name}`);
+            logger.debug(`${EmojiEnum.MALE} End recruitment for ${clan.name}`);
         }
         await recruitmentModel.sendFooter();
     });

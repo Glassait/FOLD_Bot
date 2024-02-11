@@ -87,27 +87,14 @@ export class TriviaGameModel {
     private triviaStats: TriviaStatisticType;
     //endregion
 
-    //region PRIVATE READONLY
-    /**
-     * @instance of the logger.
-     * @private
-     */
+    //region INJECTION
     private readonly logger: Logger;
-    /**
-     * @instance of the inventory service.
-     * @private
-     */
     private readonly inventory: InventorySingleton;
-    /**
-     * @instance of the WoT API service.
-     * @private
-     */
     private readonly wotApi: WotApiModel = new WotApiModel();
-    /**
-     * @instance of the statistic service.
-     * @private
-     */
-    private readonly statisticSingleton: StatisticSingleton;
+    private readonly statistic: StatisticSingleton;
+    //endregion
+
+    //region PRIVATE READONLY
     /**
      * Embed used to display information about the trivia game.
      * @private
@@ -132,7 +119,7 @@ export class TriviaGameModel {
     public async fetchMandatory(client: Client): Promise<void> {
         this.channel = await this.inventory.getChannelForTrivia(client);
         this.trivia = this.inventory.trivia;
-        this.triviaStats = this.statisticSingleton.trivia;
+        this.triviaStats = this.statistic.trivia;
     }
 
     /**
@@ -290,6 +277,7 @@ export class TriviaGameModel {
         this.allTanks.forEach((vehicle: VehicleData): void => {
             const vehicleAmmo: Ammo = vehicle.default_profile.ammo[this.datum.ammoIndex];
             if (vehicle.name !== this.datum.tank.name && vehicleAmmo.type === ammo.type && this.checkVehicleAmmoDetail(vehicleAmmo, ammo)) {
+                this.logger.trace(`Another tank has the same shell \`${vehicle.name}\``);
                 otherAnswer.push(vehicle.name);
             }
         });
@@ -371,7 +359,7 @@ export class TriviaGameModel {
             return false;
         }
 
-        const vehicleAmmo: Ammo = vehicle.default_profile.ammo[0];
+        const vehicleAmmo: Ammo = vehicle.default_profile.ammo[this.datum.ammoIndex];
         const ammo: Ammo = this.datum.tank.default_profile.ammo[this.datum.ammoIndex];
         return vehicleAmmo.type === ammo.type && this.checkVehicleAmmoDetail(vehicleAmmo, ammo);
     }
@@ -390,12 +378,12 @@ export class TriviaGameModel {
         this.logger.trace("Start updating the player's statistics");
 
         for (const [playerId, playerAnswer] of responses) {
-            this.logger.trace(`Start updating ${playerId} statistic`);
+            this.logger.trace(`Start updating \`${playerId}\` statistic`);
             await this.updatePlayerStatistic(playerId, playerAnswer, goodAnswer);
-            this.logger.trace(`End updating ${playerId} statistic`);
+            this.logger.trace(`End updating \`${playerId}\` statistic`);
         }
 
-        this.statisticSingleton.trivia = this.triviaStats;
+        this.statistic.trivia = this.triviaStats;
     }
 
     /**
@@ -404,7 +392,7 @@ export class TriviaGameModel {
      * @private
      */
     private updateOverallStatistic(responses: [string, PlayerAnswer][]): void {
-        const overall: MonthlyTriviaOverallStatisticType = this.triviaStats.overall[this.statisticSingleton.currentMonth] ?? {
+        const overall: MonthlyTriviaOverallStatisticType = this.triviaStats.overall[this.statistic.currentMonth] ?? {
             number_of_game: 0,
             game_without_participation: 0,
             unique_tanks: [],
@@ -419,7 +407,7 @@ export class TriviaGameModel {
             overall.unique_tanks.push(this.datum.tank.name);
         }
 
-        this.triviaStats.overall[this.statisticSingleton.currentMonth] = overall;
+        this.triviaStats.overall[this.statistic.currentMonth] = overall;
     }
 
     /**
@@ -470,7 +458,7 @@ export class TriviaGameModel {
     private async updatePlayerStatistic(playerId: string, playerAnswer: PlayerAnswer, goodAnswer: [string, PlayerAnswer][]): Promise<void> {
         const player: TriviaPlayerStatisticType = this.triviaStats.player[playerId] ?? {};
 
-        const playerStat: MonthlyTriviaPlayerStatisticType = player[this.statisticSingleton.currentMonth] ?? {
+        const playerStat: MonthlyTriviaPlayerStatisticType = player[this.statistic.currentMonth] ?? {
             elo: 0,
             right_answer: 0,
             win_strick: { current: 0, max: 0 },
@@ -493,7 +481,7 @@ export class TriviaGameModel {
             await this.handleWrongAnswer(playerStat, winStrick, playerAnswer, oldElo, playerId);
         }
 
-        player[this.statisticSingleton.currentMonth] = playerStat;
+        player[this.statistic.currentMonth] = playerStat;
         this.triviaStats.player[playerId] = player;
     }
 
@@ -527,7 +515,7 @@ export class TriviaGameModel {
                 playerStat.elo - oldElo
             }\`)`,
         });
-        this.logger.trace(`Player ${playerId} found the right answer`);
+        this.logger.trace(`Player \`${playerId}\` found the right answer`);
     }
 
     /**
@@ -564,6 +552,6 @@ export class TriviaGameModel {
                 this.datum.isPen ? ammo.penetration[1] : ammo.damage[1]
             }\`.\nTon nouvelle elo est : \`${playerStat.elo}\` (modification de \`${playerStat.elo - oldElo}\`)`,
         });
-        this.logger.trace(`Player ${playerId} failed to find the right answer`);
+        this.logger.trace(`Player \`${playerId}\` failed to find the right answer`);
     }
 }
