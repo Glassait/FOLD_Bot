@@ -86,7 +86,7 @@ export class StatisticSingleton {
         return this._instance;
     }
 
-    //region TRIVIA
+    //region TRIVIA-GET-SET
     /**
      * Gets the trivia-related statistics, including overall and player-specific data.
      *
@@ -162,5 +162,22 @@ export class StatisticSingleton {
         this._data.fold_recruitment.clan[clanId] = clanStats;
 
         FileUtil.writeIntoJson(this.path, this._data);
+    }
+
+    /**
+     * Retrieves the fold recruitment statistics for a specific clan based on its ID.
+     *
+     * @param {string} clanId - The ID of the clan for which to retrieve the statistics.
+     * @returns {FoldRecruitmentClanStatisticType} - The fold recruitment statistics for the specified clan.
+     *
+     * @example
+     * ```typescript
+     * const clanID = 'ABC123';
+     * const clanStatistics = instance.getClanStatistics(clanID);
+     * console.log(clanStatistics); // Clan statistics object for the specified ID
+     * ```
+     */
+    public getClanStatistics(clanId: string): FoldRecruitmentClanStatisticType {
+        return this._data.fold_recruitment.clan[clanId];
     }
 }

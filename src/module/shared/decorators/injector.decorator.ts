@@ -6,6 +6,7 @@ import { StatisticSingleton } from '../singleton/statistic.singleton';
 import { TimeEnum } from '../enums/time.enum';
 import https from 'https';
 import http from 'http';
+import { FeatureSingleton } from '../singleton/feature.singleton';
 
 const logger: Logger = new Logger(new Context('Injector'));
 
@@ -15,11 +16,23 @@ const logger: Logger = new Logger(new Context('Injector'));
 type Constructor = new (...args: any[]) => any;
 
 /**
- * Inject the logger in the class. Doesn't work on static class (need constructor)
- * @param base The class to inject inside
- * @constructor
- * @see https://github.com/microsoft/TypeScript/issues/37157 For more information about the class decorator
- * @in-class private readonly logger: Logger;
+ * Injects a `Logger` instance into the specified class. Doesn't work on static class (need constructor)
+ *
+ * @template T - The class constructor type.
+ * @param {T} base - The base class constructor to inject the `Logger` into.
+ * @returns {T} - The updated class constructor with the injected `Logger`.
+ *
+ * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator@example
+ *
+ * @example
+ * ```typescript
+ * @LoggerInjector
+ * class MyClass {
+ *      private readonly logger: Logger;
+ *
+ *      // ... class implementation
+ * }
+ * ```
  */
 export function LoggerInjector<T extends Constructor>(base: T): T {
     logger.trace(`Logger injected for \`${base.name}\``);
@@ -31,11 +44,23 @@ export function LoggerInjector<T extends Constructor>(base: T): T {
 }
 
 /**
- * Inject the inventory instance in the class. Doesn't work on static class (need constructor)
- * @param base The class to inject inside
- * @constructor
- * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator
- * @in-class private readonly inventory: InventorySingleton;
+ * Injects a `InventorySingleton` instance into the specified class. Doesn't work on static class (need constructor)
+ *
+ * @template T - The class constructor type.
+ * @param {T} base - The base class constructor to inject the `InventorySingleton` into.
+ * @returns {T} - The updated class constructor with the injected `InventorySingleton`.
+ *
+ * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator@example
+ *
+ * @example
+ * ```typescript
+ * @InventoryInjector
+ * class MyClass {
+ *      private readonly inventory: InventorySingleton;
+ *
+ *      // ... class implementation
+ * }
+ * ```
  */
 export function InventoryInjector<T extends Constructor>(base: T): T {
     logger.trace(`Inventory injected for \`${base.name}\``);
@@ -47,11 +72,23 @@ export function InventoryInjector<T extends Constructor>(base: T): T {
 }
 
 /**
- * Inject the inventory instance in the class. Doesn't work on static class (need constructor)
+ * Injects a `AxiosInstance` instance into the specified class. Doesn't work on static class (need constructor)
+ *
+ * @template T - The class constructor type.
  * @param [timeout=TimeEnum.Minute] The timeout of
- * @constructor
+ * @returns {T} - The updated class constructor with the injected `AxiosInstance`.
+ *
  * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator@example
- * @in-class private readonly axios: AxiosInstance;
+ *
+ * @example
+ * ```typescript
+ * @AxiosInjector
+ * class MyClass {
+ *      private readonly axios: AxiosInstance;
+ *
+ *      // ... class implementation
+ * }
+ * ```
  */
 export function AxiosInjector<T extends Constructor>(timeout: number = TimeEnum.MINUTE): (base: T) => T {
     return function (base: T): T {
@@ -70,17 +107,57 @@ export function AxiosInjector<T extends Constructor>(timeout: number = TimeEnum.
 }
 
 /**
- * Inject the statistic instance in the class. Doesn't work on static class (need constructor)
- * @param base The class to inject inside
- * @constructor
+ * Injects a `StatisticSingleton` instance into the specified class. Doesn't work on static class (need constructor)
+ *
+ * @template T - The class constructor type.
+ * @param {T} base - The base class constructor to inject the `StatisticSingleton` into.
+ * @returns {T} - The updated class constructor with the injected `StatisticSingleton`.
+ *
  * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator@example
- * @in-class private readonly statistic: StatisticSingleton;
+ *
+ * @example
+ * ```typescript
+ * @FeatureInjector
+ * class MyClass {
+ *      private readonly statistic: StatisticSingleton;
+ *
+ *      // ... class implementation
+ * }
+ * ```
  */
 export function StatisticInjector<T extends Constructor>(base: T): T {
     logger.trace(`Statistic injected for \`${base.name}\``);
     return {
         [base.name]: class extends base {
             statistic: StatisticSingleton = StatisticSingleton.instance;
+        },
+    }[base.name];
+}
+
+/**
+ * Injects a `FeatureSingleton` instance into the specified class. Doesn't work on static class (need constructor)
+ *
+ * @template T - The class constructor type.
+ * @param {T} base - The base class constructor to inject the `FeatureSingleton` into.
+ * @returns {T} - The updated class constructor with the injected `FeatureSingleton`.
+ *
+ * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator@example
+ *
+ * @example
+ * ```typescript
+ * @FeatureInjector
+ * class MyClass {
+ *      private readonly feature: FeatureSingleton;
+ *
+ *      // ... class implementation
+ * }
+ * ```
+ */
+export function FeatureInjector<T extends Constructor>(base: T): T {
+    logger.trace(`Statistic injected for \`${base.name}\``);
+    return {
+        [base.name]: class extends base {
+            feature: FeatureSingleton = FeatureSingleton.instance;
         },
     }[base.name];
 }
