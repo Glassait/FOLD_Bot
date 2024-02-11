@@ -56,7 +56,7 @@ export const command: SlashCommandModel = new SlashCommandModel(
                 return;
             }
 
-            inventory.updateLastClan(<string>id.value, new Date().toISOString());
+            inventory.updateLastCheckForClan(<string>id.value, new Date().toISOString());
 
             logger.info(`Clan \`${id.value} ${name.value}\` added to the clan to watch`);
             await interaction.editReply({

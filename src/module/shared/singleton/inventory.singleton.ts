@@ -199,12 +199,19 @@ export class InventorySingleton {
     }
 
     /**
-     * Update the last time a clan joined the fold recruitment.
-     * Update the inventory.json file
-     * @param clanID The ID of the clan
-     * @param timestamp The timestamp of the last join
+     * Updates the last check timestamp for a specific clan in the fold recruitment inventory.
+     *
+     * @param {string} clanID - The ID of the clan for which to update the last check timestamp.
+     * @param {string} timestamp - The new timestamp to set as the last check for the specified clan.
+     *
+     * @example
+     * ```typescript
+     * const clanID = 'ABC123';
+     * const newTimestamp = '2024-02-10T12:00:00Z';
+     * instance.updateLastCheckForClan(clanID, newTimestamp);
+     * ```
      */
-    public updateLastClan(clanID: string, timestamp: string): void {
+    public updateLastCheckForClan(clanID: string, timestamp: string): void {
         this._inventory.fold_recruitment[clanID] = timestamp;
         FileUtil.writeIntoJson(this.path, this._inventory);
     }

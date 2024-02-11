@@ -2,7 +2,7 @@ import { Logger } from '../classes/logger';
 import { Context } from '../classes/context';
 import {
     FoldRecruitmentClanStatisticType,
-    FoldRecruitmentStatisticType,
+    MonthlyFoldRecruitmentClanStatisticType,
     StatisticType,
     TriviaPlayerStatisticType,
     TriviaStatisticType,
@@ -54,7 +54,20 @@ export class StatisticSingleton {
         this._data = JSON.parse(readFileSync(this.path).toString());
 
         this._data.version = this.INITIAL_VALUE.version;
-        this._data.trivia.version = this.INITIAL_VALUE.trivia.version;
+
+        if (this._data.trivia) {
+            this._data.trivia.version = this.INITIAL_VALUE.trivia.version;
+        } else {
+            this._data.trivia = this.INITIAL_VALUE.trivia;
+            FileUtil.writeIntoJson(this.path, this._data);
+        }
+
+        if (this._data.fold_recruitment) {
+            this._data.fold_recruitment.version = this.INITIAL_VALUE.fold_recruitment.version;
+        } else {
+            this._data.fold_recruitment = this.INITIAL_VALUE.fold_recruitment;
+            FileUtil.writeIntoJson(this.path, this._data);
+        }
     }
 
     /**
@@ -106,39 +119,6 @@ export class StatisticSingleton {
     }
     //endregion
 
-    //region FOLD RECRUITMENT
-    /**
-     * Gets the fold recruitment-related statistics, including version information and clan-specific data.
-     *
-     * @returns {FoldRecruitmentStatisticType} - Fold recruitment-related statistics.
-     *
-     * @example
-     * ```typescript
-     * const foldRecruitmentStats = instance.foldRecruitment;
-     * console.log(foldRecruitmentStats); // { version: 1, clan: {} }
-     * ```
-     */
-    public get foldRecruitment(): FoldRecruitmentStatisticType {
-        return this._data.fold_recruitment;
-    }
-
-    /**
-     * Sets the fold recruitment-related statistics and writes the updated data to the JSON file.
-     *
-     * @param {FoldRecruitmentStatisticType} foldRecruitment - The updated fold recruitment-related statistics.
-     *
-     * @example
-     * ```typescript
-     * const newFoldRecruitmentStats = { version: 2, clan: { `updated clan data` } };
-     * instance.foldRecruitment = newFoldRecruitmentStats;
-     * ```
-     */
-    public set foldRecruitment(foldRecruitment: FoldRecruitmentStatisticType) {
-        this._data.fold_recruitment = foldRecruitment;
-        FileUtil.writeIntoJson(this.path, this._data);
-    }
-    //endregion
-
     /**
      * Gets the player-specific trivia statistics for a specific player.
      *
@@ -157,19 +137,30 @@ export class StatisticSingleton {
     }
 
     /**
-     * Gets the clan-specific fold recruitment statistics for a specific clan.
+     * Updates the fold recruitment statistics for a specific clan, including the number of leaving players.
      *
-     * @param {string} clanID - The ID of the clan for whom to retrieve statistics.
-     * @returns {FoldRecruitmentClanStatisticType} - Clan-specific fold recruitment statistics.
+     * @param {string} clanId - The ID of the clan for which to update the statistics.
+     * @param {number} leavingPlayer - The number of leaving players to add to the statistics.
      *
      * @example
      * ```typescript
      * const clanID = 'ABC123';
-     * const clanStats = instance.getClanStatistic(clanID);
-     * console.log(clanStats); // { leaving_player: 5 }
+     * const leavingPlayerCount = 3;
+     * instance.updateClanStatistics(clanID, leavingPlayerCount);
      * ```
      */
-    public getClanStatistic(clanID: string): FoldRecruitmentClanStatisticType {
-        return this._data.fold_recruitment.clan[clanID];
+    public updateClanStatistics(clanId: string, leavingPlayer: number): void {
+        this.logger.trace(`Updating statistic for \`${clanId}\`, by adding \`${leavingPlayer}\``);
+
+        const clanStats: FoldRecruitmentClanStatisticType = this._data.fold_recruitment.clan[clanId] ?? {};
+        const monthStats: MonthlyFoldRecruitmentClanStatisticType = clanStats[this.currentMonth] ?? {
+            leaving_player: 0,
+        };
+
+        monthStats.leaving_player += leavingPlayer;
+        clanStats[this.currentMonth] = monthStats;
+        this._data.fold_recruitment.clan[clanId] = clanStats;
+
+        FileUtil.writeIntoJson(this.path, this._data);
     }
 }

@@ -80,7 +80,7 @@ export function StatisticInjector<T extends Constructor>(base: T): T {
     logger.trace(`Statistic injected for \`${base.name}\``);
     return {
         [base.name]: class extends base {
-            statisticSingleton: StatisticSingleton = StatisticSingleton.instance;
+            statistic: StatisticSingleton = StatisticSingleton.instance;
         },
     }[base.name];
 }
