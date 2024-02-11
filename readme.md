@@ -90,6 +90,12 @@ Use this space to list resources you find helpful and would like to give credit 
 
 ## Changelog
 
+### 2.2.8
+
+-   Add statistics for fold-recruitment on clan leaving players
+-   Fix index when another tanks are also the right answer
+-   Fix [statistics injector](src/module/shared/decorators/injector.decorator.ts)
+
 ### 2.2.7
 
 -   Method to generate schedule for loop ([forLoopTimeSleep](src/module/shared/utils/time.util.ts))
@@ -99,6 +105,8 @@ Use this space to list resources you find helpful and would like to give credit 
 -   Watch commands (add/remove) now send message in channel
 -   Add in inventory ban words for news. Check the href of news and
 -   Fix loosing message for trivia game (give right shell, type, special and pen)
+-   Add trace log in error message
+-   Watch-clan remove command now have autocomplete
 
 ### 2.2.6
 
