@@ -91,6 +91,13 @@ export class FoldRecruitmentModel {
      * @param data The data of the activity of the clan
      */
     public async sendMessageToChannelFromExtractedPlayer(clan: Clan, data: FoldRecruitmentType): Promise<void> {
+        if (!this.inventory.getLastActivityOfClan(clan.id)) {
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+
+            this.inventory.updateLastCheckForClan(clan.id, yesterday.toISOString());
+        }
+
         const extracted: LeaveClanActivity[] = data.items.filter(
             (item: ClanActivity): boolean =>
                 item.subtype === WotClanActivity.LEAVE_CLAN &&
