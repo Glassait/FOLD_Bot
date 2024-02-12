@@ -95,6 +95,7 @@ Use this space to list resources you find helpful and would like to give credit 
 -   Add statistics for fold-recruitment on clan leaving players
 -   Fix index when another tanks are also the right answer
 -   Fix [statistics injector](src/module/shared/decorators/injector.decorator.ts)
+-   Fix clan without last activity
 
 ### 2.2.7
 
