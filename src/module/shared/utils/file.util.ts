@@ -1,12 +1,9 @@
 import { writeFile } from 'fs';
 import { Logger } from '../classes/logger';
 import { Context } from '../classes/context';
+import { EmojiEnum } from '../enums/emoji.enum';
 
 export class FileUtil {
-    /**
-     * The logger to log thing
-     * @private
-     */
     private static readonly logger: Logger = new Logger(new Context(FileUtil.name));
 
     /**
@@ -20,9 +17,12 @@ export class FileUtil {
         }
         writeFile(path, JSON.stringify(data, null, '\t'), err => {
             if (err) {
-                this.logger.warning(`🔄❌ Failed to sync the inventory file with error: ${err}`);
+                this.logger.warn(
+                    `${EmojiEnum.LOOP}${EmojiEnum.RED_CROSS} Failed to sync the inventory file with error: {}`,
+                    err as unknown as string
+                );
             } else {
-                this.logger.trace(`${path.split('/')[path.split('/').length - 1]} successfully updated`);
+                this.logger.debug(`${path.split('/')[path.split('/').length - 1]} successfully updated`);
             }
         });
     }

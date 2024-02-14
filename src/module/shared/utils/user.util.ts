@@ -1,9 +1,4 @@
-import {
-    ChatInputCommandInteraction,
-    CommandInteractionOption,
-    Guild,
-    GuildMember,
-} from 'discord.js';
+import { ChatInputCommandInteraction, CommandInteractionOption, Guild, GuildMember } from 'discord.js';
 
 export class UserUtil {
     public static async getGuildMemberFromInteraction(
@@ -44,10 +39,7 @@ export class UserUtil {
         return targetUser;
     }
 
-    public static async getGuildMemberFromGuild(
-        guild: Guild,
-        userId: string
-    ): Promise<GuildMember> {
+    public static async getGuildMemberFromGuild(guild: Guild, userId: string): Promise<GuildMember> {
         return await guild.members.fetch(userId);
     }
 }

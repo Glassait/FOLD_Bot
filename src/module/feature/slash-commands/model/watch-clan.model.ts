@@ -31,6 +31,9 @@ import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 @StatisticInjector
 export class WatchClanModel {
     //region PRIVATE
+    /**
+     * Embed send to the recruitment chanel to confirm that the clan has been deleted or added
+     */
     private confirmationEmbed: EmbedBuilder = new EmbedBuilder().setColor(Colors.Green);
     //endregion
 
@@ -83,7 +86,7 @@ export class WatchClanModel {
         const added = this.feature.addClan({ id: <string>id.value, name: <string>name.value });
 
         if (!added) {
-            this.logger.info(`Clan ${id.value} already exists`);
+            this.logger.warn('Clan {} already exists', id.value as string);
             await interaction.editReply({ content: 'Le clan existe déjà !' });
 
             return;
@@ -91,7 +94,7 @@ export class WatchClanModel {
 
         this.inventory.updateLastCheckForClan(<string>id.value, new Date().toISOString());
 
-        this.logger.info(`Clan \`${id.value} ${name.value}\` added to the clan to watch`);
+        this.logger.info(`Clan {} - {} added to the clan to watch`, id.value as string, name.value as string);
         await interaction.editReply({
             content: 'Le clan a bien été ajouté ! Le clan sera observé à partir de demain (*^▽^*)',
         });
@@ -124,14 +127,14 @@ export class WatchClanModel {
         const removed: Clan[] = this.feature.removeClan(<string>idOrName.value);
 
         if (removed.length <= 0) {
-            this.logger.info(`Clan ${idOrName.value} doesn't exist in the clan to watch`);
+            this.logger.warn("Clan {} doesn't exist in the clan to watch", idOrName.value as string);
             await interaction.editReply({ content: "Le clan n'existe pas et donc ne peux pas être supprimé !" });
             return;
         }
 
         this.inventory.deleteClan(removed[0].id);
 
-        this.logger.info(`Clan \`${removed[0].id} ${removed[0].name}\` removed from the clan to watch`);
+        this.logger.info(`Clan {} - {} removed from the clan to watch`, removed[0].id, removed[0].name);
         await interaction.editReply({ content: 'Le clan a bien été supprimé !' });
 
         this.confirmationEmbed
@@ -149,7 +152,7 @@ export class WatchClanModel {
         const clans: Clan[] = this.feature.clans.filter((value: Clan) => value.id === idOrName.value || value.name === idOrName.value);
 
         if (clans.length === 0) {
-            this.logger.warning(`No clan found with id or name equal to \`${idOrName.value}\``);
+            this.logger.warn('No clan found with id or name equal to {}', idOrName.value as string);
             await interaction.editReply({ content: `Aucun clan n'ai enregistré avec le nom ou l'id suivant : \`${idOrName.value}\`` });
             return;
         }
@@ -157,7 +160,7 @@ export class WatchClanModel {
         const clanStats: FoldRecruitmentClanStatisticType = this.statistic.getClanStatistics(clans[0].id);
 
         if (!clanStats || Object.keys(clanStats).length === 0) {
-            this.logger.warning(`The following clan \`${clans[0].name}\` doesn't have any statistics`);
+            this.logger.warn("The following clan {} doesn't have any statistics", clans[0].name);
             await interaction.editReply({ content: `Aucune statistique n'a été trouvée pour le clan suivant : \`${clans[0].name}\`` });
             return;
         }

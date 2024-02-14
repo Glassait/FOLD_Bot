@@ -4,6 +4,7 @@ import { Context } from '../../shared/classes/context';
 import { SentenceUtil } from '../../shared/utils/sentence.util';
 import { Logger } from '../../shared/classes/logger';
 import { TriviaMonthModel } from './models/trivia-month.model';
+import { EmojiEnum } from '../../shared/enums/emoji.enum';
 
 export const event: BotEvent = {
     name: Events.ClientReady,
@@ -11,9 +12,9 @@ export const event: BotEvent = {
     async execute(client: Client): Promise<void> {
         const logger: Logger = new Logger(new Context('READY-EVENT'));
 
-        logger.info(`💪 Logged in as ${client.user?.tag}`);
+        logger.info(`${EmojiEnum.MUSCLE} Logged in as {}`, client.user?.tag as string);
         const status = SentenceUtil.getRandomStatus();
-        logger.info(`Status of the bot set to ${status[0]} and ${status[1]}`);
+        logger.debug(`Status of the bot set to {} and {}`, status[0], status[1]);
 
         client.user?.setPresence({
             activities: [

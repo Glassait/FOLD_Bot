@@ -32,7 +32,7 @@ export const event: BotEvent = {
             }
 
             try {
-                logger.trace(`Chat input command received : \`${command.name}\``);
+                logger.info(`Chat input command received : {}`, command.name);
                 await command.execute(interaction, client);
             } catch (error) {
                 logger.error(`${error}`, error);

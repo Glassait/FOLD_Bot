@@ -58,7 +58,7 @@ export class FeatureSingleton {
     public static get instance(): FeatureSingleton {
         if (!this._instance) {
             this._instance = new FeatureSingleton();
-            this._instance.logger.trace('Feature instance initialized');
+            this._instance.logger.info('{} instance initialized', 'Feature');
         }
         return this._instance;
     }
@@ -187,7 +187,7 @@ export class FeatureSingleton {
             (value: Reply) => value.activateFor === activateFor && value.replyTo === replyTo
         );
         if (!object) {
-            this.logger.warning(`No auto-reply for ${activateFor} to reply to ${replyTo}`);
+            this.logger.warn('No auto-reply for {} to reply to {}', activateFor, replyTo);
             return;
         }
 

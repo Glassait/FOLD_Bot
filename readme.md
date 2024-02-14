@@ -96,6 +96,9 @@ Use this space to list resources you find helpful and would like to give credit 
 -   Fix index when another tanks are also the right answer
 -   Fix [statistics injector](src/module/shared/decorators/injector.decorator.ts)
 -   Fix clan without last activity
+-   Better docs
+-   Remove trace log
+-   Add code placeholders method for log
 
 ### 2.2.7
 

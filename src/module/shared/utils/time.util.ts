@@ -44,7 +44,7 @@ export class TimeUtil {
             const targetDate = new Date();
             const date = schedule.split(':');
             targetDate.setHours(Number(date[0]), Number(date[1]) || 0, 0, 0);
-            this.logger.info(`${loopName} loop start at ${targetDate}`);
+            this.logger.info(`${loopName} loop start at {}`, String(targetDate));
             const time = targetDate.getTime() - startDate.getTime();
 
             if (time > 0) {

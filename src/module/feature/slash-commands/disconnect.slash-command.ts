@@ -18,7 +18,7 @@ export const command: SlashCommandModel = new SlashCommandModel(
         }
 
         try {
-            logger.debug(`Disconnect user \`${targetUser.displayName}\``);
+            logger.debug(`Disconnect user {}`, targetUser.displayName);
             await targetUser.voice.disconnect();
             await interaction.editReply({
                 content: "L'utilisateur a été déconnecté, c'est méchant mais c'est toi qui décide...",
