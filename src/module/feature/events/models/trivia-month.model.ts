@@ -65,7 +65,7 @@ export class TriviaMonthModel {
      * Send all the trivia month embeds to the channel
      */
     public async sendToChannel(): Promise<void> {
-        this.logger.info('Sending trivia month message...');
+        this.logger.debug('Sending trivia month message...');
         await this.channel.send({
             content: '@here',
             embeds: this.listEmbed,

@@ -6,6 +6,7 @@ import { Context } from '../../shared/classes/context';
 import { Logger } from '../../shared/classes/logger';
 import { SlashCommandModel } from '../slash-commands/model/slash-command.model';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
+import { EmojiEnum } from '../../shared/enums/emoji.enum';
 
 module.exports = async (_client: Client): Promise<void> => {
     const logger: Logger = new Logger(new Context('COMMANDS-HANDLER'));
@@ -23,7 +24,7 @@ module.exports = async (_client: Client): Promise<void> => {
             body[value] = guild;
         });
 
-        logger.info(`🔥 Successfully loaded command ${command.name}`);
+        logger.info(`${EmojiEnum.FLAME} Successfully loaded command ${command.name}`);
     });
 
     const rest: REST = new REST({ version: '10' }).setToken(token);
@@ -34,7 +35,7 @@ module.exports = async (_client: Client): Promise<void> => {
                 body: entry[1],
             });
 
-            logger.debug(`Successfully reloaded application ${entry[1].length} slash-commands for guild ${entry[0]}`);
+            logger.info(`Successfully reloaded application ${entry[1].length} slash-commands for guild ${entry[0]}`);
         } catch (error) {
             logger.error(`${error}`, error);
         }

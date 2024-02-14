@@ -21,15 +21,6 @@ export class Logger {
     }
 
     /**
-     * Log TRACE
-     * @param msg The message of the TRACE
-     * @see LoggerSingleton#trace
-     */
-    public trace(msg: string): void {
-        this.logger.trace(this.context, msg);
-    }
-
-    /**
      * Log DEBUG
      * @param msg The message of the DEBUG
      * @see LoggerSingleton#debug
@@ -52,7 +43,7 @@ export class Logger {
      * @param msg The message of the WARNING
      * @see LoggerSingleton#warning
      */
-    public warning(msg: string): void {
+    public warn(msg: string): void {
         this.logger.warning(this.context, msg);
     }
 

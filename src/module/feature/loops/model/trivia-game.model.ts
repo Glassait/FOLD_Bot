@@ -126,7 +126,7 @@ export class TriviaGameModel {
      * Fetches the tanks to be used in the trivia game.
      */
     public async fetchTanks(): Promise<void> {
-        this.logger.trace('Start fetching tanks');
+        this.logger.debug('Start fetching tanks');
         const pages: number[] = RandomUtil.getArrayWithRandomNumber(4, this.trivia.limit, 1, false, this.inventory.triviaLastPage);
         const tankopediaResponses: TankopediaVehiclesSuccess[] = [];
 
@@ -155,7 +155,7 @@ export class TriviaGameModel {
             isPen: RandomUtil.getRandomNumber() !== 0,
         };
 
-        this.logger.trace(
+        this.logger.info(
             `Tank for game selected : \`${this.datum.tank.name}\`, the ammo type is : ${
                 this.datum.ammoIndex ? `\`${ShellType.GOLD}\`` : `\`${ShellType.NORMAL}\``
             } and the question is for ${this.datum.isPen ? '`penetration`' : '`damage`'}`
@@ -198,7 +198,7 @@ export class TriviaGameModel {
             embeds: [this.startGameEmbed],
             components: [row],
         });
-        this.logger.trace('Trivia game message send to the guild');
+        this.logger.debug('Trivia game message send to the guild');
         this.timer = Date.now();
     }
 
@@ -206,7 +206,7 @@ export class TriviaGameModel {
      * Collects the answers from the players.
      */
     public async collectAnswer(): Promise<void> {
-        this.logger.trace('Collecting player answer start');
+        this.logger.debug('Collecting player answer start');
         this.playerAnswer = {};
         this.gameMessage
             .createMessageComponentCollector({
@@ -264,7 +264,7 @@ export class TriviaGameModel {
      * Sends the answer to the trivia game channel and updates the player statistics.
      */
     public async sendAnswerToChannel(): Promise<void> {
-        this.logger.trace('Collect answer end. Start calculating the scores');
+        this.logger.debug('Collect answer end. Start calculating the scores');
         const playersResponse: [string, PlayerAnswer][] = Object.entries(this.playerAnswer).sort(
             (a: [string, PlayerAnswer], b: [string, PlayerAnswer]) => a[1].responseTime - b[1].responseTime
         );
@@ -277,7 +277,7 @@ export class TriviaGameModel {
         this.allTanks.forEach((vehicle: VehicleData): void => {
             const vehicleAmmo: Ammo = vehicle.default_profile.ammo[this.datum.ammoIndex];
             if (vehicle.name !== this.datum.tank.name && vehicleAmmo.type === ammo.type && this.checkVehicleAmmoDetail(vehicleAmmo, ammo)) {
-                this.logger.trace(`Another tank has the same shell \`${vehicle.name}\``);
+                this.logger.debug(`Another tank has the same shell \`${vehicle.name}\``);
                 otherAnswer.push(vehicle.name);
             }
         });
@@ -306,7 +306,7 @@ export class TriviaGameModel {
             .setColor(goodAnswer.length === 0 ? Colors.Red : Colors.Gold);
 
         await this.gameMessage.edit({ embeds: [this.answerEmbed, playerEmbed], components: [] });
-        this.logger.trace('Game message update with answer and top 3 players');
+        this.logger.debug('Game message update with answer and top 3 players');
 
         await this.updateStatistic(playersResponse, goodAnswer);
     }
@@ -372,15 +372,15 @@ export class TriviaGameModel {
      * @returns {Promise<void>} - A Promise that resolves after updating the trivia statistics.
      */
     private async updateStatistic(responses: [string, PlayerAnswer][], goodAnswer: [string, PlayerAnswer][]): Promise<void> {
-        this.logger.trace('Start updating the overall statistics');
+        this.logger.debug('Start updating the overall statistics');
         this.updateOverallStatistic(responses);
 
-        this.logger.trace("Start updating the player's statistics");
+        this.logger.debug("Start updating the player's statistics");
 
         for (const [playerId, playerAnswer] of responses) {
-            this.logger.trace(`Start updating \`${playerId}\` statistic`);
+            this.logger.debug(`Start updating \`${playerId}\` statistic`);
             await this.updatePlayerStatistic(playerId, playerAnswer, goodAnswer);
-            this.logger.trace(`End updating \`${playerId}\` statistic`);
+            this.logger.debug(`End updating \`${playerId}\` statistic`);
         }
 
         this.statistic.trivia = this.triviaStats;
@@ -443,7 +443,7 @@ export class TriviaGameModel {
             action = changedAnswer ? 'changed his answer' : 'already answered';
         }
 
-        this.logger.trace(
+        this.logger.debug(
             `${interaction.member?.nickname ?? interaction.user.displayName} ${action} to the trivia game with: \`${interaction.customId}\``
         );
     }
@@ -515,7 +515,7 @@ export class TriviaGameModel {
                 playerStat.elo - oldElo
             }\`)`,
         });
-        this.logger.trace(`Player \`${playerId}\` found the right answer`);
+        this.logger.debug(`Player \`${playerId}\` found the right answer`);
     }
 
     /**
@@ -552,6 +552,6 @@ export class TriviaGameModel {
                 this.datum.isPen ? ammo.penetration[1] : ammo.damage[1]
             }\`.\nTon nouvelle elo est : \`${playerStat.elo}\` (modification de \`${playerStat.elo - oldElo}\`)`,
         });
-        this.logger.trace(`Player \`${playerId}\` failed to find the right answer`);
+        this.logger.debug(`Player \`${playerId}\` failed to find the right answer`);
     }
 }

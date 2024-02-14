@@ -61,7 +61,7 @@ export class InventorySingleton {
     public static get instance(): InventorySingleton {
         if (!this._instance) {
             this._instance = new InventorySingleton();
-            this._instance.logger.trace('Inventory instance initialized');
+            this._instance.logger.info('Inventory instance initialized');
         }
         return this._instance;
     }
@@ -185,7 +185,7 @@ export class InventorySingleton {
      * @param client
      */
     public async getChannelForTrivia(client: Client): Promise<TextChannel> {
-        this.logger.trace('Channel instance fetch for the trivia game');
+        this.logger.debug('Channel instance fetch for the trivia game');
         return await this.fetchChannel(client, this._inventory.game.trivia.channel);
     }
 
@@ -194,7 +194,7 @@ export class InventorySingleton {
      * @param client
      */
     public async getChannelForFoldRecruitment(client: Client): Promise<TextChannel> {
-        this.logger.trace('Channel instance fetch for the fold recruitment');
+        this.logger.debug('Channel instance fetch for the fold recruitment');
         return await this.fetchChannel(client, this._inventory.fold_recruitment.channel);
     }
 

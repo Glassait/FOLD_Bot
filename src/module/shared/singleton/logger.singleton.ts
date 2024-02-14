@@ -44,16 +44,6 @@ export class LoggerSingleton extends Context {
     }
 
     /**
-     * Write TRACE log in the file
-     * @param context The context of the TRACE
-     * @param msg The message of the TRACE
-     */
-    public trace(context: Context, msg: string): void {
-        console.debug(`${EmojiEnum.TRACE} : ${msg}`);
-        this.addToLog('TRACE', 'gray', context.context, msg);
-    }
-
-    /**
      * Write DEBUG log in the file
      * @param context The context of the DEBUG
      * @param msg The message of the DEBUG

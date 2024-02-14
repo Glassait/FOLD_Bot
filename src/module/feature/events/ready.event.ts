@@ -13,7 +13,7 @@ export const event: BotEvent = {
 
         logger.info(`💪 Logged in as ${client.user?.tag}`);
         const status = SentenceUtil.getRandomStatus();
-        logger.info(`Status of the bot set to ${status[0]} and ${status[1]}`);
+        logger.debug(`Status of the bot set to ${status[0]} and ${status[1]}`);
 
         client.user?.setPresence({
             activities: [

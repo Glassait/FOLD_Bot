@@ -20,9 +20,9 @@ export class FileUtil {
         }
         writeFile(path, JSON.stringify(data, null, '\t'), err => {
             if (err) {
-                this.logger.warning(`🔄❌ Failed to sync the inventory file with error: ${err}`);
+                this.logger.warn(`🔄❌ Failed to sync the inventory file with error: ${err}`);
             } else {
-                this.logger.trace(`${path.split('/')[path.split('/').length - 1]} successfully updated`);
+                this.logger.debug(`${path.split('/')[path.split('/').length - 1]} successfully updated`);
             }
         });
     }

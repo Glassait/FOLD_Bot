@@ -7,7 +7,7 @@ import { Logger } from './module/shared/classes/logger';
 
 const logger: Logger = new Logger(new Context('INDEX'));
 
-logger.debug('🤖 Bot is starting...');
+logger.info('🤖 Bot is starting...');
 
 const client: Client = new Client({
     intents: [
@@ -28,7 +28,7 @@ readdirSync(handlersDir).forEach((handler: string): void => {
 
 client.login(token).then((value: string): void => {
     if (value) {
-        logger.debug('The bot is ready to kick some ass');
+        logger.info('The bot is ready to kick some ass');
     } else {
         logger.error('Failed to connect');
     }

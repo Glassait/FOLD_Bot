@@ -4,6 +4,7 @@ import { join } from 'path';
 import { BotEvent } from '../events/types/bot-event.type';
 import { Context } from '../../shared/classes/context';
 import { Logger } from '../../shared/classes/logger';
+import { EmojiEnum } from '../../shared/enums/emoji.enum';
 
 const logger: Logger = new Logger(new Context('EVENT-HANDLER'));
 
@@ -21,7 +22,9 @@ module.exports = async (client: Client): Promise<void> => {
             : client.on(event.name.toString(), (...args: any[]) => event.execute(client, ...args));
 
         numberOfEvent++;
-        logger.info(`🌠 Successfully loaded event ${event.name} as \`${event.once ? 'temporary' : 'permanent'}\` listener !`);
+        logger.info(
+            `${EmojiEnum.STAR} Successfully loaded event ${event.name} as \`${event.once ? 'temporary' : 'permanent'}\` listener !`
+        );
     });
-    logger.info(`Loaded ${numberOfEvent} events`);
+    logger.debug(`Loaded ${numberOfEvent} events`);
 };

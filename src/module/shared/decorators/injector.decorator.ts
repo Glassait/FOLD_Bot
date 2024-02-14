@@ -35,7 +35,7 @@ type Constructor = new (...args: any[]) => any;
  * ```
  */
 export function LoggerInjector<T extends Constructor>(base: T): T {
-    logger.trace(`Logger injected for \`${base.name}\``);
+    logger.info(`Logger injected for \`${base.name}\``);
     return {
         [base.name]: class extends base {
             logger: Logger = new Logger(new Context(base.name));
@@ -63,7 +63,7 @@ export function LoggerInjector<T extends Constructor>(base: T): T {
  * ```
  */
 export function InventoryInjector<T extends Constructor>(base: T): T {
-    logger.trace(`Inventory injected for \`${base.name}\``);
+    logger.info(`Inventory injected for \`${base.name}\``);
     return {
         [base.name]: class extends base {
             inventory: InventorySingleton = InventorySingleton.instance;
@@ -92,7 +92,7 @@ export function InventoryInjector<T extends Constructor>(base: T): T {
  */
 export function AxiosInjector<T extends Constructor>(timeout: number = TimeEnum.MINUTE): (base: T) => T {
     return function (base: T): T {
-        logger.trace(`Axios injected for \`${base.name}\` with a timeout of \`${timeout}\`ms`);
+        logger.info(`Axios injected for \`${base.name}\` with a timeout of \`${timeout}\`ms`);
         return {
             [base.name]: class extends base {
                 axios: AxiosInstance = axios.create({
@@ -126,7 +126,7 @@ export function AxiosInjector<T extends Constructor>(timeout: number = TimeEnum.
  * ```
  */
 export function StatisticInjector<T extends Constructor>(base: T): T {
-    logger.trace(`Statistic injected for \`${base.name}\``);
+    logger.info(`Statistic injected for \`${base.name}\``);
     return {
         [base.name]: class extends base {
             statistic: StatisticSingleton = StatisticSingleton.instance;
@@ -154,7 +154,7 @@ export function StatisticInjector<T extends Constructor>(base: T): T {
  * ```
  */
 export function FeatureInjector<T extends Constructor>(base: T): T {
-    logger.trace(`Statistic injected for \`${base.name}\``);
+    logger.info(`Statistic injected for \`${base.name}\``);
     return {
         [base.name]: class extends base {
             feature: FeatureSingleton = FeatureSingleton.instance;

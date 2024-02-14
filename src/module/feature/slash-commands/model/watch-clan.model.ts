@@ -31,6 +31,9 @@ import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 @StatisticInjector
 export class WatchClanModel {
     //region PRIVATE
+    /**
+     * Embed send to the recruitment chanel to confirm that the clan has been deleted or added
+     */
     private confirmationEmbed: EmbedBuilder = new EmbedBuilder().setColor(Colors.Green);
     //endregion
 
@@ -83,7 +86,7 @@ export class WatchClanModel {
         const added = this.feature.addClan({ id: <string>id.value, name: <string>name.value });
 
         if (!added) {
-            this.logger.info(`Clan ${id.value} already exists`);
+            this.logger.warn(`Clan ${id.value} already exists`);
             await interaction.editReply({ content: 'Le clan existe déjà !' });
 
             return;
@@ -124,7 +127,7 @@ export class WatchClanModel {
         const removed: Clan[] = this.feature.removeClan(<string>idOrName.value);
 
         if (removed.length <= 0) {
-            this.logger.info(`Clan ${idOrName.value} doesn't exist in the clan to watch`);
+            this.logger.warn(`Clan ${idOrName.value} doesn't exist in the clan to watch`);
             await interaction.editReply({ content: "Le clan n'existe pas et donc ne peux pas être supprimé !" });
             return;
         }
@@ -149,7 +152,7 @@ export class WatchClanModel {
         const clans: Clan[] = this.feature.clans.filter((value: Clan) => value.id === idOrName.value || value.name === idOrName.value);
 
         if (clans.length === 0) {
-            this.logger.warning(`No clan found with id or name equal to \`${idOrName.value}\``);
+            this.logger.warn(`No clan found with id or name equal to \`${idOrName.value}\``);
             await interaction.editReply({ content: `Aucun clan n'ai enregistré avec le nom ou l'id suivant : \`${idOrName.value}\`` });
             return;
         }
@@ -157,7 +160,7 @@ export class WatchClanModel {
         const clanStats: FoldRecruitmentClanStatisticType = this.statistic.getClanStatistics(clans[0].id);
 
         if (!clanStats || Object.keys(clanStats).length === 0) {
-            this.logger.warning(`The following clan \`${clans[0].name}\` doesn't have any statistics`);
+            this.logger.warn(`The following clan \`${clans[0].name}\` doesn't have any statistics`);
             await interaction.editReply({ content: `Aucune statistique n'a été trouvée pour le clan suivant : \`${clans[0].name}\`` });
             return;
         }

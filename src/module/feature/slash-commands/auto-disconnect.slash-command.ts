@@ -23,7 +23,7 @@ export const command: SlashCommandModel = new SlashCommandModel(
                 content: 'Déconnexion automatique activé, un vrai 😈 😈 😈',
             });
         } else {
-            logger.info(`AutoDisconnect deactivated`);
+            logger.info('AutoDisconnect disabled');
             feature.autoDisconnect = '';
             await interaction.editReply({
                 content: "Déconnexion automatique désactivée, c'est bien de laisser les gens vivre !",

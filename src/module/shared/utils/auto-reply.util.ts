@@ -32,7 +32,7 @@ export class AutoReplyUtil {
         );
 
         if (hasAutoReply) {
-            this.logger.trace(`Auto reply send to channel \`${message.channel.id}\` to user \`${message.author.displayName}\``);
+            this.logger.debug(`Auto reply send to channel \`${message.channel.id}\` to user \`${message.author.displayName}\``);
             await message.channel.send({ content: SentenceUtil.getRandomResponse(id), reply: { messageReference: message.id } });
         }
     }

@@ -1,6 +1,7 @@
 import { MockEnum } from '../enums/mock.enum';
 import { Logger } from '../classes/logger';
 import { Context } from '../classes/context';
+import { EmojiEnum } from '../enums/emoji.enum';
 
 /**
  * A utility class for environment-related operations.
@@ -25,7 +26,7 @@ export class EnvUtil {
      * @param time The number of milliseconds to sleep.
      */
     public static async sleep(time: number): Promise<void> {
-        this.logger.debug('😴 Sleeping for ' + time / 1000 + ' s');
+        this.logger.debug(`${EmojiEnum.SLEEP} Sleeping for ${time / 1000} sec`);
         await new Promise(r => setTimeout(r, time < 0 ? 0 : time));
     }
 }

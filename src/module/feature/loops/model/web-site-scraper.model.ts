@@ -41,7 +41,7 @@ export class WebSiteScraper {
      */
     public async scrapWebsiteAtIndex(index: number): Promise<void> {
         const newsLetter: WebSiteState = this.inventory.getNewsLetterAtIndex(index);
-        this.logger.trace(`${EmojiEnum.MINE} Start scrapping ${newsLetter.name}`);
+        this.logger.debug(`${EmojiEnum.MINE} Start scrapping ${newsLetter.name}`);
 
         this.axios
             .get(newsLetter.liveUrl)
@@ -110,7 +110,7 @@ export class WebSiteScraper {
                 }
             }
         }
-        this.logger.trace(`${EmojiEnum.MINE} End scrapping for \`${webSiteState.name}\``);
+        this.logger.debug(`${EmojiEnum.MINE} End scrapping for \`${webSiteState.name}\``);
     }
 
     /**
@@ -193,7 +193,9 @@ export class WebSiteScraper {
             return;
         }
 
-        this.logger.debug(`📨 Sending news on channel ${this.channel.name} for the web site ${webSiteState.name}, with the url ${url}`);
+        this.logger.info(
+            `${EmojiEnum.LETTER} Sending news on channel ${this.channel.name} for the web site ${webSiteState.name}, with the url ${url}`
+        );
         const embed: EmbedBuilder = new EmbedBuilder().setTitle(title).setDescription(description).setURL(url);
 
         if (image) {

@@ -5,6 +5,7 @@ import { EnvUtil } from '../../shared/utils/env.util';
 import { TriviaGameModel } from './model/trivia-game.model';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
 import { TimeUtil } from '../../shared/utils/time.util';
+import { EmojiEnum } from '../../shared/enums/emoji.enum';
 
 module.exports = async (client: Client): Promise<void> => {
     const logger: Logger = new Logger(new Context('TRIVIA-LOOP'));
@@ -12,17 +13,17 @@ module.exports = async (client: Client): Promise<void> => {
     const inventory: InventorySingleton = InventorySingleton.instance;
     await triviaGame.fetchMandatory(client);
 
-    logger.info('🔁 Trivia game initialized');
+    logger.info(`${EmojiEnum.LOOP} Trivia game initialized`);
     await TimeUtil.forLoopTimeSleep(inventory.triviaSchedule, '🎮 Trivia', async (): Promise<void> => {
-        logger.info('🎮 Trivia game start');
+        logger.debug(`${EmojiEnum.GAME} Trivia game start`);
         await triviaGame.fetchTanks();
 
         await triviaGame.sendMessageToChannel();
         await triviaGame.collectAnswer();
 
         await EnvUtil.sleep(triviaGame.MAX_TIME);
-        logger.info('🎮 Trivia game end');
+        logger.debug(`${EmojiEnum.GAME} Trivia game end`);
         await triviaGame.sendAnswerToChannel();
     });
-    logger.debug('🔁 Trivia loop end');
+    logger.info(`${EmojiEnum.LOOP} Trivia loop end`);
 };

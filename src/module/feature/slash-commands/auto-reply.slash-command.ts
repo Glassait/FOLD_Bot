@@ -20,7 +20,7 @@ export const command: SlashCommandModel = new SlashCommandModel(
             const alreadyAutoReply: boolean = feature.hasAutoReplyTo(interaction.user.id, targetUser.id);
 
             if (alreadyAutoReply) {
-                logger.info(
+                logger.warn(
                     `AutoReply already activated for \`${interaction.user.displayName}\` to reply to \`${targetUser.displayName}\``
                 );
                 await interaction.editReply({
@@ -41,7 +41,7 @@ export const command: SlashCommandModel = new SlashCommandModel(
                 content: `Réponse automatique désactiver pour <@${targetUser.id}>`,
             });
         } else {
-            logger.warning('Technical error when activating autoReply');
+            logger.warn('Technical error when activating autoReply');
             await interaction.editReply({
                 content: 'Technical error',
             });

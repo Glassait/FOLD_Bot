@@ -1,51 +1,73 @@
 /**
  * Enum representing emojis for various categories or types.
- *
- * @enum {string}
  */
 export enum EmojiEnum {
     /**
-     * Represents the '🔁' emoji for the 'LOOP' category.
+     * Represents a looping or repeating action.
      */
     LOOP = '🔁',
     /**
-     * Represents the '📢' emoji for the 'ANNOUNCEMENT' category.
+     * Represents an announcement or broadcast message.
      */
     ANNOUNCEMENT = '📢',
     /**
-     * Represents the '🚨' emoji for the 'ERROR' category.
+     * Represents an error or critical issue.
      */
     ERROR = '🚨',
     /**
-     * Represents the '⚠️' emoji for the 'WARNING' category.
+     * Represents a warning or cautionary message.
      */
     WARNING = '⚠️',
     /**
-     * Represents the '🛈' emoji for the 'INFO' category.
+     * Represents an informative message or status.
      */
     INFO = '🛈',
     /**
-     * Represents the '🔧' emoji for the 'DEBUG' category.
+     * Represents a debugging or troubleshooting message.
      */
     DEBUG = '🔧',
     /**
-     * Represents the '✎' emoji for the 'TRACE' category.
+     * Represents a trace or detailed logging message.
      */
     TRACE = '✎',
     /**
-     * Represents the '📁' emoji for the 'FILE' category.
+     * Represents a file-related action or message.
      */
     FILE = '📁',
     /**
-     * Represents the '⛏' emoji for the 'MINE' category.
+     * Represents a mining or digging-related action.
      */
     MINE = '⛏',
     /**
-     * Represents the '🙍‍♂️' emoji for the 'MALE' category.
+     * Represents a male-related item or message.
      */
     MALE = '🙍‍♂️',
     /**
-     * Represents the '🗑️' emoji for the 'TRASH' category.
+     * Represents a deletion or trashing action.
      */
     TRASH = '🗑️',
+    /**
+     * Represents a soldier or military-related item.
+     */
+    SOLDIER = '💂',
+    /**
+     * Represents a gaming-related action or message.
+     */
+    GAME = '🎮',
+    /**
+     * Represents something intense, fiery, or passionate.
+     */
+    FLAME = '🔥',
+    /**
+     * Represents a star or something exceptional.
+     */
+    STAR = '🌠',
+    /**
+     * Represents a letter or newsletter or send action.
+     */
+    LETTER = '📨',
+    /**
+     * Represents a sleeping action.
+     */
+    SLEEP = '😴',
 }
