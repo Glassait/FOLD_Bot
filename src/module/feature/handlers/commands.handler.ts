@@ -24,7 +24,7 @@ module.exports = async (_client: Client): Promise<void> => {
             body[value] = guild;
         });
 
-        logger.info(`${EmojiEnum.FLAME} Successfully loaded command ${command.name}`);
+        logger.info(`${EmojiEnum.FLAME} Successfully loaded command {}`, command.name);
     });
 
     const rest: REST = new REST({ version: '10' }).setToken(token);
@@ -35,7 +35,7 @@ module.exports = async (_client: Client): Promise<void> => {
                 body: entry[1],
             });
 
-            logger.info(`Successfully reloaded application ${entry[1].length} slash-commands for guild ${entry[0]}`);
+            logger.info(`Successfully reloaded application {} slash-commands for guild {}`, String(entry[1].length), entry[0]);
         } catch (error) {
             logger.error(`${error}`, error);
         }

@@ -81,7 +81,7 @@ export class StatisticSingleton {
     public static get instance(): StatisticSingleton {
         if (!this._instance) {
             this._instance = new StatisticSingleton();
-            this._instance.logger.info('Inventory instance initialized');
+            this._instance.logger.info('{} instance initialized', 'Statistic');
         }
         return this._instance;
     }
@@ -150,7 +150,7 @@ export class StatisticSingleton {
      * ```
      */
     public updateClanStatistics(clanId: string, leavingPlayer: number): void {
-        this.logger.debug(`Updating statistic for \`${clanId}\`, by adding \`${leavingPlayer}\``);
+        this.logger.debug(`Updating statistic for {}, by adding {}`, clanId, String(leavingPlayer));
 
         const clanStats: FoldRecruitmentClanStatisticType = this._data.fold_recruitment.clan[clanId] ?? {};
         const monthStats: MonthlyFoldRecruitmentClanStatisticType = clanStats[this.currentMonth] ?? {

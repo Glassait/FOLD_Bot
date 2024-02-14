@@ -76,7 +76,7 @@ export class FoldRecruitmentModel {
      */
     public async fetchClanActivity(clan: Clan): Promise<void> {
         const url = this.url.replace('clanID', clan.id).replace('today', new Date().toISOString().slice(0, 19));
-        this.logger.debug(`Fetching activity of the clan with url: ${url}`);
+        this.logger.debug(`Fetching activity of the clan with url: {}`, url);
 
         try {
             return await this.sendMessageToChannelFromExtractedPlayer(clan, (await this.axios.get(url)).data);
@@ -118,7 +118,7 @@ export class FoldRecruitmentModel {
             return players;
         }, []);
 
-        this.logger.debug(`${datum.length} players leaves the clan`);
+        this.logger.debug(`{} players leaves the clan`, String(datum.length));
 
         if (this.inventory.getFeatureFlippingRecruitment('header_clan') && datum.length > 0) {
             const embed = new EmbedBuilder()

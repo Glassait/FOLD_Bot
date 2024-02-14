@@ -22,9 +22,7 @@ module.exports = async (client: Client): Promise<void> => {
             : client.on(event.name.toString(), (...args: any[]) => event.execute(client, ...args));
 
         numberOfEvent++;
-        logger.info(
-            `${EmojiEnum.STAR} Successfully loaded event ${event.name} as \`${event.once ? 'temporary' : 'permanent'}\` listener !`
-        );
+        logger.info(`${EmojiEnum.STAR} Successfully loaded event {} as {} listener !`, event.name, event.once ? 'temporary' : 'permanent');
     });
     logger.debug(`Loaded ${numberOfEvent} events`);
 };

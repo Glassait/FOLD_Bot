@@ -20,22 +20,20 @@ export const command: SlashCommandModel = new SlashCommandModel(
             const alreadyAutoReply: boolean = feature.hasAutoReplyTo(interaction.user.id, targetUser.id);
 
             if (alreadyAutoReply) {
-                logger.warn(
-                    `AutoReply already activated for \`${interaction.user.displayName}\` to reply to \`${targetUser.displayName}\``
-                );
+                logger.warn(`AutoReply already activated for {} to reply to {}`, interaction.user.displayName, targetUser.displayName);
                 await interaction.editReply({
                     content: `Tu as déjà une réponse automatique mis en place pour <@${targetUser.id}>`,
                 });
                 return;
             }
 
-            logger.info(`AutoReply activated for \`${interaction.user.displayName}\` to reply to \`${targetUser.displayName}\``);
+            logger.info(`AutoReply activated for {} to reply to {}`, interaction.user.displayName, targetUser.displayName);
             feature.addAutoReply({ activateFor: interaction.user.id, replyTo: targetUser.id });
             await interaction.editReply({
                 content: `Réponse automatique mis en place pour <@${targetUser.id}>`,
             });
         } else if (targetUser) {
-            logger.info(`AutoReply deactivated for \`${interaction.user.displayName}\` to reply to \`${targetUser.displayName}\``);
+            logger.info(`AutoReply deactivated for {} to reply to {}`, interaction.user.displayName, targetUser.displayName);
             feature.deleteAutoReply(interaction.user.id, targetUser.id);
             await interaction.editReply({
                 content: `Réponse automatique désactiver pour <@${targetUser.id}>`,

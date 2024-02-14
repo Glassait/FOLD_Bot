@@ -32,7 +32,7 @@ export class WotApiModel {
      */
     public async fetchTankopediaApi(url: string): Promise<TankopediaVehiclesSuccess> {
         url = this.WOT_API + url.replace('applicationId', application_id_wot);
-        this.logger.debug(`${EmojiEnum.SOLDIER} Fetching wot api with url ${url}`);
+        this.logger.debug(`${EmojiEnum.SOLDIER} Fetching wot api with url {}`, url);
 
         let numberOfTry = 0;
         let data: TankopediaVehicle;

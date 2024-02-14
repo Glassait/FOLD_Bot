@@ -61,7 +61,7 @@ export class InventorySingleton {
     public static get instance(): InventorySingleton {
         if (!this._instance) {
             this._instance = new InventorySingleton();
-            this._instance.logger.info('Inventory instance initialized');
+            this._instance.logger.info('{} instance initialized', 'Inventory');
         }
         return this._instance;
     }

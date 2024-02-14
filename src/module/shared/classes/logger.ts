@@ -21,30 +21,33 @@ export class Logger {
     }
 
     /**
-     * Log DEBUG
-     * @param msg The message of the DEBUG
-     * @see LoggerSingleton#debug
+     * Logs a debug message with optional code snippets.
+     *
+     * @param {string} msg - The main message to log.
+     * @param {...string} args - Code snippets to include in the message.
      */
-    public debug(msg: string): void {
-        this.logger.debug(this.context, msg);
+    public debug(msg: string, ...args: string[]): void {
+        this.logger.debug(this.context, this.transformToCode(msg, ...args));
     }
 
     /**
-     * Log INFO
-     * @param msg The message of the INFO
-     * @see LoggerSingleton#info
+     * Logs an info message with optional code snippets.
+     *
+     * @param {string} msg - The main message to log.
+     * @param {...string} args - Code snippets to include in the message.
      */
-    public info(msg: string): void {
-        this.logger.info(this.context, msg);
+    public info(msg: string, ...args: string[]): void {
+        this.logger.info(this.context, this.transformToCode(msg, ...args));
     }
 
     /**
-     * Log WARNING
-     * @param msg The message of the WARNING
-     * @see LoggerSingleton#warning
+     * Logs a warning message with optional code snippets.
+     *
+     * @param {string} msg - The main message to log.
+     * @param {...string} args - Code snippets to include in the message.
      */
-    public warn(msg: string): void {
-        this.logger.warning(this.context, msg);
+    public warn(msg: string, ...args: string[]): void {
+        this.logger.warning(this.context, this.transformToCode(msg, ...args));
     }
 
     /**
@@ -71,5 +74,24 @@ export class Logger {
         } else {
             return JSON.stringify(error);
         }
+    }
+
+    /**
+     * Replaces placeholders in a given text with provided code snippets.
+     *
+     * @param {string} text - The original text containing placeholders.
+     * @param {...string} args - Code snippets to replace the placeholders.
+     * @returns {string} - The modified text with placeholders replaced.
+     */
+    private transformToCode(text: string, ...args: string[]): string {
+        if (text.split('{}').length > 0 && text.split('{}').length - 1 !== args.length) {
+            throw new Error('Mismatch between the number of placeholders and the number of code snippets provided.');
+        }
+
+        args.forEach((codeText: string): void => {
+            text = text.replace('{}', `\`${codeText}\``);
+        });
+
+        return text;
     }
 }

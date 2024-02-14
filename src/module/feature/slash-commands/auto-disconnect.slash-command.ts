@@ -16,7 +16,7 @@ export const command: SlashCommandModel = new SlashCommandModel(
 
         const feature: FeatureSingleton = FeatureSingleton.instance;
         if (targetUser) {
-            logger.info(`AutoDisconnect activated on \`${targetUser.displayName}\``);
+            logger.info(`AutoDisconnect activated on {}`, targetUser.displayName);
             feature.autoDisconnect = targetUser.id.toString();
             await require('./disconnect.slash-command').command.execute(interaction);
             await interaction.editReply({

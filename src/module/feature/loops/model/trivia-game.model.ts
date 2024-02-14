@@ -156,9 +156,10 @@ export class TriviaGameModel {
         };
 
         this.logger.info(
-            `Tank for game selected : \`${this.datum.tank.name}\`, the ammo type is : ${
-                this.datum.ammoIndex ? `\`${ShellType.GOLD}\`` : `\`${ShellType.NORMAL}\``
-            } and the question is for ${this.datum.isPen ? '`penetration`' : '`damage`'}`
+            `Tank for game selected : {}, the ammo type is : {} and the question is for {}`,
+            this.datum.tank.name,
+            this.datum.ammoIndex ? ShellType.GOLD : ShellType.NORMAL,
+            this.datum.isPen ? 'penetration' : 'damage'
         );
     }
 
@@ -255,7 +256,7 @@ export class TriviaGameModel {
 
                     this.logCollect(hasAlreadyAnswer, changedAnswer, interaction);
                 } catch (error) {
-                    this.logger.error(`Error during collection of answer${error}`, error);
+                    this.logger.error(`Error during collecting player answer : ${error}`, error);
                 }
             });
     }
@@ -277,7 +278,7 @@ export class TriviaGameModel {
         this.allTanks.forEach((vehicle: VehicleData): void => {
             const vehicleAmmo: Ammo = vehicle.default_profile.ammo[this.datum.ammoIndex];
             if (vehicle.name !== this.datum.tank.name && vehicleAmmo.type === ammo.type && this.checkVehicleAmmoDetail(vehicleAmmo, ammo)) {
-                this.logger.debug(`Another tank has the same shell \`${vehicle.name}\``);
+                this.logger.debug(`Another tank has the same shell {}`, vehicle.name);
                 otherAnswer.push(vehicle.name);
             }
         });
@@ -377,10 +378,10 @@ export class TriviaGameModel {
 
         this.logger.debug("Start updating the player's statistics");
 
-        for (const [playerId, playerAnswer] of responses) {
-            this.logger.debug(`Start updating \`${playerId}\` statistic`);
-            await this.updatePlayerStatistic(playerId, playerAnswer, goodAnswer);
-            this.logger.debug(`End updating \`${playerId}\` statistic`);
+        for (const [playerName, playerAnswer] of responses) {
+            this.logger.debug(`Start updating {} statistic`, playerName);
+            await this.updatePlayerStatistic(playerName, playerAnswer, goodAnswer);
+            this.logger.debug(`End updating {} statistic`, playerName);
         }
 
         this.statistic.trivia = this.triviaStats;
@@ -444,19 +445,25 @@ export class TriviaGameModel {
         }
 
         this.logger.debug(
-            `${interaction.member?.nickname ?? interaction.user.displayName} ${action} to the trivia game with: \`${interaction.customId}\``
+            `{} ${action} to the trivia game with: {}`,
+            interaction.member?.nickname ?? interaction.user.displayName,
+            interaction.customId
         );
     }
 
     /**
      * Updates the statistics for a specific player.
      *
-     * @param {string} playerId - The ID of the player.
+     * @param {string} playerName - The name of the player.
      * @param {PlayerAnswer} playerAnswer - The player's answer object.
-     * @param {[string, PlayerAnswer][]} goodAnswer - Array of correct player responses, where each element is a tuple [playerId, playerAnswer].
+     * @param {[string, PlayerAnswer][]} goodAnswer - Array of correct player responses, where each element is a tuple [playerName, playerAnswer].
      */
-    private async updatePlayerStatistic(playerId: string, playerAnswer: PlayerAnswer, goodAnswer: [string, PlayerAnswer][]): Promise<void> {
-        const player: TriviaPlayerStatisticType = this.triviaStats.player[playerId] ?? {};
+    private async updatePlayerStatistic(
+        playerName: string,
+        playerAnswer: PlayerAnswer,
+        goodAnswer: [string, PlayerAnswer][]
+    ): Promise<void> {
+        const player: TriviaPlayerStatisticType = this.triviaStats.player[playerName] ?? {};
 
         const playerStat: MonthlyTriviaPlayerStatisticType = player[this.statistic.currentMonth] ?? {
             elo: 0,
@@ -468,7 +475,7 @@ export class TriviaGameModel {
         playerStat.participation++;
         playerStat.answer_time.push(playerAnswer.responseTime);
 
-        const isGoodAnswer = goodAnswer.find((value: [string, PlayerAnswer]): boolean => value[0] === playerId);
+        const isGoodAnswer = goodAnswer.find((value: [string, PlayerAnswer]): boolean => value[0] === playerName);
 
         const oldElo = playerStat.elo;
         playerStat.elo = this.calculateElo(playerStat, playerAnswer, isGoodAnswer ? goodAnswer.indexOf(isGoodAnswer) + 1 : -1);
@@ -476,13 +483,13 @@ export class TriviaGameModel {
         const winStrick = playerStat.win_strick as { current: number; max: number };
 
         if (isGoodAnswer) {
-            await this.handleGoodAnswer(playerStat, winStrick, playerAnswer, oldElo, playerId);
+            await this.handleGoodAnswer(playerStat, winStrick, playerAnswer, oldElo, playerName);
         } else {
-            await this.handleWrongAnswer(playerStat, winStrick, playerAnswer, oldElo, playerId);
+            await this.handleWrongAnswer(playerStat, winStrick, playerAnswer, oldElo, playerName);
         }
 
         player[this.statistic.currentMonth] = playerStat;
-        this.triviaStats.player[playerId] = player;
+        this.triviaStats.player[playerName] = player;
     }
 
     /**
@@ -492,7 +499,7 @@ export class TriviaGameModel {
      * @param {{ current: number; max: number }} winStrick - The player's win streak object.
      * @param {PlayerAnswer} playerAnswer - The player's answer object.
      * @param {number} oldElo - The player's old Elo value.
-     * @param {string} playerId - The ID of the player.
+     * @param {string} playerName - The name of the player.
      *
      * @private
      */
@@ -504,7 +511,7 @@ export class TriviaGameModel {
         },
         playerAnswer: PlayerAnswer,
         oldElo: number,
-        playerId: string
+        playerName: string
     ): Promise<void> {
         playerStat.right_answer++;
         winStrick.current++;
@@ -515,17 +522,17 @@ export class TriviaGameModel {
                 playerStat.elo - oldElo
             }\`)`,
         });
-        this.logger.debug(`Player \`${playerId}\` found the right answer`);
+        this.logger.debug(`Player {} found the right answer`, playerName);
     }
 
     /**
      * Handles the scenario when the player gives a wrong answer.
      *
-     * @param {string} playerId - The ID of the player.
-     * @param {PlayerAnswer} playerAnswer - The player's answer object.
      * @param {MonthlyTriviaPlayerStatisticType} playerStat - The player's monthly statistic object.
      * @param {{ current: number; max: number }} winStrick - The player's win streak object.
+     * @param {PlayerAnswer} playerAnswer - The player's answer object.
      * @param {number} oldElo - The player's old Elo value.
+     * @param {string} playerName - The name of the player.
      */
     private async handleWrongAnswer(
         playerStat: MonthlyTriviaPlayerStatisticType,
@@ -535,7 +542,7 @@ export class TriviaGameModel {
         },
         playerAnswer: PlayerAnswer,
         oldElo: number,
-        playerId: string
+        playerName: string
     ): Promise<void> {
         winStrick.current = 0;
         const tank = this.allTanks.find((tank: VehicleData): boolean => tank.name === playerAnswer.response);
@@ -552,6 +559,6 @@ export class TriviaGameModel {
                 this.datum.isPen ? ammo.penetration[1] : ammo.damage[1]
             }\`.\nTon nouvelle elo est : \`${playerStat.elo}\` (modification de \`${playerStat.elo - oldElo}\`)`,
         });
-        this.logger.debug(`Player \`${playerId}\` failed to find the right answer`);
+        this.logger.debug(`Player {} failed to find the right answer`, playerName);
     }
 }

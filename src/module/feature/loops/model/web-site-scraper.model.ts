@@ -41,15 +41,15 @@ export class WebSiteScraper {
      */
     public async scrapWebsiteAtIndex(index: number): Promise<void> {
         const newsLetter: WebSiteState = this.inventory.getNewsLetterAtIndex(index);
-        this.logger.debug(`${EmojiEnum.MINE} Start scrapping ${newsLetter.name}`);
+        this.logger.debug(`${EmojiEnum.MINE} Start scrapping {}`, newsLetter.name);
 
         this.axios
             .get(newsLetter.liveUrl)
             .then((response: AxiosResponse<string, any>): void => {
-                this.logger.debug(`Fetching newsletter for \`${newsLetter.name}\` end successfully`);
+                this.logger.debug(`Fetching newsletter for {} end successfully`, newsLetter.name);
                 this.getLastNews(response.data, newsLetter)
                     .then((): void => {
-                        this.logger.debug(`Scraping newsletter \`${newsLetter.name}\` end successfully`);
+                        this.logger.debug(`Scraping newsletter \{} end successfully`, newsLetter.name);
                     })
                     .catch(reason => {
                         this.logger.error(`Scrapping newsletter for \`${newsLetter.name}\` failed: ${reason}`);
@@ -110,7 +110,7 @@ export class WebSiteScraper {
                 }
             }
         }
-        this.logger.debug(`${EmojiEnum.MINE} End scrapping for \`${webSiteState.name}\``);
+        this.logger.debug(`${EmojiEnum.MINE} End scrapping for {}`, webSiteState.name);
     }
 
     /**
@@ -189,12 +189,15 @@ export class WebSiteScraper {
         this.inventory.updateLastUrlOfWebsite(url, webSiteState.name);
 
         if (this.checkHrefContainBanWord(url)) {
-            this.logger.debug(`${EmojiEnum.TRASH} \`${url}\` contains ban words !`);
+            this.logger.debug(`${EmojiEnum.TRASH} {} contains ban words !`, url);
             return;
         }
 
         this.logger.info(
-            `${EmojiEnum.LETTER} Sending news on channel ${this.channel.name} for the web site ${webSiteState.name}, with the url ${url}`
+            `${EmojiEnum.LETTER} Sending news on channel {} for the web site {}, with the url {}`,
+            this.channel.name,
+            webSiteState.name,
+            url
         );
         const embed: EmbedBuilder = new EmbedBuilder().setTitle(title).setDescription(description).setURL(url);
 

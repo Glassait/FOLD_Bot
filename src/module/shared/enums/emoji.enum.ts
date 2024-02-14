@@ -5,7 +5,7 @@ export enum EmojiEnum {
     /**
      * Represents a looping or repeating action.
      */
-    LOOP = '🔁',
+    LOOP = '🔄',
     /**
      * Represents an announcement or broadcast message.
      */
@@ -70,4 +70,12 @@ export enum EmojiEnum {
      * Represents a sleeping action.
      */
     SLEEP = '😴',
+    /**
+     * Represents a cancel or failed action.
+     */
+    RED_CROSS = '❌',
+    /**
+     * Represents a ready action.
+     */
+    MUSCLE = '💪',
 }
