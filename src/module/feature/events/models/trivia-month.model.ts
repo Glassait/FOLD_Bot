@@ -1,6 +1,6 @@
 import { InventoryInjector, LoggerInjector, StatisticInjector } from '../../../shared/decorators/injector.decorator';
 import { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
-import { Client, Colors, EmbedBuilder, TextChannel } from 'discord.js';
+import { ChannelType, Client, Colors, EmbedBuilder, TextChannel, ThreadAutoArchiveDuration } from 'discord.js';
 import { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
 import { MonthlyTriviaOverallStatisticType, TriviaPlayerStatisticType, TriviaStatisticType } from '../../../shared/types/statistic.type';
 import { MEDAL } from '../../../shared/utils/variables.util';
@@ -20,22 +20,18 @@ export class TriviaMonthModel {
     //region PRIVATE
     /**
      * The trivia text channel
-     * @private
      */
     private channel: TextChannel;
     /**
      * The previous month
-     * @private
      */
     private month: string;
     /**
      * The list of all player's statistics
-     * @private
      */
     private playerClassement: [string, TriviaPlayerStatisticType][];
     /**
      * The list of embed for the message
-     * @private
      */
     private listEmbed: EmbedBuilder[];
     //endregion
@@ -62,7 +58,7 @@ export class TriviaMonthModel {
     }
 
     /**
-     * Send all the trivia month embeds to the channel
+     * Sends the trivia month message to the channel and creates a feedback thread.
      */
     public async sendToChannel(): Promise<void> {
         this.logger.debug('Sending trivia month message...');
@@ -70,6 +66,14 @@ export class TriviaMonthModel {
             content: '@here',
             embeds: this.listEmbed,
         });
+
+        const thread = await this.channel.threads.create({
+            name: 'Feedback trivia',
+            autoArchiveDuration: ThreadAutoArchiveDuration.OneDay,
+            type: ChannelType.PublicThread,
+        });
+
+        await thread.send({ content: 'Vous pouvez mettre ici tous les feedback que vous voulez. Je lis tout :)' });
     }
 
     /**
@@ -148,7 +152,7 @@ export class TriviaMonthModel {
 
         const quickPlayer: [string, TriviaPlayerStatisticType] = this.playerClassement[0];
 
-        if (quickPlayer?.length <= 0) {
+        if (!quickPlayer || quickPlayer?.length <= 0) {
             return;
         }
 
@@ -172,7 +176,7 @@ export class TriviaMonthModel {
     public embedSlowPlayer(): void {
         const slowPlayer: [string, TriviaPlayerStatisticType] = this.playerClassement[this.playerClassement.length - 1];
 
-        if (slowPlayer?.length <= 0) {
+        if (!slowPlayer || slowPlayer?.length <= 0) {
             return;
         }
 
@@ -198,7 +202,7 @@ export class TriviaMonthModel {
         );
         const winStrickPlayer: [string, TriviaPlayerStatisticType] = this.playerClassement[0];
 
-        if (winStrickPlayer?.length <= 0) {
+        if (!winStrickPlayer || winStrickPlayer?.length <= 0) {
             return;
         }
 
@@ -249,7 +253,7 @@ export class TriviaMonthModel {
     }
 
     /**
-     * Create the feedback embed
+     * Creates an Embed message to collect feedback in a thread.
      */
     public embedFeedBack(): void {
         this.listEmbed.push(
@@ -257,7 +261,7 @@ export class TriviaMonthModel {
                 .setTitle('Feedback')
                 .setColor(Colors.DarkGold)
                 .setDescription(
-                    "Merci d'avoir participé tout au long de ce mois. Si vous avez des feedbacks à me faire (positif ou négatif) je suis preneur (❤️ω❤️)"
+                    "Merci d'avoir participé tout au long de ce mois. Si vous avez des feedbacks à me faire (positif ou négatif), merci de les écrires dans le thread juste en dessous. Merci beaucoup (❤️ω❤️)"
                 )
         );
     }
