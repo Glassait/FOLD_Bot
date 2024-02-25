@@ -12,46 +12,42 @@ import { DiscordId } from '../types/feature.type';
  * This class implement the Singleton pattern
  */
 export class InventorySingleton {
+    //region PRIVATE READONLY FIELD
     /**
      * The path to the inventory.json file
      */
-    public readonly path: string = './src/module/core/inventory.json';
-
+    private readonly path: string = './src/module/core/inventory.json';
     /**
      * The logger to log thing
-     * @private
      */
     private readonly logger: Logger = new Logger(new Context(InventorySingleton.name));
     /**
      * The data of the inventory
-     * @private
      */
     private readonly _inventory: InventoryType;
-
     /**
      * The id of the dev channel
-     * @private
      */
     private readonly DEV_CHANNEL: Channel = { guild: '840375560785231962', id: '1171525891604623472' };
+    //endregion
 
     /**
-     * Private constructor to respect the singleton pattern
-     * @private
-     * @constructor
+     * Private constructor for the FeatureSingleton class.
+     * Initializes the instance by reading the inventory.json file and performs additional setup.
+     * If running in development mode, overrides channel configurations with a development channel.
      */
     private constructor() {
         this._inventory = JSON.parse(readFileSync(this.path).toString());
 
         if (EnvUtil.isDev() && this._inventory) {
-            this._inventory.newsLetter.channel = this.DEV_CHANNEL;
-            this._inventory.game.trivia.channel = this.DEV_CHANNEL;
-            this._inventory.fold_recruitment.channel = this.DEV_CHANNEL;
+            Object.entries(this._inventory.channels).forEach((channel: [string, Channel]): void => {
+                this._inventory.channels[channel[0]] = this.DEV_CHANNEL;
+            });
         }
     }
 
     /**
      * The instance of the class, used for the singleton pattern
-     * @private
      */
     private static _instance: InventorySingleton | undefined;
 
@@ -156,7 +152,7 @@ export class InventorySingleton {
      * Get the channel in the discord server to send the news
      */
     public async getNewsLetterChannel(client: Client): Promise<TextChannel> {
-        return await this.fetchChannel(client, this._inventory.newsLetter.channel);
+        return await this.fetchChannel(client, this._inventory.channels.newsletter);
     }
 
     /**
@@ -181,21 +177,57 @@ export class InventorySingleton {
     }
 
     /**
-     * Get the channel for the trivia game
-     * @param client
+     * Fetch the text channel instance for the trivia game.
+     *
+     * @param {Client} client - The Discord client instance.
+     * @returns {Promise<TextChannel>} - A promise that resolves to the text channel instance for the trivia game.
+     *
+     * @example
+     * ```typescript
+     * const discordClient = // ... obtained Discord client instance
+     * const triviaChannel = await instance.getChannelForTrivia(discordClient);
+     * console.log(triviaChannel); // Text channel instance for the trivia game
+     * ```
      */
     public async getChannelForTrivia(client: Client): Promise<TextChannel> {
         this.logger.debug('Channel instance fetch for the trivia game');
-        return await this.fetchChannel(client, this._inventory.game.trivia.channel);
+        return await this.fetchChannel(client, this._inventory.channels.trivia);
     }
 
     /**
-     * Get the channel for the fold recruitment
-     * @param client
+     * Fetch the text channel instance for the fold recruitment.
+     *
+     * @param {Client} client - The Discord client instance.
+     * @returns {Promise<TextChannel>} - A promise that resolves to the text channel instance for the fold recruitment.
+     *
+     * @example
+     * ```typescript
+     * const discordClient = // ... obtained Discord client instance
+     * const foldRecruitmentChannel = await instance.getChannelForFoldRecruitment(discordClient);
+     * console.log(foldRecruitmentChannel); // Text channel instance for the fold recruitment
+     * ```
      */
     public async getChannelForFoldRecruitment(client: Client): Promise<TextChannel> {
         this.logger.debug('Channel instance fetch for the fold recruitment');
-        return await this.fetchChannel(client, this._inventory.fold_recruitment.channel);
+        return await this.fetchChannel(client, this._inventory.channels.fold_recruitment);
+    }
+
+    /**
+     * Fetch the text channel instance for the fold month.
+     *
+     * @param {Client} client - The Discord client instance.
+     * @returns {Promise<TextChannel>} - A promise that resolves to the text channel instance for the fold month.
+     *
+     * @example
+     * ```typescript
+     * const discordClient = // ... obtained Discord client instance
+     * const foldMonthChannel = await instance.getChannelForFoldMonth(discordClient);
+     * console.log(foldMonthChannel); // Text channel instance for the fold month
+     * ```
+     */
+    public async getChannelForFoldMonth(client: Client): Promise<TextChannel> {
+        this.logger.debug('Channel instance fetch for the fold month message');
+        return await this.fetchChannel(client, this._inventory.channels.fold_month);
     }
 
     /**

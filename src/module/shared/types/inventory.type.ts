@@ -41,10 +41,6 @@ export type WebSiteState = {
  */
 export type NewsLetter = {
     /**
-     * The Discord channel for the newsletter.
-     */
-    channel: Channel;
-    /**
      * Array of website states.
      */
     website: WebSiteState[];
@@ -58,10 +54,6 @@ export type NewsLetter = {
  * Type defining the structure for the trivia game.
  */
 export type TriviaType = {
-    /**
-     * The Discord channel for the trivia game.
-     */
-    channel: Channel;
     /**
      * The URL associated with the trivia game.
      */
@@ -92,10 +84,6 @@ export type Fold_recruitment = {
         footer_message: boolean;
     };
     /**
-     * The Discord channel for recruitment.
-     */
-    channel: Channel;
-    /**
      * Array of schedules for recruitment.
      */
     schedule: string[];
@@ -113,7 +101,6 @@ export type InventoryType = {
      * The newsletter section of the inventory.
      */
     newsLetter: NewsLetter;
-
     /**
      * The game section of the inventory.
      */
@@ -123,12 +110,32 @@ export type InventoryType = {
          */
         trivia: TriviaType;
     };
-
     /**
      * The recruitment section of the inventory.
      */
     fold_recruitment: Fold_recruitment;
-
+    /**
+     * Channels configuration for various features.
+     */
+    channels: {
+        /**
+         * The channel configuration for the newsletter feature.
+         */
+        newsletter: Channel;
+        /**
+         * The channel configuration for the trivia feature.
+         */
+        trivia: Channel;
+        /**
+         * The channel configuration for the fold recruitment feature.
+         */
+        fold_recruitment: Channel;
+        /**
+         * The channel configuration for the fold month message.
+         */
+        fold_month: Channel;
+        [key: string]: Channel;
+    };
     /**
      * Object mapping command keys to Discord IDs.
      */

@@ -3,8 +3,9 @@ import { BotEvent } from './types/bot-event.type';
 import { Context } from '../../shared/classes/context';
 import { SentenceUtil } from '../../shared/utils/sentence.util';
 import { Logger } from '../../shared/classes/logger';
-import { TriviaMonthModel } from './models/trivia-month.model';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
+import { FoldMonthModel } from './models/fold-month.model';
+import { TriviaMonthModel } from './models/trivia-month.model';
 
 export const event: BotEvent = {
     name: Events.ClientReady,
@@ -28,10 +29,14 @@ export const event: BotEvent = {
 
         const today = new Date();
         if (today.getDate() === 1) {
+            const foldMonth = new FoldMonthModel();
+
+            await foldMonth.fetchChannel(client);
+            await foldMonth.sendMessage();
+
             const triviaMonth = new TriviaMonthModel();
 
-            await triviaMonth.fetchMandatory(client, today);
-
+            await triviaMonth.fetchMandatory(client);
             triviaMonth.embedIntroduction();
             triviaMonth.embedScoreboard();
             triviaMonth.embedQuickPlayer();
@@ -39,7 +44,6 @@ export const event: BotEvent = {
             triviaMonth.embedWinStrickPlayer();
             triviaMonth.embedOverall();
             triviaMonth.embedFeedBack();
-
             await triviaMonth.sendToChannel();
         }
     },
