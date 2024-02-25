@@ -96,7 +96,7 @@ export function AxiosInjector<T extends Constructor>(timeout: number = TimeEnum.
         return {
             [base.name]: class extends base {
                 axios: AxiosInstance = axios.create({
-                    timeout: TimeEnum.MINUTE,
+                    timeout: timeout,
                     headers: { 'Content-Type': 'application/json;' },
                     httpAgent: new http.Agent({ keepAlive: true, timeout: timeout }),
                     httpsAgent: new https.Agent({ keepAlive: true, timeout: timeout }),
