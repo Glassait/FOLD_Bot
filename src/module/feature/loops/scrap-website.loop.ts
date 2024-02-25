@@ -10,6 +10,12 @@ import { EmojiEnum } from '../../shared/enums/emoji.enum';
 module.exports = async (client: Client): Promise<void> => {
     const logger: Logger = new Logger(new Context('SCRAP-WEBSITE-LOOP'));
     const length: number = InventorySingleton.instance.numberOfNewsletter;
+
+    if (length <= 0) {
+        logger.warn('No newsletter website given. Ending script here. Add one in the inventory to start scrapping !');
+        return;
+    }
+
     const webSiteScraper: WebSiteScraper = new WebSiteScraper();
     await webSiteScraper.fetchChannel(client);
 
