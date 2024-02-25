@@ -6,6 +6,7 @@ import { MonthlyTriviaOverallStatisticType, TriviaPlayerStatisticType, TriviaSta
 import { MEDAL } from '../../../shared/utils/variables.util';
 import { TimeEnum } from '../../../shared/enums/time.enum';
 import { Logger } from '../../../shared/classes/logger';
+import { DateUtil } from '../../../shared/utils/date.util';
 
 @InventoryInjector
 @StatisticInjector
@@ -37,17 +38,24 @@ export class TriviaMonthModel {
     //endregion
 
     /**
-     * Fetch and initialize mandatory thing
-     * @param client the discord client
-     * @param today today date
+     * Performs mandatory tasks at the beginning of each month for the trivia game.
+     * This includes creating the trivia month message, fetching the trivia channel, and initializing necessary data.
+     *
+     * @param {Client} client - The Discord client instance.
+     * @returns {Promise<void>} - A promise that resolves once the mandatory tasks are completed.
+     *
+     * @example
+     * ```typescript
+     * const discordClient = // ... obtained Discord client instance
+     * await instance.fetchMandatory(discordClient);
+     * console.log('Mandatory tasks completed successfully.');
+     * ```
      */
-    public async fetchMandatory(client: Client, today: Date): Promise<void> {
+    public async fetchMandatory(client: Client): Promise<void> {
         this.logger.info('First of the month, creation of the trivia month message');
         this.channel = await this.inventory.getChannelForTrivia(client);
 
-        const month = new Date();
-        month.setMonth(today.getMonth() - 1);
-        this.month = month.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+        this.month = DateUtil.getPreviousMonth();
 
         const stats: TriviaStatisticType = this.statistic.trivia;
 
