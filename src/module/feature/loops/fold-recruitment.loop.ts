@@ -12,7 +12,7 @@ module.exports = async (client: Client): Promise<void> => {
     const feature: FeatureSingleton = FeatureSingleton.instance;
     const inventory: InventorySingleton = InventorySingleton.instance;
     const recruitmentModel: FoldRecruitmentModel = new FoldRecruitmentModel();
-    await recruitmentModel.fetchMandatory(client);
+    await recruitmentModel.fetchChannel(client);
 
     await TimeUtil.forLoopTimeSleep(inventory.foldSchedule, `${EmojiEnum.LOOP} Recruitment`, async (): Promise<void> => {
         for (const clan of feature.clans) {

@@ -14,31 +14,28 @@ import { StatisticSingleton } from '../../../shared/singleton/statistic.singleto
 @InventoryInjector
 @StatisticInjector
 export class FoldRecruitmentModel {
+    //region PRIVATE READONLY FIELDS
     /**
      * The base url for the wargaming
-     * @private
      */
     private readonly url: string = 'https://eu.wargaming.net/clans/wot/clanID/newsfeed/api/events/?date_until=today&offset=3600';
     /**
      * The base url for the image
-     * @private
      */
     private readonly image: string = 'https://eu.wargaming.net/clans/media/clans/emblems/cl_605/clanID/emblem_64x64.png';
     /**
      * The base url of tomatoGG
-     * @private
      */
     private readonly tomato: string = `https://tomato.gg/stats/EU/${FoldRecruitmentEnum.NAME}=${FoldRecruitmentEnum.ID}`;
     /**
      * The base url of WoT
-     * @private
      */
     private readonly wot: string = `https://worldoftanks.eu/fr/community/accounts/${FoldRecruitmentEnum.ID}-${FoldRecruitmentEnum.NAME}/`;
     /**
      * The base url of Wot Life
-     * @private
      */
     private readonly wotLife: string = `https://fr.wot-life.com/eu/player/${FoldRecruitmentEnum.NAME}-${FoldRecruitmentEnum.ID}/`;
+    //endregion
 
     //region INJECTION
     private readonly logger: Logger;
@@ -47,26 +44,27 @@ export class FoldRecruitmentModel {
     private readonly statistic: StatisticSingleton;
     //endregion
 
+    //region PRIVATE FIELDS
     /**
      * The limite date to not take player
-     * @private
      */
     private limiteDate: Date = new Date('2024-01-05T00:00:00');
     /**
      * The channel to send the leaving player inside
-     * @private
      */
     private channel: TextChannel;
     /**
      * The total number of players who leaved there clan
      */
     private totalNumberOfPlayers: number = 0;
+    //endregion
 
     /**
-     * Fetch the mandatory information form the inventory
-     * @param client
+     * Fetch the channel for fold recruitment and sets it for the instance.
+     *
+     * @param {Client} client - The Discord client.
      */
-    public async fetchMandatory(client: Client): Promise<void> {
+    public async fetchChannel(client: Client): Promise<void> {
         this.channel = await this.inventory.getChannelForFoldRecruitment(client);
     }
 

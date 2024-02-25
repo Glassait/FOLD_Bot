@@ -99,6 +99,8 @@ Use this space to list resources you find helpful and would like to give credit 
 -   Better docs
 -   Remove trace log
 -   Add code placeholders method for log
+-   Fix timeout axios
+-   Add check when no newsletter website given
 
 ### 2.2.7
 
