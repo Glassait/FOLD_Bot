@@ -1,9 +1,5 @@
 {
 	"newsLetter": {
-		"channel": {
-			"guild": "840375560785231962",
-			"id": "1177006853318779002"
-		},
 		"website": [],
 		"banWords": []
 	},
@@ -11,10 +7,6 @@
 		"trivia": {
 			"limit": 0,
 			"url": "wot/encyclopedia/vehicles/?application_id=applicationId&tier=10&language=fr&fields=name%2C+images.big_icon%2C+default_profile.ammo.damage%2C+default_profile.ammo.penetration%2C+default_profile.ammo.type&limit=1&page_no=pageNumber&type=heavyTank%2C+AT-SPG%2C+mediumTank%2C+lightTank",
-			"channel": {
-				"guild": "840375560785231962",
-				"id": "1191868924304838656"
-			},
 			"schedule": [],
 			"last_tank_page": []
 		}
@@ -24,10 +16,24 @@
 			"header_clan": false,
 			"footer_message": false
 		},
-		"schedule": [],
-		"channel": {
+		"schedule": []
+	},
+	"channels": {
+		"newsletter": {
+			"guild": "840375560785231962",
+			"id": "1177006853318779002"
+		},
+		"trivia": {
+			"guild": "840375560785231962",
+			"id": "1191868924304838656"
+		},
+		"fold_recruitment": {
 			"guild": "1184852469164027976",
 			"id": "1192589349225771058"
+		},
+		"fold_month": {
+			"guild": "1184852469164027976",
+			"id": "1184853857940017162"
 		}
 	},
 	"commands": {
