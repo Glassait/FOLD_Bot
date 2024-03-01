@@ -5,6 +5,7 @@ import { SentenceUtil } from '../../shared/utils/sentence.util';
 import { Logger } from '../../shared/classes/logger';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
 import { TriviaMonthModel } from './models/trivia-month.model';
+import { FoldMonthModel } from './models/fold-month.model';
 
 export const event: BotEvent = {
     name: Events.ClientReady,
@@ -28,10 +29,10 @@ export const event: BotEvent = {
 
         const today = new Date();
         if (today.getDate() === 1) {
-            // const foldMonth = new FoldMonthModel();
+            const foldMonth = new FoldMonthModel();
 
-            // await foldMonth.fetchChannel(client);
-            // await foldMonth.sendMessage();
+            await foldMonth.fetchChannel(client);
+            await foldMonth.sendMessage();
 
             const triviaMonth = new TriviaMonthModel();
 

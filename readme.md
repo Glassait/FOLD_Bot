@@ -90,6 +90,10 @@ Use this space to list resources you find helpful and would like to give credit 
 
 ## Changelog
 
+### 2.2.9
+
+-   Fix trivia month messages
+
 ### 2.2.8
 
 -   Add statistics for fold-recruitment on clan leaving players
