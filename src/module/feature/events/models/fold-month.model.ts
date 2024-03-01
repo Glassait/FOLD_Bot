@@ -61,7 +61,7 @@ export class FoldMonthModel {
             .setTitle('Feedback')
             .setColor(Colors.LuminousVividPink)
             .setDescription(
-                "Nous sommes toujours à la recherche de feedback sur l'organisation du clan ou la qualité de vie, que ça soit sur le discord, le site ou autre. Vous pouvez les mettre dans le fil en dessous"
+                "Nous sommes toujours à la recherche de feedback (avis ou retour d'expérience) sur l'organisation du clan ou la qualité de vie, que ça soit sur le discord, le site ou autre. Vous pouvez les mettre dans le fil en dessous.\n\nHésité pas a mettre un :thumbsup: sur les idées que vous trouvez pertinente :)"
             );
 
         await this.channel.send({

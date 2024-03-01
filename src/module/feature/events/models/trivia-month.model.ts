@@ -59,9 +59,12 @@ export class TriviaMonthModel {
 
         const stats: TriviaStatisticType = this.statistic.trivia;
 
-        this.playerClassement = Object.entries(stats.player).sort(
-            (a: [string, TriviaPlayerStatisticType], b: [string, TriviaPlayerStatisticType]) => b[1][this.month].elo - a[1][this.month].elo
-        );
+        this.playerClassement = Object.entries(stats.player)
+            .filter((player: [string, TriviaPlayerStatisticType]) => player[1][this.month])
+            .sort(
+                (a: [string, TriviaPlayerStatisticType], b: [string, TriviaPlayerStatisticType]) =>
+                    b[1][this.month].elo - a[1][this.month].elo
+            );
         this.listEmbed = [];
     }
 
