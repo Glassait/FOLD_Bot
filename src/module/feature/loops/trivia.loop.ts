@@ -11,6 +11,12 @@ module.exports = async (client: Client): Promise<void> => {
     const logger: Logger = new Logger(new Context('TRIVIA-LOOP'));
     const triviaGame: TriviaGameModel = new TriviaGameModel();
     const inventory: InventorySingleton = InventorySingleton.instance;
+
+    if (!inventory.triviaIsActivated()) {
+        logger.warn("Trivia game disabled, if it's normal, dont mind this message !");
+        return;
+    }
+
     await triviaGame.fetchMandatory(client);
 
     logger.info(`${EmojiEnum.LOOP} Trivia game initialized`);

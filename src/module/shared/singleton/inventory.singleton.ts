@@ -290,6 +290,21 @@ export class InventorySingleton {
     }
 
     /**
+     * Checks whether the trivia game is activated.
+     *
+     * @returns {boolean} - Returns `true` if the trivia game is activated, and `false` otherwise.
+     *
+     * @example
+     * ```typescript
+     * const isActivated = instance.triviaIsActivated();
+     * console.log(isActivated); // true or false
+     * ```
+     */
+    public triviaIsActivated(): boolean {
+        return this._inventory.game.trivia.activated;
+    }
+
+    /**
      * Get the text channel from the cache and if is not load fetch it from the guild manager
      * @param client The Discord.js client.
      * @param channel The channel information.
