@@ -70,6 +70,10 @@ export type TriviaType = {
      * Array of last tank pages for the trivia game.
      */
     last_tank_page: number[];
+    /**
+     * Tell if the trivia game is activated or not
+     */
+    activated: boolean;
 };
 
 /**
