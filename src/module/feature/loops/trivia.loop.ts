@@ -12,7 +12,7 @@ module.exports = async (client: Client): Promise<void> => {
     const triviaGame: TriviaGameModel = new TriviaGameModel();
     const inventory: InventorySingleton = InventorySingleton.instance;
 
-    if (!inventory.triviaIsActivated()) {
+    if (!inventory.getFeatureFlipping('trivia')) {
         logger.warn("Trivia game disabled, if it's normal, dont mind this message !");
         return;
     }

@@ -9,8 +9,14 @@ import { TimeUtil } from '../../shared/utils/time.util';
 
 module.exports = async (client: Client): Promise<void> => {
     const logger: Logger = new Logger(new Context('Fold-Recruitment-LOOP'));
-    const feature: FeatureSingleton = FeatureSingleton.instance;
     const inventory: InventorySingleton = InventorySingleton.instance;
+
+    if (!inventory.getFeatureFlipping('fold_recruitment')) {
+        logger.warn("Fold recruitment disabled, if it's normal, dont mind this message !");
+        return;
+    }
+
+    const feature: FeatureSingleton = FeatureSingleton.instance;
     const recruitmentModel: FoldRecruitmentModel = new FoldRecruitmentModel();
     await recruitmentModel.fetchChannel(client);
 
