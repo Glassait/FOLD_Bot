@@ -88,9 +88,29 @@ export class TriviaMonthModel {
     }
 
     /**
+     * Creates multiple embeds for various statistics and information related to the trivia game.
+     *
+     * @example
+     * ```typescript
+     * const triviaMonth = new TriviaMonthModel();
+     * await triviaMonth.fetchMandatory(client)
+     * triviaMonth.createEmbed();
+     * ```
+     */
+    public createEmbed(): void {
+        this.embedIntroduction();
+        this.embedScoreboard();
+        this.embedQuickPlayer();
+        this.embedSlowPlayer();
+        this.embedWinStrickPlayer();
+        this.embedOverall();
+        this.embedFeedBack();
+    }
+
+    /**
      * Create the introduction embed
      */
-    public embedIntroduction(): void {
+    private embedIntroduction(): void {
         this.listEmbed.push(
             new EmbedBuilder()
                 .setTitle(`Résumé du mois de ${this.month}`)
@@ -103,7 +123,7 @@ export class TriviaMonthModel {
     /**
      * Create the scoreboard embed
      */
-    public embedScoreboard(): void {
+    private embedScoreboard(): void {
         let index = 0;
         let embed = new EmbedBuilder()
             .setTitle('Tableau des scores')
@@ -155,7 +175,7 @@ export class TriviaMonthModel {
     /**
      * Create embed for the quickest player
      */
-    public embedQuickPlayer(): void {
+    private embedQuickPlayer(): void {
         this.playerClassement.sort(
             (a: [string, TriviaPlayerStatisticType], b: [string, TriviaPlayerStatisticType]) =>
                 Math.min(...a[1][this.month].answer_time) - Math.min(...b[1][this.month].answer_time)
@@ -184,7 +204,7 @@ export class TriviaMonthModel {
     /**
      * Create embed for the slowest player
      */
-    public embedSlowPlayer(): void {
+    private embedSlowPlayer(): void {
         const slowPlayer: [string, TriviaPlayerStatisticType] = this.playerClassement[this.playerClassement.length - 1];
 
         if (!slowPlayer || slowPlayer?.length <= 0) {
@@ -206,7 +226,7 @@ export class TriviaMonthModel {
     /**
      * Create embed for the best win strick
      */
-    public embedWinStrickPlayer(): void {
+    private embedWinStrickPlayer(): void {
         this.playerClassement.sort(
             (a: [string, TriviaPlayerStatisticType], b: [string, TriviaPlayerStatisticType]) =>
                 b[1][this.month].win_strick.max - a[1][this.month].win_strick.max
@@ -235,7 +255,7 @@ export class TriviaMonthModel {
     /**
      * Create the embed for overall statistics
      */
-    public embedOverall(): void {
+    private embedOverall(): void {
         const overallStatistic: MonthlyTriviaOverallStatisticType = this.statistic.trivia.overall[this.month];
         if (!overallStatistic) {
             return;
@@ -266,7 +286,7 @@ export class TriviaMonthModel {
     /**
      * Creates an Embed message to collect feedback in a thread.
      */
-    public embedFeedBack(): void {
+    private embedFeedBack(): void {
         this.listEmbed.push(
             new EmbedBuilder()
                 .setTitle('Feedback')

@@ -290,18 +290,23 @@ export class InventorySingleton {
     }
 
     /**
-     * Checks whether the trivia game is activated.
+     * Retrieves the state of a feature flipping based on its name.
      *
-     * @returns {boolean} - Returns `true` if the trivia game is activated, and `false` otherwise.
+     * @param {string} feature - The name of the feature.
+     * @returns {boolean | undefined} - Returns the state of the feature if found, or `undefined` if the feature is not present.
      *
      * @example
      * ```typescript
-     * const isActivated = instance.triviaIsActivated();
-     * console.log(isActivated); // true or false
+     * const isFeatureEnabled = instance.getFeatureFlipping('myFeature');
+     * if (isFeatureEnabled !== undefined) {
+     *   console.log(`Feature 'myFeature' is ${isFeatureEnabled ? 'enabled' : 'disabled'}`);
+     * } else {
+     *   console.log(`Feature 'myFeature' not found`);
+     * }
      * ```
      */
-    public triviaIsActivated(): boolean {
-        return this._inventory.game.trivia.activated;
+    public getFeatureFlipping(feature: string): boolean | undefined {
+        return this._inventory.feature_flipping[feature];
     }
 
     /**

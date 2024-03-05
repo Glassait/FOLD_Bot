@@ -9,7 +9,14 @@ import { EmojiEnum } from '../../shared/enums/emoji.enum';
 
 module.exports = async (client: Client): Promise<void> => {
     const logger: Logger = new Logger(new Context('SCRAP-WEBSITE-LOOP'));
-    const length: number = InventorySingleton.instance.numberOfNewsletter;
+    const inventory = InventorySingleton.instance;
+
+    if (!inventory.getFeatureFlipping('scrap_website')) {
+        logger.warn("Scrap website feature disabled, if it's normal, dont mind this message!");
+        return;
+    }
+
+    const length: number = inventory.numberOfNewsletter;
 
     if (length <= 0) {
         logger.warn('No newsletter website given. Ending script here. Add one in the inventory to start scrapping !');

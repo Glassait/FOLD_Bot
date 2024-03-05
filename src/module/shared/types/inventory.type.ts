@@ -70,10 +70,6 @@ export type TriviaType = {
      * Array of last tank pages for the trivia game.
      */
     last_tank_page: number[];
-    /**
-     * Tell if the trivia game is activated or not
-     */
-    activated: boolean;
 };
 
 /**
@@ -145,5 +141,23 @@ export type InventoryType = {
      */
     commands: {
         [key: string]: DiscordId[];
+    };
+    /**
+     * Feature flipping configuration to enable or disable specific features dynamically.
+     *
+     * @example
+     * ```typescript
+     * const inventory: InventoryType = {
+     *   // ... other fields ...
+     *   feature_flipping: {
+     *     feature1: true,
+     *     feature2: false,
+     *     // ...
+     *   },
+     * };
+     * ```
+     */
+    feature_flipping: {
+        [key: string]: boolean;
     };
 };

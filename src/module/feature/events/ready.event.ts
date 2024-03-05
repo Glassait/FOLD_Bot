@@ -6,12 +6,14 @@ import { Logger } from '../../shared/classes/logger';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
 import { TriviaMonthModel } from './models/trivia-month.model';
 import { FoldMonthModel } from './models/fold-month.model';
+import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
 
 export const event: BotEvent = {
     name: Events.ClientReady,
     once: true,
     async execute(client: Client): Promise<void> {
         const logger: Logger = new Logger(new Context('READY-EVENT'));
+        const inventory: InventorySingleton = InventorySingleton.instance;
 
         logger.info(`${EmojiEnum.MUSCLE} Logged in as {}`, client.user?.tag as string);
         const status = SentenceUtil.getRandomStatus();
@@ -28,22 +30,23 @@ export const event: BotEvent = {
         });
 
         const today = new Date();
-        if (today.getDate() === 1) {
+
+        if (today.getDate() !== 1) {
+            return;
+        }
+
+        if (inventory.getFeatureFlipping('fold_month')) {
             const foldMonth = new FoldMonthModel();
 
             await foldMonth.fetchChannel(client);
             await foldMonth.sendMessage();
+        }
 
+        if (inventory.getFeatureFlipping('trivia_month')) {
             const triviaMonth = new TriviaMonthModel();
 
             await triviaMonth.fetchMandatory(client);
-            triviaMonth.embedIntroduction();
-            triviaMonth.embedScoreboard();
-            triviaMonth.embedQuickPlayer();
-            triviaMonth.embedSlowPlayer();
-            triviaMonth.embedWinStrickPlayer();
-            triviaMonth.embedOverall();
-            triviaMonth.embedFeedBack();
+            triviaMonth.createEmbed();
             await triviaMonth.sendToChannel();
         }
     },
