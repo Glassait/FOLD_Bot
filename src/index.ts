@@ -51,3 +51,12 @@ setTimeout((): void => {
 process.on('unhandledRejection', error => {
     logger.error(`Unhandled promise rejection: ${error}`, error);
 });
+
+/**
+ * Event handler for uncaught exceptions in the Node.js process.
+ *
+ * @param {Error} err - The uncaught exception error object.
+ */
+process.on('uncaughtException', (err: Error): void => {
+    logger.error(`${err}`, err);
+});
