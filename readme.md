@@ -93,6 +93,8 @@ Use this space to list resources you find helpful and would like to give credit 
 ### 2.2.9
 
 -   Fix trivia month messages
+-   Disabled Trivia game
+-   Add more caught for error and exception
 
 ### 2.2.8
 
