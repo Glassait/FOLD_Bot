@@ -77,16 +77,13 @@ export type TriviaType = {
  */
 export type Fold_recruitment = {
     /**
-     * Object with boolean properties: header_clan and footer_message.
-     */
-    feature: {
-        header_clan: boolean;
-        footer_message: boolean;
-    };
-    /**
      * Array of schedules for recruitment.
      */
     schedule: string[];
+    /**
+     * The wot api url to get the clan image
+     */
+    image_url: string;
     /**
      * Additional properties for recruitment.
      */

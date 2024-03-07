@@ -9,9 +9,26 @@ export type DiscordId = string; // NOSONAR
 export type Reply = { activateFor: DiscordId; replyTo: DiscordId };
 
 /**
- * Define the World of tank clan for the recruitment
+ * Represents information about a clan.
+ *
+ * @example
+ * const myClan: Clan = { id: '123', name: 'My Clan', imageUrl: 'https://example.com/clan_image.jpg' };
+ * console.log(myClan); // { id: '123', name: 'My Clan', imageUrl: 'https://example.com/clan_image.jpg' }
  */
-export type Clan = { id: string; name: string };
+export type Clan = {
+    /**
+     * The unique identifier of the clan.
+     */
+    id: string;
+    /**
+     * The name of the clan.
+     */
+    name: string;
+    /**
+     * The optional URL of the clan's image.
+     */
+    imageUrl?: string;
+};
 
 /**
  * Defined the architecture of the feature.json file

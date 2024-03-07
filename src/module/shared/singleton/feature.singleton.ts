@@ -165,6 +165,23 @@ export class FeatureSingleton {
 
         return filter;
     }
+
+    /**
+     * Updates information about a clan in the watch list.
+     *
+     * @param {Clan} clan - The updated clan information.
+     *
+     * @example
+     * const updatedClan: Clan = { id: '123', name: 'Updated Clan', imageUrl: 'https://example.com/updated_clan_image.jpg' };
+     * feature.updateClan(updatedClan);
+     */
+    public updateClan(clan: Clan): void {
+        const index = this._data.watch_clan.indexOf(clan);
+        this._data.watch_clan[index] = clan;
+        this.logger.debug('Clan updated with value : {}', JSON.stringify(clan));
+
+        FileUtil.writeIntoJson(this.path, this._data);
+    }
     //endregion
 
     //region AUTO-REPLY
