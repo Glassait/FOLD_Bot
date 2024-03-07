@@ -26,7 +26,6 @@ module.exports = async (client: Client): Promise<void> => {
             await recruitmentModel.fetchClanActivity(clan);
             logger.debug(`${EmojiEnum.MALE} End recruitment for {}`, clan.name);
         }
-        await recruitmentModel.sendFooter();
     });
     logger.info(`${EmojiEnum.LOOP} End recruitment loop`);
 };

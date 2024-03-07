@@ -78,4 +78,8 @@ export enum EmojiEnum {
      * Represents a ready action.
      */
     MUSCLE = '💪',
+    /**
+     * Represents a redirection action.
+     */
+    REDIRECTION = '↗️',
 }

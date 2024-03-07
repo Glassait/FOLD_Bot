@@ -133,6 +133,21 @@ export class InventorySingleton {
     }
 
     /**
+     * Gets the URL for the clan image used in fold recruitment.
+     *
+     * @type {string}
+     *
+     * @example
+     * ```typescript
+     * const clanImageUrl = instance.urlClanImage;
+     * console.log(clanImageUrl); // 'https://example.com/clan-image.jpg'
+     * ```
+     */
+    get urlClanImage(): string {
+        return this._inventory.fold_recruitment.image_url;
+    }
+
+    /**
      * Get the website at the index
      * @param index The index of the website
      * @throws Error If the index is out of bound
@@ -279,14 +294,6 @@ export class InventorySingleton {
         }
 
         return command;
-    }
-
-    /**
-     * Get the value of a feature in the fold recruitment
-     * @param feature The feature to retrieve
-     */
-    public getFeatureFlippingRecruitment(feature: 'header_clan' | 'footer_message'): boolean {
-        return this._inventory.fold_recruitment.feature[feature];
     }
 
     /**

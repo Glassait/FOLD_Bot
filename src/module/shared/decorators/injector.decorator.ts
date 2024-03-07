@@ -25,14 +25,12 @@ type Constructor = new (...args: any[]) => any;
  * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator@example
  *
  * @example
- * ```typescript
- * @LoggerInjector
+ * -@LoggerInjector
  * class MyClass {
  *      private readonly logger: Logger;
  *
  *      // ... class implementation
  * }
- * ```
  */
 export function LoggerInjector<T extends Constructor>(base: T): T {
     logger.info(`Logger injected for {}`, base.name);
@@ -53,14 +51,12 @@ export function LoggerInjector<T extends Constructor>(base: T): T {
  * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator@example
  *
  * @example
- * ```typescript
- * @InventoryInjector
+ * -@InventoryInjector
  * class MyClass {
  *      private readonly inventory: InventorySingleton;
  *
  *      // ... class implementation
  * }
- * ```
  */
 export function InventoryInjector<T extends Constructor>(base: T): T {
     logger.info(`Inventory injected for {}`, base.name);
@@ -81,14 +77,12 @@ export function InventoryInjector<T extends Constructor>(base: T): T {
  * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator@example
  *
  * @example
- * ```typescript
- * @AxiosInjector
+ * -@AxiosInjector
  * class MyClass {
  *      private readonly axios: AxiosInstance;
  *
  *      // ... class implementation
  * }
- * ```
  */
 export function AxiosInjector<T extends Constructor>(timeout: number = TimeEnum.MINUTE): (base: T) => T {
     return function (base: T): T {
@@ -116,14 +110,12 @@ export function AxiosInjector<T extends Constructor>(timeout: number = TimeEnum.
  * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator@example
  *
  * @example
- * ```typescript
- * @FeatureInjector
+ * -@FeatureInjector
  * class MyClass {
  *      private readonly statistic: StatisticSingleton;
  *
  *      // ... class implementation
  * }
- * ```
  */
 export function StatisticInjector<T extends Constructor>(base: T): T {
     logger.info(`Statistic injected for {}`, base.name);
@@ -144,14 +136,12 @@ export function StatisticInjector<T extends Constructor>(base: T): T {
  * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator@example
  *
  * @example
- * ```typescript
- * @FeatureInjector
+ * -@FeatureInjector
  * class MyClass {
  *      private readonly feature: FeatureSingleton;
  *
  *      // ... class implementation
  * }
- * ```
  */
 export function FeatureInjector<T extends Constructor>(base: T): T {
     logger.info(`Statistic injected for {}`, base.name);

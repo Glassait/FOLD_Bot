@@ -6,16 +6,13 @@
 	"game": {
 		"trivia": {
 			"limit": 0,
-			"url": "wot/encyclopedia/vehicles/?application_id=applicationId&tier=10&language=fr&fields=name%2C+images.big_icon%2C+default_profile.ammo.damage%2C+default_profile.ammo.penetration%2C+default_profile.ammo.type&limit=1&page_no=pageNumber&type=heavyTank%2C+AT-SPG%2C+mediumTank%2C+lightTank",
+			"url": "wot/encyclopedia/vehicles/?application_id=APPLICATION_ID&tier=10&language=fr&fields=name%2C+images.big_icon%2C+default_profile.ammo.damage%2C+default_profile.ammo.penetration%2C+default_profile.ammo.type&limit=1&page_no=pageNumber&type=heavyTank%2C+AT-SPG%2C+mediumTank%2C+lightTank",
 			"schedule": [],
 			"last_tank_page": []
 		}
 	},
 	"fold_recruitment": {
-		"feature": {
-			"header_clan": false,
-			"footer_message": false
-		},
+		"image_url": "wot/clans/list/?application_id=APPLICATION_ID&fields=emblems.x64&search=CLAN_NAME",
 		"schedule": []
 	},
 	"channels": {
