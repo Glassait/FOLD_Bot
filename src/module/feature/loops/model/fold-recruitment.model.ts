@@ -204,12 +204,10 @@ export class FoldRecruitmentModel {
      * @returns {{ datum: Players[]; extracted: LeaveClanActivity[] }} - An object containing extracted players and leave clan activities.
      *
      * @example
-     * ```typescript
      * const feedData = // clan activity feed data ;
      * const clan = //clan object ;
      * const { datum, extracted } = instance.extractPLayerFromFeed(feedData, clan);
      * console.log(datum, extracted);
-     * ```
      */
     private extractPLayerFromFeed(
         data: FoldRecruitmentType,

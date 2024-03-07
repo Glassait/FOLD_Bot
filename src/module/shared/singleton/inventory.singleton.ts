@@ -138,10 +138,8 @@ export class InventorySingleton {
      * @type {string}
      *
      * @example
-     * ```typescript
      * const clanImageUrl = instance.urlClanImage;
      * console.log(clanImageUrl); // 'https://example.com/clan-image.jpg'
-     * ```
      */
     get urlClanImage(): string {
         return this._inventory.fold_recruitment.image_url;
