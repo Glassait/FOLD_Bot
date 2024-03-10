@@ -72,7 +72,11 @@ export class WebSiteScraper {
         const $: CheerioAPI = cheerio.load(html);
         if (webSiteState.name === WebsiteNameEnum.WOT_EXPRESS) {
             const links: any[] = $(webSiteState.selector).get();
-            const index: number = links.indexOf(links.find(value => value.attribs.href == webSiteState.lastUrl));
+            let index: number = links.indexOf(links.find(value => value.attribs.href == webSiteState.lastUrl));
+
+            if (index === -1) {
+                index = 12;
+            }
 
             if (!webSiteState.lastUrl) {
                 await this.wotExpress(links, 1, webSiteState);
@@ -143,9 +147,11 @@ export class WebSiteScraper {
      * @returns {Promise<void>} - A Promise that resolves after processing the WOT Express data.
      */
     private async wotExpress(links: any[], index: number, webSiteState: WebSiteState): Promise<void> {
+        const isEu = links[index].children[2]?.attribs.class?.includes('eu');
+
         await this.sendNews(
             links[index].attribs.href,
-            webSiteState.name,
+            `${webSiteState.name} : ${isEu ? 'EU news' : 'RU news'}`,
             `Nouvelle rumeur venant de ${webSiteState.name}`,
             webSiteState,
             links[index].children[0].attribs.style.split('url(/')[1].split(')')[0]
