@@ -97,6 +97,8 @@ Use this space to list resources you find helpful and would like to give credit 
 -   Add more caught for error and exception
 -   Add feature flipping in inventory
 -   Change the fold recruitment message by changing th wot url with the wargaming url and adding author to the embed with the clan image, clan name and redirection to the wot portail of the clan
+-   Send message when no player found after the fold recruitment scan
+-   Automatically backup core files
 
 ### 2.2.8
 

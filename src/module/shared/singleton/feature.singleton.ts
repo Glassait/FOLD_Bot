@@ -15,6 +15,10 @@ export class FeatureSingleton {
      */
     private readonly path: string = './src/module/core/feature.json';
     /**
+     * The backup  path to the feature configuration file.
+     */
+    private readonly backupPath: string = './src/module/core/backup/feature.json';
+    /**
      * The initial value of the feature configuration.
      */
     private readonly INITIAL_VALUE: FeatureType = {
@@ -109,6 +113,15 @@ export class FeatureSingleton {
     public get clans(): Clan[] {
         return this._data.watch_clan;
     }
+    //endregion
+
+    /**
+     * Backs up the current data of the feature singleton by writing it into a JSON file.
+     */
+    public backupData(): void {
+        this.logger.info('Backing up {}', FeatureSingleton.name);
+        FileUtil.writeIntoJson(this.backupPath, this._data);
+    }
 
     /**
      * Adds a clan to the list of watched clans.
@@ -182,7 +195,6 @@ export class FeatureSingleton {
 
         FileUtil.writeIntoJson(this.path, this._data);
     }
-    //endregion
 
     //region AUTO-REPLY
     /**
