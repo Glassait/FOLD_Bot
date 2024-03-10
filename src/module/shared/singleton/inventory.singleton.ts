@@ -18,6 +18,10 @@ export class InventorySingleton {
      */
     private readonly path: string = './src/module/core/inventory.json';
     /**
+     * The backup path to the inventory.json file
+     */
+    private readonly backupPath: string = './src/module/core/backup/inventory.json';
+    /**
      * The logger to log thing
      */
     private readonly logger: Logger = new Logger(new Context(InventorySingleton.name));
@@ -46,6 +50,7 @@ export class InventorySingleton {
         }
     }
 
+    //region SINGLETON
     /**
      * The instance of the class, used for the singleton pattern
      */
@@ -61,7 +66,9 @@ export class InventorySingleton {
         }
         return this._instance;
     }
+    //endregion
 
+    //region SCRAPPING
     /**
      * Get the number of newsletter in the inventory
      */
@@ -69,6 +76,17 @@ export class InventorySingleton {
         return this._inventory.newsLetter.website.length;
     }
 
+    /**
+     * Getter for the array of banned words used in the newsletter.
+     *
+     * @returns {string[]} - An array of banned words for the newsletter.
+     */
+    public get banWords(): string[] {
+        return this._inventory.newsLetter.banWords;
+    }
+    //endregion
+
+    //region TRIVIA
     /**
      * Get the trivia information from the inventory
      */
@@ -112,7 +130,9 @@ export class InventorySingleton {
         this._inventory.game.trivia.last_tank_page = lastPage;
         FileUtil.writeIntoJson(this.path, this._inventory);
     }
+    //endregion
 
+    //region FOLD RECRUITMENT
     /**
      * Get the schedule for the fold recruitment.
      * The value need to be parsed to extract the hours and the minutes
@@ -124,15 +144,6 @@ export class InventorySingleton {
     }
 
     /**
-     * Getter for the array of banned words used in the newsletter.
-     *
-     * @returns {string[]} - An array of banned words for the newsletter.
-     */
-    public get banWords(): string[] {
-        return this._inventory.newsLetter.banWords;
-    }
-
-    /**
      * Gets the URL for the clan image used in fold recruitment.
      *
      * @type {string}
@@ -141,10 +152,12 @@ export class InventorySingleton {
      * const clanImageUrl = instance.urlClanImage;
      * console.log(clanImageUrl); // 'https://example.com/clan-image.jpg'
      */
-    get urlClanImage(): string {
+    public get urlClanImage(): string {
         return this._inventory.fold_recruitment.image_url;
     }
+    //endregion
 
+    //region METHOD SCRAPPING
     /**
      * Get the website at the index
      * @param index The index of the website
@@ -188,7 +201,9 @@ export class InventorySingleton {
         this._inventory.newsLetter.website[index].lastUrl = url;
         FileUtil.writeIntoJson(this.path, this._inventory);
     }
+    //endregion
 
+    //region CHANNEL
     /**
      * Fetch the text channel instance for the trivia game.
      *
@@ -242,7 +257,9 @@ export class InventorySingleton {
         this.logger.debug('Channel instance fetch for the fold month message');
         return await this.fetchChannel(client, this._inventory.channels.fold_month);
     }
+    //endregion
 
+    //region METHOD FOLD RECRUITMENT
     /**
      * Updates the last check timestamp for a specific clan in the fold recruitment inventory.
      *
@@ -277,6 +294,15 @@ export class InventorySingleton {
     public deleteClan(clanID: string): void {
         delete this._inventory.fold_recruitment[clanID];
         FileUtil.writeIntoJson(this.path, this._inventory);
+    }
+    //endregion
+
+    /**
+     * Backs up the current data of the inventory singleton by writing it into a JSON file.
+     */
+    public backupData(): void {
+        this.logger.info('Backing up {}', InventorySingleton.name);
+        FileUtil.writeIntoJson(this.backupPath, this._inventory);
     }
 
     /**

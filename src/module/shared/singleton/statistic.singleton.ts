@@ -14,15 +14,22 @@ import { readFileSync } from 'fs';
  * This class keep track of the statistics for the different games
  */
 export class StatisticSingleton {
+    //region PUBLIC FIELD
     /**
      * Keep track of the current month for the statistic
      */
     public currentMonth: string = new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+    //endregion
 
+    //region PRIVATE READONLY
     /**
-     * The path to the statistic file
+     * The path to the statistic.json file
      */
-    private path: string = './src/module/core/statistic.json';
+    private readonly path: string = './src/module/core/statistic.json';
+    /**
+     * The backup file path to the statistic.json file
+     */
+    private readonly backupPath: string = './src/module/core/backup/statistic.json';
     /**
      * The logger to log thing
      */
@@ -46,6 +53,7 @@ export class StatisticSingleton {
      * The statistic
      */
     private readonly _data: StatisticType = this.INITIAL_VALUE;
+    //endregion
 
     /**
      * Private constructor to respect singleton pattern
@@ -70,6 +78,7 @@ export class StatisticSingleton {
         }
     }
 
+    //region SINGLETON
     /**
      * The instance of the class, used for the singleton pattern
      */
@@ -85,6 +94,7 @@ export class StatisticSingleton {
         }
         return this._instance;
     }
+    //endregion
 
     //region TRIVIA-GET-SET
     /**
@@ -118,6 +128,14 @@ export class StatisticSingleton {
         FileUtil.writeIntoJson(this.path, this._data);
     }
     //endregion
+
+    /**
+     * Backs up the current data of the inventory singleton by writing it into a JSON file.
+     */
+    public backupData(): void {
+        this.logger.info('Backing up {}', StatisticSingleton.name);
+        FileUtil.writeIntoJson(this.backupPath, this._data);
+    }
 
     /**
      * Gets the player-specific trivia statistics for a specific player.

@@ -6,6 +6,7 @@ import { FoldRecruitmentModel } from './model/fold-recruitment.model';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
 import { TimeUtil } from '../../shared/utils/time.util';
+import { StatisticSingleton } from '../../shared/singleton/statistic.singleton';
 
 module.exports = async (client: Client): Promise<void> => {
     const logger: Logger = new Logger(new Context('Fold-Recruitment-LOOP'));
@@ -21,6 +22,10 @@ module.exports = async (client: Client): Promise<void> => {
     await recruitmentModel.fetchChannel(client);
 
     await TimeUtil.forLoopTimeSleep(inventory.foldSchedule, `${EmojiEnum.LOOP} Recruitment`, async (): Promise<void> => {
+        feature.backupData();
+        inventory.backupData();
+        StatisticSingleton.instance.backupData();
+
         recruitmentModel.noPlayerFound = true;
 
         for (const clan of feature.clans) {

@@ -130,4 +130,5 @@ dist
 
 /.idea/
 */**/config.json
-/src/logs/*.md
+*/**/logs/**/*
+*/**/backup/
