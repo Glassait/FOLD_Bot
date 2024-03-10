@@ -21,10 +21,16 @@ module.exports = async (client: Client): Promise<void> => {
     await recruitmentModel.fetchChannel(client);
 
     await TimeUtil.forLoopTimeSleep(inventory.foldSchedule, `${EmojiEnum.LOOP} Recruitment`, async (): Promise<void> => {
+        recruitmentModel.noPlayerFound = true;
+
         for (const clan of feature.clans) {
             logger.debug(`${EmojiEnum.MALE} Start recruitment for {}`, clan.name);
             await recruitmentModel.fetchClanActivity(clan);
             logger.debug(`${EmojiEnum.MALE} End recruitment for {}`, clan.name);
+        }
+
+        if (recruitmentModel.noPlayerFound) {
+            await recruitmentModel.sendMessageNoPlayerFound();
         }
     });
     logger.info(`${EmojiEnum.LOOP} End recruitment loop`);
