@@ -22,7 +22,7 @@ type Constructor = new (...args: any[]) => any;
  * @param {T} base - The base class constructor to inject the `Logger` into.
  * @returns {T} - The updated class constructor with the injected `Logger`.
  *
- * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator@example
+ * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator
  *
  * @example
  * -@LoggerInjector
@@ -48,7 +48,7 @@ export function LoggerInjector<T extends Constructor>(base: T): T {
  * @param {T} base - The base class constructor to inject the `InventorySingleton` into.
  * @returns {T} - The updated class constructor with the injected `InventorySingleton`.
  *
- * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator@example
+ * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator
  *
  * @example
  * -@InventoryInjector
@@ -74,7 +74,7 @@ export function InventoryInjector<T extends Constructor>(base: T): T {
  * @param [timeout=TimeEnum.Minute] The timeout of
  * @returns {T} - The updated class constructor with the injected `AxiosInstance`.
  *
- * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator@example
+ * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator
  *
  * @example
  * -@AxiosInjector
@@ -107,10 +107,10 @@ export function AxiosInjector<T extends Constructor>(timeout: number = TimeEnum.
  * @param {T} base - The base class constructor to inject the `StatisticSingleton` into.
  * @returns {T} - The updated class constructor with the injected `StatisticSingleton`.
  *
- * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator@example
+ * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator
  *
  * @example
- * -@FeatureInjector
+ * -@StatisticInjector
  * class MyClass {
  *      private readonly statistic: StatisticSingleton;
  *
@@ -133,7 +133,7 @@ export function StatisticInjector<T extends Constructor>(base: T): T {
  * @param {T} base - The base class constructor to inject the `FeatureSingleton` into.
  * @returns {T} - The updated class constructor with the injected `FeatureSingleton`.
  *
- * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator@example
+ * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator
  *
  * @example
  * -@FeatureInjector
@@ -144,7 +144,7 @@ export function StatisticInjector<T extends Constructor>(base: T): T {
  * }
  */
 export function FeatureInjector<T extends Constructor>(base: T): T {
-    logger.info(`Statistic injected for {}`, base.name);
+    logger.info(`Feature injected for {}`, base.name);
     return {
         [base.name]: class extends base {
             feature: FeatureSingleton = FeatureSingleton.instance;

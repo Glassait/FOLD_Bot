@@ -53,6 +53,12 @@ export class FoldRecruitmentModel {
      * @replace PLAYER_NAME
      */
     private readonly wotLife: string = `https://fr.wot-life.com/eu/player/${ConstantsEnum.PLAYER_NAME}-${ConstantsEnum.PLAYER_ID}/`;
+    /**
+     * Embed for the message indicating that no player was found.
+     */
+    private readonly embedNoPlayerFound: EmbedBuilder = new EmbedBuilder()
+        .setColor(Colors.DarkRed)
+        .setTitle("Aucun joueurs n'a quitté son clan depuis le dernier scan !");
     //endregion
 
     //region INJECTION
@@ -61,6 +67,7 @@ export class FoldRecruitmentModel {
     private readonly inventory: InventorySingleton;
     private readonly statistic: StatisticSingleton;
     private readonly feature: FeatureSingleton;
+    private readonly wotApiModel: WotApiModel = new WotApiModel();
     //endregion
 
     //region PRIVATE FIELDS
@@ -69,9 +76,19 @@ export class FoldRecruitmentModel {
      */
     private channel: TextChannel;
     /**
-     * Represents an instance of the WotApiModel used for interacting with the Wargaming API.
+     * Indicates whether any player was found during the fold recruitment.
      */
-    private wotApiModel: WotApiModel = new WotApiModel();
+    private _noPlayerFound: boolean;
+    //endregion
+
+    //region GETTER
+    get noPlayerFound(): boolean {
+        return this._noPlayerFound;
+    }
+
+    set noPlayerFound(value: boolean) {
+        this._noPlayerFound = value;
+    }
     //endregion
 
     /**
@@ -92,7 +109,7 @@ export class FoldRecruitmentModel {
      *
      * @example
      * const myClan = { id: '123', name: 'MyClan' };
-     * await foldRecruitement.fetchClanActivity(myClan);
+     * await foldRecruitment.fetchClanActivity(myClan);
      */
     public async fetchClanActivity(clan: Clan): Promise<void> {
         const url = this.url.replace(ConstantsEnum.CLAN_ID, clan.id).replace('today', new Date().toISOString().slice(0, 19));
@@ -130,7 +147,7 @@ export class FoldRecruitmentModel {
             this.inventory.updateLastCheckForClan(clan.id, yesterday.toISOString());
         }
 
-        const { datum, extracted } = this.extractPLayerFromFeed(data, clan);
+        const { datum, extracted } = this.extractPlayerFromFeed(data, clan);
 
         this.logger.debug(`{} players leaves the clan`, String(datum.length));
 
@@ -139,9 +156,18 @@ export class FoldRecruitmentModel {
         }
 
         if (extracted[0]) {
+            this._noPlayerFound = false;
             this.inventory.updateLastCheckForClan(clan.id, extracted[0].created_at);
             this.statistic.updateClanStatistics(clan.id, datum.length);
         }
+    }
+
+    /**
+     * Sends a message to the fold recruitment channel indicating that no player was found.
+     */
+    public async sendMessageNoPlayerFound(): Promise<void> {
+        this.logger.info('No player found during the fold recruitment !');
+        await this.channel.send({ embeds: [this.embedNoPlayerFound] });
     }
 
     /**
@@ -206,10 +232,10 @@ export class FoldRecruitmentModel {
      * @example
      * const feedData = // clan activity feed data ;
      * const clan = //clan object ;
-     * const { datum, extracted } = instance.extractPLayerFromFeed(feedData, clan);
+     * const { datum, extracted } = instance.extractPlayerFromFeed(feedData, clan);
      * console.log(datum, extracted);
      */
-    private extractPLayerFromFeed(
+    private extractPlayerFromFeed(
         data: FoldRecruitmentType,
         clan: Clan
     ): {
