@@ -1,6 +1,6 @@
 import { InventoryInjector, LoggerInjector, StatisticInjector } from '../../../shared/decorators/injector.decorator';
 import { Logger } from '../../../shared/classes/logger';
-import { TriviaType } from '../../../shared/types/inventory.type';
+import { Trivia } from '../../../shared/types/inventory.type';
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -49,7 +49,7 @@ export class TriviaGameModel {
      * The information fetch from the inventory
      * @private
      */
-    private trivia: TriviaType;
+    private trivia: Trivia;
     /**
      * Channel where the trivia game is being played.
      * @private
@@ -124,6 +124,8 @@ export class TriviaGameModel {
 
     /**
      * Fetches the tanks to be used in the trivia game.
+     * @todo TO DELETE
+     * @deprecated
      */
     public async fetchTanks(): Promise<void> {
         this.logger.debug('Start fetching tanks');
@@ -165,6 +167,8 @@ export class TriviaGameModel {
 
     /**
      * Sends a message to the trivia game channel with information about the game and the selected tank.
+     * TODO TO DELETE
+     * @deprecated
      */
     public async sendMessageToChannel(): Promise<void> {
         const target = new Date();
@@ -205,6 +209,8 @@ export class TriviaGameModel {
 
     /**
      * Collects the answers from the players.
+     * TODO TO DELETE
+     * @deprecated
      */
     public async collectAnswer(): Promise<void> {
         this.logger.debug('Collecting player answer start');
@@ -318,6 +324,8 @@ export class TriviaGameModel {
      * @param ammo The datum ammo
      * @return true if the vehicle ammo is the same (penetration or damage), false otherwise
      * @private
+     * TODO TO DELETE
+     * @deprecated
      */
     private checkVehicleAmmoDetail(vehicleAmmo: Ammo, ammo: Ammo): boolean {
         if (this.datum.isPen) {
@@ -437,6 +445,8 @@ export class TriviaGameModel {
      * @param alreadyAnswer If the player already answer
      * @param changedAnswer If the player changed his answer
      * @param interaction The interaction
+     * TODO TO DELETE
+     * @deprecated
      */
     private logCollect(alreadyAnswer: boolean, changedAnswer: boolean, interaction: ButtonInteraction<'cached'>): void {
         let action: string = 'answered';

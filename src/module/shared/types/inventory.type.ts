@@ -53,7 +53,7 @@ export type NewsLetter = {
 /**
  * Type defining the structure for the trivia game.
  */
-export type TriviaType = {
+export type Trivia = {
     /**
      * The URL associated with the trivia game.
      */
@@ -105,7 +105,7 @@ export type InventoryType = {
         /**
          * The trivia type within the game section.
          */
-        trivia: TriviaType;
+        trivia: Trivia;
     };
     /**
      * The recruitment section of the inventory.

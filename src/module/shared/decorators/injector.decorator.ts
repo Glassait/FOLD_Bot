@@ -7,6 +7,7 @@ import { TimeEnum } from '../enums/time.enum';
 import https from 'https';
 import http from 'http';
 import { FeatureSingleton } from '../singleton/feature.singleton';
+import { TriviaSingleton } from '../singleton/trivia.singleton';
 
 const logger: Logger = new Logger(new Context('Injector'));
 
@@ -148,6 +149,32 @@ export function FeatureInjector<T extends Constructor>(base: T): T {
     return {
         [base.name]: class extends base {
             feature: FeatureSingleton = FeatureSingleton.instance;
+        },
+    }[base.name];
+}
+
+/**
+ * Injects a `TriviaSingleton` instance into the specified class. Doesn't work on static class (need constructor)
+ *
+ * @template T - The class constructor type.
+ * @param {T} base - The base class constructor to inject the `TriviaSingleton` into.
+ * @returns {T} - The updated class constructor with the injected `TriviaSingleton`.
+ *
+ * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator
+ *
+ * @example
+ * -@TriviaInjector
+ * class MyClass {
+ *      private readonly trivia: TriviaSingleton;
+ *
+ *      // ... class implementation
+ * }
+ */
+export function TriviaInjector<T extends Constructor>(base: T): T {
+    logger.info(`Trivia injected for {}`, base.name);
+    return {
+        [base.name]: class extends base {
+            trivia: TriviaSingleton = TriviaSingleton.instance;
         },
     }[base.name];
 }

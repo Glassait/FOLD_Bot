@@ -7,6 +7,7 @@ import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
 import { TimeUtil } from '../../shared/utils/time.util';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
 
+// TODO TO DELETE
 module.exports = async (client: Client): Promise<void> => {
     const logger: Logger = new Logger(new Context('TRIVIA-LOOP'));
     const triviaGame: TriviaGameModel = new TriviaGameModel();

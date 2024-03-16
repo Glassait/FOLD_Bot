@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs';
-import { Channel, InventoryType, TriviaType, WebSiteState } from '../types/inventory.type';
+import { Channel, InventoryType, Trivia, WebSiteState } from '../types/inventory.type';
 import { EnvUtil } from '../utils/env.util';
 import { Logger } from '../classes/logger';
 import { Client, TextChannel } from 'discord.js';
@@ -90,7 +90,7 @@ export class InventorySingleton {
     /**
      * Get the trivia information from the inventory
      */
-    public get trivia(): TriviaType {
+    public get trivia(): Trivia {
         return this._inventory.game.trivia;
     }
 
@@ -98,7 +98,7 @@ export class InventorySingleton {
      * Update the trivia information with the new value and update the json file
      * @param trivia The new value
      */
-    public set trivia(trivia: TriviaType) {
+    public set trivia(trivia: Trivia) {
         this._inventory.game.trivia = trivia;
         FileUtil.writeIntoJson(this.path, this._inventory);
     }

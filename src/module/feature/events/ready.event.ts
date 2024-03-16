@@ -7,6 +7,7 @@ import { EmojiEnum } from '../../shared/enums/emoji.enum';
 import { TriviaMonthModel } from './models/trivia-month.model';
 import { FoldMonthModel } from './models/fold-month.model';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
+import { TriviaSingleton } from '../../shared/singleton/trivia.singleton';
 
 export const event: BotEvent = {
     name: Events.ClientReady,
@@ -48,6 +49,10 @@ export const event: BotEvent = {
             await triviaMonth.fetchMandatory(client);
             triviaMonth.createEmbed();
             await triviaMonth.sendToChannel();
+        }
+
+        if (inventory.getFeatureFlipping('trivia')) {
+            await TriviaSingleton.instance.fetchTankOfTheDay();
         }
     },
 };
