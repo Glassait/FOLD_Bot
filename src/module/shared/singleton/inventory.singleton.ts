@@ -32,7 +32,7 @@ export class InventorySingleton {
     /**
      * The id of the dev channel
      */
-    private readonly DEV_CHANNEL: Channel = { guild: '840375560785231962', id: '1171525891604623472' };
+    private readonly DEV_CHANNEL: Channel = { guild: '1218558386761891901', id: '1218558387361546412' };
     //endregion
 
     /**

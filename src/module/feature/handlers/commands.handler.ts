@@ -31,9 +31,7 @@ module.exports = async (_client: Client): Promise<void> => {
 
     for (const entry of Object.entries(body)) {
         try {
-            await rest.put(Routes.applicationGuildCommands(client_id, entry[0]), {
-                body: entry[1],
-            });
+            await rest.put(Routes.applicationGuildCommands(client_id, entry[0]), { body: entry[1] });
 
             logger.info(`Successfully reloaded application {} slash-commands for guild {}`, String(entry[1].length), entry[0]);
         } catch (error) {

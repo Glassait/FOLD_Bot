@@ -38,7 +38,8 @@
 		"disconnect": [],
 		"auto-reply": [],
 		"auto-disconnect": [],
-		"trivia-statistics": []
+		"trivia-statistics": [],
+		"al_capone-trophy": []
 	},
 	"feature_flipping": {
 		"trivia": false,
