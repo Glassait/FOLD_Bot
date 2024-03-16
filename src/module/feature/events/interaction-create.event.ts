@@ -15,7 +15,7 @@ export const event: BotEvent = {
     name: Events.InteractionCreate,
     async execute(client: Client, interaction: Interaction): Promise<void> {
         if (interaction.isChatInputCommand()) {
-            if (EnvUtil.isDev()) {
+            if (EnvUtil.isDev() && interaction.guildId !== '1218558386761891901') {
                 await interaction.reply({
                     content:
                         "Je suis actuellement entrain d'être améliorer par mon créateur, cette commande ne fonctionne pas !\nMerci d'éssayer plus tard :)",

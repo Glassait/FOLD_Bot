@@ -2,29 +2,6 @@
 
 # Slash Command
 
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li>
-      <a href="#create-new-slash-command">Create new slash command</a>
-    </li>
-    <li>
-        <a href="#⚙-options--permission">⚙️ Options & Permission</a>
-        <ul>
-            <li>
-                <a href="#options">Options</a>
-            </li>
-            <li>
-                <a href="#permission">Permission</a>
-            </li>
-        </ul>
-    </li>
-    <li>
-        <a href="#log">Log</a>    
-    </li>
-  </ol>
-</details>
-
 In the folder you will find all the slash command of the bot.
 
 <p id="createNewSlashCommand"></p>
@@ -75,7 +52,9 @@ export const command: SlashCommandModel = new SlashCommandModel(
     async (interaction: ChatInputCommandInteraction): Promise<void> => {
         // The code execute by the commande
     },
-    [new SlashCommandMentionableOption().setName('target').setDescription('The user to ban')]
+    {
+        option: [new SlashCommandMentionableOption().setName('target').setDescription("L'utilisateur à déconnecter").setRequired(true)],
+    }
 );
 ```
 
@@ -99,8 +78,9 @@ export const command: SlashCommandModel = new SlashCommandModel(
     async (interaction: ChatInputCommandInteraction): Promise<void> => {
         // The code execute by the commande
     },
-    null,
-    PermissionsBitField.Flags.MoveMembers
+    {
+        permission: PermissionsBitField.Flags.MoveMembers,
+    }
 );
 ```
 
