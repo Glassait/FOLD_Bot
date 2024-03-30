@@ -1,3 +1,134 @@
 {
-	"version": 0
+	"version": 2,
+	"trivia": {
+		"version": 4,
+		"overall": {
+			"mars 2024": {
+				"day_tank": {
+					"27/03/24": [
+						{
+							"tank": {
+								"images": {
+									"big_icon": "http://api.worldoftanks.eu/static/2.71.0/wot/encyclopedia/vehicle/japan-J40_Type_71.png"
+								},
+								"name": "Type 71",
+								"default_profile": {
+									"ammo": [
+										{
+											"type": "ARMOR_PIERCING",
+											"damage": [
+												300,
+												400,
+												500
+											]
+										},
+										{
+											"type": "ARMOR_PIERCING_CR",
+											"damage": [
+												300,
+												400,
+												500
+											]
+										},
+										{
+											"type": "HIGH_EXPLOSIVE",
+											"damage": [
+												386,
+												515,
+												644
+											]
+										}
+									]
+								}
+							},
+							"ammoIndex": 1
+						}
+					],
+					"29/03/24": [
+						{
+							"tank": {
+								"images": {
+									"big_icon": "http://api.worldoftanks.eu/static/2.71.0/wot/encyclopedia/vehicle/china-Ch22_113.png"
+								},
+								"name": "113",
+								"default_profile": {
+									"ammo": [
+										{
+											"type": "ARMOR_PIERCING",
+											"damage": [
+												330,
+												440,
+												550
+											]
+										},
+										{
+											"type": "HOLLOW_CHARGE",
+											"damage": [
+												330,
+												440,
+												550
+											]
+										},
+										{
+											"type": "HIGH_EXPLOSIVE",
+											"damage": [
+												398,
+												530,
+												663
+											]
+										}
+									]
+								}
+							},
+							"ammoIndex": 0
+						}
+					]
+				},
+				"number_of_game": 0
+			}
+		},
+		"player": {
+			"glassait": {
+				"mars 2024": {
+					"elo": 142,
+					"daily": {
+						"24/03/24": {
+							"participation": 1,
+							"answer": [
+								null
+							],
+							"answer_date": [
+								"2024-03-24T16:00:46.577Z"
+							],
+							"answer_time": [
+								null
+							],
+							"right_answer": 0
+						},
+						"25/03/24": {
+							"participation": 1,
+							"answer": [
+								"113"
+							],
+							"answer_date": [
+								"2024-03-30T07:49:22.914Z"
+							],
+							"answer_time": [
+								2399
+							],
+							"right_answer": 1
+						}
+					},
+					"win_strick": {
+						"current": 1,
+						"max": 1
+					}
+				}
+			}
+		}
+	},
+	"fold_recruitment": {
+		"version": 1,
+		"clan": {}
+	}
 }

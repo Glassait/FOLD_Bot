@@ -96,7 +96,8 @@ export class InventorySingleton {
 
     /**
      * Update the trivia information with the new value and update the json file
-     * @param trivia The new value
+     *
+     * @param {Trivia} trivia - The new trivia value
      */
     public set trivia(trivia: Trivia) {
         this._inventory.game.trivia = trivia;

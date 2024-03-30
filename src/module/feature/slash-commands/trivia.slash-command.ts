@@ -1,10 +1,7 @@
 import { ChatInputCommandInteraction, SlashCommandSubcommandBuilder } from 'discord.js';
 import { SlashCommandModel } from './model/slash-command.model';
-import { StatisticSingleton } from '../../shared/singleton/statistic.singleton';
 import { TriviaModel } from './model/trivia.model';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
-
-const statistic: StatisticSingleton = StatisticSingleton.instance;
 
 const MAPPING = {
     STATISTICS: {
@@ -18,6 +15,7 @@ const MAPPING = {
     },
 };
 const trivia = new TriviaModel();
+trivia.initialize();
 
 export const command: SlashCommandModel = new SlashCommandModel(
     'trivia',
@@ -96,7 +94,9 @@ export const command: SlashCommandModel = new SlashCommandModel(
         option: [
             new SlashCommandSubcommandBuilder()
                 .setName(MAPPING.GAME.name)
-                .setDescription('Jouer au jeu trivia et apprenez les alpha des tier 10 (max 4 par jours)'),
+                .setDescription(
+                    `Jouer au jeu trivia et apprenez les alpha des tier 10 (maximum ${InventorySingleton.instance.trivia.max_number_of_question} par jour)`
+                ),
             new SlashCommandSubcommandBuilder()
                 .setName(MAPPING.STATISTICS.name)
                 .setDescription('Visualiser-vos statistiques sur le jeu trivia'),

@@ -59,17 +59,96 @@ export type Trivia = {
      */
     url: string;
     /**
-     * The limit for the trivia game.
+     * The total number of tanks, used when fetching the tanks from the wot api.
+     *
+     * @example
+     * {
+     *    "game": {
+     *        "trivia": {
+     *            "total_number_of_tanks": 88,
+     *        }
+     *    }
+     * }
      */
-    limit: number;
+    total_number_of_tanks: number;
     /**
      * Array of schedules for the trivia game.
+     * @todo TO DELETE : No more schedules trivia
      */
     schedule: string[];
     /**
      * Array of last tank pages for the trivia game.
+     *
+     * @example
+     * {
+     *    "game": {
+     *        "trivia": {
+     *            "last_tank_page": [1, 2, 3, 4],
+     *        }
+     *    }
+     * }
      */
     last_tank_page: number[];
+    /**
+     * The maximum number of tank pages that can be store in the {@link last_tank_page} array.
+     *
+     *  When the {@link last_tank_page} array length is higher than the number, the 4 first tanks pages can be re-used.
+     *
+     * @example
+     * {
+     *    "game": {
+     *        "trivia": {
+     *            "max_number_of_unique_tanks": 15,
+     *        }
+     *    }
+     * }
+     */
+    max_number_of_unique_tanks: number;
+    /**
+     * The maximum number of questions the player can ask.
+     *
+     * @default 4 per day
+     *
+     * @example
+     * {
+     *    "game": {
+     *        "trivia": {
+     *            "max_number_of_question": 4,
+     *        }
+     *    }
+     * }
+     */
+    max_number_of_question: number;
+    /**
+     * The maximum duration for a trivia question (in minutes).
+     *
+     * @default 2
+     *
+     * @example
+     * {
+     *    "game": {
+     *        "trivia": {
+     *            "max_duration_of_question": 2,
+     *        }
+     *    }
+     * }
+     */
+    max_duration_of_question: number;
+    /**
+     * The maximum duration for a trivia question (in minutes).
+     *
+     * @default 15
+     *
+     * @example
+     * {
+     *    "game": {
+     *        "trivia": {
+     *            "max_response_time_limit": 15,
+     *        }
+     *    }
+     * }
+     */
+    max_response_time_limit: number;
 };
 
 /**

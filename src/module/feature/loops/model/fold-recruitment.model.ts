@@ -14,7 +14,7 @@ import { Clan } from '../../../shared/types/feature.type';
 import { ConstantsEnum, WotClanActivity } from '../enums/fold-recruitment.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
 import { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
-import { WotApiModel } from './wot-api.model';
+import { WotApiModel } from '../../../shared/apis/wot-api.model';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 import { FeatureSingleton } from '../../../shared/singleton/feature.singleton';
 

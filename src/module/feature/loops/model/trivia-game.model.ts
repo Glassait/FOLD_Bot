@@ -15,15 +15,10 @@ import {
 } from 'discord.js';
 import { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
 import { RandomUtil } from '../../../shared/utils/random.util';
-import { Ammo, TankopediaVehiclesSuccess, VehicleData } from '../types/wot-api.type';
-import { WotApiModel } from './wot-api.model';
+import { Ammo, TankopediaVehiclesSuccess, VehicleData } from '../../../shared/types/wot-api.type';
+import { WotApiModel } from '../../../shared/apis/wot-api.model';
 import { StatisticSingleton } from 'src/module/shared/singleton/statistic.singleton';
-import {
-    MonthlyTriviaOverallStatisticType,
-    MonthlyTriviaPlayerStatisticType,
-    TriviaPlayerStatisticType,
-    TriviaStatisticType,
-} from '../../../shared/types/statistic.type';
+import { MonthlyTriviaPlayerStatisticType, TriviaPlayerStatisticType, TriviaStatistic } from '../../../shared/types/statistic.type';
 import { ShellEnum, ShellType } from '../enums/shell.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
 import { TimeUtil } from '../../../shared/utils/time.util';
@@ -84,7 +79,7 @@ export class TriviaGameModel {
      * Trivia statistics.
      * @private
      */
-    private triviaStats: TriviaStatisticType;
+    private triviaStats: TriviaStatistic;
     //endregion
 
     //region INJECTION
@@ -129,7 +124,13 @@ export class TriviaGameModel {
      */
     public async fetchTanks(): Promise<void> {
         this.logger.debug('Start fetching tanks');
-        const pages: number[] = RandomUtil.getArrayWithRandomNumber(4, this.trivia.limit, 1, false, this.inventory.triviaLastPage);
+        const pages: number[] = RandomUtil.getArrayWithRandomNumber(
+            4,
+            this.trivia.total_number_of_tanks,
+            1,
+            false,
+            this.inventory.triviaLastPage
+        );
         const tankopediaResponses: TankopediaVehiclesSuccess[] = [];
 
         this.inventory.triviaLastPage = [
@@ -141,8 +142,8 @@ export class TriviaGameModel {
             tankopediaResponses.push(await this.wotApi.fetchTankopediaApi(this.trivia.url.replace('pageNumber', String(page))));
         }
 
-        if (tankopediaResponses[0].meta.count !== this.trivia.limit) {
-            this.trivia.limit = tankopediaResponses[0].meta.page_total;
+        if (tankopediaResponses[0].meta.count !== this.trivia.total_number_of_tanks) {
+            this.trivia.total_number_of_tanks = tankopediaResponses[0].meta.page_total;
             this.inventory.trivia = this.trivia;
         }
 
@@ -401,22 +402,22 @@ export class TriviaGameModel {
      * @private
      */
     private updateOverallStatistic(responses: [string, PlayerAnswer][]): void {
-        const overall: MonthlyTriviaOverallStatisticType = this.triviaStats.overall[this.statistic.currentMonth] ?? {
-            number_of_game: 0,
-            game_without_participation: 0,
-            unique_tanks: [],
-        };
-
-        overall.number_of_game++;
-
-        if (responses.length === 0) {
-            overall.game_without_participation++;
-        }
-        if (overall.unique_tanks && !overall.unique_tanks.includes(this.datum.tank.name)) {
-            overall.unique_tanks.push(this.datum.tank.name);
-        }
-
-        this.triviaStats.overall[this.statistic.currentMonth] = overall;
+        // const overall: MonthlyTriviaOverallStatistic = this.triviaStats.overall[this.statistic.currentMonth] ?? {
+        //     number_of_game: 0,
+        //     game_without_participation: 0,
+        //     unique_tanks: [],
+        // };
+        //
+        // overall.number_of_game++;
+        //
+        // if (responses.length === 0) {
+        //     overall.game_without_participation++;
+        // }
+        // if (overall.unique_tanks && !overall.unique_tanks.includes(this.datum.tank.name)) {
+        //     overall.unique_tanks.push(this.datum.tank.name);
+        // }
+        //
+        // this.triviaStats.overall[this.statistic.currentMonth] = overall;
     }
 
     /**
@@ -482,8 +483,8 @@ export class TriviaGameModel {
             answer_time: [],
             participation: 0,
         };
-        playerStat.participation++;
-        playerStat.answer_time.push(playerAnswer.responseTime);
+        // playerStat.participation++;
+        // playerStat.answer_time.push(playerAnswer.responseTime);
 
         const isGoodAnswer = goodAnswer.find((value: [string, PlayerAnswer]): boolean => value[0] === playerName);
 
@@ -523,7 +524,7 @@ export class TriviaGameModel {
         oldElo: number,
         playerName: string
     ): Promise<void> {
-        playerStat.right_answer++;
+        // playerStat.right_answer++;
         winStrick.current++;
         winStrick.max = Math.max(winStrick.current, winStrick.max);
 

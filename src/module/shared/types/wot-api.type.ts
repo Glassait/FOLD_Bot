@@ -1,4 +1,4 @@
-import { WargamingErrorType, WargamingSuccessType } from '../../../shared/types/wargaming-api.type';
+import { WargamingErrorType, WargamingSuccessType } from './wargaming-api.type';
 
 //region TANKOPEDIA
 /**

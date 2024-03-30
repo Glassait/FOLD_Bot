@@ -30,6 +30,10 @@ export const event: BotEvent = {
             status: 'online',
         });
 
+        if (inventory.getFeatureFlipping('trivia')) {
+            await TriviaSingleton.instance.fetchTankOfTheDay();
+        }
+
         const today = new Date();
 
         if (today.getDate() !== 1) {
@@ -49,10 +53,6 @@ export const event: BotEvent = {
             await triviaMonth.fetchMandatory(client);
             triviaMonth.createEmbed();
             await triviaMonth.sendToChannel();
-        }
-
-        if (inventory.getFeatureFlipping('trivia')) {
-            await TriviaSingleton.instance.fetchTankOfTheDay();
         }
     },
 };

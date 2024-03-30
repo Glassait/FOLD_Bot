@@ -1,9 +1,11 @@
 export class RandomUtil {
     /**
      * Calculate a random number between {@link min} and {@link max}
-     * @param [max=1] The max number of the randomness, include
-     * @param [min=0] The min number of the randomness, include
-     * @return Return a random number between {@link min} and {@link max}
+     *
+     * @param {number} [max=1] - The max number (inclusive), include
+     * @param {number} [min=0] - The min number (inclusive), include
+     *
+     * @return {number} - A random number between {@link min} and {@link max}
      */
     public static getRandomNumber(max: number = 1, min: number = 0): number {
         return Math.floor(Math.random() * (max - min + 1) + min);
@@ -11,12 +13,16 @@ export class RandomUtil {
 
     /**
      * Create an array of number fill with random number between {@link max} and {@link min}
-     * @param [length=1] The length of the array
-     * @param [max=1] The max for the random number, include
-     * @param [min=0] The min for the ransom number, include
-     * @param [allowRepeat] If the array can contains same value multiple times
-     * @param [forbidden] The forbidden number to not add in the array
-     * @return The array fill with random number
+     *
+     * @param {number} [length=1] - The length of the array to generate.
+     * @param {number} [max=1] - The maximum value (inclusive) of the random numbers.
+     * @param {number} [min=0] - The minimum value (inclusive) of the random numbers.
+     * @param {boolean} [allowRepeat] - Whether repetition of numbers is allowed in the array.
+     * @param {number[]} [forbidden] - An array of numbers that are forbidden to be generated.
+     *
+     * @throws {Error} - Will throw an error if the length is less than 1 or if max is less than min.
+     *
+     * @return {number[]} - An array of random integers within the specified range.
      */
     public static getArrayWithRandomNumber(
         length: number = 1,
@@ -25,16 +31,31 @@ export class RandomUtil {
         allowRepeat?: boolean,
         forbidden?: number[]
     ): number[] {
-        return new Array(length).fill(undefined).reduce((previousValue: number[], _currentValue: any): number[] => {
+        if (!Number.isInteger(length) || length < 1) {
+            throw new Error('Length must be a positive integer greater than 0.');
+        }
+
+        if (!Number.isInteger(max) || !Number.isInteger(min) || max < min) {
+            throw new Error('Max and min must be integers, and max must be greater than min.');
+        }
+
+        const range = max - min + 1;
+        const uniqueNumbers = new Set<number>(forbidden);
+        const result: number[] = [];
+
+        if (!allowRepeat && range < length) {
+            throw new Error('Cannot generate unique numbers within the specified range.');
+        }
+
+        while (result.length < length) {
             let randomNumber: number = this.getRandomNumber(max, min);
-            while (
-                (!allowRepeat && previousValue.includes(randomNumber)) ||
-                (forbidden?.length !== 0 && forbidden?.includes(randomNumber))
-            ) {
-                randomNumber = this.getRandomNumber(max, min);
+
+            if (allowRepeat || !uniqueNumbers.has(randomNumber)) {
+                result.push(randomNumber);
+                uniqueNumbers.add(randomNumber);
             }
-            previousValue.push(randomNumber);
-            return previousValue;
-        }, []);
+        }
+
+        return result;
     }
 }

@@ -1,11 +1,16 @@
 import { Logger } from '../classes/logger';
 import { Context } from '../classes/context';
-import { WotApiModel } from '../../feature/loops/model/wot-api.model';
 import { RandomUtil } from '../utils/random.util';
-import { TankopediaVehiclesSuccess, VehicleData } from '../../feature/loops/types/wot-api.type';
+import { TankopediaVehiclesSuccess, VehicleData } from '../types/wot-api.type';
 import { ShellType } from '../../feature/loops/enums/shell.enum';
 import { InventorySingleton } from './inventory.singleton';
 import { Trivia } from '../types/inventory.type';
+import { WotApiModel } from '../apis/wot-api.model';
+import { application_id_wot } from '../../core/config.json';
+import { ConstantsEnum } from '../../feature/loops/enums/wot-api.enum';
+import { TriviaSelected } from '../types/trivia.type';
+import { StatisticSingleton } from './statistic.singleton';
+import { TriviaStatistic } from '../types/statistic.type';
 
 /**
  * Class used to manage the trivia game
@@ -13,14 +18,50 @@ import { Trivia } from '../types/inventory.type';
  */
 export class TriviaSingleton {
     //region INJECTION
-    private readonly logger: Logger = new Logger(new Context(TriviaSingleton.name));
-    private readonly wotApi: WotApiModel = new WotApiModel();
-    private readonly inventory: InventorySingleton = InventorySingleton.instance;
+    private readonly logger: Logger;
+    private readonly wotApi: WotApiModel;
+    private readonly inventory: InventorySingleton;
+    private readonly statistic: StatisticSingleton;
     //endregion
 
-    //region PRIVATE FIELD
-    private trivia: Trivia = this.inventory.trivia;
+    //region PRIVATE READONLY FIELDS
+    /**
+     * Contains all the daily tanks for the trivia game.
+     *
+     * @length 4
+     * @sub-length 4
+     */
+    private readonly _allTanks: VehicleData[][];
+    /**
+     * Contains all the selected tanks for the trivia game.
+     *
+     * @length 4
+     */
+    private readonly _datum: TriviaSelected[];
+    /**
+     * The information stored in the inventory about the trivia game
+     */
+    private readonly trivia: Trivia;
+    /**
+     * The information stored in the statistique about the trivia game
+     */
+    private readonly triviaStatistique: TriviaStatistic;
     //endregion
+
+    private constructor() {
+        const api = require('../apis/wot-api.model').WotApiModel;
+
+        this.wotApi = new api();
+        this.inventory = InventorySingleton.instance;
+        this.logger = new Logger(new Context(TriviaSingleton.name));
+        this.statistic = StatisticSingleton.instance;
+
+        this.trivia = this.inventory.trivia;
+        this.triviaStatistique = this.statistic.trivia;
+
+        this._allTanks = [];
+        this._datum = [];
+    }
 
     //region SINGLETON
     private static _instance: TriviaSingleton;
@@ -36,45 +77,32 @@ export class TriviaSingleton {
     //endregion
 
     //region GETTER-SETTER
-    private _allTanks: VehicleData[][] = [];
+    get datum(): TriviaSelected[] {
+        return this._datum;
+    }
 
     get allTanks(): VehicleData[][] {
         return this._allTanks;
     }
-
-    private _datum: { ammoIndex: number; tank: VehicleData }[] = [];
-
-    get datum(): { ammoIndex: number; tank: VehicleData }[] {
-        return this._datum;
-    }
     //endregion
 
+    /**
+     * Fetches tank of the day for the trivia game.
+     */
     public async fetchTankOfTheDay(): Promise<void> {
-        for (let i = 0; i < 4; i++) {
+        this.statistic.initializeMonthStatistics();
+
+        for (let i = 0; i < this.trivia.max_number_of_question; i++) {
             this.logger.debug(`Start fetching tanks n°${i}`);
-            const pages: number[] = RandomUtil.getArrayWithRandomNumber(4, this.trivia.limit, 1, false, this.inventory.triviaLastPage);
-            const tankopediaResponses: TankopediaVehiclesSuccess[] = [];
+            const tankPages: number[] = this.fetchTankPages();
 
-            this.inventory.triviaLastPage = [
-                ...this.inventory.triviaLastPage.slice(this.inventory.triviaLastPage.length >= 12 ? 4 : 0),
-                ...pages,
-            ];
+            const tankopediaResponses: TankopediaVehiclesSuccess[] = await this.fetchTankopediaResponses(tankPages);
 
-            for (const page of pages) {
-                tankopediaResponses.push(await this.wotApi.fetchTankopediaApi(this.trivia.url.replace('pageNumber', String(page))));
+            if (tankopediaResponses[0].meta.count !== this.trivia.total_number_of_tanks) {
+                this.trivia.total_number_of_tanks = tankopediaResponses[0].meta.page_total;
             }
 
-            if (tankopediaResponses[0].meta.count !== this.trivia.limit) {
-                this.trivia.limit = tankopediaResponses[0].meta.page_total;
-                this.inventory.trivia = this.trivia;
-            }
-
-            this._allTanks.push(
-                tankopediaResponses.reduce((data: VehicleData[], vehicles: TankopediaVehiclesSuccess): VehicleData[] => {
-                    data.push(vehicles.data[Object.keys(vehicles.data)[0]]);
-                    return data;
-                }, [])
-            );
+            this._allTanks.push(this.extractTankData(tankopediaResponses));
 
             this._datum.push({
                 tank: this._allTanks[i][RandomUtil.getRandomNumber(this._allTanks.length - 1)],
@@ -87,5 +115,61 @@ export class TriviaSingleton {
                 this._datum[i].ammoIndex ? ShellType.GOLD : ShellType.NORMAL
             );
         }
+
+        this.triviaStatistique.overall[this.statistic.currentMonth].day_tank[this.statistic.currentDay] = this._datum;
+
+        this.statistic.trivia = this.triviaStatistique;
+        this.inventory.trivia = this.trivia;
+    }
+
+    /**
+     * Fetches tank pages for tank of the day.
+     *
+     * @returns {number[]} Array of tank pages to fetch.
+     */
+    private fetchTankPages(): number[] {
+        const tankPages: number[] = RandomUtil.getArrayWithRandomNumber(
+            4,
+            this.trivia.total_number_of_tanks,
+            1,
+            false,
+            this.trivia.last_tank_page
+        );
+
+        this.trivia.last_tank_page = [
+            ...this.trivia.last_tank_page.slice(this.trivia.last_tank_page.length >= this.trivia.max_number_of_unique_tanks ? 4 : 0),
+            ...tankPages,
+        ];
+        return tankPages;
+    }
+
+    /**
+     * Fetches tankopedia responses for the given tank pages.
+     *
+     * @param {number[]} tankPages - Array of tank pages to fetch.
+     *
+     * @returns {Promise<TankopediaVehiclesSuccess[]>} A Promise that resolves with an array of tankopedia responses.
+     */
+    private async fetchTankopediaResponses(tankPages: number[]): Promise<TankopediaVehiclesSuccess[]> {
+        const responses: TankopediaVehiclesSuccess[] = [];
+        for (const page of tankPages) {
+            responses.push(
+                await this.wotApi.fetchTankopediaApi(
+                    this.trivia.url.replace('pageNumber', String(page)).replace(ConstantsEnum.APPLICATION_ID, application_id_wot)
+                )
+            );
+        }
+        return responses;
+    }
+
+    /**
+     * Extracts tank data from tankopedia responses.
+     *
+     * @param {TankopediaVehiclesSuccess[]} responses - Array of tankopedia responses.
+     *
+     * @returns {VehicleData[]} Array of tank data.
+     */
+    private extractTankData(responses: TankopediaVehiclesSuccess[]): VehicleData[] {
+        return responses.flatMap((response: TankopediaVehiclesSuccess) => Object.values(response.data)[0]);
     }
 }

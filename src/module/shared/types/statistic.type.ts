@@ -1,27 +1,60 @@
+import { TriviaSelected } from './trivia.type';
+
 //region TRIVIA
+/**
+ * The list of daily tanks selected
+ */
+export type DailyTank = { [day: string]: TriviaSelected[] };
+
 /**
  * Represents the overall statistics for a specific month in the trivia game.
  */
-export type MonthlyTriviaOverallStatisticType = {
+export type MonthlyTriviaOverallStatistic = {
     /**
      * The total number of games start by the bot, during the month
      */
     number_of_game: number;
     /**
-     * The total number of games without participation, during the month
+     * The total number of day without participation, during the month
      */
-    game_without_participation: number;
+    day_without_participation: number;
     /**
-     * The list of unique tanks selected, during the month
+     * The list of daily selected tanks
      */
-    unique_tanks?: string[];
+    day_tank: DailyTank;
 };
 
 /**
  * Represents the overall statistics for the trivia game, categorized by month.
  */
 export type TriviaOverallStatisticType = {
-    [key: string]: MonthlyTriviaOverallStatisticType;
+    [month: string]: MonthlyTriviaOverallStatistic;
+};
+
+/**
+ * The daily statistique of the player
+ */
+export type DailyPlayer = {
+    /**
+     * The participation of the player during the day
+     */
+    participation: number;
+    /**
+     * The total number of right answers during the day
+     */
+    right_answer: number;
+    /**
+     * All daily answer given by the player during the day
+     */
+    answer: string[];
+    /**
+     * The time taken by the player to answer the trivia question during the month
+     */
+    answer_time: number[];
+    /**
+     * The date when the player answered the trivia question
+     */
+    answer_date: Date[];
 };
 
 /**
@@ -33,17 +66,9 @@ export type MonthlyTriviaPlayerStatisticType = {
      */
     elo: number;
     /**
-     * The participation of the player during the month
+     * The daily statistique of the player
      */
-    participation: number;
-    /**
-     * The total number of right answer given by the player during the month
-     */
-    right_answer: number;
-    /**
-     * The time taken by the player to answer the trivia question during the month
-     */
-    answer_time: number[];
+    daily: { [day: string]: DailyPlayer };
     /**
      * The winning streak of the player during the month
      */
@@ -54,13 +79,13 @@ export type MonthlyTriviaPlayerStatisticType = {
  * Represents the player-specific statistics for the trivia game, categorized by player.
  */
 export type TriviaPlayerStatisticType = {
-    [key: string]: MonthlyTriviaPlayerStatisticType;
+    [month: string]: MonthlyTriviaPlayerStatisticType;
 };
 
 /**
  * Represents the overall statistics for the trivia game, including both overall and player-specific data.
  */
-export type TriviaStatisticType = {
+export type TriviaStatistic = {
     /**
      * The version number of the trivia statistics data.
      * @update It each time the architecture changes
@@ -68,7 +93,7 @@ export type TriviaStatisticType = {
     version: number;
     overall: TriviaOverallStatisticType;
     player: {
-        [key: string]: TriviaPlayerStatisticType;
+        [player: string]: TriviaPlayerStatisticType;
     };
 };
 //endregion
@@ -85,7 +110,7 @@ export type MonthlyFoldRecruitmentClanStatisticType = {
  * Represents the fold recruitment statistics for multiple months, categorized by month.
  */
 export type FoldRecruitmentClanStatisticType = {
-    [key: string]: MonthlyFoldRecruitmentClanStatisticType;
+    [month: string]: MonthlyFoldRecruitmentClanStatisticType;
 };
 
 /**
@@ -101,7 +126,7 @@ export type FoldRecruitmentStatisticType = {
      * Clan-specific fold recruitment statistics, categorized by clan id.
      */
     clan: {
-        [key: string]: FoldRecruitmentClanStatisticType;
+        [clan: string]: FoldRecruitmentClanStatisticType;
     };
 };
 //endregion
@@ -118,7 +143,7 @@ export type StatisticType = {
     /**
      * Trivia-related statistics, including overall and player-specific data.
      */
-    trivia: TriviaStatisticType;
+    trivia: TriviaStatistic;
     /**
      * Statistics related to fold recruitment.
      */

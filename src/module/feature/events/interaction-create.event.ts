@@ -8,7 +8,11 @@ import { EnvUtil } from '../../shared/utils/env.util';
 const logger: Logger = new Logger(new Context('INTERACTION-CREATE-EVENT'));
 
 function getCommand(interaction: { commandName: string }): SlashCommandModel | undefined {
-    return require(`../slash-commands/${interaction.commandName}.slash-command`).command;
+    try {
+        return require(`../slash-commands/${interaction.commandName}.slash-command`).command;
+    } catch (err) {
+        return undefined;
+    }
 }
 
 export const event: BotEvent = {

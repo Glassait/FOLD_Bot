@@ -2,9 +2,8 @@ import { InventoryInjector, LoggerInjector, StatisticInjector } from '../../../s
 import { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
 import { ChannelType, Client, Colors, EmbedBuilder, TextChannel, ThreadAutoArchiveDuration } from 'discord.js';
 import { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
-import { MonthlyTriviaOverallStatisticType, TriviaPlayerStatisticType, TriviaStatisticType } from '../../../shared/types/statistic.type';
+import { MonthlyTriviaOverallStatistic, TriviaPlayerStatisticType, TriviaStatistic } from '../../../shared/types/statistic.type';
 import { MEDAL } from '../../../shared/utils/variables.util';
-import { TimeEnum } from '../../../shared/enums/time.enum';
 import { Logger } from '../../../shared/classes/logger';
 import { DateUtil } from '../../../shared/utils/date.util';
 
@@ -57,7 +56,7 @@ export class TriviaMonthModel {
 
         this.month = DateUtil.getPreviousMonth();
 
-        const stats: TriviaStatisticType = this.statistic.trivia;
+        const stats: TriviaStatistic = this.statistic.trivia;
 
         this.playerClassement = Object.entries(stats.player)
             .filter((player: [string, TriviaPlayerStatisticType]) => player[1][this.month])
@@ -176,10 +175,10 @@ export class TriviaMonthModel {
      * Create embed for the quickest player
      */
     private embedQuickPlayer(): void {
-        this.playerClassement.sort(
-            (a: [string, TriviaPlayerStatisticType], b: [string, TriviaPlayerStatisticType]) =>
-                Math.min(...a[1][this.month].answer_time) - Math.min(...b[1][this.month].answer_time)
-        );
+        // this.playerClassement.sort(
+        //     (a: [string, TriviaPlayerStatisticType], b: [string, TriviaPlayerStatisticType]) =>
+        //         Math.min(...a[1][this.month].answer_time) - Math.min(...b[1][this.month].answer_time)
+        // );
 
         const quickPlayer: [string, TriviaPlayerStatisticType] = this.playerClassement[0];
 
@@ -190,12 +189,12 @@ export class TriviaMonthModel {
         this.listEmbed.push(
             new EmbedBuilder()
                 .setTitle('Le joueur le plus rapide')
-                .setDescription(
-                    `Tel un EBR 75, \`${quickPlayer[0]}\` détruit ces ennemies plus vite que l'éclair.` +
-                        `Ainsi il a répondu le plus rapidement en \`${
-                            Math.min(...quickPlayer[1][this.month].answer_time) / TimeEnum.SECONDE
-                        }\` secondes.`
-                )
+                // .setDescription(
+                //     `Tel un EBR 75, \`${quickPlayer[0]}\` détruit ces ennemies plus vite que l'éclair.` +
+                //         `Ainsi il a répondu le plus rapidement en \`${
+                //             Math.min(...quickPlayer[1][this.month].answer_time) / TimeEnum.SECONDE
+                //         }\` secondes.`
+                // )
                 .setColor(Colors.DarkGold)
                 .setImage('https://images6.alphacoders.com/131/1315267.jpeg')
         );
@@ -214,10 +213,10 @@ export class TriviaMonthModel {
         this.listEmbed.push(
             new EmbedBuilder()
                 .setTitle('Le joueur le plus lent')
-                .setDescription(
-                    `\`${slowPlayer[0]}\` est un véritable mur d'acier IRL, du coup il prend son temps pour répondre.` +
-                        ` Son temps le plus long est de \`${Math.min(...slowPlayer[1][this.month].answer_time) / 1000}\` secondes.`
-                )
+                // .setDescription(
+                //     `\`${slowPlayer[0]}\` est un véritable mur d'acier IRL, du coup il prend son temps pour répondre.` +
+                //         ` Son temps le plus long est de \`${Math.min(...slowPlayer[1][this.month].answer_time) / 1000}\` secondes.`
+                // )
                 .setColor(Colors.DarkGold)
                 .setImage('https://static-ptl-eu.gcdn.co/dcont/fb/image/wot_wallpaperseptember2015_eng_1024x600_eng.jpg')
         );
@@ -256,7 +255,7 @@ export class TriviaMonthModel {
      * Create the embed for overall statistics
      */
     private embedOverall(): void {
-        const overallStatistic: MonthlyTriviaOverallStatisticType = this.statistic.trivia.overall[this.month];
+        const overallStatistic: MonthlyTriviaOverallStatistic = this.statistic.trivia.overall[this.month];
         if (!overallStatistic) {
             return;
         }
@@ -269,16 +268,16 @@ export class TriviaMonthModel {
                 { name: 'Nombre total de parties :', value: `\`${overallStatistic.number_of_game}\`` },
                 {
                     name: 'Nombre de parties sans participation :',
-                    value: `\`${overallStatistic.game_without_participation}\``,
+                    value: `\`${overallStatistic.day_without_participation}\``,
                 }
             );
 
-        if (overallStatistic.unique_tanks) {
-            embedOverall.setFields({
-                name: 'Nombre de chars uniques :',
-                value: `\`${overallStatistic.unique_tanks.length}\``,
-            });
-        }
+        // if (overallStatistic.unique_tanks) {
+        //     embedOverall.setFields({
+        //         name: 'Nombre de chars uniques :',
+        //         value: `\`${overallStatistic.unique_tanks.length}\``,
+        //     });
+        // }
 
         this.listEmbed.push(embedOverall);
     }
