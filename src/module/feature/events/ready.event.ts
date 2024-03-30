@@ -15,6 +15,7 @@ export const event: BotEvent = {
     async execute(client: Client): Promise<void> {
         const logger: Logger = new Logger(new Context('READY-EVENT'));
         const inventory: InventorySingleton = InventorySingleton.instance;
+        const trivia = TriviaSingleton.instance;
 
         logger.info(`${EmojiEnum.MUSCLE} Logged in as {}`, client.user?.tag as string);
         const status = SentenceUtil.getRandomStatus();
@@ -31,7 +32,8 @@ export const event: BotEvent = {
         });
 
         if (inventory.getFeatureFlipping('trivia')) {
-            await TriviaSingleton.instance.fetchTankOfTheDay();
+            await trivia.fetchTankOfTheDay();
+            await trivia.sendTriviaResultForYesterday(client);
         }
 
         const today = new Date();

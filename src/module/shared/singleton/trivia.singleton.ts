@@ -2,7 +2,7 @@ import { Logger } from '../classes/logger';
 import { Context } from '../classes/context';
 import { RandomUtil } from '../utils/random.util';
 import { TankopediaVehiclesSuccess, VehicleData } from '../types/wot-api.type';
-import { ShellType } from '../../feature/loops/enums/shell.enum';
+import { ShellEnum, ShellType } from '../../feature/loops/enums/shell.enum';
 import { InventorySingleton } from './inventory.singleton';
 import { Trivia } from '../types/inventory.type';
 import { WotApiModel } from '../apis/wot-api.model';
@@ -10,7 +10,11 @@ import { application_id_wot } from '../../core/config.json';
 import { ConstantsEnum } from '../../feature/loops/enums/wot-api.enum';
 import { TriviaSelected } from '../types/trivia.type';
 import { StatisticSingleton } from './statistic.singleton';
-import { TriviaStatistic } from '../types/statistic.type';
+import { TriviaPlayerStatisticType, TriviaStatistic } from '../types/statistic.type';
+import { Client, Colors, EmbedBuilder, TextChannel } from 'discord.js';
+import { DateUtil } from '../utils/date.util';
+import { MEDAL } from '../utils/variables.util';
+import { TimeEnum } from '../enums/time.enum';
 
 /**
  * Class used to manage the trivia game
@@ -46,6 +50,10 @@ export class TriviaSingleton {
      * The information stored in the statistique about the trivia game
      */
     private readonly triviaStatistique: TriviaStatistic;
+    //endregion
+
+    //region PRIVATE FIELDS
+    private channel: TextChannel;
     //endregion
 
     private constructor() {
@@ -92,6 +100,11 @@ export class TriviaSingleton {
     public async fetchTankOfTheDay(): Promise<void> {
         this.statistic.initializeMonthStatistics();
 
+        if (this.triviaStatistique.overall[this.statistic.currentMonth].day_tank[this.statistic.currentDay]) {
+            this.logger.debug('Trivia tanks already fetch, cannot fetch new tanks !');
+            return;
+        }
+
         for (let i = 0; i < this.trivia.max_number_of_question; i++) {
             this.logger.debug(`Start fetching tanks n°${i}`);
             const tankPages: number[] = this.fetchTankPages();
@@ -117,9 +130,130 @@ export class TriviaSingleton {
         }
 
         this.triviaStatistique.overall[this.statistic.currentMonth].day_tank[this.statistic.currentDay] = this._datum;
+        this.triviaStatistique.overall[this.statistic.currentMonth].number_of_game += this._datum.length;
 
         this.statistic.trivia = this.triviaStatistique;
         this.inventory.trivia = this.trivia;
+    }
+
+    public async sendTriviaResultForYesterday(client: Client): Promise<void> {
+        this.logger.debug('Start collecting data to send the trivia result');
+        this.channel = await this.inventory.getChannelForTrivia(client);
+
+        const previousDay = DateUtil.getPreviousDay();
+        const dayTankElement = this.triviaStatistique.overall[this.statistic.currentMonth].day_tank[previousDay];
+
+        if (!dayTankElement) {
+            this.logger.debug('No tanks fetch yesterday');
+            return;
+        }
+
+        let dayWithoutParticipation: boolean = true;
+
+        for (const selected of dayTankElement) {
+            const index: number = dayTankElement.indexOf(selected);
+
+            const player: [string, TriviaPlayerStatisticType][] = Object.entries(this.triviaStatistique.player)
+                .filter((value: [string, TriviaPlayerStatisticType]): boolean => {
+                    return value[1][this.statistic.currentMonth].daily[previousDay]?.answer[index] === selected.tank.name;
+                })
+                .sort((a: [string, TriviaPlayerStatisticType], b: [string, TriviaPlayerStatisticType]) => {
+                    return (
+                        b[1][this.statistic.currentMonth].daily[previousDay].answer_time[index] -
+                        a[1][this.statistic.currentMonth].daily[previousDay].answer_time[index]
+                    );
+                })
+                .slice(0, 2);
+
+            if (player.length > 0) {
+                dayWithoutParticipation = false;
+            }
+
+            const answerEmbed = new EmbedBuilder()
+                .setTitle(`Question n°${index + 1}`)
+                .setColor(Colors.DarkGold)
+                .setImage(selected.tank.images.big_icon)
+                .setDescription(`Le char à deviner était : \`${selected.tank.name}\``)
+                .setFooter({ text: 'Trivia Game' })
+                .setFields(
+                    {
+                        name: 'Obus normal',
+                        value: `\`${ShellEnum[selected.tank.default_profile.ammo[0].type as keyof typeof ShellEnum]} ${
+                            selected.tank.default_profile.ammo[0].damage[1]
+                        }\``,
+                        inline: true,
+                    },
+                    {
+                        name: 'Obus spécial (ou gold)',
+                        value: `\`${ShellEnum[selected.tank.default_profile.ammo[1].type as keyof typeof ShellEnum]} ${
+                            selected.tank.default_profile.ammo[1].damage[1]
+                        }\``,
+                        inline: true,
+                    },
+                    {
+                        name: 'Obus explosif',
+                        value: `\`${ShellEnum[selected.tank.default_profile.ammo[2].type as keyof typeof ShellEnum]} ${
+                            selected.tank.default_profile.ammo[2].damage[1]
+                        }\``,
+                        inline: true,
+                    }
+                );
+
+            const playerEmbed = new EmbedBuilder()
+                .setTitle(':trophy: Podium des joueurs :trophy: ')
+                .setColor(Colors.DarkGold)
+                .setFooter({ text: 'Trivia Game' });
+
+            if (player.length === 0) {
+                this.logger.debug('No players answer to the question n°{}', String(index + 1));
+                playerEmbed.setDescription("Aucun joueur n'a envoyé de réponse ou répondu correctement à cette question");
+            } else {
+                playerEmbed.setFields({
+                    name: `Top 3`,
+                    value: player.reduce(
+                        (previousValue: string, currentValue: [string, TriviaPlayerStatisticType], currentIndex: number): string => {
+                            this.logger.debug(
+                                'The following player {} is in the top 3 for the question n°{}',
+                                currentValue[0],
+                                String(index + 1)
+                            );
+
+                            return `${previousValue}\n${MEDAL[currentIndex]}\`${currentValue[0]}\` en ${this.calculateResponseTime(
+                                currentValue,
+                                index
+                            )}`;
+                        },
+                        ''
+                    ),
+                });
+            }
+
+            this.logger.debug('Sending message in channel for question n°{}', String(index + 1));
+            await this.channel.send({
+                embeds: [answerEmbed, playerEmbed],
+            });
+        }
+
+        this.triviaStatistique.overall[this.statistic.currentMonth].day_without_participation += dayWithoutParticipation ? 1 : 0;
+        this.statistic.trivia = this.triviaStatistique;
+    }
+
+    /**
+     * Calculates the time taken by the player to answer the trivia question.
+     *
+     * @param {[string, TriviaPlayerStatisticType]} playersResponse - Array of player username and their responses.
+     * @param {number} index - The index of the question
+     *
+     * @returns {string} The time taken by the player to answer the trivia question in string format.
+     *
+     * @example
+     * const playersResponse = ['glassait', { 'mars 2024': { daily: { '30/02/24': { answer_time: [3000] } } } }]
+     * const time = this.calculateResponseTime(playersResponse, 0)
+     * console.log(time) // 3 secondes
+     */
+    private calculateResponseTime(playersResponse: [string, TriviaPlayerStatisticType], index: number): string {
+        const sec = playersResponse[1][this.statistic.currentMonth].daily[DateUtil.getPreviousDay()].answer_time[index] / TimeEnum.SECONDE;
+        return sec > 60 ? `${Math.floor(sec / 60)}:${Math.round(sec % 60)} minutes` : `${sec.toFixed(2)} secondes`;
     }
 
     /**

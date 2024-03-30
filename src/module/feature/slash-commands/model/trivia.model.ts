@@ -62,7 +62,7 @@ export class TriviaModel {
             },
             {
                 name: 'Minuteur',
-                value: "Tu as `2 minutes` pour répondre à la question. À la fin du minuteur, le bot t'enverra ton résultat : bonne ou mauvaise réponse ainsi que les informations sur le char à trouver et sur le char que tu as sélectionné.",
+                value: "Tu as `1 minute` pour répondre à la question. À la fin du minuteur, le bot t'enverra ton résultat : bonne ou mauvaise réponse ainsi que les informations sur le char à trouver et sur le char que tu as sélectionné.",
             },
             {
                 name: 'Bouton',
@@ -165,7 +165,14 @@ export class TriviaModel {
                 ?.participation >= this.inventory.trivia.max_number_of_question
         ) {
             await interaction.editReply({
-                content: `Tu as atteint le nombre maximum de question par jour ! (actuellement ${this.inventory.trivia.max_number_of_question} par jour)`,
+                content: `Tu as atteint le nombre maximum de question par jour ! (actuellement ${this.inventory.trivia.max_number_of_question} par jour)\nReviens demain pour pouvoir rejouer !`,
+            });
+            return;
+        }
+
+        if (this.datum.get(interaction.user.username)) {
+            await interaction.editReply({
+                content: `Tu as déjà une parti de trivia en cours ! Merci d'attendre que la partie précédente ce termine avant de lancer une nouvelle partie`,
             });
             return;
         }
@@ -449,6 +456,13 @@ export class TriviaModel {
         return this.checkVehicleAmmoDetail(vehicle.default_profile.ammo[datum.ammoIndex], datum.tank.default_profile.ammo[datum.ammoIndex]);
     }
 
+    /**
+     * Updates the statistic after a player has completed a trivia game.
+     *
+     * @param {PlayerAnswer} playerAnswer - The player's final answer.
+     * @param {boolean} isGoodAnswer - Indicates whether the player's final answer is correct or not.
+     * @param {string} username - The username of the player.
+     */
     private async updateStatistic(playerAnswer: PlayerAnswer, isGoodAnswer: boolean, username: string): Promise<void> {
         this.logger.debug(`Start updating {} statistic`, username);
         await this.updatePlayerStatistic(username, playerAnswer, isGoodAnswer);
@@ -456,6 +470,13 @@ export class TriviaModel {
         this.logger.debug(`End updating {} statistic`, username);
     }
 
+    /**
+     * Updates the player statistics after they have answered a trivia question.
+     *
+     * @param {string} playerName - The name of the player whose statistics need to be updated.
+     * @param {PlayerAnswer} playerAnswer - The answer provided by the player.
+     * @param {boolean} isGoodAnswer - Indicates whether the player's answer is correct or not.
+     */
     private async updatePlayerStatistic(playerName: string, playerAnswer: PlayerAnswer, isGoodAnswer: boolean): Promise<void> {
         const value = this.datum.get(playerName);
 
