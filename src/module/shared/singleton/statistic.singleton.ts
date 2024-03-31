@@ -253,7 +253,7 @@ export class StatisticSingleton {
         }
 
         this._data.trivia.player[username][this.currentMonth] = {
-            elo: Math.max(0, this._data.trivia.player[username][DateUtil.getPreviousMonth()]?.elo),
+            elo: Math.max(0, this._data.trivia.player[username][DateUtil.getPreviousMonth()]?.elo || 0),
             daily: {
                 [this.currentDay]: {
                     participation: 0,
@@ -263,7 +263,7 @@ export class StatisticSingleton {
                     right_answer: 0,
                 },
             },
-            win_strick: {
+            win_streak: {
                 current: 0,
                 max: 0,
             },

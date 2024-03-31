@@ -34,6 +34,7 @@ export const event: BotEvent = {
         if (inventory.getFeatureFlipping('trivia')) {
             await trivia.fetchTankOfTheDay();
             await trivia.sendTriviaResultForYesterday(client);
+            trivia.reduceEloOfInactifPlayer();
         }
 
         const today = new Date();

@@ -20,7 +20,7 @@ import { Ammo, VehicleData } from '../../../shared/types/wot-api.type';
 import { Logger } from '../../../shared/classes/logger';
 import { TimeUtil } from '../../../shared/utils/time.util';
 import { PlayerAnswer } from '../types/trivia-game.type';
-import { DailyPlayer, MonthlyTriviaPlayerStatisticType, TriviaStatistic } from '../../../shared/types/statistic.type';
+import { DailyPlayer, MonthlyTriviaPlayerStatisticType, TriviaStatistic, WinStreak } from '../../../shared/types/statistic.type';
 import { TriviaSelected } from '../../../shared/types/trivia.type';
 import { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
 import { InventorySingleton } from 'src/module/shared/singleton/inventory.singleton';
@@ -494,7 +494,7 @@ export class TriviaModel {
         const oldElo = value.stats.elo;
         value.stats.elo = this.calculateElo(oldElo, playerAnswer?.responseTime, isGoodAnswer);
 
-        const winStrick = value.stats.win_strick;
+        const winStrick = value.stats.win_streak;
 
         if (isGoodAnswer) {
             await this.handleGoodAnswer(winStrick, playerAnswer, oldElo, playerName);
@@ -530,20 +530,12 @@ export class TriviaModel {
     /**
      * Handle the logic when the player found the right answer
      *
-     * @param {{ current: number; max: number }} winStrick - The player win strick
+     * @param {{ current: number; max: number }} winStreak - The player win streak
      * @param {PlayerAnswer} playerAnswer - The player answer
      * @param {number} oldElo - The player elo before the answer
      * @param {string} playerName - The player username
      */
-    private async handleGoodAnswer(
-        winStrick: {
-            current: number;
-            max: number;
-        },
-        playerAnswer: PlayerAnswer,
-        oldElo: number,
-        playerName: string
-    ): Promise<void> {
+    private async handleGoodAnswer(winStreak: WinStreak, playerAnswer: PlayerAnswer, oldElo: number, playerName: string): Promise<void> {
         const value = this.datum.get(playerName);
 
         if (!value) {
@@ -551,8 +543,8 @@ export class TriviaModel {
         }
 
         value.daily.right_answer++;
-        winStrick.current++;
-        winStrick.max = Math.max(winStrick.current, winStrick.max);
+        winStreak.current++;
+        winStreak.max = Math.max(winStreak.current, winStreak.max);
 
         await playerAnswer?.interaction.editReply({
             content: '',
@@ -574,19 +566,15 @@ export class TriviaModel {
     /**
      * handle the logic when the player haven't answered or found the answer
      *
-     * @param {{ current: number; max: number }} winStrick - The player win strick
+     * @param {{ current: number; max: number }} winStreak - The player win streak
      * @param {PlayerAnswer} playerAnswer - The player answer
      * @param {number} oldElo - The player elo before the answer
      * @param {string} playerName - The player username
      * @param {VehicleData[]} allTanks - All the tanks available for the question
      * @param {TriviaSelected} datum - The tank selected for the question
-     * @private
      */
     private async handleWrongAnswer(
-        winStrick: {
-            current: number;
-            max: number;
-        },
+        winStreak: WinStreak,
         playerAnswer: PlayerAnswer,
         oldElo: number,
         playerName: string,
@@ -605,7 +593,7 @@ export class TriviaModel {
             return;
         }
 
-        winStrick.current = 0;
+        winStreak.current = 0;
         const tank = allTanks.find((tank: VehicleData): boolean => tank.name === playerAnswer?.response);
 
         if (!tank) {

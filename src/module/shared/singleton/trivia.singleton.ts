@@ -239,6 +239,32 @@ export class TriviaSingleton {
     }
 
     /**
+     * Reduces the Elo of inactive players for the previous day.
+     * Inactive players are those who did not participate in the trivia game on the previous day.
+     * The Elo reduction factor is 0.982.
+     */
+    public reduceEloOfInactifPlayer(): void {
+        this.logger.debug('Start removing elo of inactif player');
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        for (const [username, playerStats] of Object.entries(this.triviaStatistique.player)) {
+            if (!playerStats[DateUtil.convertDateToMonthYearString(yesterday)].daily[DateUtil.convertDateToDayMonthYearString(yesterday)]) {
+                const oldElo = this.triviaStatistique.player[username][DateUtil.convertDateToMonthYearString(yesterday)].elo;
+                this.triviaStatistique.player[username][DateUtil.convertDateToMonthYearString(yesterday)].elo *= 0.982;
+                this.logger.debug(
+                    'Inactif player spotted : {}, old elo : {}, new elo : {}',
+                    username,
+                    String(oldElo),
+                    String(this.triviaStatistique.player[username][DateUtil.convertDateToMonthYearString(yesterday)].elo)
+                );
+            }
+        }
+
+        this.statistic.trivia = this.triviaStatistique;
+    }
+
+    /**
      * Calculates the time taken by the player to answer the trivia question.
      *
      * @param {[string, TriviaPlayerStatisticType]} playersResponse - Array of player username and their responses.

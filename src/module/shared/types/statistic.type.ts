@@ -58,6 +58,20 @@ export type DailyPlayer = {
 };
 
 /**
+ * Represents the win streak of a player.
+ */
+export type WinStreak = {
+    /**
+     * The current win streak count.
+     */
+    current: number;
+    /**
+     * The maximum win streak count achieved.
+     */
+    max: number;
+};
+
+/**
  * Represents the player-specific statistics for a specific month in the trivia game.
  */
 export type MonthlyTriviaPlayerStatisticType = {
@@ -72,7 +86,7 @@ export type MonthlyTriviaPlayerStatisticType = {
     /**
      * The winning streak of the player during the month
      */
-    win_strick: { current: number; max: number };
+    win_streak: WinStreak;
 };
 
 /**
