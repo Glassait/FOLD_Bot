@@ -12,14 +12,14 @@ import {
     Message,
 } from 'discord.js';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
-import { ShellEnum, ShellType } from '../../loops/enums/shell.enum';
+import { ShellEnum, ShellType } from '../enums/shell.enum';
 import { InventoryInjector, LoggerInjector, StatisticInjector, TriviaInjector } from '../../../shared/decorators/injector.decorator';
 import { TriviaSingleton } from '../../../shared/singleton/trivia.singleton';
 import { TimeEnum } from '../../../shared/enums/time.enum';
 import { Ammo, VehicleData } from '../../../shared/types/wot-api.type';
 import { Logger } from '../../../shared/classes/logger';
 import { TimeUtil } from '../../../shared/utils/time.util';
-import { PlayerAnswer } from '../../loops/types/trivia-game.type';
+import { PlayerAnswer } from '../types/trivia-game.type';
 import { DailyPlayer, MonthlyTriviaPlayerStatisticType, TriviaStatistic } from '../../../shared/types/statistic.type';
 import { TriviaSelected } from '../../../shared/types/trivia.type';
 import { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';

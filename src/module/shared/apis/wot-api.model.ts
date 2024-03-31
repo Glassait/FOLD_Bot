@@ -6,7 +6,7 @@ import { application_id_wot } from '../../core/config.json';
 import { TimeEnum } from '../enums/time.enum';
 import { EmojiEnum } from '../enums/emoji.enum';
 import { InventorySingleton } from '../singleton/inventory.singleton';
-import { ConstantsEnum } from '../../feature/loops/enums/wot-api.enum';
+import { ConstantsEnum } from '../enums/wot-api.enum';
 import { WargamingErrorType, WargamingSuccessType } from '../types/wargaming-api.type';
 
 @LoggerInjector

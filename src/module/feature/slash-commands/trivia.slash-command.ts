@@ -25,7 +25,7 @@ export const command: SlashCommandModel = new SlashCommandModel(
 
         if (!InventorySingleton.instance.getFeatureFlipping('trivia')) {
             await interaction.editReply({
-                content: "Le jeu trivia n'est pas activé par l'administrateur du bot.",
+                content: "Le jeu trivia n'est pas activé par l'administrateur <@313006042340524033>.",
             });
             return;
         }
