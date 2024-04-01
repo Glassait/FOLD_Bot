@@ -72,11 +72,6 @@ export type Trivia = {
      */
     total_number_of_tanks: number;
     /**
-     * Array of schedules for the trivia game.
-     * @todo TO DELETE : No more schedules trivia
-     */
-    schedule: string[];
-    /**
      * Array of last tank pages for the trivia game.
      *
      * @example

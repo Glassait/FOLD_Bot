@@ -123,7 +123,7 @@ export class LoggerSingleton extends Context {
     private updateFile(): void {
         writeFile(this.path, this.log, err => {
             if (err) {
-                this.warning(this, `🔄❌ Failed to sync the log file with error: ${err}`);
+                this.warning(this, `🔄❌ Failed to sync the log file with error: ${err as unknown as string}`);
             }
         });
     }

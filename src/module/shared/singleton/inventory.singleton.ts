@@ -103,35 +103,6 @@ export class InventorySingleton {
         this._inventory.game.trivia = trivia;
         FileUtil.writeIntoJson(this.path, this._inventory);
     }
-
-    /**
-     * Get the schedule of the trivia game.
-     * The value need to be parsed to extract the hours and the minutes
-     *
-     * @return The schedule of the trivia game
-     */
-    public get triviaSchedule(): string[] {
-        return this._inventory.game.trivia.schedule;
-    }
-
-    /**
-     * Get the last page used for the trivia game
-     *
-     * @return The last page used for the trivia game
-     */
-    public get triviaLastPage(): number[] {
-        return this._inventory.game.trivia.last_tank_page;
-    }
-
-    /**
-     * Set the last page used for the trivia game
-     *
-     * @param lastPage The last page used for the trivia game
-     */
-    public set triviaLastPage(lastPage: number[]) {
-        this._inventory.game.trivia.last_tank_page = lastPage;
-        FileUtil.writeIntoJson(this.path, this._inventory);
-    }
     //endregion
 
     //region FOLD RECRUITMENT

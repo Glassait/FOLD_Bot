@@ -56,7 +56,7 @@ export const command: SlashCommandModel = new SlashCommandModel(
                 .setDescription('Visualiser-vos statistiques sur le jeu trivia'),
             new SlashCommandSubcommandBuilder()
                 .setName(MAPPING.SCOREBOARD.name)
-                .setDescription(`Visualiser le scoreboard du mois de \'${DateUtil.getCurrentMonth()}\' pour le jeu trivia`),
+                .setDescription(`Visualiser le scoreboard du mois de \`${DateUtil.getCurrentMonth()}\` pour le jeu trivia`),
             new SlashCommandSubcommandBuilder().setName(MAPPING.RULE.name).setDescription('Lire les règle du jeu trivia'),
         ],
     }

@@ -11,7 +11,6 @@
 			"max_response_time_limit": 15,
 			"max_duration_of_question": 1,
 			"url": "wot/encyclopedia/vehicles/?application_id=APPLICATION_ID&tier=10&language=fr&fields=name%2C+images.big_icon%2C+default_profile.ammo.damage%2C+default_profile.ammo.type&limit=1&page_no=pageNumber&type=heavyTank%2C+AT-SPG%2C+mediumTank%2C+lightTank",
-			"schedule": [],
 			"last_tank_page": []
 		}
 	},
