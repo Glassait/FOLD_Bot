@@ -10,6 +10,9 @@ import {
     ComponentType,
     EmbedBuilder,
     Message,
+    StringSelectMenuBuilder,
+    StringSelectMenuInteraction,
+    StringSelectMenuOptionBuilder,
 } from 'discord.js';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 import { ShellEnum, ShellType } from '../enums/shell.enum';
@@ -20,10 +23,17 @@ import { Ammo, VehicleData } from '../../../shared/types/wot-api.type';
 import { Logger } from '../../../shared/classes/logger';
 import { TimeUtil } from '../../../shared/utils/time.util';
 import { PlayerAnswer } from '../types/trivia-game.type';
-import { DailyPlayer, MonthlyTriviaPlayerStatisticType, TriviaStatistic, WinStreak } from '../../../shared/types/statistic.type';
+import {
+    DailyTrivia,
+    MonthlyTriviaPlayerStatisticType,
+    TriviaPlayerStatisticType,
+    TriviaStatistic,
+    WinStreak,
+} from '../../../shared/types/statistic.type';
 import { TriviaSelected } from '../../../shared/types/trivia.type';
 import { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
 import { InventorySingleton } from 'src/module/shared/singleton/inventory.singleton';
+import { MEDAL } from '../../../shared/utils/variables.util';
 
 @LoggerInjector
 @TriviaInjector
@@ -126,7 +136,7 @@ export class TriviaModel {
     private datum: Map<
         string,
         {
-            daily: DailyPlayer;
+            daily: DailyTrivia;
             stats: MonthlyTriviaPlayerStatisticType;
             interaction: ChatInputCommandInteraction;
         }
@@ -234,6 +244,124 @@ export class TriviaModel {
         this.logger.debug('Trivia game message send to {}', interaction.user.username);
 
         await this.collectAnswer(gameMessage, interaction.user.username);
+    }
+
+    /**
+     * Sends the trivia statistics for a specific month to the user.
+     *
+     * @param {ChatInputCommandInteraction} interaction - The interaction object representing the user command.
+     */
+    public async sendStatistics(interaction: ChatInputCommandInteraction): Promise<void> {
+        const playerStats = this.triviaStatistic.player[interaction.user.username];
+
+        if (!playerStats) {
+            await interaction.editReply({
+                content:
+                    "Tu n'as pas encore de statistiques pour le jeu Trivia. Essaye après avoir répondu au moins une fois au jeu. (`/trivia game`)",
+            });
+        }
+
+        const select: StringSelectMenuBuilder = new StringSelectMenuBuilder()
+            .setCustomId('trivia-statistics-select')
+            .setPlaceholder('Choisissez un mois');
+
+        Object.keys(playerStats)
+            .reverse()
+            .forEach((month: string) => select.addOptions(new StringSelectMenuOptionBuilder().setLabel(month).setValue(month)));
+
+        const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(select);
+        const message: Message<BooleanCache<CacheType>> = await interaction.editReply({
+            components: [row],
+            content: 'Choisissez un mois pour voir les statistiques.',
+        });
+
+        message
+            .createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: TimeEnum.HOUR * 2 })
+            .on('collect', async (i: StringSelectMenuInteraction): Promise<void> => {
+                const stats = playerStats[i.values[0]];
+
+                const embed = new EmbedBuilder()
+                    .setTitle(`Statistiques pour le mois de ${i.values[0]}`)
+                    .setColor(Colors.LuminousVividPink)
+                    .setDescription('Voici les statistiques demandées')
+                    .setFields(
+                        { name: 'Elo', value: `\`${stats.elo}\``, inline: true },
+                        {
+                            name: 'Nombre de bonnes réponses',
+                            value: `\`${Object.values(stats.daily).reduce((number: number, currentValue: DailyTrivia) => {
+                                number += currentValue.right_answer;
+                                return number;
+                            }, 0)}\``,
+                            inline: true,
+                        },
+                        { name: 'Plus longue séquence correcte', value: `\`${stats.win_streak.max}\`` },
+                        {
+                            name: 'Réponse la plus rapide',
+                            value: `\`${
+                                Math.min(...Object.values(stats.daily).flatMap((daily: DailyTrivia) => daily.answer_time)) /
+                                TimeEnum.SECONDE
+                            }\` sec`,
+                            inline: true,
+                        },
+                        {
+                            name: 'Réponse la plus longue',
+                            value: `\`${
+                                Math.max(...Object.values(stats.daily).flatMap((daily: DailyTrivia) => daily.answer_time)) /
+                                TimeEnum.SECONDE
+                            }\` sec`,
+                            inline: true,
+                        },
+                        {
+                            name: 'Nombre de participation',
+                            value: `\`${Object.values(stats.daily).reduce((number: number, currentValue: DailyTrivia) => {
+                                number += currentValue.participation;
+                                return number;
+                            }, 0)}\``,
+                        }
+                    );
+
+                await i.update({
+                    embeds: [embed],
+                });
+            });
+    }
+
+    /**
+     * Sends the scoreboard for the current month's trivia game.
+     *
+     * @param {ChatInputCommandInteraction} interaction - The interaction object representing the user's command interaction.
+     */
+    public async sendScoreboard(interaction: ChatInputCommandInteraction): Promise<void> {
+        const username = interaction.user.username;
+        const embedScoreboard = new EmbedBuilder()
+            .setTitle('Scoreboard')
+            .setDescription(`Voici le scoreboard du mois de \`${this.statistic.currentMonth}\` pour le jeu trivia`)
+            .setFooter({ text: 'Trivia game' })
+            .setColor(Colors.Fuchsia);
+
+        const playerStats = Object.entries(this.triviaStatistic.player)
+            .filter((player: [string, TriviaPlayerStatisticType]) => player[1][this.statistic.currentMonth])
+            .sort(
+                (a: [string, TriviaPlayerStatisticType], b: [string, TriviaPlayerStatisticType]) =>
+                    b[1][this.statistic.currentMonth].elo - a[1][this.statistic.currentMonth].elo
+            );
+
+        embedScoreboard.addFields({
+            name: 'Joueur - Elo',
+            value: playerStats
+                .map(
+                    (player: [string, TriviaPlayerStatisticType], index: number): string =>
+                        `${username === player[0] ? '`--> ' : ''}${index < 2 ? MEDAL[index] : index + 1}. ${player[0]} - ${
+                            player[1][this.statistic.currentMonth].elo
+                        }${username === player[0] ? ' <--`' : ''}`
+                )
+                .join('\n'),
+            inline: true,
+        });
+
+        await interaction.editReply({
+            embeds: [embedScoreboard],
+        });
     }
 
     /**

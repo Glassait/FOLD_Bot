@@ -34,7 +34,7 @@ export type TriviaOverallStatisticType = {
 /**
  * The daily statistique of the player
  */
-export type DailyPlayer = {
+export type DailyTrivia = {
     /**
      * The participation of the player during the day
      */
@@ -82,7 +82,7 @@ export type MonthlyTriviaPlayerStatisticType = {
     /**
      * The daily statistique of the player
      */
-    daily: { [day: string]: DailyPlayer };
+    daily: { [day: string]: DailyTrivia };
     /**
      * The winning streak of the player during the month
      */

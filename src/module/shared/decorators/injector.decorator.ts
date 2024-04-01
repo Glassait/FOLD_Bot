@@ -34,7 +34,7 @@ type Constructor = new (...args: any[]) => any;
  * }
  */
 export function LoggerInjector<T extends Constructor>(base: T): T {
-    logger.info(`Logger injected for {}`, base.name);
+    logger.debug(`Logger injected for {}`, base.name);
     return {
         [base.name]: class extends base {
             logger: Logger = new Logger(new Context(base.name));
@@ -60,7 +60,7 @@ export function LoggerInjector<T extends Constructor>(base: T): T {
  * }
  */
 export function InventoryInjector<T extends Constructor>(base: T): T {
-    logger.info(`Inventory injected for {}`, base.name);
+    logger.debug(`Inventory injected for {}`, base.name);
     return {
         [base.name]: class extends base {
             inventory: InventorySingleton = InventorySingleton.instance;
@@ -87,7 +87,7 @@ export function InventoryInjector<T extends Constructor>(base: T): T {
  */
 export function AxiosInjector<T extends Constructor>(timeout: number = TimeEnum.MINUTE): (base: T) => T {
     return function (base: T): T {
-        logger.info(`Axios injected for {} with a timeout of {}ms`, base.name, String(timeout));
+        logger.debug(`Axios injected for {} with a timeout of {}ms`, base.name, String(timeout));
         return {
             [base.name]: class extends base {
                 axios: AxiosInstance = axios.create({
@@ -119,7 +119,7 @@ export function AxiosInjector<T extends Constructor>(timeout: number = TimeEnum.
  * }
  */
 export function StatisticInjector<T extends Constructor>(base: T): T {
-    logger.info(`Statistic injected for {}`, base.name);
+    logger.debug(`Statistic injected for {}`, base.name);
     return {
         [base.name]: class extends base {
             statistic: StatisticSingleton = StatisticSingleton.instance;
@@ -145,7 +145,7 @@ export function StatisticInjector<T extends Constructor>(base: T): T {
  * }
  */
 export function FeatureInjector<T extends Constructor>(base: T): T {
-    logger.info(`Feature injected for {}`, base.name);
+    logger.debug(`Feature injected for {}`, base.name);
     return {
         [base.name]: class extends base {
             feature: FeatureSingleton = FeatureSingleton.instance;
@@ -171,7 +171,7 @@ export function FeatureInjector<T extends Constructor>(base: T): T {
  * }
  */
 export function TriviaInjector<T extends Constructor>(base: T): T {
-    logger.info(`Trivia injected for {}`, base.name);
+    logger.debug(`Trivia injected for {}`, base.name);
     return {
         [base.name]: class extends base {
             trivia: TriviaSingleton = TriviaSingleton.instance;

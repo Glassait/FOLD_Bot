@@ -2,7 +2,7 @@ import { InventoryInjector, LoggerInjector, StatisticInjector } from '../../../s
 import { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
 import { ChannelType, Client, Colors, EmbedBuilder, TextChannel, ThreadAutoArchiveDuration } from 'discord.js';
 import { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
-import { DailyPlayer, MonthlyTriviaOverallStatistic, TriviaPlayerStatisticType } from '../../../shared/types/statistic.type';
+import { DailyTrivia, MonthlyTriviaOverallStatistic, TriviaPlayerStatisticType } from '../../../shared/types/statistic.type';
 import { MEDAL } from '../../../shared/utils/variables.util';
 import { Logger } from '../../../shared/classes/logger';
 import { DateUtil } from '../../../shared/utils/date.util';
@@ -167,8 +167,8 @@ export class TriviaMonthModel {
     private embedQuickPlayer(): void {
         this.playerClassement.sort(
             (a: [string, TriviaPlayerStatisticType], b: [string, TriviaPlayerStatisticType]) =>
-                Math.min(...Object.values(a[1][this.month].daily).flatMap((value: DailyPlayer) => value.answer_time)) -
-                Math.min(...Object.values(b[1][this.month].daily).flatMap((value: DailyPlayer) => value.answer_time))
+                Math.min(...Object.values(a[1][this.month].daily).flatMap((value: DailyTrivia) => value.answer_time)) -
+                Math.min(...Object.values(b[1][this.month].daily).flatMap((value: DailyTrivia) => value.answer_time))
         );
 
         const quickPlayer: [string, TriviaPlayerStatisticType] = this.playerClassement[0];
@@ -184,7 +184,7 @@ export class TriviaMonthModel {
                     `Tel un EBR 75, \`${quickPlayer[0]}\` détruit ces ennemies plus vite que l'éclair.` +
                         `Ainsi il a répondu le plus rapidement en \`${
                             Math.min(
-                                ...Object.values(quickPlayer[1][this.month].daily).flatMap((value: DailyPlayer) => value.answer_time)
+                                ...Object.values(quickPlayer[1][this.month].daily).flatMap((value: DailyTrivia) => value.answer_time)
                             ) / TimeEnum.SECONDE
                         }\` secondes.`
                 )
@@ -209,7 +209,7 @@ export class TriviaMonthModel {
                 .setDescription(
                     `\`${slowPlayer[0]}\` est un véritable mur d'acier IRL, du coup il prend son temps pour répondre.` +
                         ` Son temps le plus long est de \`${
-                            Math.min(...Object.values(slowPlayer[1][this.month].daily).flatMap((value: DailyPlayer) => value.answer_time)) /
+                            Math.min(...Object.values(slowPlayer[1][this.month].daily).flatMap((value: DailyTrivia) => value.answer_time)) /
                             1000
                         }\` secondes.`
                 )

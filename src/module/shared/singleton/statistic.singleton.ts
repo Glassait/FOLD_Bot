@@ -4,7 +4,6 @@ import {
     FoldRecruitmentClanStatisticType,
     MonthlyFoldRecruitmentClanStatisticType,
     StatisticType,
-    TriviaPlayerStatisticType,
     TriviaStatistic,
 } from '../types/statistic.type';
 import { FileUtil } from '../utils/file.util';
@@ -136,21 +135,6 @@ export class StatisticSingleton {
     public backupData(): void {
         this.logger.info('Backing up {}', StatisticSingleton.name);
         FileUtil.writeIntoJson(this.backupPath, this._data);
-    }
-
-    /**
-     * Gets the player-specific trivia statistics for a specific player.
-     *
-     * @param {string} playerId - The ID of the player for whom to retrieve statistics.
-     * @returns {TriviaPlayerStatisticType} - Player-specific trivia statistics.
-     *
-     * @example
-     * const playerId = '123456789';
-     * const playerStats = instance.getPlayerStatistic(playerId);
-     * console.log(playerStats); // { elo: 1500, participation: 5, right_answer: 2, answer_time: [ `array of answer times` ], win_strick: { current: 1, max: 2 } }
-     */
-    public getPlayerStatistic(playerId: string): TriviaPlayerStatisticType {
-        return this._data.trivia.player[playerId];
     }
 
     /**

@@ -7,6 +7,8 @@ import { Logger } from '../../shared/classes/logger';
 import { SlashCommandModel } from '../slash-commands/model/slash-command.model';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
+import { EnvUtil } from '../../shared/utils/env.util';
+import { TimeEnum } from '../../shared/enums/time.enum';
 
 module.exports = async (_client: Client): Promise<void> => {
     const logger: Logger = new Logger(new Context('COMMANDS-HANDLER'));
@@ -31,6 +33,8 @@ module.exports = async (_client: Client): Promise<void> => {
 
     for (const entry of Object.entries(body)) {
         try {
+            await rest.put(Routes.applicationGuildCommands(client_id, entry[0]), { body: [] });
+            await EnvUtil.sleep(TimeEnum.SECONDE);
             await rest.put(Routes.applicationGuildCommands(client_id, entry[0]), { body: entry[1] });
 
             logger.info(`Successfully reloaded application {} slash-commands for guild {}`, String(entry[1].length), entry[0]);

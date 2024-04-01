@@ -252,6 +252,9 @@ export class TriviaSingleton {
             if (!playerStats[DateUtil.convertDateToMonthYearString(yesterday)].daily[DateUtil.convertDateToDayMonthYearString(yesterday)]) {
                 const oldElo = this.triviaStatistique.player[username][DateUtil.convertDateToMonthYearString(yesterday)].elo;
                 this.triviaStatistique.player[username][DateUtil.convertDateToMonthYearString(yesterday)].elo *= 0.982;
+                this.triviaStatistique.player[username][DateUtil.convertDateToMonthYearString(yesterday)].elo = Math.round(
+                    this.triviaStatistique.player[username][DateUtil.convertDateToMonthYearString(yesterday)].elo
+                );
                 this.logger.debug(
                     'Inactif player spotted : {}, old elo : {}, new elo : {}',
                     username,

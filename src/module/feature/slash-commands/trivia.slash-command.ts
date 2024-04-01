@@ -2,10 +2,14 @@ import { ChatInputCommandInteraction, SlashCommandSubcommandBuilder } from 'disc
 import { SlashCommandModel } from './model/slash-command.model';
 import { TriviaModel } from './model/trivia.model';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
+import { DateUtil } from '../../shared/utils/date.util';
 
 const MAPPING = {
     STATISTICS: {
         name: 'statistics',
+    },
+    SCOREBOARD: {
+        name: 'scoreboard',
     },
     GAME: {
         name: 'game',
@@ -31,64 +35,14 @@ export const command: SlashCommandModel = new SlashCommandModel(
         }
 
         if (interaction.options.getSubcommand() === MAPPING.STATISTICS.name) {
-            // await watchClan.addClanToWatch(interaction, MAPPING);
+            await trivia.sendStatistics(interaction);
         } else if (interaction.options.getSubcommand() === MAPPING.GAME.name) {
             await trivia.sendGame(interaction);
+        } else if (interaction.options.getSubcommand() === MAPPING.SCOREBOARD.name) {
+            await trivia.sendScoreboard(interaction);
         } else if (interaction.options.getSubcommand() === MAPPING.RULE.name) {
             await trivia.sendRule(interaction);
         }
-        /*const playerStats = statistic.getPlayerStatistic(interaction.user.username);
-
-        if (!playerStats) {
-            await interaction.editReply({
-                content: "Tu n'as pas encore de statistiques pour le jeu Trivia. Essaye après avoir répondu au moins une fois au jeu.",
-            });
-        }
-
-        const select: StringSelectMenuBuilder = new StringSelectMenuBuilder()
-            .setCustomId('trivia-statistics-select')
-            .setPlaceholder('Choisissez un mois');
-
-        Object.keys(playerStats)
-            .reverse()
-            .forEach((month: string) => select.addOptions(new StringSelectMenuOptionBuilder().setLabel(month).setValue(month)));
-
-        const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(select);
-        const message: Message<BooleanCache<CacheType>> = await interaction.editReply({
-            components: [row],
-            content: 'Choisissez un mois pour voir les statistiques.',
-        });
-
-        message
-            .createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: TimeEnum.HOUR * 2 })
-            .on('collect', async (i: StringSelectMenuInteraction): Promise<void> => {
-                const stats = playerStats[i.values[0]];
-
-                const embed = new EmbedBuilder()
-                    .setTitle(`Statistiques pour le mois de ${i.values[0]}`)
-                    .setColor(Colors.LuminousVividPink)
-                    .setDescription('Voici les statistiques demandées')
-                    .setFields(
-                        { name: 'Elo', value: `\`${stats.elo}\``, inline: true },
-                        { name: 'Nombre de bonnes réponses', value: `\`${stats.right_answer}\``, inline: true },
-                        { name: 'Plus longue séquence correcte', value: `\`${(stats.win_strick as { max: number }).max}\`` },
-                        {
-                            name: 'Réponse la plus rapide',
-                            value: `\`${Math.min(...stats.answer_time) / TimeEnum.SECONDE}\` sec`,
-                            inline: true,
-                        },
-                        {
-                            name: 'Réponse la plus longue',
-                            value: `\`${Math.max(...stats.answer_time) / TimeEnum.SECONDE}\` sec`,
-                            inline: true,
-                        },
-                        { name: 'Nombre de participation', value: `\`${stats.participation}\`` }
-                    );
-
-                await i.update({
-                    embeds: [embed],
-                });
-            });*/
     },
     {
         option: [
@@ -100,6 +54,9 @@ export const command: SlashCommandModel = new SlashCommandModel(
             new SlashCommandSubcommandBuilder()
                 .setName(MAPPING.STATISTICS.name)
                 .setDescription('Visualiser-vos statistiques sur le jeu trivia'),
+            new SlashCommandSubcommandBuilder()
+                .setName(MAPPING.SCOREBOARD.name)
+                .setDescription(`Visualiser le scoreboard du mois de \'${DateUtil.getCurrentMonth()}\' pour le jeu trivia`),
             new SlashCommandSubcommandBuilder().setName(MAPPING.RULE.name).setDescription('Lire les règle du jeu trivia'),
         ],
     }
