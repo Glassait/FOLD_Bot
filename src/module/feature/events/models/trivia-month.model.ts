@@ -281,7 +281,7 @@ export class TriviaMonthModel {
                 .setTitle("Retour d'utilisation")
                 .setColor(Colors.DarkGold)
                 .setDescription(
-                    "Merci d'avoir participé tout au long de ce mois. Si vous avez des feedbacks à me faire (positif ou négatif), merci de les écrires dans le thread juste en dessous. Merci beaucoup (❤️ω❤️)"
+                    "Merci d'avoir participé tout au long de ce mois. Si vous avez des feedbacks à me faire (positif ou négatif), merci de les écrire dans le thread juste en dessous. Merci beaucoup (❤️ω❤️)"
                 )
         );
     }

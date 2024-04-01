@@ -215,7 +215,7 @@ export class StatisticSingleton {
      *
      * @example
      * StatisticSingleton.instance.initializeTriviaMonth('test');
-     * console.log(StatisticSingleton.instance.trivia.player['test'][StatisticSingleton.instance.currentMonth]) // { elo: 0, dail: {}, win_strick: { current: 0, max: 0, } }
+     * console.log(StatisticSingleton.instance.trivia.player['test'][StatisticSingleton.instance.currentMonth]) // { elo: 0, dail: {}, win_streak: { current: 0, max: 0, } }
      */
     public initializeTriviaMonth(username: string): void {
         if (this._data.trivia.player[username] && this._data.trivia.player[username][this.currentMonth]) {

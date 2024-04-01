@@ -68,7 +68,7 @@ export class TriviaModel {
             },
             {
                 name: 'Obus',
-                value: `Affichant son \`type\` (AP, APRC, etc) et son \`dégât moyen (alpha)\`, l'obus peut être un obus \`standard\` ou un obus \`spécial\` (ou gold). **${EmojiEnum.WARNING} Le bot ne récupère actuellement que le premier canon des chars, alors sois attentif aux chars tels que l'IS-4, l'AMX M4 54, et autres !**`,
+                value: `Affichant son \`type\` (AP, APCR, etc) et son \`dégât moyen (alpha)\`, l'obus peut être un obus \`standard\` ou un obus \`spécial\` (ou gold). **${EmojiEnum.WARNING} Le bot ne récupère actuellement que le premier canon des chars, alors sois attentif aux chars tels que l'IS-4, l'AMX M4 54, et autres !**`,
             },
             {
                 name: 'Minuteur',
@@ -504,7 +504,7 @@ export class TriviaModel {
      *
      * @example
      * const embed = this.createAnswerEmbed(true, {...}, true);
-     * console.log(embed) // Embed{ title: "Réponse principale", color: Colors.Red, etc }
+     * console.log(embed) // Embed{ title: "Réponse principale", color: Colors.Red, etc. }
      */
     private createAnswerEmbed(main: boolean, vehicle: VehicleData, isGoodAnswer: boolean): EmbedBuilder {
         return new EmbedBuilder()
@@ -622,12 +622,12 @@ export class TriviaModel {
         const oldElo = value.stats.elo;
         value.stats.elo = this.calculateElo(oldElo, playerAnswer?.responseTime, isGoodAnswer);
 
-        const winStrick = value.stats.win_streak;
+        const winStreak = value.stats.win_streak;
 
         if (isGoodAnswer) {
-            await this.handleGoodAnswer(winStrick, playerAnswer, oldElo, playerName);
+            await this.handleGoodAnswer(winStreak, playerAnswer, oldElo, playerName);
         } else {
-            await this.handleWrongAnswer(winStrick, playerAnswer, oldElo, playerName, allTanks, datum);
+            await this.handleWrongAnswer(winStreak, playerAnswer, oldElo, playerName, allTanks, datum);
         }
 
         this.statistic.trivia = this.triviaStatistic;
