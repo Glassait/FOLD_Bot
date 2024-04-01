@@ -366,7 +366,7 @@ export class TriviaModel {
             value: playerStats
                 .map(
                     (player: [string, TriviaPlayerStatisticType], index: number): string =>
-                        `${username === player[0] ? '`--> ' : ''}${index < 2 ? MEDAL[index] : index + 1}. ${player[0]} - ${
+                        `${username === player[0] ? '`--> ' : ''}${index < 3 ? MEDAL[index] : index + 1}. ${player[0]} - ${
                             player[1][this.statistic.currentMonth].elo
                         }${username === player[0] ? ' <--`' : ''}`
                 )
