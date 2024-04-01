@@ -259,6 +259,7 @@ export class TriviaModel {
                 content:
                     "Tu n'as pas encore de statistiques pour le jeu Trivia. Essaye après avoir répondu au moins une fois au jeu. (`/trivia game`)",
             });
+            return;
         }
 
         const select: StringSelectMenuBuilder = new StringSelectMenuBuilder()
@@ -339,12 +340,26 @@ export class TriviaModel {
             .setFooter({ text: 'Trivia game' })
             .setColor(Colors.Fuchsia);
 
+        if (Object.values(this.triviaStatistic.player).length === 0) {
+            await interaction.editReply({
+                content: "Aucun joueur n'a pour l'instant joué au jeu",
+            });
+            return;
+        }
+
         const playerStats = Object.entries(this.triviaStatistic.player)
             .filter((player: [string, TriviaPlayerStatisticType]) => player[1][this.statistic.currentMonth])
             .sort(
                 (a: [string, TriviaPlayerStatisticType], b: [string, TriviaPlayerStatisticType]) =>
                     b[1][this.statistic.currentMonth].elo - a[1][this.statistic.currentMonth].elo
             );
+
+        if (playerStats.length === 0) {
+            await interaction.editReply({
+                content: "Aucun joueur n'a pour l'instant joué ce mois si au jeu",
+            });
+            return;
+        }
 
         embedScoreboard.addFields({
             name: 'Joueur - Elo',
