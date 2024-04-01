@@ -3,7 +3,8 @@ import { SlashCommandBuilder, SlashCommandChannelOption, SlashCommandSubcommandB
 
 /**
  * Define all slash commands options used.
- * ! Don't forget to update to the {@link OptionMap} when updating this type
+ *
+ * Don't forget to update to the {@link OptionMap} when updating this type
  */
 export type OptionType =
     | SlashCommandStringOption

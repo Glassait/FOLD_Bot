@@ -1,4 +1,4 @@
-import { WargamingErrorType, WargamingSuccessType } from '../../../shared/types/wargaming-api.type';
+import { WargamingErrorType, WargamingSuccessType } from './wargaming-api.type';
 
 //region TANKOPEDIA
 /**
@@ -11,7 +11,7 @@ export type TankopediaVehiclesError = WargamingErrorType;
  */
 export type Ammo = {
     /**
-     * The damage of the ammo, list of 3, min alpha max
+     * The ammo's damage, list of 3, min alpha max
      */
     damage: number[];
     /**

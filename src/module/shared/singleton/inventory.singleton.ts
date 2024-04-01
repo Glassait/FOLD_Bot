@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs';
-import { Channel, InventoryType, TriviaType, WebSiteState } from '../types/inventory.type';
+import { Channel, InventoryType, Trivia, WebSiteState } from '../types/inventory.type';
 import { EnvUtil } from '../utils/env.util';
 import { Logger } from '../classes/logger';
 import { Client, TextChannel } from 'discord.js';
@@ -90,44 +90,17 @@ export class InventorySingleton {
     /**
      * Get the trivia information from the inventory
      */
-    public get trivia(): TriviaType {
+    public get trivia(): Trivia {
         return this._inventory.game.trivia;
     }
 
     /**
      * Update the trivia information with the new value and update the json file
-     * @param trivia The new value
+     *
+     * @param {Trivia} trivia - The new trivia value
      */
-    public set trivia(trivia: TriviaType) {
+    public set trivia(trivia: Trivia) {
         this._inventory.game.trivia = trivia;
-        FileUtil.writeIntoJson(this.path, this._inventory);
-    }
-
-    /**
-     * Get the schedule of the trivia game.
-     * The value need to be parsed to extract the hours and the minutes
-     *
-     * @return The schedule of the trivia game
-     */
-    public get triviaSchedule(): string[] {
-        return this._inventory.game.trivia.schedule;
-    }
-
-    /**
-     * Get the last page used for the trivia game
-     *
-     * @return The last page used for the trivia game
-     */
-    public get triviaLastPage(): number[] {
-        return this._inventory.game.trivia.last_tank_page;
-    }
-
-    /**
-     * Set the last page used for the trivia game
-     * @param lastPage The last page used for the trivia game
-     */
-    public set triviaLastPage(lastPage: number[]) {
-        this._inventory.game.trivia.last_tank_page = lastPage;
         FileUtil.writeIntoJson(this.path, this._inventory);
     }
     //endregion
@@ -208,14 +181,13 @@ export class InventorySingleton {
      * Fetch the text channel instance for the trivia game.
      *
      * @param {Client} client - The Discord client instance.
+     *
      * @returns {Promise<TextChannel>} - A promise that resolves to the text channel instance for the trivia game.
      *
      * @example
-     * ```typescript
      * const discordClient = // ... obtained Discord client instance
      * const triviaChannel = await instance.getChannelForTrivia(discordClient);
      * console.log(triviaChannel); // Text channel instance for the trivia game
-     * ```
      */
     public async getChannelForTrivia(client: Client): Promise<TextChannel> {
         this.logger.debug('Channel instance fetch for the trivia game');
@@ -226,14 +198,13 @@ export class InventorySingleton {
      * Fetch the text channel instance for the fold recruitment.
      *
      * @param {Client} client - The Discord client instance.
+     *
      * @returns {Promise<TextChannel>} - A promise that resolves to the text channel instance for the fold recruitment.
      *
      * @example
-     * ```typescript
      * const discordClient = // ... obtained Discord client instance
      * const foldRecruitmentChannel = await instance.getChannelForFoldRecruitment(discordClient);
      * console.log(foldRecruitmentChannel); // Text channel instance for the fold recruitment
-     * ```
      */
     public async getChannelForFoldRecruitment(client: Client): Promise<TextChannel> {
         this.logger.debug('Channel instance fetch for the fold recruitment');
@@ -244,14 +215,13 @@ export class InventorySingleton {
      * Fetch the text channel instance for the fold month.
      *
      * @param {Client} client - The Discord client instance.
+     *
      * @returns {Promise<TextChannel>} - A promise that resolves to the text channel instance for the fold month.
      *
      * @example
-     * ```typescript
      * const discordClient = // ... obtained Discord client instance
      * const foldMonthChannel = await instance.getChannelForFoldMonth(discordClient);
      * console.log(foldMonthChannel); // Text channel instance for the fold month
-     * ```
      */
     public async getChannelForFoldMonth(client: Client): Promise<TextChannel> {
         this.logger.debug('Channel instance fetch for the fold month message');
@@ -267,11 +237,9 @@ export class InventorySingleton {
      * @param {string} timestamp - The new timestamp to set as the last check for the specified clan.
      *
      * @example
-     * ```typescript
      * const clanID = 'ABC123';
      * const newTimestamp = '2024-02-10T12:00:00Z';
      * instance.updateLastCheckForClan(clanID, newTimestamp);
-     * ```
      */
     public updateLastCheckForClan(clanID: string, timestamp: string): void {
         this._inventory.fold_recruitment[clanID] = timestamp;
@@ -280,7 +248,9 @@ export class InventorySingleton {
 
     /**
      * Get the last time a clan joined the fold recruitment.
+     *
      * @param clanID The ID of the clan
+     *
      * @returns The timestamp of the last join
      */
     public getLastActivityOfClan(clanID: string): string {
@@ -289,6 +259,7 @@ export class InventorySingleton {
 
     /**
      * Delete a clan from the fold recruitment
+     *
      * @param clanID The ID of the clan
      */
     public deleteClan(clanID: string): void {
@@ -327,14 +298,12 @@ export class InventorySingleton {
      * @returns {boolean | undefined} - Returns the state of the feature if found, or `undefined` if the feature is not present.
      *
      * @example
-     * ```typescript
      * const isFeatureEnabled = instance.getFeatureFlipping('myFeature');
      * if (isFeatureEnabled !== undefined) {
      *   console.log(`Feature 'myFeature' is ${isFeatureEnabled ? 'enabled' : 'disabled'}`);
      * } else {
      *   console.log(`Feature 'myFeature' not found`);
      * }
-     * ```
      */
     public getFeatureFlipping(feature: string): boolean | undefined {
         return this._inventory.feature_flipping[feature];
@@ -342,10 +311,11 @@ export class InventorySingleton {
 
     /**
      * Get the text channel from the cache and if is not load fetch it from the guild manager
+     *
      * @param client The Discord.js client.
      * @param channel The channel information.
+     *
      * @returns The Discord channel.
-     * @private
      */
     private async fetchChannel(client: Client, channel: Channel): Promise<TextChannel> {
         let chan: TextChannel | undefined = <TextChannel>client.channels.cache.get(channel.id);

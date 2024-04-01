@@ -4,11 +4,11 @@ import {
     FoldRecruitmentClanStatisticType,
     MonthlyFoldRecruitmentClanStatisticType,
     StatisticType,
-    TriviaPlayerStatisticType,
-    TriviaStatisticType,
+    TriviaStatistic,
 } from '../types/statistic.type';
 import { FileUtil } from '../utils/file.util';
 import { readFileSync } from 'fs';
+import { DateUtil } from '../utils/date.util';
 
 /**
  * This class keep track of the statistics for the different games
@@ -18,7 +18,11 @@ export class StatisticSingleton {
     /**
      * Keep track of the current month for the statistic
      */
-    public currentMonth: string = new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+    public currentMonth: string = DateUtil.getCurrentMonth();
+    /**
+     * Keep track of the
+     */
+    public currentDay: string = DateUtil.getCurrentDay();
     //endregion
 
     //region PRIVATE READONLY
@@ -40,7 +44,7 @@ export class StatisticSingleton {
     private readonly INITIAL_VALUE: StatisticType = {
         version: 2,
         trivia: {
-            version: 3,
+            version: 4,
             overall: {},
             player: {},
         },
@@ -100,30 +104,26 @@ export class StatisticSingleton {
     /**
      * Gets the trivia-related statistics, including overall and player-specific data.
      *
-     * @returns {TriviaStatisticType} - Trivia-related statistics.
+     * @returns {TriviaStatistic} - Trivia-related statistics.
      *
      * @example
-     * ```typescript
      * const triviaStats = instance.trivia;
      * console.log(triviaStats); // { version: 3, overall: {}, player: {} }
-     * ```
      */
-    public get trivia(): TriviaStatisticType {
+    public get trivia(): TriviaStatistic {
         return this._data.trivia;
     }
 
     /**
      * Sets the trivia-related statistics and writes the updated data to the JSON file.
      *
-     * @param {TriviaStatisticType} trivia - The updated trivia-related statistics.
+     * @param {TriviaStatistic} trivia - The updated trivia-related statistics.
      *
      * @example
-     * ```typescript
      * const newTriviaStats = { version: 4, overall: { `updated overall data` }, player: { `updated player data` } };
      * instance.trivia = newTriviaStats;
-     * ```
      */
-    public set trivia(trivia: TriviaStatisticType) {
+    public set trivia(trivia: TriviaStatistic) {
         this._data.trivia = trivia;
         FileUtil.writeIntoJson(this.path, this._data);
     }
@@ -138,34 +138,15 @@ export class StatisticSingleton {
     }
 
     /**
-     * Gets the player-specific trivia statistics for a specific player.
-     *
-     * @param {string} playerId - The ID of the player for whom to retrieve statistics.
-     * @returns {TriviaPlayerStatisticType} - Player-specific trivia statistics.
-     *
-     * @example
-     * ```typescript
-     * const playerId = '123456789';
-     * const playerStats = instance.getPlayerStatistic(playerId);
-     * console.log(playerStats); // { elo: 1500, participation: 5, right_answer: 2, answer_time: [ `array of answer times` ], win_strick: { current: 1, max: 2 } }
-     * ```
-     */
-    public getPlayerStatistic(playerId: string): TriviaPlayerStatisticType {
-        return this._data.trivia.player[playerId];
-    }
-
-    /**
      * Updates the fold recruitment statistics for a specific clan, including the number of leaving players.
      *
      * @param {string} clanId - The ID of the clan for which to update the statistics.
      * @param {number} leavingPlayer - The number of leaving players to add to the statistics.
      *
      * @example
-     * ```typescript
      * const clanID = 'ABC123';
      * const leavingPlayerCount = 3;
      * instance.updateClanStatistics(clanID, leavingPlayerCount);
-     * ```
      */
     public updateClanStatistics(clanId: string, leavingPlayer: number): void {
         this.logger.debug(`Updating statistic for {}, by adding {}`, clanId, String(leavingPlayer));
@@ -186,16 +167,90 @@ export class StatisticSingleton {
      * Retrieves the fold recruitment statistics for a specific clan based on its ID.
      *
      * @param {string} clanId - The ID of the clan for which to retrieve the statistics.
+     *
      * @returns {FoldRecruitmentClanStatisticType} - The fold recruitment statistics for the specified clan.
      *
      * @example
-     * ```typescript
      * const clanID = 'ABC123';
      * const clanStatistics = instance.getClanStatistics(clanID);
      * console.log(clanStatistics); // Clan statistics object for the specified ID
-     * ```
      */
     public getClanStatistics(clanId: string): FoldRecruitmentClanStatisticType {
         return this._data.fold_recruitment.clan[clanId];
+    }
+
+    /**
+     * Initialize the month statistique for trivia game and fold recruitment
+     */
+    public initializeMonthStatistics(): void {
+        if (this._data.trivia.overall[this.currentMonth]) {
+            return;
+        }
+
+        this.logger.info('Initializing month stats placeholder');
+
+        this._data.trivia.overall[this.currentMonth] = {
+            day_tank: {},
+            day_without_participation: 0,
+            number_of_game: 0,
+        };
+
+        Object.keys(this._data.trivia.player).forEach((player: string): void => {
+            this.initializeTriviaMonth(player);
+        });
+
+        Object.keys(this._data.fold_recruitment.clan).forEach((clan: string): void => {
+            this._data.fold_recruitment.clan[clan][this.currentMonth] = {
+                leaving_player: 0,
+            };
+        });
+
+        FileUtil.writeIntoJson(this.path, this._data);
+    }
+
+    /**
+     * Initialize the month placeholder for trivia player
+     *
+     * @param {string} username - The player username
+     *
+     * @example
+     * StatisticSingleton.instance.initializeTriviaMonth('test');
+     * console.log(StatisticSingleton.instance.trivia.player['test'][StatisticSingleton.instance.currentMonth]) // { elo: 0, dail: {}, win_streak: { current: 0, max: 0, } }
+     */
+    public initializeTriviaMonth(username: string): void {
+        if (this._data.trivia.player[username] && this._data.trivia.player[username][this.currentMonth]) {
+            if (!this._data.trivia.player[username][this.currentMonth].daily[this.currentDay]) {
+                this._data.trivia.player[username][this.currentMonth].daily[this.currentDay] = {
+                    participation: 0,
+                    answer: [],
+                    answer_date: [],
+                    answer_time: [],
+                    right_answer: 0,
+                };
+            }
+
+            return;
+        }
+
+        if (!this._data.trivia.player[username]) {
+            this._data.trivia.player[username] = {};
+        }
+
+        this._data.trivia.player[username][this.currentMonth] = {
+            elo: Math.max(0, this._data.trivia.player[username][DateUtil.getPreviousMonth()]?.elo || 0),
+            daily: {
+                [this.currentDay]: {
+                    participation: 0,
+                    answer: [],
+                    answer_date: [],
+                    answer_time: [],
+                    right_answer: 0,
+                },
+            },
+            win_streak: {
+                current: 0,
+                max: 0,
+            },
+        };
     }
 }

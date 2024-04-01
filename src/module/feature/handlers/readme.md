@@ -2,21 +2,9 @@
 
 # Handler
 
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li>
-      <a href="#create-new-handler">Create new handler</a>
-    </li>
-    <li>
-        <a href="#log">Log</a>    
-    </li>
-  </ol>
-</details>
-
 In the folder you will find all the handlers of the bot.
 
-Basically an handler is a script who is executed at the start of the bot
+Basically a handler is a script who is executed at the start of the bot
 
 # Create new handler
 

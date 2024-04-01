@@ -90,6 +90,11 @@ Use this space to list resources you find helpful and would like to give credit 
 
 ## Changelog
 
+### 2.2.10
+
+- Add the al_capone trophy slash command
+- Rework the trivia game, everything explain here [#138](https://github.com/Glassait/freePuntosBot/issues/138)
+
 ### 2.2.9
 
 -   Fix trivia month messages

@@ -7,6 +7,7 @@ import { EmojiEnum } from '../../shared/enums/emoji.enum';
 import { TriviaMonthModel } from './models/trivia-month.model';
 import { FoldMonthModel } from './models/fold-month.model';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
+import { TriviaSingleton } from '../../shared/singleton/trivia.singleton';
 
 export const event: BotEvent = {
     name: Events.ClientReady,
@@ -14,6 +15,7 @@ export const event: BotEvent = {
     async execute(client: Client): Promise<void> {
         const logger: Logger = new Logger(new Context('READY-EVENT'));
         const inventory: InventorySingleton = InventorySingleton.instance;
+        const trivia = TriviaSingleton.instance;
 
         logger.info(`${EmojiEnum.MUSCLE} Logged in as {}`, client.user?.tag as string);
         const status = SentenceUtil.getRandomStatus();
@@ -28,6 +30,12 @@ export const event: BotEvent = {
             ],
             status: 'online',
         });
+
+        if (inventory.getFeatureFlipping('trivia')) {
+            await trivia.fetchTankOfTheDay();
+            await trivia.sendTriviaResultForYesterday(client);
+            trivia.reduceEloOfInactifPlayer();
+        }
 
         const today = new Date();
 

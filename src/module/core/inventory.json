@@ -5,9 +5,12 @@
 	},
 	"game": {
 		"trivia": {
-			"limit": 0,
-			"url": "wot/encyclopedia/vehicles/?application_id=APPLICATION_ID&tier=10&language=fr&fields=name%2C+images.big_icon%2C+default_profile.ammo.damage%2C+default_profile.ammo.penetration%2C+default_profile.ammo.type&limit=1&page_no=pageNumber&type=heavyTank%2C+AT-SPG%2C+mediumTank%2C+lightTank",
-			"schedule": [],
+			"total_number_of_tanks": 88,
+			"max_number_of_question": 4,
+			"max_number_of_unique_tanks": 15,
+			"max_response_time_limit": 15,
+			"max_duration_of_question": 1,
+			"url": "wot/encyclopedia/vehicles/?application_id=APPLICATION_ID&tier=10&language=fr&fields=name%2C+images.big_icon%2C+default_profile.ammo.damage%2C+default_profile.ammo.type&limit=1&page_no=pageNumber&type=heavyTank%2C+AT-SPG%2C+mediumTank%2C+lightTank",
 			"last_tank_page": []
 		}
 	},
@@ -38,14 +41,14 @@
 		"disconnect": [],
 		"auto-reply": [],
 		"auto-disconnect": [],
-		"trivia-statistics": [],
+		"trivia": [],
 		"al_capone-trophy": []
 	},
 	"feature_flipping": {
 		"trivia": false,
-		"trivia_month": true,
-		"fold_month": true,
-		"fold_recruitment": true,
-		"scrap_website": true
+		"trivia_month": false,
+		"fold_month": false,
+		"fold_recruitment": false,
+		"scrap_website": false
 	}
 }

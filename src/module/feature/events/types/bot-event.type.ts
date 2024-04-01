@@ -14,8 +14,8 @@ export interface BotEvent {
     once?: boolean;
     /**
      * The callback function used when the event is raised
-     * @param args The list of arguments passed to the callback function.
-     * ! The first argument is the client
+     *
+     * @param args The list of arguments passed to the callback function. The first argument is the client
      */
     execute: (...args: any) => Promise<void>;
 }

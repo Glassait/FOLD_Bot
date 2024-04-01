@@ -1,13 +1,13 @@
 import { AxiosInstance } from 'axios';
-import { AxiosInjector, InventoryInjector, LoggerInjector } from '../../../shared/decorators/injector.decorator';
-import { Logger } from '../../../shared/classes/logger';
+import { AxiosInjector, InventoryInjector, LoggerInjector } from '../decorators/injector.decorator';
+import { Logger } from '../classes/logger';
 import { Clans, ClansSuccess, TankopediaVehicle, TankopediaVehiclesSuccess } from '../types/wot-api.type';
-import { application_id_wot } from '../../../core/config.json';
-import { TimeEnum } from '../../../shared/enums/time.enum';
-import { EmojiEnum } from '../../../shared/enums/emoji.enum';
-import { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
+import { application_id_wot } from '../../core/config.json';
+import { TimeEnum } from '../enums/time.enum';
+import { EmojiEnum } from '../enums/emoji.enum';
+import { InventorySingleton } from '../singleton/inventory.singleton';
 import { ConstantsEnum } from '../enums/wot-api.enum';
-import { WargamingErrorType, WargamingSuccessType } from '../../../shared/types/wargaming-api.type';
+import { WargamingErrorType, WargamingSuccessType } from '../types/wargaming-api.type';
 
 @LoggerInjector
 @AxiosInjector(TimeEnum.SECONDE * 30)

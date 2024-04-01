@@ -7,6 +7,7 @@ import { TimeEnum } from '../enums/time.enum';
 import https from 'https';
 import http from 'http';
 import { FeatureSingleton } from '../singleton/feature.singleton';
+import { TriviaSingleton } from '../singleton/trivia.singleton';
 
 const logger: Logger = new Logger(new Context('Injector'));
 
@@ -33,7 +34,7 @@ type Constructor = new (...args: any[]) => any;
  * }
  */
 export function LoggerInjector<T extends Constructor>(base: T): T {
-    logger.info(`Logger injected for {}`, base.name);
+    logger.debug(`Logger injected for {}`, base.name);
     return {
         [base.name]: class extends base {
             logger: Logger = new Logger(new Context(base.name));
@@ -59,7 +60,7 @@ export function LoggerInjector<T extends Constructor>(base: T): T {
  * }
  */
 export function InventoryInjector<T extends Constructor>(base: T): T {
-    logger.info(`Inventory injected for {}`, base.name);
+    logger.debug(`Inventory injected for {}`, base.name);
     return {
         [base.name]: class extends base {
             inventory: InventorySingleton = InventorySingleton.instance;
@@ -86,7 +87,7 @@ export function InventoryInjector<T extends Constructor>(base: T): T {
  */
 export function AxiosInjector<T extends Constructor>(timeout: number = TimeEnum.MINUTE): (base: T) => T {
     return function (base: T): T {
-        logger.info(`Axios injected for {} with a timeout of {}ms`, base.name, String(timeout));
+        logger.debug(`Axios injected for {} with a timeout of {}ms`, base.name, String(timeout));
         return {
             [base.name]: class extends base {
                 axios: AxiosInstance = axios.create({
@@ -118,7 +119,7 @@ export function AxiosInjector<T extends Constructor>(timeout: number = TimeEnum.
  * }
  */
 export function StatisticInjector<T extends Constructor>(base: T): T {
-    logger.info(`Statistic injected for {}`, base.name);
+    logger.debug(`Statistic injected for {}`, base.name);
     return {
         [base.name]: class extends base {
             statistic: StatisticSingleton = StatisticSingleton.instance;
@@ -144,10 +145,36 @@ export function StatisticInjector<T extends Constructor>(base: T): T {
  * }
  */
 export function FeatureInjector<T extends Constructor>(base: T): T {
-    logger.info(`Feature injected for {}`, base.name);
+    logger.debug(`Feature injected for {}`, base.name);
     return {
         [base.name]: class extends base {
             feature: FeatureSingleton = FeatureSingleton.instance;
+        },
+    }[base.name];
+}
+
+/**
+ * Injects a `TriviaSingleton` instance into the specified class. Doesn't work on static class (need constructor)
+ *
+ * @template T - The class constructor type.
+ * @param {T} base - The base class constructor to inject the `TriviaSingleton` into.
+ * @returns {T} - The updated class constructor with the injected `TriviaSingleton`.
+ *
+ * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator
+ *
+ * @example
+ * -@TriviaInjector
+ * class MyClass {
+ *      private readonly trivia: TriviaSingleton;
+ *
+ *      // ... class implementation
+ * }
+ */
+export function TriviaInjector<T extends Constructor>(base: T): T {
+    logger.debug(`Trivia injected for {}`, base.name);
+    return {
+        [base.name]: class extends base {
+            trivia: TriviaSingleton = TriviaSingleton.instance;
         },
     }[base.name];
 }

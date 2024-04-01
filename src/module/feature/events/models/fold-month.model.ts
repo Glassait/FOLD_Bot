@@ -23,12 +23,10 @@ export class FoldMonthModel {
      * Fetches the designated channel for monthly announcements.
      *
      * @param {Client} client - The Discord client instance.
-     * @returns {Promise<void>} - A promise that resolves once the channel is fetched.
      *
      * @example
-     * ```typescript
+     * const foldMonthModel = new FoldMonthModel();
      * await foldMonthModel.fetchChannel(client);
-     * ```
      */
     public async fetchChannel(client: Client): Promise<void> {
         this.channel = await this.inventory.getChannelForFoldMonth(client);
@@ -37,12 +35,9 @@ export class FoldMonthModel {
     /**
      * Sends monthly announcement messages to the designated channel.
      *
-     * @returns {Promise<void>} - A promise that resolves once the messages are sent.
-     *
      * @example
-     * ```typescript
+     * const foldMonthModel = // Initialize the instance and fetch mandatory
      * await foldMonthModel.sendMessage();
-     * ```
      */
     public async sendMessage(): Promise<void> {
         const embedIntroduction = new EmbedBuilder()
