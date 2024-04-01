@@ -39,7 +39,7 @@ export const event: BotEvent = {
 
         const today = new Date();
 
-        if (today.getDate() !== 2) {
+        if (today.getDate() !== 1) {
             return;
         }
 
