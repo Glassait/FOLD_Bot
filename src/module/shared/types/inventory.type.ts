@@ -158,10 +158,6 @@ export type Fold_recruitment = {
      * The wot api url to get the clan image
      */
     image_url: string;
-    /**
-     * Additional properties for recruitment.
-     */
-    [key: string]: string | any; // NOSONAR
 };
 
 /**
@@ -217,7 +213,6 @@ export type InventoryType = {
      * Feature flipping configuration to enable or disable specific features dynamically.
      *
      * @example
-     * ```typescript
      * const inventory: InventoryType = {
      *   // ... other fields ...
      *   feature_flipping: {
@@ -226,7 +221,6 @@ export type InventoryType = {
      *     // ...
      *   },
      * };
-     * ```
      */
     feature_flipping: {
         [key: string]: boolean;

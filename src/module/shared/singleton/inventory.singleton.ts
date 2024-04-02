@@ -229,45 +229,6 @@ export class InventorySingleton {
     }
     //endregion
 
-    //region METHOD FOLD RECRUITMENT
-    /**
-     * Updates the last check timestamp for a specific clan in the fold recruitment inventory.
-     *
-     * @param {string} clanID - The ID of the clan for which to update the last check timestamp.
-     * @param {string} timestamp - The new timestamp to set as the last check for the specified clan.
-     *
-     * @example
-     * const clanID = 'ABC123';
-     * const newTimestamp = '2024-02-10T12:00:00Z';
-     * instance.updateLastCheckForClan(clanID, newTimestamp);
-     */
-    public updateLastCheckForClan(clanID: string, timestamp: string): void {
-        this._inventory.fold_recruitment[clanID] = timestamp;
-        FileUtil.writeIntoJson(this.path, this._inventory);
-    }
-
-    /**
-     * Get the last time a clan joined the fold recruitment.
-     *
-     * @param clanID The ID of the clan
-     *
-     * @returns The timestamp of the last join
-     */
-    public getLastActivityOfClan(clanID: string): string {
-        return this._inventory.fold_recruitment[clanID] as string;
-    }
-
-    /**
-     * Delete a clan from the fold recruitment
-     *
-     * @param clanID The ID of the clan
-     */
-    public deleteClan(clanID: string): void {
-        delete this._inventory.fold_recruitment[clanID];
-        FileUtil.writeIntoJson(this.path, this._inventory);
-    }
-    //endregion
-
     /**
      * Backs up the current data of the inventory singleton by writing it into a JSON file.
      */

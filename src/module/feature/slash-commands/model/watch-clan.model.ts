@@ -73,17 +73,15 @@ export class WatchClanModel {
      * @param {Object} MAPPING - The mapping object containing options for the command.
      *
      * @example
-     * ```typescript
      * const interaction = // ... obtained interaction object
      * const MAPPING = // ... defined mapping object
      * await instance.addWatchClan(interaction, MAPPING);
-     * ```
      */
     public async addClanToWatch(interaction: ChatInputCommandInteraction, MAPPING: any): Promise<void> {
         const id: CommandInteractionOption = interaction.options.get(MAPPING.ADD.optionsName[0]) as CommandInteractionOption;
         const name: CommandInteractionOption = interaction.options.get(MAPPING.ADD.optionsName[1]) as CommandInteractionOption;
 
-        const added = this.feature.addClan({ id: <string>id.value, name: <string>name.value });
+        const added = this.feature.addClan(<string>id.value, { name: <string>name.value });
 
         if (!added) {
             this.logger.warn('Clan {} already exists', id.value as string);
@@ -92,11 +90,9 @@ export class WatchClanModel {
             return;
         }
 
-        this.inventory.updateLastCheckForClan(<string>id.value, new Date().toISOString());
-
         this.logger.info(`Clan {} - {} added to the clan to watch`, id.value as string, name.value as string);
         await interaction.editReply({
-            content: 'Le clan a bien été ajouté ! Le clan sera observé à partir de demain (*^▽^*)',
+            content: 'Le clan a bien été ajouté ! Le clan sera observé à partir du prochain crénaux (*^▽^*)',
         });
 
         this.confirmationEmbed
@@ -115,53 +111,55 @@ export class WatchClanModel {
      * @param {Object} MAPPING - The mapping object containing options for the command.
      *
      * @example
-     * ```typescript
      * const interaction = // ... obtained interaction object
      * const MAPPING = // ... defined mapping object
      * await instance.removeClanFromWatch(interaction, MAPPING);
-     * ```
      */
     public async removeClanFromWatch(interaction: ChatInputCommandInteraction, MAPPING: any): Promise<void> {
         const idOrName: CommandInteractionOption = interaction.options.get(MAPPING.REMOVE.optionsName[0]) as CommandInteractionOption;
 
-        const removed: Clan[] = this.feature.removeClan(<string>idOrName.value);
+        const removed: Clan | undefined = this.feature.removeClan(<string>idOrName.value);
 
-        if (removed.length <= 0) {
+        if (!removed) {
             this.logger.warn("Clan {} doesn't exist in the clan to watch", idOrName.value as string);
             await interaction.editReply({ content: "Le clan n'existe pas et donc ne peux pas être supprimé !" });
             return;
         }
 
-        this.inventory.deleteClan(removed[0].id);
-
-        this.logger.info(`Clan {} - {} removed from the clan to watch`, removed[0].id, removed[0].name);
+        this.logger.info(`Clan {} - {} removed from the clan to watch`, idOrName.value as string, removed.name);
         await interaction.editReply({ content: 'Le clan a bien été supprimé !' });
 
         this.confirmationEmbed
             .setTitle("Suppression de clan de l'observateur")
-            .setDescription(`Le clan \`${removed[0].name}\` a été supprimé de la liste des clans à observer !`);
+            .setDescription(`Le clan \`${removed.name}\` a été supprimé de la liste des clans à observer !`);
 
         await this.channel.send({
             embeds: [this.confirmationEmbed],
         });
     }
 
+    /**
+     * Show the statistics of the clan sélected in the slash command
+     *
+     * @param {ChatInputCommandInteraction} interaction - The slash command interaction
+     * @param MAPPING - Map to get the option name
+     */
     public async clanStatistics(interaction: ChatInputCommandInteraction, MAPPING: any): Promise<void> {
         const idOrName: CommandInteractionOption = interaction.options.get(MAPPING.STATS.optionsName[0]) as CommandInteractionOption;
 
-        const clans: Clan[] = this.feature.clans.filter((value: Clan) => value.id === idOrName.value || value.name === idOrName.value);
+        const { id, clan } = this.feature.getWatchClanFromIdOrName(<string>idOrName.value);
 
-        if (clans.length === 0) {
+        if (!id || !clan) {
             this.logger.warn('No clan found with id or name equal to {}', idOrName.value as string);
             await interaction.editReply({ content: `Aucun clan n'ai enregistré avec le nom ou l'id suivant : \`${idOrName.value}\`` });
             return;
         }
 
-        const clanStats: FoldRecruitmentClanStatisticType = this.statistic.getClanStatistics(clans[0].id);
+        const clanStats: FoldRecruitmentClanStatisticType = this.statistic.getClanStatistics(id);
 
         if (!clanStats || Object.keys(clanStats).length === 0) {
-            this.logger.warn("The following clan {} doesn't have any statistics", clans[0].name);
-            await interaction.editReply({ content: `Aucune statistique n'a été trouvée pour le clan suivant : \`${clans[0].name}\`` });
+            this.logger.warn("The following clan {} doesn't have any statistics", clan.name);
+            await interaction.editReply({ content: `Aucune statistique n'a été trouvée pour le clan suivant : \`${clan.name}\`` });
             return;
         }
 
@@ -209,21 +207,19 @@ export class WatchClanModel {
      * @param {AutocompleteInteraction} interaction - The autocomplete interaction triggered by the user.
      *
      * @example
-     * ```typescript
      * const autocompleteInteraction = // ... obtained autocomplete interaction object
      * await instance.autocomplete(autocompleteInteraction);
-     * ```
      */
     public async autocomplete(interaction: AutocompleteInteraction): Promise<void> {
         const focusedOption = interaction.options.getFocused(true);
 
-        const filtered = this.feature.clans.filter(
-            (clan: Clan) => clan.id.includes(focusedOption.value) || clan.name.includes(focusedOption.value)
+        const filtered: [string, Clan][] = Object.entries(this.feature.watch_clans).filter(
+            (clan: [string, Clan]) => clan[0].includes(focusedOption.value) || clan[1].name.includes(focusedOption.value)
         );
 
         await interaction.respond(
             filtered
-                .map((clan: Clan): { name: string; value: string } => ({ name: `${clan.name} | ${clan.id}`, value: clan.id }))
+                .map((clan: [string, Clan]): { name: string; value: string } => ({ name: `${clan[1].name} | ${clan[0]}`, value: clan[0] }))
                 .slice(0, 24)
         );
     }

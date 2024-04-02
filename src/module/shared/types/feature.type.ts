@@ -17,10 +17,6 @@ export type Reply = { activateFor: DiscordId; replyTo: DiscordId };
  */
 export type Clan = {
     /**
-     * The unique identifier of the clan.
-     */
-    id: string;
-    /**
      * The name of the clan.
      */
     name: string;
@@ -28,6 +24,10 @@ export type Clan = {
      * The optional URL of the clan's image.
      */
     imageUrl?: string;
+    /**
+     * The last time a leaving activity was detected
+     */
+    last_activity?: string;
 };
 
 /**
@@ -43,7 +43,9 @@ export type FeatureType = {
      */
     auto_reply: Reply[];
     /**
-     * The list of clan to watch
+     * The list of clan to watch, organized with a unique identifier of the clan.
      */
-    watch_clan: Clan[];
+    watch_clan: {
+        [id: string]: Clan;
+    };
 };
