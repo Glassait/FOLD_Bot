@@ -159,11 +159,11 @@ export class TriviaSingleton {
                 })
                 .sort((a: [string, TriviaPlayerStatisticType], b: [string, TriviaPlayerStatisticType]) => {
                     return (
-                        b[1][this.statistic.currentMonth].daily[previousDay].answer_time[index] -
-                        a[1][this.statistic.currentMonth].daily[previousDay].answer_time[index]
+                        a[1][this.statistic.currentMonth].daily[previousDay].answer_time[index] -
+                        b[1][this.statistic.currentMonth].daily[previousDay].answer_time[index]
                     );
                 })
-                .slice(0, 2);
+                .slice(0, 3);
 
             if (player.length > 0) {
                 dayWithoutParticipation = false;

@@ -82,4 +82,8 @@ export enum EmojiEnum {
      * Represents a redirection action.
      */
     REDIRECTION = '↗️',
+    /**
+     * Represent reminding action
+     */
+    CLOCHE = '🔔',
 }

@@ -503,7 +503,7 @@ export class TriviaModel {
         });
 
         await interaction?.editReply({ embeds: [answerEmbed, ...otherAnswer], components: [] });
-        this.logger.debug('Game message update with answer and top 3 players');
+        this.logger.debug("Game's message update with answer");
 
         await this.updateStatistic(playerAnswer, isGoodAnswer, username);
     }
@@ -630,7 +630,7 @@ export class TriviaModel {
         const { allTanks, datum } = this.getData(playerName);
 
         value.daily.participation++;
-        value.daily.answer.push(playerAnswer?.response);
+        value.daily.answer.push(isGoodAnswer ? datum.tank.name : playerAnswer?.response);
         value.daily.answer_time.push(playerAnswer?.responseTime);
         value.daily.answer_date.push(new Date());
 
