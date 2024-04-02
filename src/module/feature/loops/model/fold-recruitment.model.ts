@@ -154,7 +154,7 @@ export class FoldRecruitmentModel {
      * await this.sendMessageToChannelFromExtractedPlayer(clanId, clan, (await this.axios.get(Url to build)).data);
      */
     public async sendMessageToChannelFromExtractedPlayer(clanId: string, clan: Clan, data: FoldRecruitmentData): Promise<void> {
-        if (!this.feature.watch_clans[clanId].last_activity) {
+        if (!this.feature.watchClans[clanId].last_activity) {
             const yesterday = new Date();
             yesterday.setDate(yesterday.getDate() - 1);
             clan.last_activity = yesterday.toISOString();
@@ -202,14 +202,20 @@ export class FoldRecruitmentModel {
      * await this.buildAndSendEmbedForPlayer(player, id, clan);
      */
     private async buildAndSendEmbedForPlayer(player: Players, clanId: string, clan: Clan): Promise<void> {
+        const blacklisted: string = this.feature.playerBlacklisted[player.name];
+
         const embedPlayer: EmbedBuilder = new EmbedBuilder()
             .setAuthor({
                 name: `${clan.name} ${EmojiEnum.REDIRECTION}`,
                 iconURL: clan.imageUrl,
                 url: this.clanUrl.replace(ConstantsEnum.CLAN_ID, clanId),
             })
-            .setTitle('Nouveau joueur pouvant être recruté')
-            .setDescription(`Le joueur suivant \`${player.name}\` a quitté \`${clan.name}\``)
+            .setTitle(blacklisted ? 'Joueur sur liste noire détecté' : 'Nouveau joueur pouvant être recruté')
+            .setDescription(
+                `Le joueur suivant \`${player.name}\` a quitté \`${clan.name}\`.${
+                    blacklisted ? '\n\nLe joueur suivant a ètè mis sur liste noire pour la raison suivante : `' + blacklisted + '`' : ''
+                }`
+            )
             .setFields(
                 {
                     name: 'Wargaming',
@@ -233,7 +239,7 @@ export class FoldRecruitmentModel {
                     inline: true,
                 }
             )
-            .setColor(Colors.Blurple);
+            .setColor(blacklisted ? Colors.Red : Colors.Blurple);
 
         await this.channel.send({ embeds: [embedPlayer] });
     }
@@ -263,7 +269,7 @@ export class FoldRecruitmentModel {
         const extracted: LeaveClanActivity[] = data.items.filter(
             (item: ClanActivity): boolean =>
                 item.subtype === WotClanActivity.LEAVE_CLAN &&
-                new Date(item.created_at) > new Date(this.feature.watch_clans[clanId].last_activity ?? '')
+                new Date(item.created_at) > new Date(this.feature.watchClans[clanId].last_activity ?? '')
         ) as unknown as LeaveClanActivity[];
 
         const datum: Players[] = extracted.reduce((players: Players[], currentValue: LeaveClanActivity) => {

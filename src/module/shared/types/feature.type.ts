@@ -31,6 +31,20 @@ export type Clan = {
 };
 
 /**
+ * Represents the list of clans being watched from the fold recruitment.
+ */
+export type WatchClan = {
+    /**
+     * The list of clans watch from the fold recruitment
+     */
+    [id: string]: Clan;
+};
+
+export type PlayerBlacklisted = {
+    [name: string]: string;
+};
+
+/**
  * Defined the architecture of the feature.json file
  */
 export type FeatureType = {
@@ -45,7 +59,9 @@ export type FeatureType = {
     /**
      * The list of clan to watch, organized with a unique identifier of the clan.
      */
-    watch_clan: {
-        [id: string]: Clan;
-    };
+    watch_clan: WatchClan;
+    /**
+     * The list of blacklisted players from the fold recruitment
+     */
+    player_blacklisted: PlayerBlacklisted;
 };

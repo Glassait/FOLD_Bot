@@ -28,7 +28,7 @@ module.exports = async (client: Client): Promise<void> => {
 
         recruitmentModel.noPlayerFound = true;
 
-        for (const [clanId, clan] of Object.entries(feature.watch_clans)) {
+        for (const [clanId, clan] of Object.entries(feature.watchClans)) {
             logger.debug(`${EmojiEnum.MALE} Start recruitment for {}`, clan.name);
             await recruitmentModel.fetchClanActivity(clanId, clan);
             logger.debug(`${EmojiEnum.MALE} End recruitment for {}`, clan.name);

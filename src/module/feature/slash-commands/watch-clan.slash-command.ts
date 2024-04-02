@@ -22,6 +22,14 @@ const MAPPING = {
         name: 'statistics',
         optionsName: ['id-ou-name'],
     },
+    BLACKLIST_PLAYER: {
+        name: 'blacklist-player',
+        optionsName: ['player-name', 'reason'],
+    },
+    UNBLACKLIST_PLAYER: {
+        name: 'unblacklist-player',
+        optionsName: ['player-name'],
+    },
 };
 const watchClan: WatchClanModel = new WatchClanModel();
 
@@ -41,6 +49,10 @@ export const command: SlashCommandModel = new SlashCommandModel(
             await watchClan.removeClanFromWatch(interaction, MAPPING);
         } else if (interaction.options.getSubcommand() === MAPPING.STATS.name) {
             await watchClan.clanStatistics(interaction, MAPPING);
+        } else if (interaction.options.getSubcommand() === MAPPING.BLACKLIST_PLAYER.name) {
+            await watchClan.addPlayerToBlacklist(interaction, MAPPING);
+        } else if (interaction.options.getSubcommand() === MAPPING.UNBLACKLIST_PLAYER.name) {
+            await watchClan.removePlayerToBlacklist(interaction, MAPPING);
         }
     },
     {
@@ -73,6 +85,24 @@ export const command: SlashCommandModel = new SlashCommandModel(
                         .setDescription("L'id ou le nom du clan à supprimer")
                         .setRequired(true)
                         .setAutocomplete(true)
+                ),
+            new SlashCommandSubcommandBuilder()
+                .setName(MAPPING.BLACKLIST_PLAYER.name)
+                .setDescription('Ajoute un joueur à la liste noire pour le recrutement')
+                .addStringOption((builder: SlashCommandStringOption) =>
+                    builder.setName(MAPPING.BLACKLIST_PLAYER.optionsName[0]).setDescription('Le nom du joueur').setRequired(true)
+                )
+                .addStringOption((builder: SlashCommandStringOption) =>
+                    builder
+                        .setName(MAPPING.BLACKLIST_PLAYER.optionsName[1])
+                        .setDescription('La raison de la mise en liste noire')
+                        .setRequired(true)
+                ),
+            new SlashCommandSubcommandBuilder()
+                .setName(MAPPING.UNBLACKLIST_PLAYER.name)
+                .setDescription('Retire un joueur de la liste noire pour le recrutement')
+                .addStringOption((builder: SlashCommandStringOption) =>
+                    builder.setName(MAPPING.UNBLACKLIST_PLAYER.optionsName[0]).setDescription('Le nom du joueur').setRequired(true)
                 ),
         ],
         permission: PermissionsBitField.Flags.KickMembers,
