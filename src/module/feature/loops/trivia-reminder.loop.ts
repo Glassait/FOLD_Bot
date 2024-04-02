@@ -23,7 +23,7 @@ module.exports = async (client: Client): Promise<void> => {
                     .setTitle(`${EmojiEnum.LOOP} Rappel pour le Trivia ${EmojiEnum.LOOP}`)
                     .setColor(Colors.Blue)
                     .setDescription(
-                        `Pour ceux qui ne l'ont pas encore fait, n'oublier pas de faire vos \`${inventory.trivia.max_number_of_question}\` questions du jours sinon vous risquez de perdre des points. (plus d'info avec la commande \`/trivia rule\`)`
+                        `Pour ceux qui ne l'on pas encore fait, n'oublier pas de faire au moins une questions aujourd'hui sinon vous risquez de perdre des points. (plus d'info avec la commande \`/trivia rule\`)`
                     ),
             ],
         });
