@@ -94,6 +94,8 @@ Use this space to list resources you find helpful and would like to give credit 
 
 - Add the al_capone trophy slash command
 - Rework the trivia game, everything explain here [#138](https://github.com/Glassait/freePuntosBot/issues/138)
+- Put url for fol-recruitment in inventory
+- Rework last activity of clan (moved in feature.json)
 
 ### 2.2.9
 
