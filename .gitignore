@@ -130,5 +130,6 @@ dist
 
 /.idea/
 */**/config.json
+*/**/config.prod.json
 */**/logs/**/*
 */**/backup/

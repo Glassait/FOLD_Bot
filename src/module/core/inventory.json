@@ -16,6 +16,11 @@
 	},
 	"fold_recruitment": {
 		"image_url": "wot/clans/list/?application_id=APPLICATION_ID&fields=emblems.x64&search=CLAN_NAME",
+		"newsfeed_url": "https://eu.wargaming.net/clans/wot/CLAN_ID/newsfeed/api/events/?date_until=today&offset=3600",
+		"clan_url": "https://eu.wargaming.net/clans/wot/CLAN_ID/",
+		"tomato_url": "https://tomato.gg/stats/EU/PLAYER_NAME-PLAYER_ID",
+		"wargaming_url": "https://eu.wargaming.net/clans/wot/search/#wgsearch&type=accounts&search=PLAYER_NAME&account_id=PLAYER_ID&limit=10&accounts-battle_type=random&accounts-timeframe=all",
+		"wot_life_url": "https://fr.wot-life.com/eu/player/PLAYER_NAME-PLAYER_ID/",
 		"schedule": []
 	},
 	"channels": {

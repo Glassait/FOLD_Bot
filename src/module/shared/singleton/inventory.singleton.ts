@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs';
-import { Channel, InventoryType, Trivia, WebSiteState } from '../types/inventory.type';
+import { Channel, FoldRecruitment, InventoryType, Trivia, WebSiteState } from '../types/inventory.type';
 import { EnvUtil } from '../utils/env.util';
 import { Logger } from '../classes/logger';
 import { Client, TextChannel } from 'discord.js';
@@ -107,26 +107,10 @@ export class InventorySingleton {
 
     //region FOLD RECRUITMENT
     /**
-     * Get the schedule for the fold recruitment.
-     * The value need to be parsed to extract the hours and the minutes
-     *
-     * @return The schedule of the fold recruitment
+     * Get the fold recruitment object from the inventory.
      */
-    public get foldSchedule(): string[] {
-        return this._inventory.fold_recruitment.schedule;
-    }
-
-    /**
-     * Gets the URL for the clan image used in fold recruitment.
-     *
-     * @type {string}
-     *
-     * @example
-     * const clanImageUrl = instance.urlClanImage;
-     * console.log(clanImageUrl); // 'https://example.com/clan-image.jpg'
-     */
-    public get urlClanImage(): string {
-        return this._inventory.fold_recruitment.image_url;
+    public get foldRecruitment(): FoldRecruitment {
+        return this._inventory.fold_recruitment;
     }
     //endregion
 
@@ -226,45 +210,6 @@ export class InventorySingleton {
     public async getChannelForFoldMonth(client: Client): Promise<TextChannel> {
         this.logger.debug('Channel instance fetch for the fold month message');
         return await this.fetchChannel(client, this._inventory.channels.fold_month);
-    }
-    //endregion
-
-    //region METHOD FOLD RECRUITMENT
-    /**
-     * Updates the last check timestamp for a specific clan in the fold recruitment inventory.
-     *
-     * @param {string} clanID - The ID of the clan for which to update the last check timestamp.
-     * @param {string} timestamp - The new timestamp to set as the last check for the specified clan.
-     *
-     * @example
-     * const clanID = 'ABC123';
-     * const newTimestamp = '2024-02-10T12:00:00Z';
-     * instance.updateLastCheckForClan(clanID, newTimestamp);
-     */
-    public updateLastCheckForClan(clanID: string, timestamp: string): void {
-        this._inventory.fold_recruitment[clanID] = timestamp;
-        FileUtil.writeIntoJson(this.path, this._inventory);
-    }
-
-    /**
-     * Get the last time a clan joined the fold recruitment.
-     *
-     * @param clanID The ID of the clan
-     *
-     * @returns The timestamp of the last join
-     */
-    public getLastActivityOfClan(clanID: string): string {
-        return this._inventory.fold_recruitment[clanID] as string;
-    }
-
-    /**
-     * Delete a clan from the fold recruitment
-     *
-     * @param clanID The ID of the clan
-     */
-    public deleteClan(clanID: string): void {
-        delete this._inventory.fold_recruitment[clanID];
-        FileUtil.writeIntoJson(this.path, this._inventory);
     }
     //endregion
 

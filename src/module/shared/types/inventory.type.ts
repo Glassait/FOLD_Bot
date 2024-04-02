@@ -149,7 +149,7 @@ export type Trivia = {
 /**
  * Type defining the architecture for describing recruitment.
  */
-export type Fold_recruitment = {
+export type FoldRecruitment = {
     /**
      * Array of schedules for recruitment.
      */
@@ -159,9 +159,25 @@ export type Fold_recruitment = {
      */
     image_url: string;
     /**
-     * Additional properties for recruitment.
+     * The wot api url to get the clan activity
      */
-    [key: string]: string | any; // NOSONAR
+    newsfeed_url: string;
+    /**
+     * The wargaming url to display the main page of the clan
+     */
+    clan_url: string;
+    /**
+     * The tomato url to display the main statistics of the player
+     */
+    tomato_url: string;
+    /**
+     * The wargaming url to display the main statistics of the player
+     */
+    wargaming_url: string;
+    /**
+     * The wot life url to display the main statistics of the player
+     */
+    wot_life_url: string;
 };
 
 /**
@@ -184,7 +200,7 @@ export type InventoryType = {
     /**
      * The recruitment section of the inventory.
      */
-    fold_recruitment: Fold_recruitment;
+    fold_recruitment: FoldRecruitment;
     /**
      * Channels configuration for various features.
      */
@@ -217,7 +233,6 @@ export type InventoryType = {
      * Feature flipping configuration to enable or disable specific features dynamically.
      *
      * @example
-     * ```typescript
      * const inventory: InventoryType = {
      *   // ... other fields ...
      *   feature_flipping: {
@@ -226,7 +241,6 @@ export type InventoryType = {
      *     // ...
      *   },
      * };
-     * ```
      */
     feature_flipping: {
         [key: string]: boolean;

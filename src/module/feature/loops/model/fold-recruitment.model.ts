@@ -7,7 +7,7 @@ import {
 } from '../../../shared/decorators/injector.decorator';
 import { Logger } from '../../../shared/classes/logger';
 import { AxiosInstance } from 'axios';
-import { ClanActivity, FoldRecruitmentType, LeaveClanActivity, Players } from '../types/fold-recruitment.type';
+import { ClanActivity, FoldRecruitmentData, LeaveClanActivity, Players } from '../types/fold-recruitment.type';
 import { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
 import { Client, Colors, EmbedBuilder, TextChannel } from 'discord.js';
 import { Clan } from '../../../shared/types/feature.type';
@@ -25,34 +25,6 @@ import { FeatureSingleton } from '../../../shared/singleton/feature.singleton';
 @FeatureInjector
 export class FoldRecruitmentModel {
     //region PRIVATE READONLY FIELDS
-    /**
-     * The base url for the wargaming feed of elements
-     * @replace CLAN_ID
-     */
-    private readonly url: string = `https://eu.wargaming.net/clans/wot/${ConstantsEnum.CLAN_ID}/newsfeed/api/events/?date_until=today&offset=3600`;
-    /**
-     * The base url for the wot clan
-     * @replace CLAN_ID
-     */
-    private readonly clanUrl: string = `https://eu.wargaming.net/clans/wot/${ConstantsEnum.CLAN_ID}/`;
-    /**
-     * The base url of tomatoGG for player's statistics
-     * @replace PLAYER_ID
-     * @replace PLAYER_NAME
-     */
-    private readonly tomato: string = `https://tomato.gg/stats/EU/${ConstantsEnum.PLAYER_NAME}=${ConstantsEnum.PLAYER_ID}`;
-    /**
-     * The base url of Wargaming for player's statistics
-     * @replace PLAYER_ID
-     * @replace PLAYER_NAME
-     */
-    private readonly wargaming: string = `https://eu.wargaming.net/clans/wot/search/#wgsearch&type=accounts&search=${ConstantsEnum.PLAYER_NAME}&account_id=${ConstantsEnum.PLAYER_ID}&limit=10&accounts-battle_type=random&accounts-timeframe=all`;
-    /**
-     * The base url of Wot Life for player's statistics
-     * @replace PLAYER_ID
-     * @replace PLAYER_NAME
-     */
-    private readonly wotLife: string = `https://fr.wot-life.com/eu/player/${ConstantsEnum.PLAYER_NAME}-${ConstantsEnum.PLAYER_ID}/`;
     /**
      * Embed for the message indicating that no player was found.
      */
@@ -76,6 +48,34 @@ export class FoldRecruitmentModel {
      */
     private channel: TextChannel;
     /**
+     * The base url for the wargaming feed of elements
+     * @replace CLAN_ID
+     */
+    private url: string;
+    /**
+     * The base url for the wot clan
+     * @replace CLAN_ID
+     */
+    private clanUrl: string;
+    /**
+     * The base url of tomatoGG for player's statistics
+     * @replace PLAYER_ID
+     * @replace PLAYER_NAME
+     */
+    private tomato: string;
+    /**
+     * The base url of Wargaming for player's statistics
+     * @replace PLAYER_ID
+     * @replace PLAYER_NAME
+     */
+    private wargaming: string;
+    /**
+     * The base url of Wot Life for player's statistics
+     * @replace PLAYER_ID
+     * @replace PLAYER_NAME
+     */
+    private wotLife: string;
+    /**
      * Indicates whether any player was found during the fold recruitment.
      */
     private _noPlayerFound: boolean;
@@ -98,28 +98,36 @@ export class FoldRecruitmentModel {
      */
     public async fetchChannel(client: Client): Promise<void> {
         this.channel = await this.inventory.getChannelForFoldRecruitment(client);
+
+        this.url = this.inventory.foldRecruitment.newsfeed_url;
+        this.clanUrl = this.inventory.foldRecruitment.clan_url;
+        this.tomato = this.inventory.foldRecruitment.tomato_url;
+        this.wargaming = this.inventory.foldRecruitment.wargaming_url;
+        this.wotLife = this.inventory.foldRecruitment.wot_life_url;
     }
 
     /**
      * Fetches the activity of a clan and sends a message to the designated channel.
      *
+     * @param {string} clanId - The unique identifier of the clan clan.
      * @param {Clan} clan - The clan for which the activity is to be fetched.
      *
      * @returns {Promise<void>} - A promise that resolves once the activity is fetched and the message is sent.
      *
      * @example
-     * const myClan = { id: '123', name: 'MyClan' };
-     * await foldRecruitment.fetchClanActivity(myClan);
+     * const myClan = { name: 'MyClan' };
+     * const id = '123';
+     * await foldRecruitment.fetchClanActivity(id, myClan);
      */
-    public async fetchClanActivity(clan: Clan): Promise<void> {
-        const url = this.url.replace(ConstantsEnum.CLAN_ID, clan.id).replace('today', new Date().toISOString().slice(0, 19));
+    public async fetchClanActivity(clanId: string, clan: Clan): Promise<void> {
+        const url = this.url.replace(ConstantsEnum.CLAN_ID, clanId).replace('today', new Date().toISOString().slice(0, 19));
 
         if (!clan.imageUrl) {
             try {
                 this.logger.debug(`Fetching image of the clan : {}`, JSON.stringify(clan));
                 const data = await this.wotApiModel.fetchClanImage(clan.name);
                 clan.imageUrl = data.data[0]?.emblems?.x64?.portal;
-                this.feature.updateClan(clan);
+                this.feature.updateClan(clanId, clan);
             } catch (error) {
                 this.logger.error(`An error occurred while fetching the image of the clan: ${error}`, error);
             }
@@ -127,7 +135,7 @@ export class FoldRecruitmentModel {
 
         try {
             this.logger.debug(`Fetching activity of the clan with url: {}`, url);
-            return await this.sendMessageToChannelFromExtractedPlayer(clan, (await this.axios.get(url)).data);
+            return await this.sendMessageToChannelFromExtractedPlayer(clanId, clan, (await this.axios.get(url)).data);
         } catch (error) {
             this.logger.error(`An error occurred while fetching the activity of the clan: ${error}`, error);
         }
@@ -136,29 +144,37 @@ export class FoldRecruitmentModel {
     /**
      * Extracts players who left the clan and sends a message with their information in the channel
      *
-     * @param clan The clan to extract players from
-     * @param data The data of the activity of the clan
+     * @param {string} clanId - The unique identifier of the clan.
+     * @param {Clan} clan - The clan to extract players from
+     * @param {FoldRecruitmentData} data - The data of the activity of the clan, get from the wargaming api
+     *
+     * @example
+     * const myClan = { name: 'MyClan' };
+     * const id = '123';
+     * await this.sendMessageToChannelFromExtractedPlayer(clanId, clan, (await this.axios.get(Url to build)).data);
      */
-    public async sendMessageToChannelFromExtractedPlayer(clan: Clan, data: FoldRecruitmentType): Promise<void> {
-        if (!this.inventory.getLastActivityOfClan(clan.id)) {
+    public async sendMessageToChannelFromExtractedPlayer(clanId: string, clan: Clan, data: FoldRecruitmentData): Promise<void> {
+        if (!this.feature.watch_clans[clanId].last_activity) {
             const yesterday = new Date();
             yesterday.setDate(yesterday.getDate() - 1);
+            clan.last_activity = yesterday.toISOString();
 
-            this.inventory.updateLastCheckForClan(clan.id, yesterday.toISOString());
+            this.feature.updateClan(clanId, clan);
         }
 
-        const { datum, extracted } = this.extractPlayerFromFeed(data, clan);
+        const { datum, extracted } = this.extractPlayerFromFeed(data, clanId);
 
         this.logger.debug(`{} players leaves the clan`, String(datum.length));
 
         for (const player of datum) {
-            await this.buildAndSendEmbedForPlayer(player, clan);
+            await this.buildAndSendEmbedForPlayer(player, clanId, clan);
         }
 
         if (extracted[0]) {
             this._noPlayerFound = false;
-            this.inventory.updateLastCheckForClan(clan.id, extracted[0].created_at);
-            this.statistic.updateClanStatistics(clan.id, datum.length);
+            clan.last_activity = extracted[0].created_at;
+            this.feature.updateClan(clanId, clan);
+            this.statistic.updateClanStatistics(clanId, datum.length);
         }
     }
 
@@ -174,23 +190,23 @@ export class FoldRecruitmentModel {
      * Builds and sends an embed message for a player who has left a clan and can be recruited.
      *
      * @param {Players} player - The player who has left the clan.
+     * @param {string} clanId - The unique identifier of the clan.
      * @param {Clan} clan - The clan from which the player has left.
-     *
-     * @returns {Promise<void>} - A Promise that resolves once the embed message is sent.
      *
      * @throws {Error} If an error occurs during the process.
      *
      * @example
      * const player = // player object ;
-     * const clan = // clan object ;
-     * await this.buildAndSendEmbedForPlayer(player, clan);
+     * const clan = { name: "FOLD_"} ;
+     * const id = "123";
+     * await this.buildAndSendEmbedForPlayer(player, id, clan);
      */
-    private async buildAndSendEmbedForPlayer(player: Players, clan: Clan): Promise<void> {
+    private async buildAndSendEmbedForPlayer(player: Players, clanId: string, clan: Clan): Promise<void> {
         const embedPlayer: EmbedBuilder = new EmbedBuilder()
             .setAuthor({
                 name: `${clan.name} ${EmojiEnum.REDIRECTION}`,
                 iconURL: clan.imageUrl,
-                url: this.clanUrl.replace(ConstantsEnum.CLAN_ID, clan.id),
+                url: this.clanUrl.replace(ConstantsEnum.CLAN_ID, clanId),
             })
             .setTitle('Nouveau joueur pouvant être recruté')
             .setDescription(`Le joueur suivant \`${player.name}\` a quitté \`${clan.name}\``)
@@ -225,19 +241,21 @@ export class FoldRecruitmentModel {
     /**
      * Extracts players and leave clan activities from the given clan activity feed data.
      *
-     * @param {FoldRecruitmentType} data - The clan activity feed data.
-     * @param {Clan} clan - The clan for which the activity is being extracted.
+     * @param {FoldRecruitmentData} data - The clan activity feed data.
+     * @param {string} clanId - The unique identifier of the clan.
+     *
      * @returns {{ datum: Players[]; extracted: LeaveClanActivity[] }} - An object containing extracted players and leave clan activities.
      *
      * @example
-     * const feedData = // clan activity feed data ;
-     * const clan = //clan object ;
-     * const { datum, extracted } = instance.extractPlayerFromFeed(feedData, clan);
+     * const feedData = // clan activity feed data;
+     * const clan = { name: 'FOLD_'};
+     * const id = '123';
+     * const { datum, extracted } = instance.extractPlayerFromFeed(feedData, id, clan);
      * console.log(datum, extracted);
      */
     private extractPlayerFromFeed(
-        data: FoldRecruitmentType,
-        clan: Clan
+        data: FoldRecruitmentData,
+        clanId: string
     ): {
         datum: Players[];
         extracted: LeaveClanActivity[];
@@ -245,7 +263,7 @@ export class FoldRecruitmentModel {
         const extracted: LeaveClanActivity[] = data.items.filter(
             (item: ClanActivity): boolean =>
                 item.subtype === WotClanActivity.LEAVE_CLAN &&
-                new Date(item.created_at) > new Date(this.inventory.getLastActivityOfClan(clan.id))
+                new Date(item.created_at) > new Date(this.feature.watch_clans[clanId].last_activity ?? '')
         ) as unknown as LeaveClanActivity[];
 
         const datum: Players[] = extracted.reduce((players: Players[], currentValue: LeaveClanActivity) => {
