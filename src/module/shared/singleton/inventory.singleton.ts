@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs';
-import { Channel, InventoryType, Trivia, WebSiteState } from '../types/inventory.type';
+import { Channel, FoldRecruitment, InventoryType, Trivia, WebSiteState } from '../types/inventory.type';
 import { EnvUtil } from '../utils/env.util';
 import { Logger } from '../classes/logger';
 import { Client, TextChannel } from 'discord.js';
@@ -107,26 +107,10 @@ export class InventorySingleton {
 
     //region FOLD RECRUITMENT
     /**
-     * Get the schedule for the fold recruitment.
-     * The value need to be parsed to extract the hours and the minutes
-     *
-     * @return The schedule of the fold recruitment
+     * Get the fold recruitment object from the inventory.
      */
-    public get foldSchedule(): string[] {
-        return this._inventory.fold_recruitment.schedule;
-    }
-
-    /**
-     * Gets the URL for the clan image used in fold recruitment.
-     *
-     * @type {string}
-     *
-     * @example
-     * const clanImageUrl = instance.urlClanImage;
-     * console.log(clanImageUrl); // 'https://example.com/clan-image.jpg'
-     */
-    public get urlClanImage(): string {
-        return this._inventory.fold_recruitment.image_url;
+    public get foldRecruitment(): FoldRecruitment {
+        return this._inventory.fold_recruitment;
     }
     //endregion
 

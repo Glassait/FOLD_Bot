@@ -61,7 +61,9 @@ export class WotApiModel {
     public async fetchClanImage(name: string): Promise<ClansSuccess> {
         const url =
             this.WOT_API +
-            this.inventory.urlClanImage.replace(ConstantsEnum.APPLICATION_ID, application_id_wot).replace(ConstantsEnum.CLAN_NAME, name);
+            this.inventory.foldRecruitment.image_url
+                .replace(ConstantsEnum.APPLICATION_ID, application_id_wot)
+                .replace(ConstantsEnum.CLAN_NAME, name);
         this.logger.debug(`${EmojiEnum.SOLDIER} Fetching clans api with url {}`, url);
 
         return await this.getDataFromUrl<ClansSuccess, Clans>(url);

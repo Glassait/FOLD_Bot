@@ -21,7 +21,7 @@ module.exports = async (client: Client): Promise<void> => {
     const recruitmentModel: FoldRecruitmentModel = new FoldRecruitmentModel();
     await recruitmentModel.fetchChannel(client);
 
-    await TimeUtil.forLoopTimeSleep(inventory.foldSchedule, `${EmojiEnum.LOOP} Recruitment`, async (): Promise<void> => {
+    await TimeUtil.forLoopTimeSleep(inventory.foldRecruitment.schedule, `${EmojiEnum.LOOP} Recruitment`, async (): Promise<void> => {
         feature.backupData();
         inventory.backupData();
         StatisticSingleton.instance.backupData();

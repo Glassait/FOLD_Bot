@@ -26,34 +26,6 @@ import { FeatureSingleton } from '../../../shared/singleton/feature.singleton';
 export class FoldRecruitmentModel {
     //region PRIVATE READONLY FIELDS
     /**
-     * The base url for the wargaming feed of elements
-     * @replace CLAN_ID
-     */
-    private url: string;
-    /**
-     * The base url for the wot clan
-     * @replace CLAN_ID
-     */
-    private readonly clanUrl: string = `https://eu.wargaming.net/clans/wot/${ConstantsEnum.CLAN_ID}/`;
-    /**
-     * The base url of tomatoGG for player's statistics
-     * @replace PLAYER_ID
-     * @replace PLAYER_NAME
-     */
-    private readonly tomato: string = `https://tomato.gg/stats/EU/${ConstantsEnum.PLAYER_NAME}=${ConstantsEnum.PLAYER_ID}`;
-    /**
-     * The base url of Wargaming for player's statistics
-     * @replace PLAYER_ID
-     * @replace PLAYER_NAME
-     */
-    private readonly wargaming: string = `https://eu.wargaming.net/clans/wot/search/#wgsearch&type=accounts&search=${ConstantsEnum.PLAYER_NAME}&account_id=${ConstantsEnum.PLAYER_ID}&limit=10&accounts-battle_type=random&accounts-timeframe=all`;
-    /**
-     * The base url of Wot Life for player's statistics
-     * @replace PLAYER_ID
-     * @replace PLAYER_NAME
-     */
-    private readonly wotLife: string = `https://fr.wot-life.com/eu/player/${ConstantsEnum.PLAYER_NAME}-${ConstantsEnum.PLAYER_ID}/`;
-    /**
      * Embed for the message indicating that no player was found.
      */
     private readonly embedNoPlayerFound: EmbedBuilder = new EmbedBuilder()
@@ -75,6 +47,34 @@ export class FoldRecruitmentModel {
      * The channel to send the leaving player inside
      */
     private channel: TextChannel;
+    /**
+     * The base url for the wargaming feed of elements
+     * @replace CLAN_ID
+     */
+    private url: string;
+    /**
+     * The base url for the wot clan
+     * @replace CLAN_ID
+     */
+    private clanUrl: string;
+    /**
+     * The base url of tomatoGG for player's statistics
+     * @replace PLAYER_ID
+     * @replace PLAYER_NAME
+     */
+    private tomato: string;
+    /**
+     * The base url of Wargaming for player's statistics
+     * @replace PLAYER_ID
+     * @replace PLAYER_NAME
+     */
+    private wargaming: string;
+    /**
+     * The base url of Wot Life for player's statistics
+     * @replace PLAYER_ID
+     * @replace PLAYER_NAME
+     */
+    private wotLife: string;
     /**
      * Indicates whether any player was found during the fold recruitment.
      */
@@ -98,6 +98,12 @@ export class FoldRecruitmentModel {
      */
     public async fetchChannel(client: Client): Promise<void> {
         this.channel = await this.inventory.getChannelForFoldRecruitment(client);
+
+        this.url = this.inventory.foldRecruitment.newsfeed_url;
+        this.clanUrl = this.inventory.foldRecruitment.clan_url;
+        this.tomato = this.inventory.foldRecruitment.tomato_url;
+        this.wargaming = this.inventory.foldRecruitment.wargaming_url;
+        this.wotLife = this.inventory.foldRecruitment.wot_life_url;
     }
 
     /**
