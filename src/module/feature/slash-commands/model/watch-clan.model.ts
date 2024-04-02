@@ -213,7 +213,7 @@ export class WatchClanModel {
     public async autocomplete(interaction: AutocompleteInteraction): Promise<void> {
         const focusedOption = interaction.options.getFocused(true);
 
-        const filtered: [string, Clan][] = Object.entries(this.feature.watch_clans).filter(
+        const filtered: [string, Clan][] = Object.entries(this.feature.watchClans).filter(
             (clan: [string, Clan]) => clan[0].includes(focusedOption.value) || clan[1].name.includes(focusedOption.value)
         );
 
@@ -222,5 +222,79 @@ export class WatchClanModel {
                 .map((clan: [string, Clan]): { name: string; value: string } => ({ name: `${clan[1].name} | ${clan[0]}`, value: clan[0] }))
                 .slice(0, 24)
         );
+    }
+
+    /**
+     * Callback used for the slash command. Allow user to blacklist player in the fold recruitment
+     *
+     * @param {ChatInputCommandInteraction} interaction - The slash command interaction
+     * @param MAPPING - Mapping used to get option name
+     */
+    public async addPlayerToBlacklist(
+        interaction: ChatInputCommandInteraction,
+        MAPPING: {
+            BLACKLIST_PLAYER: {
+                optionsName: string[];
+            };
+        }
+    ): Promise<void> {
+        let name: string = interaction.options.get(MAPPING.BLACKLIST_PLAYER.optionsName[0])?.value as string;
+        name = name.trim();
+        let reason: string = interaction.options.get(MAPPING.BLACKLIST_PLAYER.optionsName[1])?.value as string;
+        reason = reason.trim();
+
+        if (this.feature.playerBlacklisted[name]) {
+            await interaction.editReply({
+                content: `Le joueur \`${name}\` est déjà dans la liste noire !`,
+            });
+            return;
+        }
+
+        this.feature.playerBlacklisted[name] = reason;
+        this.feature.writeIntoFile();
+
+        this.confirmationEmbed
+            .setTitle('Ajout de joueur sur liste noire')
+            .setDescription(`Le joueur \`${name}\` a été ajouté sur liste noire !`);
+
+        await interaction.deleteReply();
+        await this._channel.send({
+            embeds: [this.confirmationEmbed],
+        });
+    }
+
+    /**
+     * Callback used for the slash command. Allow user to remove from the blacklist a player in the fold recruitment
+     *
+     * @param {ChatInputCommandInteraction} interaction - The slash command interaction
+     * @param MAPPING - Mapping used to get option name
+     */
+    public async removePlayerToBlacklist(
+        interaction: ChatInputCommandInteraction,
+        MAPPING: {
+            UNBLACKLIST_PLAYER: { optionsName: string[] };
+        }
+    ): Promise<void> {
+        let name: string = interaction.options.get(MAPPING.UNBLACKLIST_PLAYER.optionsName[0])?.value as string;
+        name = name.trim();
+
+        if (!this.feature.playerBlacklisted[name]) {
+            await interaction.editReply({
+                content: `Le joueur \`${name}\` n'est pas sur la liste noire !`,
+            });
+            return;
+        }
+
+        delete this.feature.playerBlacklisted[name];
+        this.feature.writeIntoFile();
+
+        this.confirmationEmbed
+            .setTitle('Suppression de joueur sur liste noire')
+            .setDescription(`Le joueur \`${name}\` a été supprimé de la liste noire !`);
+
+        await interaction.deleteReply();
+        await this._channel.send({
+            embeds: [this.confirmationEmbed],
+        });
     }
 }

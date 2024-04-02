@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs';
-import { Clan, DiscordId, FeatureType, Reply } from '../types/feature.type';
+import { Clan, DiscordId, FeatureType, PlayerBlacklisted, Reply, WatchClan } from '../types/feature.type';
 import { Logger } from '../classes/logger';
 import { Context } from '../classes/context';
 import { FileUtil } from '../utils/file.util';
@@ -25,6 +25,7 @@ export class FeatureSingleton {
         auto_disconnect: '',
         auto_reply: [],
         watch_clan: {},
+        player_blacklisted: {},
     };
     //endregion
 
@@ -110,8 +111,15 @@ export class FeatureSingleton {
     /**
      * Gets the list of clans to watch.
      */
-    public get watch_clans(): { [p: string]: Clan } {
+    public get watchClans(): WatchClan {
         return this._data.watch_clan;
+    }
+
+    /**
+     * Get the list of blacklisted players.
+     */
+    public get playerBlacklisted(): PlayerBlacklisted {
+        return this._data.player_blacklisted;
     }
     //endregion
 
@@ -150,7 +158,6 @@ export class FeatureSingleton {
         }
 
         this._data.watch_clan[clanId] = clan;
-        FileUtil.writeIntoJson(this.path, this._data);
 
         return true;
     }
@@ -180,7 +187,7 @@ export class FeatureSingleton {
         }
 
         delete this._data.watch_clan[id];
-        FileUtil.writeIntoJson(this.path, this._data);
+        this.writeIntoFile();
 
         return clan;
     }
@@ -230,25 +237,26 @@ export class FeatureSingleton {
     public updateClan(clanId: string, clan: Clan): void {
         this._data.watch_clan[clanId] = clan;
         this.logger.debug('Clan updated with value : {}', JSON.stringify(clan));
-
-        FileUtil.writeIntoJson(this.path, this._data);
+        this.writeIntoFile();
     }
     //endregion
 
     //region AUTO-REPLY
     /**
      * Adds an auto-reply rule.
-     * @param item The auto-reply rule to add.
+     *
+     * @param {Reply} item - The auto-reply rule to add.
      */
     public addAutoReply(item: Reply): void {
         this._data.auto_reply.push(item);
-        FileUtil.writeIntoJson(this.path, this._data);
+        this.writeIntoFile();
     }
 
     /**
      * Deletes an auto-reply rule.
-     * @param activateFor The ID of the user that triggers the auto-reply.
-     * @param replyTo The ID of the user that the auto-reply is sent to.
+     *
+     * @param {DiscordId} activateFor - The ID of the user that triggers the auto-reply.
+     * @param {DiscordId} replyTo - The ID of the user that the auto-reply is sent to.
      */
     public deleteAutoReply(activateFor: DiscordId, replyTo: DiscordId): void {
         const object: Reply | undefined = this._data.auto_reply.find(
@@ -262,12 +270,13 @@ export class FeatureSingleton {
         const index: number = this._data.auto_reply.indexOf(object);
 
         this._data.auto_reply.splice(index, 1);
-        FileUtil.writeIntoJson(this.path, this._data);
+        this.writeIntoFile();
     }
 
     /**
      * Gets the auto-replies for a specific user.
-     * @param replyTo The ID of the user.
+     *
+     * @param {DiscordId} replyTo - The ID of the user.
      */
     public getArrayFromReplyTo(replyTo: DiscordId): Reply[] {
         return this._data.auto_reply.filter((value: Reply): boolean => value.replyTo === replyTo);
@@ -275,11 +284,19 @@ export class FeatureSingleton {
 
     /**
      * Checks if an auto-reply rule exists for a specific user.
-     * @param activateFor The ID of the user that triggers the auto-reply.
-     * @param replyTo The ID of the user that the auto-reply is sent to.
+     *
+     * @param {DiscordId} activateFor - The ID of the user that triggers the auto-reply.
+     * @param {DiscordId} replyTo - The ID of the user that the auto-reply is sent to.
      */
     public hasAutoReplyTo(activateFor: DiscordId, replyTo: DiscordId): boolean {
         return this._data.auto_reply.some((value: Reply) => value.activateFor === activateFor && value.replyTo === replyTo);
     }
     //endregion
+
+    /**
+     * Method to write the data into the json file
+     */
+    public writeIntoFile(): void {
+        FileUtil.writeIntoJson(this.path, this._data);
+    }
 }

@@ -97,6 +97,7 @@ Use this space to list resources you find helpful and would like to give credit 
 -   Put url for fol-recruitment in inventory
 -   Rework last activity of clan (moved in feature.json)
 -   Grammatical error
+-   Blacklist player for fold recruitment
 
 ### 2.2.9
 
