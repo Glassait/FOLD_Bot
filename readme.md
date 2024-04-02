@@ -92,10 +92,11 @@ Use this space to list resources you find helpful and would like to give credit 
 
 ### 2.2.10
 
-- Add the al_capone trophy slash command
-- Rework the trivia game, everything explain here [#138](https://github.com/Glassait/freePuntosBot/issues/138)
-- Put url for fol-recruitment in inventory
-- Rework last activity of clan (moved in feature.json)
+-   Add the al_capone trophy slash command
+-   Rework the trivia game, everything explain here [#138](https://github.com/Glassait/freePuntosBot/issues/138)
+-   Put url for fol-recruitment in inventory
+-   Rework last activity of clan (moved in feature.json)
+-   Grammatical error
 
 ### 2.2.9
 

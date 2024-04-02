@@ -30,7 +30,7 @@ export class FoldRecruitmentModel {
      */
     private readonly embedNoPlayerFound: EmbedBuilder = new EmbedBuilder()
         .setColor(Colors.DarkRed)
-        .setTitle("Aucun joueurs n'a quitté son clan depuis le dernier scan !");
+        .setTitle("Aucun joueur n'a quitté son clan depuis le dernier scan !");
     //endregion
 
     //region INJECTION
