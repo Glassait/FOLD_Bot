@@ -3,13 +3,18 @@ import { Logger } from './logger';
 
 export class CoreFile<DType extends object> {
     protected logger: Logger;
+    protected _data: DType;
 
     constructor(
         private readonly path: string,
         private readonly backupPath: string,
         private readonly fileName: string,
-        protected _data: DType
-    ) {}
+        data?: DType
+    ) {
+        if (data) {
+            this._data = data;
+        }
+    }
 
     public backupData(): void {
         if (!FileUtil.folderOrFileExists(this.backupPath)) {

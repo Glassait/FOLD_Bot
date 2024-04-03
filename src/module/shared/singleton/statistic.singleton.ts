@@ -6,42 +6,18 @@ import {
     StatisticType,
     TriviaStatistic,
 } from '../types/statistic.type';
-import { FileUtil } from '../utils/file.util';
-import { readFileSync } from 'fs';
 import { DateUtil } from '../utils/date.util';
+import { CoreFile } from '../classes/core-file';
 
 /**
  * This class keep track of the statistics for the different games
  */
-export class StatisticSingleton {
-    //region PUBLIC FIELD
-    /**
-     * Keep track of the current month for the statistic
-     */
-    public currentMonth: string = DateUtil.getCurrentMonth();
-    /**
-     * Keep track of the
-     */
-    public currentDay: string = DateUtil.getCurrentDay();
-    //endregion
-
+export class StatisticSingleton extends CoreFile<StatisticType> {
     //region PRIVATE READONLY
-    /**
-     * The path to the statistic.json file
-     */
-    private readonly path: string = './src/module/core/statistic.json';
-    /**
-     * The backup file path to the statistic.json file
-     */
-    private readonly backupPath: string = './src/module/core/backup/statistic.json';
-    /**
-     * The logger to log thing
-     */
-    private readonly logger: Logger = new Logger(new Context(StatisticSingleton.name));
     /**
      * Represents the initial value for the statistics data.
      */
-    private readonly INITIAL_VALUE: StatisticType = {
+    private static readonly INITIAL_VALUE: StatisticType = {
         version: 2,
         trivia: {
             version: 4,
@@ -53,33 +29,41 @@ export class StatisticSingleton {
             clan: {},
         },
     };
+    //region PUBLIC FIELD
     /**
-     * The statistic
+     * Keep track of the current month for the statistic
      */
-    private readonly _data: StatisticType = this.INITIAL_VALUE;
+    public currentMonth: string = DateUtil.getCurrentMonth();
+    //endregion
+    /**
+     * Keep track of the
+     */
+    public currentDay: string = DateUtil.getCurrentDay();
     //endregion
 
     /**
-     * Private constructor to respect singleton pattern
+     * Private constructor for the StatisticSingleton class.
+     * Initializes the instance by reading the json core file and performs additional setup.
      */
     private constructor() {
-        this._data = JSON.parse(readFileSync(this.path).toString());
+        super('./src/module/core', './src/module/core/backup', 'statistic.json', StatisticSingleton.INITIAL_VALUE);
 
-        this._data.version = this.INITIAL_VALUE.version;
+        this.logger = new Logger(new Context(StatisticSingleton.name));
+
+        this._data = JSON.parse(this.readFile().toString());
+
+        this._data.version = StatisticSingleton.INITIAL_VALUE.version;
 
         if (this._data.trivia) {
-            this._data.trivia.version = this.INITIAL_VALUE.trivia.version;
-        } else {
-            this._data.trivia = this.INITIAL_VALUE.trivia;
-            FileUtil.writeIntoJson(this.path, this._data);
+            this._data.trivia.version = StatisticSingleton.INITIAL_VALUE.trivia.version;
         }
 
         if (this._data.fold_recruitment) {
-            this._data.fold_recruitment.version = this.INITIAL_VALUE.fold_recruitment.version;
-        } else {
-            this._data.fold_recruitment = this.INITIAL_VALUE.fold_recruitment;
-            FileUtil.writeIntoJson(this.path, this._data);
+            this._data.fold_recruitment.version = StatisticSingleton.INITIAL_VALUE.fold_recruitment.version;
         }
+
+        this.backupData();
+        this.logger.info('{} instance initialized', StatisticSingleton.name);
     }
 
     //region SINGLETON
@@ -94,7 +78,6 @@ export class StatisticSingleton {
     public static get instance(): StatisticSingleton {
         if (!this._instance) {
             this._instance = new StatisticSingleton();
-            this._instance.logger.info('{} instance initialized', 'Statistic');
         }
         return this._instance;
     }
@@ -125,17 +108,9 @@ export class StatisticSingleton {
      */
     public set trivia(trivia: TriviaStatistic) {
         this._data.trivia = trivia;
-        FileUtil.writeIntoJson(this.path, this._data);
+        this.writeData();
     }
     //endregion
-
-    /**
-     * Backs up the current data of the inventory singleton by writing it into a JSON file.
-     */
-    public backupData(): void {
-        this.logger.info('Backing up {}', StatisticSingleton.name);
-        FileUtil.writeIntoJson(this.backupPath, this._data);
-    }
 
     /**
      * Updates the fold recruitment statistics for a specific clan, including the number of leaving players.
@@ -160,7 +135,7 @@ export class StatisticSingleton {
         clanStats[this.currentMonth] = monthStats;
         this._data.fold_recruitment.clan[clanId] = clanStats;
 
-        FileUtil.writeIntoJson(this.path, this._data);
+        this.writeData();
     }
 
     /**
@@ -205,7 +180,7 @@ export class StatisticSingleton {
             };
         });
 
-        FileUtil.writeIntoJson(this.path, this._data);
+        this.writeData();
     }
 
     /**

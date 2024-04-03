@@ -92,7 +92,7 @@ export class WatchClanModel {
 
         this.logger.info(`Clan {} - {} added to the clan to watch`, id.value as string, name.value as string);
         await interaction.editReply({
-            content: 'Le clan a bien été ajouté ! Le clan sera observé à partir du prochain crénaux (*^▽^*)',
+            content: 'Le clan a bien été ajouté ! Le clan sera observé à partir du prochain créneaux (*^▽^*)',
         });
 
         this.confirmationEmbed

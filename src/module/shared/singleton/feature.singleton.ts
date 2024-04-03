@@ -14,6 +14,10 @@ export class FeatureSingleton extends CoreFile<FeatureType> {
         player_blacklisted: {},
     };
 
+    /**
+     * Private constructor for the FeatureSingleton class.
+     * Initializes the instance by reading the json core file and performs additional setup.
+     */
     private constructor() {
         super('./src/module/core', './src/module/core/backup', 'feature.json', FeatureSingleton.INITIAL_VALUE);
 
