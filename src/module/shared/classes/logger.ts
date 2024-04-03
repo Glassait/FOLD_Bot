@@ -57,7 +57,7 @@ export class Logger {
      * @param {Error | string | any} [error] - Optional error object or additional error information.
      */
     public error(msg: string, error?: Error | string | any): void {
-        this.logger.error(this.context, `${msg}${error ? '\n\n' + this.getErrorDetails(error) : ''}`);
+        this.logger.error(this.context, `${msg}${error ? '\n' + this.getErrorDetails(error) : ''}`);
     }
 
     /**

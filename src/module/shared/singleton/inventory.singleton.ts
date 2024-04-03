@@ -1,4 +1,3 @@
-import { readFileSync } from 'fs';
 import { Channel, FoldRecruitment, InventoryType, Trivia, WebSiteState } from '../types/inventory.type';
 import { EnvUtil } from '../utils/env.util';
 import { Logger } from '../classes/logger';
@@ -14,13 +13,17 @@ import { DiscordId } from '../types/feature.type';
 export class InventorySingleton {
     //region PRIVATE READONLY FIELD
     /**
+     * The name of the json file
+     */
+    private readonly fileName: string = 'inventory.json';
+    /**
      * The path to the inventory.json file
      */
-    private readonly path: string = './src/module/core/inventory.json';
+    private readonly path: string = './src/module/core';
     /**
      * The backup path to the inventory.json file
      */
-    private readonly backupPath: string = './src/module/core/backup/inventory.json';
+    private readonly backupPath: string = './src/module/core/backup';
     /**
      * The logger to log thing
      */
@@ -41,11 +44,11 @@ export class InventorySingleton {
      * If running in development mode, overrides channel configurations with a development channel.
      */
     private constructor() {
-        this._inventory = JSON.parse(readFileSync(this.path).toString());
+        this._inventory = JSON.parse(FileUtil.readFile(`${this.path}/${this.fileName}`).toString());
 
-        if (EnvUtil.isDev() && this._inventory) {
-            Object.entries(this._inventory.channels).forEach((channel: [string, Channel]): void => {
-                this._inventory.channels[channel[0]] = this.DEV_CHANNEL;
+        if (EnvUtil.isDev() && 'channels' in this._inventory) {
+            Object.keys(this._inventory.channels).forEach((channel: string): void => {
+                this._inventory.channels[channel] = this.DEV_CHANNEL;
             });
         }
     }
@@ -218,7 +221,11 @@ export class InventorySingleton {
      */
     public backupData(): void {
         this.logger.info('Backing up {}', InventorySingleton.name);
-        FileUtil.writeIntoJson(this.backupPath, this._inventory);
+
+        if (!FileUtil.folderOrFileExists(this.backupPath)) {
+            FileUtil.createFolder(`${this.backupPath}/${this.fileName}`);
+        }
+        FileUtil.writeIntoJson(`${this.backupPath}/${this.fileName}`, this._inventory);
     }
 
     /**

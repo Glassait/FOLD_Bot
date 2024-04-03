@@ -1,46 +1,38 @@
-import { readFileSync } from 'fs';
 import { Clan, DiscordId, FeatureType, PlayerBlacklisted, Reply, WatchClan } from '../types/feature.type';
 import { Logger } from '../classes/logger';
 import { Context } from '../classes/context';
-import { FileUtil } from '../utils/file.util';
+import { CoreFile } from '../classes/core-file';
 
-export class FeatureSingleton {
-    //region INJECTOR
-    private readonly logger: Logger = new Logger(new Context(FeatureSingleton.name));
-    //endregion
-
-    //region PRIVATE READONLY FIELDS
-    /**
-     * The path to the feature configuration file.
-     */
-    private readonly path: string = './src/module/core/feature.json';
-    /**
-     * The backup  path to the feature configuration file.
-     */
-    private readonly backupPath: string = './src/module/core/backup/feature.json';
+export class FeatureSingleton extends CoreFile<FeatureType> {
     /**
      * The initial value of the feature configuration.
      */
-    private readonly INITIAL_VALUE: FeatureType = {
+    private static readonly INITIAL_VALUE: FeatureType = {
         auto_disconnect: '',
         auto_reply: [],
         watch_clan: {},
         player_blacklisted: {},
     };
-    //endregion
 
     private constructor() {
-        try {
-            const json: Buffer = readFileSync(this.path);
+        super('./src/module/core', './src/module/core/backup', 'feature.json', FeatureSingleton.INITIAL_VALUE);
 
-            if (json.toString() && json.toString().length > 0) {
+        this.logger = new Logger(new Context(FeatureSingleton.name));
+
+        try {
+            const json: Buffer = this.readFile();
+
+            if (json && json.length > 0) {
                 this.data = JSON.parse(json.toString());
             } else {
                 this.data = this._data;
             }
         } catch (e) {
-            FileUtil.writeIntoJson(this.path, this._data);
+            this.writeData();
         }
+
+        this.backupData();
+        this.logger.info('{} instance initialized', FeatureSingleton.name);
     }
 
     //region SINGLETON
@@ -55,46 +47,27 @@ export class FeatureSingleton {
      * @returns {FeatureSingleton} - The singleton instance of the FeatureSingleton class.
      *
      * @example
-     * ```typescript
      * const featureInstance = FeatureSingleton.instance;
      * console.log(featureInstance instanceof FeatureSingleton); // true
-     * ```
      */
     public static get instance(): FeatureSingleton {
         if (!this._instance) {
             this._instance = new FeatureSingleton();
-            this._instance.logger.info('{} instance initialized', 'Feature');
         }
+
         return this._instance;
     }
     //endregion
 
-    //region DATA
     /**
-     * The current feature configuration.
+     * Sets the data for the FeatureSingleton instance.
+     *
+     * @param {FeatureType} data - The new data value to set.
      */
-    private _data: FeatureType = this.INITIAL_VALUE;
-
-    /**
-     * Gets the current feature configuration.
-     */
-    public get data(): FeatureType {
-        return this._data;
+    public set data(data: FeatureType) {
+        this._data = this.verifyData(FeatureSingleton.INITIAL_VALUE, data);
+        this.writeData();
     }
-
-    /**
-     * Sets the feature configuration.
-     * @param value The new feature configuration.
-     */
-    public set data(value: FeatureType) {
-        const data: any = this.INITIAL_VALUE;
-        Object.keys(this.INITIAL_VALUE).forEach((key: string): void => {
-            data[key as keyof FeatureType] = value[key as keyof FeatureType] ?? this.INITIAL_VALUE[key as keyof FeatureType];
-        });
-        this._data = data;
-        FileUtil.writeIntoJson(this.path, this._data);
-    }
-    //endregion
 
     //region AUTO-DISCONNECT
     /**
@@ -103,7 +76,7 @@ export class FeatureSingleton {
      */
     public set autoDisconnect(targetId: DiscordId) {
         this._data.auto_disconnect = targetId;
-        FileUtil.writeIntoJson(this.path, this._data);
+        this.writeData();
     }
     //endregion
 
@@ -122,14 +95,6 @@ export class FeatureSingleton {
         return this._data.player_blacklisted;
     }
     //endregion
-
-    /**
-     * Backs up the current data of the feature singleton by writing it into a JSON file.
-     */
-    public backupData(): void {
-        this.logger.info('Backing up {}', FeatureSingleton.name);
-        FileUtil.writeIntoJson(this.backupPath, this._data);
-    }
 
     //region FOLD-RECRUITMENT METHODS
     /**
@@ -158,7 +123,6 @@ export class FeatureSingleton {
         }
 
         this._data.watch_clan[clanId] = clan;
-
         return true;
     }
 
@@ -180,14 +144,14 @@ export class FeatureSingleton {
      */
     public removeClan(clanIdOrName: string): Clan | undefined {
         clanIdOrName = clanIdOrName.trim().replace(/["']/g, '').toUpperCase();
-        let { id, clan } = this.getWatchClanFromIdOrName(clanIdOrName);
+        let { id, clan } = this.getClanFromIdOrName(clanIdOrName);
 
         if (!id || !clan) {
             return undefined;
         }
 
         delete this._data.watch_clan[id];
-        this.writeIntoFile();
+        this.writeData();
 
         return clan;
     }
@@ -208,7 +172,7 @@ export class FeatureSingleton {
      *     console.log(`Clan ${clan.name} found`);
      * }
      */
-    public getWatchClanFromIdOrName(clanIdOrName: string): { id?: string; clan?: Clan } {
+    public getClanFromIdOrName(clanIdOrName: string): { id?: string; clan?: Clan } {
         if (this._data.watch_clan[clanIdOrName]) {
             return { id: clanIdOrName, clan: this._data.watch_clan[clanIdOrName] };
         }
@@ -237,7 +201,42 @@ export class FeatureSingleton {
     public updateClan(clanId: string, clan: Clan): void {
         this._data.watch_clan[clanId] = clan;
         this.logger.debug('Clan updated with value : {}', JSON.stringify(clan));
-        this.writeIntoFile();
+        this.writeData();
+    }
+
+    /**
+     * Adds a player to the blacklist with the specified reason.
+     *
+     * @param {string} playerName - The name of the player to blacklist.
+     * @param {string} reason - The reason for blacklisting the player.
+     *
+     * @returns {boolean} - True if the player was successfully added to the blacklist, false if the player was already blacklisted.
+     */
+    public addBlacklistedPlayer(playerName: string, reason: string): boolean {
+        if (this._data.player_blacklisted[playerName]) {
+            return false;
+        }
+
+        this._data.player_blacklisted[playerName] = reason;
+        this.writeData();
+        return true;
+    }
+
+    /**
+     * Removes a player from the blacklist.
+     *
+     * @param {string} playerName - The name of the player to remove from the blacklist.
+     *
+     * @returns {boolean} - True if the player was successfully removed from the blacklist, false if the player was not found in the blacklist.
+     */
+    public removeBlacklistedPlayer(playerName: string): boolean {
+        if (!this._data.player_blacklisted[playerName]) {
+            return false;
+        }
+
+        delete this._data.player_blacklisted[playerName];
+        this.writeData();
+        return true;
     }
     //endregion
 
@@ -249,7 +248,7 @@ export class FeatureSingleton {
      */
     public addAutoReply(item: Reply): void {
         this._data.auto_reply.push(item);
-        this.writeIntoFile();
+        this.writeData();
     }
 
     /**
@@ -270,7 +269,7 @@ export class FeatureSingleton {
         const index: number = this._data.auto_reply.indexOf(object);
 
         this._data.auto_reply.splice(index, 1);
-        this.writeIntoFile();
+        this.writeData();
     }
 
     /**
@@ -292,11 +291,4 @@ export class FeatureSingleton {
         return this._data.auto_reply.some((value: Reply) => value.activateFor === activateFor && value.replyTo === replyTo);
     }
     //endregion
-
-    /**
-     * Method to write the data into the json file
-     */
-    public writeIntoFile(): void {
-        FileUtil.writeIntoJson(this.path, this._data);
-    }
 }
