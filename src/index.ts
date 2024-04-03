@@ -49,7 +49,7 @@ setTimeout((): void => {
  * @see https://discordjs.guide/popular-topics/errors.html#how-to-diagnose-api-errors
  */
 process.on('unhandledRejection', error => {
-    logger.error(`Unhandled promise rejection: ${error}`, error);
+    logger.error(`Unhandled promise rejection`, error);
 });
 
 /**

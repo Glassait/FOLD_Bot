@@ -1,53 +1,41 @@
-import { readFileSync } from 'fs';
 import { Channel, FoldRecruitment, InventoryType, Trivia, WebSiteState } from '../types/inventory.type';
 import { EnvUtil } from '../utils/env.util';
 import { Logger } from '../classes/logger';
 import { Client, TextChannel } from 'discord.js';
 import { Context } from '../classes/context';
-import { FileUtil } from '../utils/file.util';
 import { DiscordId } from '../types/feature.type';
+import { CoreFile } from '../classes/core-file';
 
 /**
  * Class used to manage the inventory.json file
  * This class implement the Singleton pattern
  */
-export class InventorySingleton {
-    //region PRIVATE READONLY FIELD
+export class InventorySingleton extends CoreFile<InventoryType> {
     /**
-     * The path to the inventory.json file
-     */
-    private readonly path: string = './src/module/core/inventory.json';
-    /**
-     * The backup path to the inventory.json file
-     */
-    private readonly backupPath: string = './src/module/core/backup/inventory.json';
-    /**
-     * The logger to log thing
-     */
-    private readonly logger: Logger = new Logger(new Context(InventorySingleton.name));
-    /**
-     * The data of the inventory
-     */
-    private readonly _inventory: InventoryType;
-    /**
-     * The id of the dev channel
+     * The id of the dev channel for testing purposes
      */
     private readonly DEV_CHANNEL: Channel = { guild: '1218558386761891901', id: '1218558387361546412' };
-    //endregion
 
     /**
-     * Private constructor for the FeatureSingleton class.
-     * Initializes the instance by reading the inventory.json file and performs additional setup.
+     * Private constructor for the InventorySingleton class.
+     * Initializes the instance by reading the json core file and performs additional setup.
      * If running in development mode, overrides channel configurations with a development channel.
      */
     private constructor() {
-        this._inventory = JSON.parse(readFileSync(this.path).toString());
+        super('./src/module/core', './src/module/core/backup', 'inventory.json');
 
-        if (EnvUtil.isDev() && this._inventory) {
-            Object.entries(this._inventory.channels).forEach((channel: [string, Channel]): void => {
-                this._inventory.channels[channel[0]] = this.DEV_CHANNEL;
+        this.logger = new Logger(new Context(InventorySingleton.name));
+
+        this._data = JSON.parse(this.readFile().toString());
+
+        if (EnvUtil.isDev() && 'channels' in this._data) {
+            Object.keys(this._data.channels).forEach((channel: string): void => {
+                this._data.channels[channel] = this.DEV_CHANNEL;
             });
         }
+
+        this.backupData();
+        this.logger.info('{} instance initialized', InventorySingleton.name);
     }
 
     //region SINGLETON
@@ -62,8 +50,8 @@ export class InventorySingleton {
     public static get instance(): InventorySingleton {
         if (!this._instance) {
             this._instance = new InventorySingleton();
-            this._instance.logger.info('{} instance initialized', 'Inventory');
         }
+
         return this._instance;
     }
     //endregion
@@ -73,7 +61,7 @@ export class InventorySingleton {
      * Get the number of newsletter in the inventory
      */
     public get numberOfNewsletter(): number {
-        return this._inventory.newsLetter.website.length;
+        return this._data.newsLetter.website.length;
     }
 
     /**
@@ -82,7 +70,7 @@ export class InventorySingleton {
      * @returns {string[]} - An array of banned words for the newsletter.
      */
     public get banWords(): string[] {
-        return this._inventory.newsLetter.banWords;
+        return this._data.newsLetter.banWords;
     }
     //endregion
 
@@ -91,7 +79,7 @@ export class InventorySingleton {
      * Get the trivia information from the inventory
      */
     public get trivia(): Trivia {
-        return this._inventory.game.trivia;
+        return this._data.game.trivia;
     }
 
     /**
@@ -100,8 +88,8 @@ export class InventorySingleton {
      * @param {Trivia} trivia - The new trivia value
      */
     public set trivia(trivia: Trivia) {
-        this._inventory.game.trivia = trivia;
-        FileUtil.writeIntoJson(this.path, this._inventory);
+        this._data.game.trivia = trivia;
+        this.writeData();
     }
     //endregion
 
@@ -110,7 +98,7 @@ export class InventorySingleton {
      * Get the fold recruitment object from the inventory.
      */
     public get foldRecruitment(): FoldRecruitment {
-        return this._inventory.fold_recruitment;
+        return this._data.fold_recruitment;
     }
     //endregion
 
@@ -121,7 +109,7 @@ export class InventorySingleton {
      * @throws Error If the index is out of bound
      */
     public getNewsLetterAtIndex(index: number): WebSiteState {
-        let webSiteState = this._inventory.newsLetter.website[index];
+        let webSiteState = this._data.newsLetter.website[index];
 
         if (!webSiteState) {
             this.logger.error(`Index out of bound ${index} in newsletter array`);
@@ -135,7 +123,7 @@ export class InventorySingleton {
      * Get the channel in the discord server to send the news
      */
     public async getNewsLetterChannel(client: Client): Promise<TextChannel> {
-        return await this.fetchChannel(client, this._inventory.channels.newsletter);
+        return await this.fetchChannel(client, this._data.channels.newsletter);
     }
 
     /**
@@ -145,7 +133,7 @@ export class InventorySingleton {
      * @param newsLetterName The name of the website
      */
     public updateLastUrlOfWebsite(url: string, newsLetterName: string): void {
-        const webSite: WebSiteState | undefined = this._inventory.newsLetter.website.find(
+        const webSite: WebSiteState | undefined = this._data.newsLetter.website.find(
             (value: WebSiteState): boolean => value.name === newsLetterName
         );
 
@@ -154,9 +142,9 @@ export class InventorySingleton {
             return;
         }
 
-        const index: number = this._inventory.newsLetter.website.indexOf(webSite);
-        this._inventory.newsLetter.website[index].lastUrl = url;
-        FileUtil.writeIntoJson(this.path, this._inventory);
+        const index: number = this._data.newsLetter.website.indexOf(webSite);
+        this._data.newsLetter.website[index].lastUrl = url;
+        this.writeData();
     }
     //endregion
 
@@ -175,7 +163,7 @@ export class InventorySingleton {
      */
     public async getChannelForTrivia(client: Client): Promise<TextChannel> {
         this.logger.debug('Channel instance fetch for the trivia game');
-        return await this.fetchChannel(client, this._inventory.channels.trivia);
+        return await this.fetchChannel(client, this._data.channels.trivia);
     }
 
     /**
@@ -192,7 +180,7 @@ export class InventorySingleton {
      */
     public async getChannelForFoldRecruitment(client: Client): Promise<TextChannel> {
         this.logger.debug('Channel instance fetch for the fold recruitment');
-        return await this.fetchChannel(client, this._inventory.channels.fold_recruitment);
+        return await this.fetchChannel(client, this._data.channels.fold_recruitment);
     }
 
     /**
@@ -209,17 +197,9 @@ export class InventorySingleton {
      */
     public async getChannelForFoldMonth(client: Client): Promise<TextChannel> {
         this.logger.debug('Channel instance fetch for the fold month message');
-        return await this.fetchChannel(client, this._inventory.channels.fold_month);
+        return await this.fetchChannel(client, this._data.channels.fold_month);
     }
     //endregion
-
-    /**
-     * Backs up the current data of the inventory singleton by writing it into a JSON file.
-     */
-    public backupData(): void {
-        this.logger.info('Backing up {}', InventorySingleton.name);
-        FileUtil.writeIntoJson(this.backupPath, this._inventory);
-    }
 
     /**
      * Get the commands registered in the inventory
@@ -227,7 +207,7 @@ export class InventorySingleton {
      * @returns The list of the discord id
      */
     public getCommands(name: string): DiscordId[] {
-        const command = this._inventory.commands[name];
+        const command = this._data.commands[name];
 
         if (!command) {
             throw new Error(`No command found with name ${name}`);
@@ -251,7 +231,7 @@ export class InventorySingleton {
      * }
      */
     public getFeatureFlipping(feature: string): boolean | undefined {
-        return this._inventory.feature_flipping[feature];
+        return this._data.feature_flipping[feature];
     }
 
     /**

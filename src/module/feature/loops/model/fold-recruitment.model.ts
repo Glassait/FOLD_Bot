@@ -109,7 +109,7 @@ export class FoldRecruitmentModel {
     /**
      * Fetches the activity of a clan and sends a message to the designated channel.
      *
-     * @param {string} clanId - The unique identifier of the clan clan.
+     * @param {string} clanId - The unique identifier of the clan.
      * @param {Clan} clan - The clan for which the activity is to be fetched.
      *
      * @returns {Promise<void>} - A promise that resolves once the activity is fetched and the message is sent.

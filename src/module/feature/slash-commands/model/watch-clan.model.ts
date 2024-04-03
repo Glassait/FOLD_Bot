@@ -92,7 +92,7 @@ export class WatchClanModel {
 
         this.logger.info(`Clan {} - {} added to the clan to watch`, id.value as string, name.value as string);
         await interaction.editReply({
-            content: 'Le clan a bien été ajouté ! Le clan sera observé à partir du prochain crénaux (*^▽^*)',
+            content: 'Le clan a bien été ajouté ! Le clan sera observé à partir du prochain créneaux (*^▽^*)',
         });
 
         this.confirmationEmbed
@@ -147,7 +147,7 @@ export class WatchClanModel {
     public async clanStatistics(interaction: ChatInputCommandInteraction, MAPPING: any): Promise<void> {
         const idOrName: CommandInteractionOption = interaction.options.get(MAPPING.STATS.optionsName[0]) as CommandInteractionOption;
 
-        const { id, clan } = this.feature.getWatchClanFromIdOrName(<string>idOrName.value);
+        const { id, clan } = this.feature.getClanFromIdOrName(<string>idOrName.value);
 
         if (!id || !clan) {
             this.logger.warn('No clan found with id or name equal to {}', idOrName.value as string);
@@ -243,15 +243,15 @@ export class WatchClanModel {
         let reason: string = interaction.options.get(MAPPING.BLACKLIST_PLAYER.optionsName[1])?.value as string;
         reason = reason.trim();
 
-        if (this.feature.playerBlacklisted[name]) {
+        const added = this.feature.addBlacklistedPlayer(name, reason);
+
+        if (!added) {
+            this.logger.debug('Player {} already blacklisted !', name);
             await interaction.editReply({
                 content: `Le joueur \`${name}\` est déjà dans la liste noire !`,
             });
             return;
         }
-
-        this.feature.playerBlacklisted[name] = reason;
-        this.feature.writeIntoFile();
 
         this.confirmationEmbed
             .setTitle('Ajout de joueur sur liste noire')
@@ -278,15 +278,15 @@ export class WatchClanModel {
         let name: string = interaction.options.get(MAPPING.UNBLACKLIST_PLAYER.optionsName[0])?.value as string;
         name = name.trim();
 
-        if (!this.feature.playerBlacklisted[name]) {
+        const removed = this.feature.removeBlacklistedPlayer(name);
+
+        if (!removed) {
+            this.logger.debug('Player {} is not blacklisted !', name);
             await interaction.editReply({
                 content: `Le joueur \`${name}\` n'est pas sur la liste noire !`,
             });
             return;
         }
-
-        delete this.feature.playerBlacklisted[name];
-        this.feature.writeIntoFile();
 
         this.confirmationEmbed
             .setTitle('Suppression de joueur sur liste noire')
