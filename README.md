@@ -90,6 +90,11 @@ Use this space to list resources you find helpful and would like to give credit 
 
 ## Changelog
 
+### 2.3.0
+
+-   Rework json related singleton to better readability, documentation and efficiency
+-   Fix bug when back-upping json file when backup folder doesn't exist
+
 ### 2.2.10
 
 -   Add the al_capone trophy slash command
