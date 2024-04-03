@@ -22,6 +22,9 @@ const MAPPING = {
         name: 'statistics',
         optionsName: ['id-ou-name'],
     },
+    LIST: {
+        name: 'list',
+    },
     BLACKLIST_PLAYER: {
         name: 'blacklist-player',
         optionsName: ['player-name', 'reason'],
@@ -43,16 +46,30 @@ export const command: SlashCommandModel = new SlashCommandModel(
             await watchClan.fetchChannel(client);
         }
 
-        if (interaction.options.getSubcommand() === MAPPING.ADD.name) {
-            await watchClan.addClanToWatch(interaction, MAPPING);
-        } else if (interaction.options.getSubcommand() === MAPPING.REMOVE.name) {
-            await watchClan.removeClanFromWatch(interaction, MAPPING);
-        } else if (interaction.options.getSubcommand() === MAPPING.STATS.name) {
-            await watchClan.clanStatistics(interaction, MAPPING);
-        } else if (interaction.options.getSubcommand() === MAPPING.BLACKLIST_PLAYER.name) {
-            await watchClan.addPlayerToBlacklist(interaction, MAPPING);
-        } else if (interaction.options.getSubcommand() === MAPPING.UNBLACKLIST_PLAYER.name) {
-            await watchClan.removePlayerToBlacklist(interaction, MAPPING);
+        switch (interaction.options.getSubcommand()) {
+            case MAPPING.ADD.name:
+                await watchClan.addClanToWatch(interaction, MAPPING);
+                break;
+            case MAPPING.REMOVE.name:
+                await watchClan.removeClanFromWatch(interaction, MAPPING);
+                break;
+            case MAPPING.STATS.name:
+                await watchClan.clanStatistics(interaction, MAPPING);
+                break;
+            case MAPPING.LIST.name:
+                await watchClan.clanList(interaction);
+                break;
+            case MAPPING.BLACKLIST_PLAYER.name:
+                await watchClan.addPlayerToBlacklist(interaction, MAPPING);
+                break;
+            case MAPPING.UNBLACKLIST_PLAYER.name:
+                await watchClan.removePlayerToBlacklist(interaction, MAPPING);
+                break;
+            default:
+                await interaction.editReply({
+                    content: 'Commande inconnue',
+                });
+                break;
         }
     },
     {
@@ -86,6 +103,7 @@ export const command: SlashCommandModel = new SlashCommandModel(
                         .setRequired(true)
                         .setAutocomplete(true)
                 ),
+            new SlashCommandSubcommandBuilder().setName(MAPPING.LIST.name).setDescription('Consulte la liste des clans observés'),
             new SlashCommandSubcommandBuilder()
                 .setName(MAPPING.BLACKLIST_PLAYER.name)
                 .setDescription('Ajoute un joueur à la liste noire pour le recrutement')

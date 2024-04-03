@@ -36,7 +36,11 @@ export const event: BotEvent = {
             }
 
             try {
-                logger.info(`Chat input command received : {}`, command.name);
+                logger.info(
+                    `User {} send slash command : {}`,
+                    interaction.user.username,
+                    command.name + ' ' + interaction.options.getSubcommand()
+                );
                 await command.execute(interaction, client);
             } catch (error) {
                 logger.error(`${error}`, error);
