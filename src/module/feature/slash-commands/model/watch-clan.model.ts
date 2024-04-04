@@ -202,6 +202,36 @@ export class WatchClanModel {
     }
 
     /**
+     * Callback used for the slash command. Display a list of observed clans in a paginated embed.
+     *
+     * @param {ChatInputCommandInteraction} interaction - The interaction that triggered the command.
+     *
+     * @returns {Promise<void>} - A Promise that resolves once the reply is sent.
+     */
+    public async clanList(interaction: ChatInputCommandInteraction): Promise<void> {
+        const listClanNames: string[] = Object.values(this.feature.watchClans)
+            .map((clan: Clan) => clan.name)
+            .sort((a: string, b: string): number => (a < b ? -1 : 1));
+
+        const third: number = Math.round(listClanNames.length / 3);
+
+        const embedListClan = new EmbedBuilder()
+            .setTitle('Liste des clans observés')
+            .setDescription(`Nombre de clan total observés : \`${listClanNames.length}\``)
+            .setColor(Colors.DarkGold);
+
+        for (let i = 0; i < 3; i++) {
+            const startIdx: number = i * third;
+            const endIdx: number = Math.min((i + 1) * third, listClanNames.length);
+            const clanListSlice: string[] = listClanNames.slice(startIdx, endIdx);
+
+            embedListClan.addFields({ name: `Page ${i + 1}/3`, value: clanListSlice.join('\n'), inline: true });
+        }
+
+        await interaction.editReply({ embeds: [embedListClan] });
+    }
+
+    /**
      * Handles the autocomplete logic for clan-related interactions.
      *
      * @param {AutocompleteInteraction} interaction - The autocomplete interaction triggered by the user.

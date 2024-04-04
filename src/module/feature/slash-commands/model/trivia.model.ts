@@ -72,7 +72,7 @@ export class TriviaModel {
             },
             {
                 name: 'Minuteur',
-                value: "Tu as `1 minute` pour répondre à la question. À la fin du minuteur, le bot t'enverra ton résultat : bonne ou mauvaise réponse ainsi que les informations sur le char à trouver et sur le char que tu as sélectionné.",
+                value: `Tu as \`1 minute\` pour répondre à la question. À la fin du minuteur, le bot t'enverra ton résultat : bonne ou mauvaise réponse ainsi que les informations sur le char à trouver et sur le char que tu as sélectionné.\n\nLorsque tu répond à la question en moins de \`10 secondes\`, tu obtiens un bonus de \`25%\` sur les points obtenus en cas de bonne réponse. ${EmojiEnum.WARNING} **Le temps de réponse change si la tu sélectionne une autre réponse**`,
             },
             {
                 name: 'Bouton',
@@ -92,6 +92,7 @@ export class TriviaModel {
      */
     private readonly embedExample: EmbedBuilder = new EmbedBuilder()
         .setTitle('Example de question')
+        .setDescription("Dans cette exemple, les boutons sont clickable mais aucune logique n'est implémenté !")
         .setColor(Colors.Blurple)
         .setFields(
             {
@@ -208,7 +209,7 @@ export class TriviaModel {
         const ammo: Ammo = datum.tank.default_profile.ammo[datum.ammoIndex];
 
         const target = new Date();
-        target.setMinutes(target.getMinutes() + this.maxQuestionDuration / TimeEnum.MINUTE);
+        target.setTime(target.getTime() + this.inventory.trivia.max_duration_of_question * TimeEnum.MINUTE);
 
         const startGameEmbed: EmbedBuilder = new EmbedBuilder()
             .setTitle('Devine le bon char')
@@ -277,7 +278,7 @@ export class TriviaModel {
         });
 
         message
-            .createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: TimeEnum.HOUR * 2 })
+            .createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: TimeEnum.HOUR })
             .on('collect', async (i: StringSelectMenuInteraction): Promise<void> => {
                 const stats = playerStats[i.values[0]];
 

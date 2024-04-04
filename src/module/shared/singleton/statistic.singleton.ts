@@ -50,7 +50,7 @@ export class StatisticSingleton extends CoreFile<StatisticType> {
 
         this.logger = new Logger(new Context(StatisticSingleton.name));
 
-        this._data = JSON.parse(this.readFile().toString());
+        this._data = this.verifyData(StatisticSingleton.INITIAL_VALUE, JSON.parse(this.readFile().toString()));
 
         this._data.version = StatisticSingleton.INITIAL_VALUE.version;
 
