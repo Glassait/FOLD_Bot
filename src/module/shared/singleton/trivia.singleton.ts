@@ -241,16 +241,21 @@ export class TriviaSingleton {
     /**
      * Reduces the Elo of inactive players for the previous day.
      * Inactive players are those who did not participate in the trivia game on the previous day.
-     * The Elo reduction factor is 0.982.
+     * The Elo reduction factor is 1.8%.
      */
-    public reduceEloOfInactifPlayer(): void {
+    public async reduceEloOfInactifPlayer(): Promise<void> {
         this.logger.debug('Start removing elo of inactif player');
-        const yesterday = new Date();
+        const yesterday: Date = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
+
+        const embedPlayer: EmbedBuilder = new EmbedBuilder()
+            .setTitle('Joueur inactif')
+            .setColor(Colors.DarkGold)
+            .setDescription('Voici la liste des joueurs inactifs qui ont perdu des points');
 
         for (const [username, playerStats] of Object.entries(this.triviaStatistique.player)) {
             if (!playerStats[DateUtil.convertDateToMonthYearString(yesterday)].daily[DateUtil.convertDateToDayMonthYearString(yesterday)]) {
-                const oldElo = this.triviaStatistique.player[username][DateUtil.convertDateToMonthYearString(yesterday)].elo;
+                const oldElo: number = this.triviaStatistique.player[username][DateUtil.convertDateToMonthYearString(yesterday)].elo;
                 this.triviaStatistique.player[username][DateUtil.convertDateToMonthYearString(yesterday)].elo *= 0.982;
                 this.triviaStatistique.player[username][DateUtil.convertDateToMonthYearString(yesterday)].elo = Math.round(
                     this.triviaStatistique.player[username][DateUtil.convertDateToMonthYearString(yesterday)].elo
@@ -261,9 +266,17 @@ export class TriviaSingleton {
                     String(oldElo),
                     String(this.triviaStatistique.player[username][DateUtil.convertDateToMonthYearString(yesterday)].elo)
                 );
+                embedPlayer.addFields({
+                    name: username,
+                    value: `Diminution de \`${
+                        oldElo - this.triviaStatistique.player[username][DateUtil.convertDateToMonthYearString(yesterday)].elo
+                    }\` d'élo`,
+                    inline: true,
+                });
             }
         }
 
+        await this.channel.send({ embeds: [embedPlayer] });
         this.statistic.trivia = this.triviaStatistique;
     }
 
