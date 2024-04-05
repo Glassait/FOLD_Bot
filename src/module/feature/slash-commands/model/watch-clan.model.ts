@@ -1,5 +1,6 @@
 import {
     ActionRowBuilder,
+    AutocompleteFocusedOption,
     AutocompleteInteraction,
     BooleanCache,
     CacheType,
@@ -15,20 +16,32 @@ import {
     StringSelectMenuOptionBuilder,
     TextChannel,
 } from 'discord.js';
-import { FeatureInjector, InventoryInjector, LoggerInjector, StatisticInjector } from '../../../shared/decorators/injector.decorator';
+import {
+    AxiosInjector,
+    FeatureInjector,
+    InventoryInjector,
+    LoggerInjector,
+    StatisticInjector,
+} from '../../../shared/decorators/injector.decorator';
 import { Logger } from '../../../shared/classes/logger';
 import { FeatureSingleton } from '../../../shared/singleton/feature.singleton';
 import { InventorySingleton } from 'src/module/shared/singleton/inventory.singleton';
-import { Clan } from '../../../shared/types/feature.type';
+import { Clan, PlayerBlacklistedDetail } from '../../../shared/types/feature.type';
 import { TimeEnum } from '../../../shared/enums/time.enum';
 import { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
 import { FoldRecruitmentClanStatisticType } from '../../../shared/types/statistic.type';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
+import { AxiosInstance } from 'axios';
+import { ConstantsEnum } from '../../loops/enums/fold-recruitment.enum';
+import { WotApiConstants } from '../../../shared/enums/wot-api.enum';
+import { application_id_wot } from '../../../core/config.json';
+import { WargamingSuccessType } from '../../../shared/types/wargaming-api.type';
 
 @LoggerInjector
 @FeatureInjector
 @InventoryInjector
 @StatisticInjector
+@AxiosInjector(TimeEnum.SECONDE * 10)
 export class WatchClanModel {
     //region PRIVATE
     /**
@@ -42,6 +55,7 @@ export class WatchClanModel {
     private readonly feature: FeatureSingleton;
     private readonly inventory: InventorySingleton;
     private readonly statistic: StatisticSingleton;
+    private readonly axios: AxiosInstance;
     //endregion
 
     private _channel: TextChannel;
@@ -231,27 +245,18 @@ export class WatchClanModel {
         await interaction.editReply({ embeds: [embedListClan] });
     }
 
-    /**
-     * Handles the autocomplete logic for clan-related interactions.
-     *
-     * @param {AutocompleteInteraction} interaction - The autocomplete interaction triggered by the user.
-     *
-     * @example
-     * const autocompleteInteraction = // ... obtained autocomplete interaction object
-     * await instance.autocomplete(autocompleteInteraction);
-     */
-    public async autocomplete(interaction: AutocompleteInteraction): Promise<void> {
-        const focusedOption = interaction.options.getFocused(true);
-
-        const filtered: [string, Clan][] = Object.entries(this.feature.watchClans).filter(
-            (clan: [string, Clan]) => clan[0].includes(focusedOption.value) || clan[1].name.includes(focusedOption.value)
-        );
-
-        await interaction.respond(
-            filtered
-                .map((clan: [string, Clan]): { name: string; value: string } => ({ name: `${clan[1].name} | ${clan[0]}`, value: clan[0] }))
-                .slice(0, 24)
-        );
+    public async autocomplete(interaction: AutocompleteInteraction, type: 'clan' | 'add-player' | 'remove-player'): Promise<void> {
+        switch (type) {
+            case 'clan':
+                await this.autocompleteClan(interaction);
+                break;
+            case 'add-player':
+                await this.autocompleteAddPlayer(interaction);
+                break;
+            case 'remove-player':
+                await this.autocompleteRemovePlayer(interaction);
+                break;
+        }
     }
 
     /**
@@ -268,21 +273,23 @@ export class WatchClanModel {
             };
         }
     ): Promise<void> {
-        let name: string = interaction.options.get(MAPPING.BLACKLIST_PLAYER.optionsName[0])?.value as string;
-        name = name.trim();
+        let idAndName: string = interaction.options.get(MAPPING.BLACKLIST_PLAYER.optionsName[0])?.value as string;
+        idAndName = idAndName.trim();
         let reason: string = interaction.options.get(MAPPING.BLACKLIST_PLAYER.optionsName[1])?.value as string;
         reason = reason.trim();
 
-        const added = this.feature.addBlacklistedPlayer(name, reason);
+        const [id, name] = idAndName.split('#');
+        const added: boolean = this.feature.addBlacklistedPlayer(id, name, reason);
 
         if (!added) {
-            this.logger.debug('Player {} already blacklisted !', name);
+            this.logger.debug('Player {} already blacklisted !', idAndName);
             await interaction.editReply({
                 content: `Le joueur \`${name}\` est déjà dans la liste noire !`,
             });
             return;
         }
 
+        this.logger.debug('Player {} added to blacklist !', idAndName);
         this.confirmationEmbed
             .setTitle('Ajout de joueur sur liste noire')
             .setDescription(`Le joueur \`${name}\` a été ajouté sur liste noire !`);
@@ -305,19 +312,21 @@ export class WatchClanModel {
             UNBLACKLIST_PLAYER: { optionsName: string[] };
         }
     ): Promise<void> {
-        let name: string = interaction.options.get(MAPPING.UNBLACKLIST_PLAYER.optionsName[0])?.value as string;
-        name = name.trim();
+        let idAndName: string = interaction.options.get(MAPPING.UNBLACKLIST_PLAYER.optionsName[0])?.value as string;
+        idAndName = idAndName.trim();
 
-        const removed = this.feature.removeBlacklistedPlayer(name);
+        const [id, name] = idAndName.split('#');
+        const removed: boolean = this.feature.removeBlacklistedPlayer(id);
 
         if (!removed) {
-            this.logger.debug('Player {} is not blacklisted !', name);
+            this.logger.debug('Player {} is not blacklisted !', idAndName);
             await interaction.editReply({
-                content: `Le joueur \`${name}\` n'est pas sur la liste noire !`,
+                content: `Le joueur \`${idAndName}\` n'est pas sur la liste noire !`,
             });
             return;
         }
 
+        this.logger.debug('Player {} removed form blacklist !', idAndName);
         this.confirmationEmbed
             .setTitle('Suppression de joueur sur liste noire')
             .setDescription(`Le joueur \`${name}\` a été supprimé de la liste noire !`);
@@ -326,5 +335,92 @@ export class WatchClanModel {
         await this._channel.send({
             embeds: [this.confirmationEmbed],
         });
+    }
+
+    /**
+     * Handles the autocomplete logic for clan-related interactions.
+     *
+     * @param {AutocompleteInteraction} interaction - The autocomplete interaction triggered by the user.
+     *
+     * @example
+     * const autocompleteInteraction = // ... obtained autocomplete interaction object
+     * await instance.autocomplete(autocompleteInteraction);
+     */
+    private async autocompleteRemovePlayer(interaction: AutocompleteInteraction): Promise<void> {
+        const focusedOption: AutocompleteFocusedOption = interaction.options.getFocused(true);
+
+        const filtered: [string, PlayerBlacklistedDetail][] = Object.entries(this.feature.playerBlacklisted).filter(
+            (player: [string, PlayerBlacklistedDetail]) =>
+                player[0].includes(focusedOption.value) || player[1].name.includes(focusedOption.value)
+        );
+
+        await interaction.respond(
+            filtered
+                .map((player: [string, PlayerBlacklistedDetail]): { name: string; value: string } => ({
+                    name: `${player[1].name} | ${player[0]}`,
+                    value: `${player[0]}#${player[1].name}`,
+                }))
+                .slice(0, 24)
+        );
+    }
+
+    /**
+     * Handles the autocomplete logic for clan-related interactions.
+     *
+     * @param {AutocompleteInteraction} interaction - The autocomplete interaction triggered by the user.
+     *
+     * @example
+     * const autocompleteInteraction = // ... obtained autocomplete interaction object
+     * await instance.autocomplete(autocompleteInteraction);
+     */
+    private async autocompleteAddPlayer(interaction: AutocompleteInteraction): Promise<void> {
+        const focusedOption: AutocompleteFocusedOption = interaction.options.getFocused(true);
+
+        if (focusedOption.value.length < 3) {
+            return;
+        }
+
+        const searchResult: WargamingSuccessType<{ nickname: string; account_id: number }[]> = (
+            await this.axios.get(
+                this.inventory.foldRecruitment.search_player_url
+                    .replace(ConstantsEnum.PLAYER_NAME, focusedOption.value)
+                    .replace(WotApiConstants.APPLICATION_ID, application_id_wot)
+            )
+        ).data;
+
+        await interaction.respond(
+            searchResult.data
+                .map((player: { nickname: string; account_id: number }): { name: string; value: string } => ({
+                    name: `${player.nickname} | ${player.account_id}`,
+                    value: `${player.account_id}#${player.nickname}`,
+                }))
+                .slice(0, 24)
+        );
+    }
+
+    /**
+     * Handles the autocomplete logic for clan-related interactions.
+     *
+     * @param {AutocompleteInteraction} interaction - The autocomplete interaction triggered by the user.
+     *
+     * @example
+     * const autocompleteInteraction = // ... obtained autocomplete interaction object
+     * await instance.autocomplete(autocompleteInteraction);
+     */
+    private async autocompleteClan(interaction: AutocompleteInteraction): Promise<void> {
+        const focusedOption: AutocompleteFocusedOption = interaction.options.getFocused(true);
+
+        const filtered: [string, Clan][] = Object.entries(this.feature.watchClans).filter(
+            (clan: [string, Clan]) => clan[0].includes(focusedOption.value) || clan[1].name.includes(focusedOption.value)
+        );
+
+        await interaction.respond(
+            filtered
+                .map((clan: [string, Clan]): { name: string; value: string } => ({
+                    name: `${clan[1].name} | ${clan[0]}`,
+                    value: clan[0],
+                }))
+                .slice(0, 24)
+        );
     }
 }

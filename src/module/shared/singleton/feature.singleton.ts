@@ -213,17 +213,21 @@ export class FeatureSingleton extends CoreFile<FeatureType> {
     /**
      * Adds a player to the blacklist with the specified reason.
      *
-     * @param {string} playerName - The name of the player to blacklist.
+     * @param {string} id - The id of the player to blacklist.
+     * @param {string} name - The name of the player to blacklist.
      * @param {string} reason - The reason for blacklisting the player.
      *
      * @returns {boolean} - True if the player was successfully added to the blacklist, false if the player was already blacklisted.
      */
-    public addBlacklistedPlayer(playerName: string, reason: string): boolean {
-        if (this._data.player_blacklisted[playerName]) {
+    public addBlacklistedPlayer(id: string, name: string, reason: string): boolean {
+        if (this._data.player_blacklisted[id]) {
             return false;
         }
 
-        this._data.player_blacklisted[playerName] = reason;
+        this._data.player_blacklisted[id] = {
+            name: name,
+            reason: reason,
+        };
         this.writeData();
 
         return true;
@@ -232,16 +236,16 @@ export class FeatureSingleton extends CoreFile<FeatureType> {
     /**
      * Removes a player from the blacklist.
      *
-     * @param {string} playerName - The name of the player to remove from the blacklist.
+     * @param {string} id - The id of the player to blacklist.
      *
      * @returns {boolean} - True if the player was successfully removed from the blacklist, false if the player was not found in the blacklist.
      */
-    public removeBlacklistedPlayer(playerName: string): boolean {
-        if (!this._data.player_blacklisted[playerName]) {
+    public removeBlacklistedPlayer(id: string): boolean {
+        if (!this._data.player_blacklisted[id]) {
             return false;
         }
 
-        delete this._data.player_blacklisted[playerName];
+        delete this._data.player_blacklisted[id];
         this.writeData();
 
         return true;

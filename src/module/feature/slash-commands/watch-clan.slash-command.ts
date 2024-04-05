@@ -108,7 +108,11 @@ export const command: SlashCommandModel = new SlashCommandModel(
                 .setName(MAPPING.BLACKLIST_PLAYER.name)
                 .setDescription('Ajoute un joueur à la liste noire pour le recrutement')
                 .addStringOption((builder: SlashCommandStringOption) =>
-                    builder.setName(MAPPING.BLACKLIST_PLAYER.optionsName[0]).setDescription('Le nom du joueur').setRequired(true)
+                    builder
+                        .setName(MAPPING.BLACKLIST_PLAYER.optionsName[0])
+                        .setDescription('Le nom du joueur')
+                        .setRequired(true)
+                        .setAutocomplete(true)
                 )
                 .addStringOption((builder: SlashCommandStringOption) =>
                     builder
@@ -120,10 +124,29 @@ export const command: SlashCommandModel = new SlashCommandModel(
                 .setName(MAPPING.UNBLACKLIST_PLAYER.name)
                 .setDescription('Retire un joueur de la liste noire pour le recrutement')
                 .addStringOption((builder: SlashCommandStringOption) =>
-                    builder.setName(MAPPING.UNBLACKLIST_PLAYER.optionsName[0]).setDescription('Le nom du joueur').setRequired(true)
+                    builder
+                        .setName(MAPPING.UNBLACKLIST_PLAYER.optionsName[0])
+                        .setDescription('Le nom du joueur')
+                        .setRequired(true)
+                        .setAutocomplete(true)
                 ),
         ],
         permission: PermissionsBitField.Flags.KickMembers,
-        autocomplete: async (interaction: AutocompleteInteraction): Promise<void> => await watchClan.autocomplete(interaction),
+        autocomplete: async (interaction: AutocompleteInteraction): Promise<void> => {
+            switch (interaction.options.getSubcommand()) {
+                case MAPPING.REMOVE.name:
+                    await watchClan.autocomplete(interaction, 'clan');
+                    break;
+                case MAPPING.STATS.name:
+                    await watchClan.autocomplete(interaction, 'clan');
+                    break;
+                case MAPPING.BLACKLIST_PLAYER.name:
+                    await watchClan.autocomplete(interaction, 'add-player');
+                    break;
+                case MAPPING.UNBLACKLIST_PLAYER.name:
+                    await watchClan.autocomplete(interaction, 'remove-player');
+                    break;
+            }
+        },
     }
 );

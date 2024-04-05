@@ -10,7 +10,7 @@ import { AxiosInstance } from 'axios';
 import { ClanActivity, FoldRecruitmentData, LeaveClanActivity, Players } from '../types/fold-recruitment.type';
 import { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
 import { Client, Colors, EmbedBuilder, TextChannel } from 'discord.js';
-import { Clan } from '../../../shared/types/feature.type';
+import { Clan, PlayerBlacklistedDetail } from '../../../shared/types/feature.type';
 import { ConstantsEnum, WotClanActivity } from '../enums/fold-recruitment.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
 import { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
@@ -202,7 +202,7 @@ export class FoldRecruitmentModel {
      * await this.buildAndSendEmbedForPlayer(player, id, clan);
      */
     private async buildAndSendEmbedForPlayer(player: Players, clanId: string, clan: Clan): Promise<void> {
-        const blacklisted: string = this.feature.playerBlacklisted[player.name];
+        const blacklisted: PlayerBlacklistedDetail | undefined = this.feature.playerBlacklisted[player.id];
 
         const embedPlayer: EmbedBuilder = new EmbedBuilder()
             .setAuthor({
@@ -213,7 +213,9 @@ export class FoldRecruitmentModel {
             .setTitle(blacklisted ? 'Joueur sur liste noire détecté' : 'Nouveau joueur pouvant être recruté')
             .setDescription(
                 `Le joueur suivant \`${player.name}\` a quitté \`${clan.name}\`.${
-                    blacklisted ? '\n\nLe joueur suivant a été mis sur liste noire pour la raison suivante : `' + blacklisted + '`' : ''
+                    blacklisted
+                        ? '\n\nLe joueur suivant a été mis sur liste noire pour la raison suivante : `' + blacklisted.name + '`'
+                        : ''
                 }`
             )
             .setFields(
