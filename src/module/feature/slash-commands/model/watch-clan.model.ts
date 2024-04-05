@@ -289,6 +289,7 @@ export class WatchClanModel {
             return;
         }
 
+        this.logger.debug('Player {} added to blacklist !', idAndName);
         this.confirmationEmbed
             .setTitle('Ajout de joueur sur liste noire')
             .setDescription(`Le joueur \`${name}\` a été ajouté sur liste noire !`);
@@ -325,6 +326,7 @@ export class WatchClanModel {
             return;
         }
 
+        this.logger.debug('Player {} removed form blacklist !', idAndName);
         this.confirmationEmbed
             .setTitle('Suppression de joueur sur liste noire')
             .setDescription(`Le joueur \`${name}\` a été supprimé de la liste noire !`);
