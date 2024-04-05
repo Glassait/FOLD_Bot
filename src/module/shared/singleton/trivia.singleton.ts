@@ -144,7 +144,7 @@ export class TriviaSingleton {
         const dayTankElement = this.triviaStatistique.overall[this.statistic.currentMonth].day_tank[previousDay];
 
         if (!dayTankElement) {
-            this.logger.debug('No tanks fetch yesterday');
+            this.logger.debug('No tanks fetch yesterday ! Not sending result');
             return;
         }
 
@@ -244,6 +244,11 @@ export class TriviaSingleton {
      * The Elo reduction factor is 1.8%.
      */
     public async reduceEloOfInactifPlayer(): Promise<void> {
+        if (!this.triviaStatistique.overall[this.statistic.currentMonth].day_tank[DateUtil.getPreviousDay()]) {
+            this.logger.debug('No tanks fetch yesterday ! Not reducing elo of inactif player');
+            return;
+        }
+
         this.logger.debug('Start removing elo of inactif player');
         const yesterday: Date = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
