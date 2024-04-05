@@ -168,6 +168,7 @@ export class FoldRecruitmentModel {
 
         for (const player of datum) {
             await this.buildAndSendEmbedForPlayer(player, clanId, clan);
+            this.feature.addLeavingPlayer(player.id);
         }
 
         if (extracted[0]) {

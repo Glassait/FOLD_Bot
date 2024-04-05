@@ -8,6 +8,7 @@ import { TriviaMonthModel } from './models/trivia-month.model';
 import { FoldMonthModel } from './models/fold-month.model';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
 import { TriviaSingleton } from '../../shared/singleton/trivia.singleton';
+import { SearchClanModel } from './models/search-clan.model';
 
 export const event: BotEvent = {
     name: Events.ClientReady,
@@ -37,14 +38,14 @@ export const event: BotEvent = {
             await trivia.reduceEloOfInactifPlayer();
         }
 
-        const today = new Date();
+        const today: Date = new Date();
 
         if (today.getDate() !== 1) {
             return;
         }
 
         if (inventory.getFeatureFlipping('fold_month')) {
-            const foldMonth = new FoldMonthModel();
+            const foldMonth: FoldMonthModel = new FoldMonthModel();
 
             await foldMonth.fetchChannel(client);
             await foldMonth.sendMessage();
@@ -56,6 +57,11 @@ export const event: BotEvent = {
             await triviaMonth.fetchMandatory(client);
             triviaMonth.createEmbed();
             await triviaMonth.sendToChannel();
+        }
+
+        if (inventory.getFeatureFlipping('search_clan')) {
+            const searchClanModel: SearchClanModel = new SearchClanModel();
+            await searchClanModel.searchClan();
         }
     },
 };

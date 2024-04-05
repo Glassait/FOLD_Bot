@@ -78,6 +78,23 @@ export type PlayerBlacklisted = {
 
 /**
  * Defined the architecture of the feature.json file
+ *
+ * @example
+ * {
+ *    "auto_disconnect": "",
+ *    "auto_reply": [],
+ *    "watch_clan": {
+ *        "6004": {
+ *            "name": "KhalidZaman",
+ *            "imageUrl": "https://perdu.com",
+ *            "last_activity": "1996-09-29 03:12:23"
+ *        },
+ *    },
+ *    "player_blacklisted": {
+ *        "HongTakahashi": "Lorem ipsum dolor sit amet",
+ *    },
+ *    "leaving_player": [1309]
+ * }
  */
 export type FeatureType = {
     /**
@@ -96,4 +113,12 @@ export type FeatureType = {
      * The list of blacklisted players from the fold recruitment
      */
     player_blacklisted: PlayerBlacklisted;
+    /**
+     * The list of leaving player detected by the bot
+     */
+    leaving_player: number[];
+    /**
+     * The list of potential clan to watch
+     */
+    potential_clan: string[];
 };
