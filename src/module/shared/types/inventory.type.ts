@@ -201,6 +201,13 @@ export type FoldRecruitment = {
      * @replace PLAYER_NAME
      */
     search_player_url: string;
+    /**
+     * The wot url to get the personal data of a player
+     *
+     * @replace APPLICATION_ID
+     * @replace PLAYER_ID
+     */
+    player_personal_data: string;
 };
 
 /**

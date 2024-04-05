@@ -22,6 +22,7 @@
 		"wargaming_url": "https://eu.wargaming.net/clans/wot/search/#wgsearch&type=accounts&search=PLAYER_NAME&account_id=PLAYER_ID&limit=10&accounts-battle_type=random&accounts-timeframe=all",
 		"wot_life_url": "https://fr.wot-life.com/eu/player/PLAYER_NAME-PLAYER_ID/",
 		"search_player_url": "https://api.worldoftanks.eu/wot/account/list/?application_id=APPLICATION_ID&search=PLAYER_NAME",
+		"player_personal_data": "https://api.worldoftanks.eu/wot/account/info/?application_id=APPLICATION_ID&account_id=PLAYER_ID&fields=clan_id",
 		"schedule": []
 	},
 	"channels": {
@@ -48,13 +49,15 @@
 		"auto-reply": [],
 		"auto-disconnect": [],
 		"trivia": [],
-		"al_capone-trophy": []
+		"al_capone-trophy": [],
+		"search-clan": []
 	},
 	"feature_flipping": {
 		"trivia": false,
 		"trivia_month": false,
 		"fold_month": false,
 		"fold_recruitment": false,
-		"scrap_website": false
+		"scrap_website": false,
+		"search_clan": false
 	}
 }

@@ -39,7 +39,7 @@ export const event: BotEvent = {
                 logger.info(
                     `User {} send slash command : {}`,
                     interaction.user.username,
-                    command.name + ' ' + interaction.options.getSubcommand()
+                    command.name + (interaction.options.data.length > 0 ? ' ' + interaction?.options.getSubcommand() : '')
                 );
                 await command.execute(interaction, client);
             } catch (error) {
