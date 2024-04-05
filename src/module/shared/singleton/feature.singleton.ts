@@ -74,10 +74,10 @@ export class FeatureSingleton extends CoreFile<FeatureType> {
     }
 
     //region AUTO-DISCONNECT
-    /**
-     * Sets the auto-disconnect target.
-     * @param targetId The ID of the user to auto-disconnect.
-     */
+    public get autoDisconnect(): string {
+        return this._data.auto_disconnect;
+    }
+
     public set autoDisconnect(targetId: DiscordId) {
         this._data.auto_disconnect = targetId;
         this.writeData();
@@ -127,6 +127,8 @@ export class FeatureSingleton extends CoreFile<FeatureType> {
         }
 
         this._data.watch_clan[clanId] = clan;
+        this.writeData();
+
         return true;
     }
 
@@ -223,6 +225,7 @@ export class FeatureSingleton extends CoreFile<FeatureType> {
 
         this._data.player_blacklisted[playerName] = reason;
         this.writeData();
+
         return true;
     }
 
@@ -240,6 +243,7 @@ export class FeatureSingleton extends CoreFile<FeatureType> {
 
         delete this._data.player_blacklisted[playerName];
         this.writeData();
+
         return true;
     }
     //endregion

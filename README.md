@@ -96,6 +96,7 @@ Use this space to list resources you find helpful and would like to give credit 
 -   Fix bug when back-upping json file when backup folder doesn't exist
 -   Add slash command to see list of all observed clans
 -   Change the time to answer trivia question
+-   Disabled the reducing points of trivia player when yesterday tanks not fetch
 
 ### 2.2.10
 
