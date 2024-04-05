@@ -156,28 +156,51 @@ export type FoldRecruitment = {
     schedule: string[];
     /**
      * The wot api url to get the clan image
+     *
+     * @replace APPLICATION_ID
+     * @replace CLAN_NAME
      */
     image_url: string;
     /**
      * The wot api url to get the clan activity
+     *
+     * @replace CLAN_ID
      */
     newsfeed_url: string;
     /**
      * The wargaming url to display the main page of the clan
+     *
+     * @replace CLAN_ID
      */
     clan_url: string;
     /**
      * The tomato url to display the main statistics of the player
+     *
+     * @replace PLAYER_NAME
+     * @replace PLAYER_ID
      */
     tomato_url: string;
     /**
      * The wargaming url to display the main statistics of the player
+     *
+     * @replace PLAYER_NAME
+     * @replace PLAYER_ID
      */
     wargaming_url: string;
     /**
      * The wot life url to display the main statistics of the player
+     *
+     * @replace PLAYER_NAME
+     * @replace PLAYER_ID
      */
     wot_life_url: string;
+    /**
+     * The wot url to search the id player of player with a name
+     *
+     * @replace APPLICATION_ID
+     * @replace PLAYER_NAME
+     */
+    search_player_url: string;
 };
 
 /**

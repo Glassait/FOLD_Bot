@@ -40,8 +40,40 @@ export type WatchClan = {
     [id: string]: Clan;
 };
 
+/**
+ * Represents the details of a blacklisted player.
+ *
+ * @example {
+ *     name: "KhaledTian",
+ *     reason: "dolor potenti efficiantur vehicula quot"
+ * }
+ */
+export type PlayerBlacklistedDetail = {
+    /**
+     * The name of the blacklisted player.
+     */
+    name: string;
+    /**
+     * The reason for blacklisting the player.
+     */
+    reason: string;
+};
+
+/**
+ * Represents a collection of blacklisted players.
+ *
+ * @example {
+ *     "9234" : {
+ *          name: "KhaledTian",
+ *          reason: "dolor potenti efficiantur vehicula quot"
+ *      }
+ * }
+ */
 export type PlayerBlacklisted = {
-    [name: string]: string;
+    /**
+     * The name of the blacklisted player.
+     */
+    [name: string]: PlayerBlacklistedDetail;
 };
 
 /**

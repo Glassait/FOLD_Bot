@@ -6,7 +6,7 @@ import { application_id_wot } from '../../core/config.json';
 import { TimeEnum } from '../enums/time.enum';
 import { EmojiEnum } from '../enums/emoji.enum';
 import { InventorySingleton } from '../singleton/inventory.singleton';
-import { ConstantsEnum } from '../enums/wot-api.enum';
+import { WotApiConstants } from '../enums/wot-api.enum';
 import { WargamingErrorType, WargamingSuccessType } from '../types/wargaming-api.type';
 
 @LoggerInjector
@@ -62,8 +62,8 @@ export class WotApiModel {
         const url =
             this.WOT_API +
             this.inventory.foldRecruitment.image_url
-                .replace(ConstantsEnum.APPLICATION_ID, application_id_wot)
-                .replace(ConstantsEnum.CLAN_NAME, name);
+                .replace(WotApiConstants.APPLICATION_ID, application_id_wot)
+                .replace(WotApiConstants.CLAN_NAME, name);
         this.logger.debug(`${EmojiEnum.SOLDIER} Fetching clans api with url {}`, url);
 
         return await this.getDataFromUrl<ClansSuccess, Clans>(url);

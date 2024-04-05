@@ -7,7 +7,7 @@
  * console.log(appId); // 'APPLICATION_ID'
  * ```
  */
-export enum ConstantsEnum {
+export enum WotApiConstants {
     APPLICATION_ID = 'APPLICATION_ID',
     CLAN_NAME = 'CLAN_NAME',
 }

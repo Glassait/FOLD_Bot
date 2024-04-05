@@ -97,6 +97,9 @@ Use this space to list resources you find helpful and would like to give credit 
 -   Add slash command to see list of all observed clans
 -   Change the time to answer trivia question
 -   Disabled the reducing points of trivia player when yesterday tanks not fetch
+-   Update the slash command to blacklist player with autocompletion ans search with wot api
+-   Update the slash command to unblacklist player with autocompletion
+-   Change the data format of blacklist player to store with ID and not name
 
 ### 2.2.10
 

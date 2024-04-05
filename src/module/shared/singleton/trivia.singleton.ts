@@ -7,7 +7,7 @@ import { InventorySingleton } from './inventory.singleton';
 import { Trivia } from '../types/inventory.type';
 import { WotApiModel } from '../apis/wot-api.model';
 import { application_id_wot } from '../../core/config.json';
-import { ConstantsEnum } from '../enums/wot-api.enum';
+import { WotApiConstants } from '../enums/wot-api.enum';
 import { TriviaSelected } from '../types/trivia.type';
 import { StatisticSingleton } from './statistic.singleton';
 import { TriviaPlayerStatisticType, TriviaStatistic } from '../types/statistic.type';
@@ -336,7 +336,7 @@ export class TriviaSingleton {
         for (const page of tankPages) {
             responses.push(
                 await this.wotApi.fetchTankopediaApi(
-                    this.trivia.url.replace('pageNumber', String(page)).replace(ConstantsEnum.APPLICATION_ID, application_id_wot)
+                    this.trivia.url.replace('pageNumber', String(page)).replace(WotApiConstants.APPLICATION_ID, application_id_wot)
                 )
             );
         }
