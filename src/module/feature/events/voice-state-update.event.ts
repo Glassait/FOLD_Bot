@@ -11,8 +11,8 @@ export const event: BotEvent = {
     name: Events.VoiceStateUpdate,
     async execute(_client: Client, _oldState: VoiceState, newState: VoiceState): Promise<void> {
         const feature: FeatureSingleton = FeatureSingleton.instance;
-        if (feature.data.auto_disconnect && newState.channelId) {
-            const targetUser: GuildMember = await UserUtil.getGuildMemberFromGuild(newState.guild, feature.data.auto_disconnect);
+        if (feature.autoDisconnect && newState.channelId) {
+            const targetUser: GuildMember = await UserUtil.getGuildMemberFromGuild(newState.guild, feature.autoDisconnect);
             logger.debug(`Disconnect user {} because auto-disconnect set for him`, targetUser.displayName);
             await targetUser.voice.disconnect();
         }
