@@ -4,11 +4,6 @@
 export type DiscordId = string; // NOSONAR
 
 /**
- * Define the auto-reply feature
- */
-export type Reply = { activateFor: DiscordId; replyTo: DiscordId };
-
-/**
  * Represents information about a clan.
  *
  * @example
@@ -81,8 +76,6 @@ export type PlayerBlacklisted = {
  *
  * @example
  * {
- *    "auto_disconnect": "",
- *    "auto_reply": [],
  *    "watch_clan": {
  *        "6004": {
  *            "name": "KhalidZaman",
@@ -97,14 +90,6 @@ export type PlayerBlacklisted = {
  * }
  */
 export type FeatureType = {
-    /**
-     * The user to auto-disconnect
-     */
-    auto_disconnect: DiscordId;
-    /**
-     * The list of auto-reply
-     */
-    auto_reply: Reply[];
     /**
      * The list of clan to watch, organized with a unique identifier of the clan.
      */

@@ -45,9 +45,6 @@
 	},
 	"commands": {
 		"watch-clan": [],
-		"disconnect": [],
-		"auto-reply": [],
-		"auto-disconnect": [],
 		"trivia": [],
 		"al_capone-trophy": [],
 		"search-clan": []

@@ -1,4 +1,4 @@
-import { Clan, DiscordId, FeatureType, PlayerBlacklisted, Reply, WatchClan } from '../types/feature.type';
+import { Clan, FeatureType, PlayerBlacklisted, WatchClan } from '../types/feature.type';
 import { Logger } from '../classes/logger';
 import { Context } from '../classes/context';
 import { CoreFile } from '../classes/core-file';
@@ -8,8 +8,6 @@ export class FeatureSingleton extends CoreFile<FeatureType> {
      * The initial value of the feature configuration.
      */
     private static readonly INITIAL_VALUE: FeatureType = {
-        auto_disconnect: '',
-        auto_reply: [],
         watch_clan: {},
         player_blacklisted: {},
         leaving_player: [],
@@ -74,17 +72,6 @@ export class FeatureSingleton extends CoreFile<FeatureType> {
         this._data = this.verifyData(FeatureSingleton.INITIAL_VALUE, data);
         this.writeData();
     }
-
-    //region AUTO-DISCONNECT
-    public get autoDisconnect(): string {
-        return this._data.auto_disconnect;
-    }
-
-    public set autoDisconnect(targetId: DiscordId) {
-        this._data.auto_disconnect = targetId;
-        this.writeData();
-    }
-    //endregion
 
     //region FOLD-RECRUITMENT
     /**
@@ -334,58 +321,6 @@ export class FeatureSingleton extends CoreFile<FeatureType> {
         this._data.potential_clan.push(url);
         this.writeData();
         this.logger.debug('Clan {} add to the list !', url);
-    }
-    //endregion
-
-    //region AUTO-REPLY METHODS
-    /**
-     * Adds an auto-reply rule.
-     *
-     * @param {Reply} item - The auto-reply rule to add.
-     */
-    public addAutoReply(item: Reply): void {
-        this._data.auto_reply.push(item);
-        this.writeData();
-    }
-
-    /**
-     * Deletes an auto-reply rule.
-     *
-     * @param {DiscordId} activateFor - The ID of the user that triggers the auto-reply.
-     * @param {DiscordId} replyTo - The ID of the user that the auto-reply is sent to.
-     */
-    public deleteAutoReply(activateFor: DiscordId, replyTo: DiscordId): void {
-        const object: Reply | undefined = this._data.auto_reply.find(
-            (value: Reply) => value.activateFor === activateFor && value.replyTo === replyTo
-        );
-        if (!object) {
-            this.logger.warn('No auto-reply for {} to reply to {}', activateFor, replyTo);
-            return;
-        }
-
-        const index: number = this._data.auto_reply.indexOf(object);
-
-        this._data.auto_reply.splice(index, 1);
-        this.writeData();
-    }
-
-    /**
-     * Gets the auto-replies for a specific user.
-     *
-     * @param {DiscordId} replyTo - The ID of the user.
-     */
-    public getArrayFromReplyTo(replyTo: DiscordId): Reply[] {
-        return this._data.auto_reply.filter((value: Reply): boolean => value.replyTo === replyTo);
-    }
-
-    /**
-     * Checks if an auto-reply rule exists for a specific user.
-     *
-     * @param {DiscordId} activateFor - The ID of the user that triggers the auto-reply.
-     * @param {DiscordId} replyTo - The ID of the user that the auto-reply is sent to.
-     */
-    public hasAutoReplyTo(activateFor: DiscordId, replyTo: DiscordId): boolean {
-        return this._data.auto_reply.some((value: Reply) => value.activateFor === activateFor && value.replyTo === replyTo);
     }
     //endregion
 }
