@@ -3,7 +3,7 @@ import * as cheerio from 'cheerio';
 import { CheerioAPI } from 'cheerio';
 import { Client, EmbedBuilder, TextChannel } from 'discord.js';
 import { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
-import { AxiosInjector, InventoryInjector, LoggerInjector } from '../../../shared/decorators/injector.decorator';
+import { Injectable, LoggerInjector } from '../../../shared/decorators/injector.decorator';
 import { Logger } from '../../../shared/classes/logger';
 import { WebsiteNameEnum } from '../enums/website-name.enum';
 import { WebSiteState } from '../../../shared/types/inventory.type';
@@ -12,8 +12,6 @@ import { EnvUtil } from '../../../shared/utils/env.util';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 
 @LoggerInjector
-@InventoryInjector
-@AxiosInjector(TimeEnum.SECONDE * 10)
 export class WebSiteScraper {
     /**
      * The channel for the newsletter
@@ -21,10 +19,10 @@ export class WebSiteScraper {
      */
     private channel: TextChannel;
 
-    //region INJECTION
-    private readonly axios: AxiosInstance;
-    private readonly inventory: InventorySingleton;
+    //region INJECTABLE
     private readonly logger: Logger;
+    @Injectable('Axios', TimeEnum.SECONDE * 10) private readonly axios: AxiosInstance;
+    @Injectable('Inventory') private readonly inventory: InventorySingleton;
     //endregion
 
     /**

@@ -1,4 +1,4 @@
-import { InventoryInjector } from '../../../shared/decorators/injector.decorator';
+import { Injectable } from '../../../shared/decorators/injector.decorator';
 import { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
 import { ChannelType, Client, Colors, EmbedBuilder, TextChannel, ThreadAutoArchiveDuration } from 'discord.js';
 import { DateUtil } from '../../../shared/utils/date.util';
@@ -6,10 +6,9 @@ import { DateUtil } from '../../../shared/utils/date.util';
 /**
  * Represents the model for managing monthly announcements and messages in a Discord server.
  */
-@InventoryInjector
 export class FoldMonthModel {
-    //region INJECTOR
-    private readonly inventory: InventorySingleton;
+    //region INJECTABLE
+    @Injectable('Inventory') private readonly inventory: InventorySingleton;
     //endregion
 
     //region PRIVATE FIELDS

@@ -1,10 +1,4 @@
-import {
-    AxiosInjector,
-    FeatureInjector,
-    InventoryInjector,
-    LoggerInjector,
-    StatisticInjector,
-} from '../../../shared/decorators/injector.decorator';
+import { Injectable, LoggerInjector } from '../../../shared/decorators/injector.decorator';
 import { Logger } from '../../../shared/classes/logger';
 import { AxiosInstance } from 'axios';
 import { ClanActivity, FoldRecruitmentData, LeaveClanActivity, Players } from '../types/fold-recruitment.type';
@@ -19,10 +13,6 @@ import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 import { FeatureSingleton } from '../../../shared/singleton/feature.singleton';
 
 @LoggerInjector
-@AxiosInjector(TimeEnum.SECONDE * 30)
-@InventoryInjector
-@StatisticInjector
-@FeatureInjector
 export class FoldRecruitmentModel {
     //region PRIVATE READONLY FIELDS
     /**
@@ -33,12 +23,12 @@ export class FoldRecruitmentModel {
         .setTitle("Aucun joueur n'a quitté son clan depuis le dernier scan !");
     //endregion
 
-    //region INJECTION
+    //region INJECTABLE
     private readonly logger: Logger;
-    private readonly axios: AxiosInstance;
-    private readonly inventory: InventorySingleton;
-    private readonly statistic: StatisticSingleton;
-    private readonly feature: FeatureSingleton;
+    @Injectable('Axios', TimeEnum.SECONDE * 30) private readonly axios: AxiosInstance;
+    @Injectable('Inventory') private readonly inventory: InventorySingleton;
+    @Injectable('Statistic') private readonly statistic: StatisticSingleton;
+    @Injectable('Feature') private readonly feature: FeatureSingleton;
     private readonly wotApiModel: WotApiModel = new WotApiModel();
     //endregion
 

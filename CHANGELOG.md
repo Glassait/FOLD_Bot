@@ -1,15 +1,9 @@
 <style>
-.Label--success {
-    border-color: #238636;
+.label {
     color: #3fb950;;
-}
-.Label--large {
     line-height: 22px;
     padding: 2px 10px;
-}
-
-.Label {
-    border: max(1px, 0.0625rem) solid #30363d;
+    border: max(1px, 0.0625rem) solid #238636;
     border-radius: 2em;
     display: inline-block;
     font-weight: 500;
@@ -24,7 +18,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.3.0] - Apr 5, 2024 <span data-view-component="true" class="Label Label--success Label--large">Latest</span>
+## [3.0.0]
+
+### Added
+
+-   This changelog whit better description
+
+### Changed
+
+-   Changed the injector to use the new decorator of typescript 5 and update all classes
+
+## [2.3.0] - Apr 5, 2024 <span data-view-component="true" class="label">Latest</span>
 
 ### Added
 
@@ -451,6 +455,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+[3.0.0]: https://github.com/Glassait/FOLD_Bot/compare/v2.3.0-5...v3.0.0-0
 [2.3.0]: https://github.com/Glassait/FOLD_Bot/compare/v2.2.10-6...v2.3.0-5
 [2.2.10]: https://github.com/Glassait/FOLD_Bot/compare/v2.2.9-8...v2.2.10-6
 [2.2.9]: https://github.com/Glassait/FOLD_Bot/compare/v2.2.8-4...v2.2.9-8

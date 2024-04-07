@@ -52,7 +52,7 @@ export class FileUtil {
 
         mkdir(path, constants.R_OK, err => {
             if (err) {
-                throw new Error(`${EmojiEnum.RED_CROSS} Failed to create the following folder ${folderName} with error: {}`, err);
+                throw new Error(`${EmojiEnum.RED_CROSS} Failed to create the following folder ${folderName} with error:`, err);
             } else {
                 this.logger.debug(`${folderName} successfully created`);
             }

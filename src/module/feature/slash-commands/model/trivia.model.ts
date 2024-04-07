@@ -16,7 +16,6 @@ import {
 } from 'discord.js';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 import { ShellEnum, ShellType } from '../enums/shell.enum';
-import { InventoryInjector, LoggerInjector, StatisticInjector, TriviaInjector } from '../../../shared/decorators/injector.decorator';
 import { TriviaSingleton } from '../../../shared/singleton/trivia.singleton';
 import { TimeEnum } from '../../../shared/enums/time.enum';
 import { Ammo, VehicleData } from '../../../shared/types/wot-api.type';
@@ -34,17 +33,15 @@ import { TriviaSelected } from '../../../shared/types/trivia.type';
 import { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
 import { InventorySingleton } from 'src/module/shared/singleton/inventory.singleton';
 import { MEDAL } from '../../../shared/utils/variables.util';
+import { Injectable, LoggerInjector } from '../../../shared/decorators/injector.decorator';
 
 @LoggerInjector
-@TriviaInjector
-@StatisticInjector
-@InventoryInjector
 export class TriviaModel {
-    //region INJECTION
-    private readonly trivia: TriviaSingleton;
+    //region INJECTABLE
     private readonly logger: Logger;
-    private readonly statistic: StatisticSingleton;
-    private readonly inventory: InventorySingleton;
+    @Injectable('Trivia') private readonly trivia: TriviaSingleton;
+    @Injectable('Statistic') private readonly statistic: StatisticSingleton;
+    @Injectable('Inventory') private readonly inventory: InventorySingleton;
     //endregion
 
     //region PRIVATE READONLY FIELDS

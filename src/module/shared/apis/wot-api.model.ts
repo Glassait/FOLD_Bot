@@ -1,17 +1,15 @@
 import { AxiosInstance } from 'axios';
-import { AxiosInjector, InventoryInjector, LoggerInjector } from '../decorators/injector.decorator';
+import { Injectable, LoggerInjector } from '../decorators/injector.decorator';
 import { Logger } from '../classes/logger';
 import { Clans, ClansSuccess, TankopediaVehicle, TankopediaVehiclesSuccess } from '../types/wot-api.type';
 import { application_id_wot } from '../../core/config.json';
-import { TimeEnum } from '../enums/time.enum';
 import { EmojiEnum } from '../enums/emoji.enum';
 import { InventorySingleton } from '../singleton/inventory.singleton';
 import { WotApiConstants } from '../enums/wot-api.enum';
 import { WargamingErrorType, WargamingSuccessType } from '../types/wargaming-api.type';
+import { TimeEnum } from '../enums/time.enum';
 
 @LoggerInjector
-@AxiosInjector(TimeEnum.SECONDE * 30)
-@InventoryInjector
 export class WotApiModel {
     /**
      * The base url for the wot api
@@ -24,9 +22,9 @@ export class WotApiModel {
     private readonly maxNumberOfTry = 5;
 
     //region INJECTOR
-    private readonly axios: AxiosInstance;
     private readonly logger: Logger;
-    private readonly inventory: InventorySingleton;
+    @Injectable('Axios', TimeEnum.SECONDE * 30) private readonly axios: AxiosInstance;
+    @Injectable('Inventory') private readonly inventory: InventorySingleton;
     //endregion
 
     /**

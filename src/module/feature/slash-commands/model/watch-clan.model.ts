@@ -16,13 +16,7 @@ import {
     StringSelectMenuOptionBuilder,
     TextChannel,
 } from 'discord.js';
-import {
-    AxiosInjector,
-    FeatureInjector,
-    InventoryInjector,
-    LoggerInjector,
-    StatisticInjector,
-} from '../../../shared/decorators/injector.decorator';
+import { Injectable, LoggerInjector } from '../../../shared/decorators/injector.decorator';
 import { Logger } from '../../../shared/classes/logger';
 import { FeatureSingleton } from '../../../shared/singleton/feature.singleton';
 import { InventorySingleton } from 'src/module/shared/singleton/inventory.singleton';
@@ -38,10 +32,6 @@ import { application_id_wot } from '../../../core/config.json';
 import { WargamingSuccessType } from '../../../shared/types/wargaming-api.type';
 
 @LoggerInjector
-@FeatureInjector
-@InventoryInjector
-@StatisticInjector
-@AxiosInjector(TimeEnum.SECONDE * 10)
 export class WatchClanModel {
     //region PRIVATE
     /**
@@ -50,12 +40,12 @@ export class WatchClanModel {
     private confirmationEmbed: EmbedBuilder = new EmbedBuilder().setColor(Colors.Green);
     //endregion
 
-    //region INJECTOR
+    //region INJECTABLE
     private readonly logger: Logger;
-    private readonly feature: FeatureSingleton;
-    private readonly inventory: InventorySingleton;
-    private readonly statistic: StatisticSingleton;
-    private readonly axios: AxiosInstance;
+    @Injectable('Feature') private readonly feature: FeatureSingleton;
+    @Injectable('Inventory') private readonly inventory: InventorySingleton;
+    @Injectable('Statistic') private readonly statistic: StatisticSingleton;
+    @Injectable('Axios', TimeEnum.SECONDE * 10) private readonly axios: AxiosInstance;
     //endregion
 
     private _channel: TextChannel;

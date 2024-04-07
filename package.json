@@ -1,41 +1,44 @@
 {
-    "name": "freepuntosbot",
-    "version": "2.3.0-6",
-    "description": "A bot for the free puntos discord server",
-    "main": "src/index.ts",
-    "scripts": {
-        "start": "ts-node .",
-        "start:mock": "ts-node . -- DEV",
-        "build": "tsc --build",
-        "clean": "tsc --build --clean"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/Glassait/freePuntosBot.git"
-    },
-    "keywords": [
-        "discord",
-        "typescript",
-        "discordjs",
-        "bot"
-    ],
-    "author": "Glassait",
-    "license": "ISC",
-    "bugs": {
-        "url": "https://github.com/Glassait/freePuntosBot/issues"
-    },
-    "homepage": "https://github.com/Glassait/freePuntosBot#readme",
-    "dependencies": {
-        "@discordjs/voice": "0.16.0",
-        "@napi-rs/canvas": "^0.1.51",
-        "axios": "1.6.2",
-        "cheerio": "1.0.0-rc.12",
-        "discord.js": "^14.12.1",
-        "ts-node": "10.9.2"
-    },
-    "devDependencies": {
-        "@types/node": "20.10.6",
-        "prettier": "3.0.3",
-        "typescript": "5.3.3"
-    }
+	"name": "fold_bot",
+	"version": "2.3.0-5",
+	"description": "A bot for the FOLD_ discord server and WoT clan",
+	"main": "src/index.ts",
+	"engines": {
+		"node": ">= 18.16.0"
+	},
+	"scripts": {
+		"start": "ts-node .",
+		"start:mock": "ts-node . -- DEV",
+		"build": "tsc --build",
+		"clean": "tsc --build --clean"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Glassait/FOLD_Bot.git"
+	},
+	"keywords": [
+		"discord",
+		"typescript",
+		"discordjs",
+		"bot"
+	],
+	"author": "Glassait",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/Glassait/FOLD_Bot/issues"
+	},
+	"homepage": "https://github.com/Glassait/FOLD_Bot#readme",
+	"dependencies": {
+		"@discordjs/voice": "0.16.0",
+		"@napi-rs/canvas": "^0.1.51",
+		"axios": "1.6.2",
+		"cheerio": "1.0.0-rc.12",
+		"discord.js": "^14.12.1",
+		"ts-node": "10.9.2"
+	},
+	"devDependencies": {
+		"@types/node": "20.10.6",
+		"prettier": "3.0.3",
+		"typescript": "5.3.3"
+	}
 }

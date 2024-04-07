@@ -1,4 +1,4 @@
-import { AxiosInjector, FeatureInjector, InventoryInjector, LoggerInjector } from '../../../shared/decorators/injector.decorator';
+import { Injectable, LoggerInjector } from '../../../shared/decorators/injector.decorator';
 import { Logger } from '../../../shared/classes/logger';
 import { FeatureSingleton } from '../../../shared/singleton/feature.singleton';
 import { AxiosInstance } from 'axios';
@@ -9,15 +9,12 @@ import { WotApiConstants } from '../../../shared/enums/wot-api.enum';
 import { application_id_wot } from '../../../core/config.json';
 
 @LoggerInjector
-@FeatureInjector
-@AxiosInjector(160)
-@InventoryInjector
 export class SearchClanModel {
-    //region INJECTOR
+    //region INJECTABLE
     private readonly logger: Logger;
-    private readonly feature: FeatureSingleton;
-    private readonly axios: AxiosInstance;
-    private readonly inventory: InventorySingleton;
+    @Injectable('Feature') private readonly feature: FeatureSingleton;
+    @Injectable('Axios', 160) private readonly axios: AxiosInstance;
+    @Injectable('Inventory') private readonly inventory: InventorySingleton;
     //endregion
 
     public async searchClan(): Promise<void> {

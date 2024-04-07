@@ -1,7 +1,7 @@
 import { Logger } from '../classes/logger';
 import { Context } from '../classes/context';
 import { InventorySingleton } from '../singleton/inventory.singleton';
-import axios, { AxiosInstance } from 'axios';
+import axios from 'axios';
 import { StatisticSingleton } from '../singleton/statistic.singleton';
 import { TimeEnum } from '../enums/time.enum';
 import https from 'https';
@@ -9,172 +9,72 @@ import http from 'http';
 import { FeatureSingleton } from '../singleton/feature.singleton';
 import { TriviaSingleton } from '../singleton/trivia.singleton';
 
-const logger: Logger = new Logger(new Context('Injector'));
-
 /**
  * Base type to define a class
  */
 type Constructor = new (...args: any[]) => any;
 
 /**
- * Injects a `Logger` instance into the specified class. Doesn't work on static class (need constructor)
+ * Decorator function to inject singleton instances based on the provided dependence type.
  *
- * @template T - The class constructor type.
- * @param {T} base - The base class constructor to inject the `Logger` into.
- * @returns {T} - The updated class constructor with the injected `Logger`.
+ * @param {('Inventory' | 'Feature' | 'Statistic' | 'Trivia' | 'Axios')} dependence - The type of dependence to inject.
+ * @param {number} [timeout=TimeEnum.Minute] - The timeout of the axios instance in seconds, used when dependence = 'Axios'
  *
- * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator
+ * @returns {Function} - Decorator function.
  *
- * @example
- * -@LoggerInjector
- * class MyClass {
- *      private readonly logger: Logger;
- *
- *      // ... class implementation
- * }
+ * @throws {Error} Throws an error if an unsupported dependence type is provided.
  */
-export function LoggerInjector<T extends Constructor>(base: T): T {
-    logger.debug(`Logger injected for {}`, base.name);
-    return {
-        [base.name]: class extends base {
-            logger: Logger = new Logger(new Context(base.name));
-        },
-    }[base.name];
-}
+export function Injectable<GDependence extends 'Inventory' | 'Feature' | 'Statistic' | 'Trivia' | 'Axios'>(
+    dependence: GDependence,
+    timeout: number = TimeEnum.MINUTE
+) {
+    return function actual<GClass>(_target: GClass, _context: ClassFieldDecoratorContext<GClass, any>) {
+        return function (this: GClass, field: any) {
+            switch (dependence) {
+                case 'Inventory':
+                    field = InventorySingleton.instance;
+                    break;
+                case 'Feature':
+                    field = FeatureSingleton.instance;
+                    break;
+                case 'Statistic':
+                    field = StatisticSingleton.instance;
+                    break;
+                case 'Trivia':
+                    field = TriviaSingleton.instance;
+                    break;
+                case 'Axios':
+                    field = axios.create({
+                        timeout: timeout,
+                        headers: { 'Content-Type': 'application/json;' },
+                        httpAgent: new http.Agent({ keepAlive: true, timeout: timeout }),
+                        httpsAgent: new https.Agent({ keepAlive: true, timeout: timeout }),
+                    });
+                    break;
+                default:
+                    throw new Error(`Unsupported dependence type: ${dependence}`);
+            }
 
-/**
- * Injects a `InventorySingleton` instance into the specified class. Doesn't work on static class (need constructor)
- *
- * @template T - The class constructor type.
- * @param {T} base - The base class constructor to inject the `InventorySingleton` into.
- * @returns {T} - The updated class constructor with the injected `InventorySingleton`.
- *
- * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator
- *
- * @example
- * -@InventoryInjector
- * class MyClass {
- *      private readonly inventory: InventorySingleton;
- *
- *      // ... class implementation
- * }
- */
-export function InventoryInjector<T extends Constructor>(base: T): T {
-    logger.debug(`Inventory injected for {}`, base.name);
-    return {
-        [base.name]: class extends base {
-            inventory: InventorySingleton = InventorySingleton.instance;
-        },
-    }[base.name];
-}
-
-/**
- * Injects a `AxiosInstance` instance into the specified class. Doesn't work on static class (need constructor)
- *
- * @template T - The class constructor type.
- * @param [timeout=TimeEnum.Minute] The timeout of
- * @returns {T} - The updated class constructor with the injected `AxiosInstance`.
- *
- * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator
- *
- * @example
- * -@AxiosInjector
- * class MyClass {
- *      private readonly axios: AxiosInstance;
- *
- *      // ... class implementation
- * }
- */
-export function AxiosInjector<T extends Constructor>(timeout: number = TimeEnum.MINUTE): (base: T) => T {
-    return function (base: T): T {
-        logger.debug(`Axios injected for {} with a timeout of {}ms`, base.name, String(timeout));
-        return {
-            [base.name]: class extends base {
-                axios: AxiosInstance = axios.create({
-                    timeout: timeout,
-                    headers: { 'Content-Type': 'application/json;' },
-                    httpAgent: new http.Agent({ keepAlive: true, timeout: timeout }),
-                    httpsAgent: new https.Agent({ keepAlive: true, timeout: timeout }),
-                });
-            },
-        }[base.name];
+            return field;
+        };
     };
 }
 
 /**
- * Injects a `StatisticSingleton` instance into the specified class. Doesn't work on static class (need constructor)
+ * Decorator function to inject a logger instance into a class.
  *
- * @template T - The class constructor type.
- * @param {T} base - The base class constructor to inject the `StatisticSingleton` into.
- * @returns {T} - The updated class constructor with the injected `StatisticSingleton`.
+ * @param {GClass} value - The class to inject the logger into.
+ * @param {ClassDecoratorContext<GClass>} _context - The decorator context (unused).
  *
- * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator
+ * @returns {GClass} - The class with the logger injected.
  *
- * @example
- * -@StatisticInjector
- * class MyClass {
- *      private readonly statistic: StatisticSingleton;
- *
- *      // ... class implementation
- * }
+ * @template GClass - The class type to inject the logger into.
  */
-export function StatisticInjector<T extends Constructor>(base: T): T {
-    logger.debug(`Statistic injected for {}`, base.name);
-    return {
-        [base.name]: class extends base {
-            statistic: StatisticSingleton = StatisticSingleton.instance;
-        },
-    }[base.name];
-}
-
-/**
- * Injects a `FeatureSingleton` instance into the specified class. Doesn't work on static class (need constructor)
- *
- * @template T - The class constructor type.
- * @param {T} base - The base class constructor to inject the `FeatureSingleton` into.
- * @returns {T} - The updated class constructor with the injected `FeatureSingleton`.
- *
- * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator
- *
- * @example
- * -@FeatureInjector
- * class MyClass {
- *      private readonly feature: FeatureSingleton;
- *
- *      // ... class implementation
- * }
- */
-export function FeatureInjector<T extends Constructor>(base: T): T {
-    logger.debug(`Feature injected for {}`, base.name);
-    return {
-        [base.name]: class extends base {
-            feature: FeatureSingleton = FeatureSingleton.instance;
-        },
-    }[base.name];
-}
-
-/**
- * Injects a `TriviaSingleton` instance into the specified class. Doesn't work on static class (need constructor)
- *
- * @template T - The class constructor type.
- * @param {T} base - The base class constructor to inject the `TriviaSingleton` into.
- * @returns {T} - The updated class constructor with the injected `TriviaSingleton`.
- *
- * @see https://github.com/microsoft/TypeScript/issues/37157 for more information about the class decorator
- *
- * @example
- * -@TriviaInjector
- * class MyClass {
- *      private readonly trivia: TriviaSingleton;
- *
- *      // ... class implementation
- * }
- */
-export function TriviaInjector<T extends Constructor>(base: T): T {
-    logger.debug(`Trivia injected for {}`, base.name);
-    return {
-        [base.name]: class extends base {
-            trivia: TriviaSingleton = TriviaSingleton.instance;
-        },
-    }[base.name];
+export function LoggerInjector<GClass extends Constructor>(value: GClass, _context: ClassDecoratorContext<GClass>): GClass {
+    return class extends value {
+        constructor(...args: any[]) {
+            super(...args);
+            this.logger = new Logger(new Context(value.name));
+        }
+    };
 }

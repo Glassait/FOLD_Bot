@@ -1,4 +1,4 @@
-import { InventoryInjector, LoggerInjector, StatisticInjector } from '../../../shared/decorators/injector.decorator';
+import { Injectable, LoggerInjector } from '../../../shared/decorators/injector.decorator';
 import { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
 import { ChannelType, Client, Colors, EmbedBuilder, TextChannel, ThreadAutoArchiveDuration } from 'discord.js';
 import { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
@@ -8,14 +8,12 @@ import { Logger } from '../../../shared/classes/logger';
 import { DateUtil } from '../../../shared/utils/date.util';
 import { TimeEnum } from '../../../shared/enums/time.enum';
 
-@InventoryInjector
-@StatisticInjector
 @LoggerInjector
 export class TriviaMonthModel {
-    //region INJECTION
-    private readonly inventory: InventorySingleton;
-    private readonly statistic: StatisticSingleton;
+    //region INJECTABLE
     private readonly logger: Logger;
+    @Injectable('Inventory') private readonly inventory: InventorySingleton;
+    @Injectable('Statistic') private readonly statistic: StatisticSingleton;
     //endregion
 
     //region PRIVATE
