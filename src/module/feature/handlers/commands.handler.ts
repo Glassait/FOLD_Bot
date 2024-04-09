@@ -7,8 +7,6 @@ import { Logger } from '../../shared/classes/logger';
 import { SlashCommandModel } from '../slash-commands/model/slash-command.model';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
-import { EnvUtil } from '../../shared/utils/env.util';
-import { TimeEnum } from '../../shared/enums/time.enum';
 
 module.exports = async (_client: Client): Promise<void> => {
     const logger: Logger = new Logger(new Context('COMMANDS-HANDLER'));
@@ -21,7 +19,7 @@ module.exports = async (_client: Client): Promise<void> => {
 
         const command: SlashCommandModel = require(`${slashCommandsDir}/${file}`).command;
         inventory.getCommands(command.name).forEach((value: string): void => {
-            const guild = body[value] ?? [];
+            const guild: RESTPostAPIChatInputApplicationCommandsJSONBody[] = body[value] ?? [];
             guild.push(command.data.toJSON());
             body[value] = guild;
         });
@@ -31,13 +29,11 @@ module.exports = async (_client: Client): Promise<void> => {
 
     const rest: REST = new REST({ version: '10' }).setToken(token);
 
-    for (const entry of Object.entries(body)) {
+    for (const [serverId, command] of Object.entries(body)) {
         try {
-            await rest.put(Routes.applicationGuildCommands(client_id, entry[0]), { body: [] });
-            await EnvUtil.sleep(TimeEnum.SECONDE);
-            await rest.put(Routes.applicationGuildCommands(client_id, entry[0]), { body: entry[1] });
+            await rest.put(Routes.applicationGuildCommands(client_id, serverId), { body: command });
 
-            logger.info(`Successfully reloaded application {} slash-commands for guild {}`, String(entry[1].length), entry[0]);
+            logger.info(`Successfully reloaded application {} slash-commands for guild {}`, String(command.length), serverId);
         } catch (error) {
             logger.error(`${error}`, error);
         }
