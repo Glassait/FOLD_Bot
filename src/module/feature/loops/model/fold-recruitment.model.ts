@@ -215,7 +215,7 @@ export class FoldRecruitmentModel {
             .setDescription(
                 `Le joueur suivant \`${player.name}\` a quitté \`${clan.name}\`.${
                     blacklisted
-                        ? '\n\nLe joueur suivant a été mis sur liste noire pour la raison suivante : `' + blacklisted.name + '`'
+                        ? '\n\nLe joueur suivant a été mis sur liste noire pour la raison suivante : `' + blacklisted.reason + '`'
                         : ''
                 }`
             )
