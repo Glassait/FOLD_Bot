@@ -5,7 +5,7 @@ In this folder you will find all the events registered by the bot and there rela
 <details>
    <summary>Summary</summary>
 
--   [Create new event](#create-new-events)
+-   [Create new event](#create-new-event)
 -   [Log](#log)
 
 </details>
@@ -19,8 +19,8 @@ In this folder you will find all the events registered by the bot and there rela
 2. Use the following template
 
     ```typescript
-    import { Client, Events, Interaction } from 'discord.js';
-    import { BotEvent } from './types/bot-event.type';
+    import { type Client, Events, type Interaction } from 'discord.js';
+    import type { BotEvent } from './types/bot-event.type';
 
     module.exports = {
         name: undefined,

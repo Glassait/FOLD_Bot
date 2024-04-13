@@ -4,7 +4,7 @@
  * @template TData - The type of data included in the success response.
  * @template TMeta - The type of additional metadata in the success response (optional).
  */
-export type WargamingSuccessType<TData, TMeta = Record<string, never>> = {
+export type WargamingSuccessType<TData, TMeta = object> = {
     /**
      * The status of the response, always set to 'ok'
      */
@@ -33,7 +33,7 @@ export type WargamingSuccessType<TData, TMeta = Record<string, never>> = {
  *
  * @template TError - The type of additional error information in the error response (optional).
  */
-export type WargamingErrorType<TError = Record<string, never>> = {
+export type WargamingErrorType<TError = object> = {
     /**
      * The status of the response, always set to 'error'.
      */

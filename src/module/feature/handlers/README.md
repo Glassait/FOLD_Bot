@@ -22,7 +22,7 @@ Basically a handler is a script who is executed at the start of the bot
 2. Use the following template
 
     ```typescript
-    import { Client } from 'discord.js';
+    import type { Client } from 'discord.js';
 
     module.exports = async (client: Client): Promise<void> => {
         // Thing to handler at the start of the bot

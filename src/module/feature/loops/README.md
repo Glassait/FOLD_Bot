@@ -11,8 +11,8 @@ In the folder you will find all the looping code of the bot.
 2. Use the following template
 
     ```typescript
-    import { Client } from 'discord.js';
-    import { BotLoop } from './bot-loop.type';
+    import type { Client } from 'discord.js';
+    import type { BotLoop } from './bot-loop.type';
 
     module.exports = {
         name: 'LoopName',
@@ -32,9 +32,9 @@ The utility class [TimeUtil](../../shared/utils/time.util.ts) have a method that
 Here an example of how to use it
 
 ```typescript
-import { Client } from 'discord.js';
+import type { Client } from 'discord.js';
 import { TimeUtil } from '../../shared/utils/time.util';
-import { BotLoop } from './types/bot-loop.type';
+import type { BotLoop } from './types/bot-loop.type';
 
 module.exports = {
     name: 'ExampleOfLoop',

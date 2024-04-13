@@ -1,6 +1,6 @@
-//region TRIVIA
 import type { TriviaSelected } from './trivia.type';
 
+//region TRIVIA
 /**
  * The list of daily tanks selected
  */

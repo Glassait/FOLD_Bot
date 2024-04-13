@@ -1,6 +1,6 @@
 import { type Client, Events } from 'discord.js';
 import { basename } from 'node:path';
-import type { Logger } from '../../shared/classes/logger';
+import { Logger } from '../../shared/classes/logger';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
 import { TriviaSingleton } from '../../shared/singleton/trivia.singleton';
@@ -13,9 +13,7 @@ module.exports = {
     name: Events.ClientReady,
     once: true,
     async execute(client: Client): Promise<void> {
-        const imp = require('../../shared/classes/logger');
-        const logger: Logger = new imp.Logger(basename(__filename));
-
+        const logger: Logger = new Logger(basename(__filename));
         const inventory: InventorySingleton = InventorySingleton.instance;
         const trivia: TriviaSingleton = TriviaSingleton.instance;
 
@@ -42,7 +40,7 @@ module.exports = {
 
         const today: Date = new Date();
 
-        if (today.getDate() !== 13) {
+        if (today.getDate() !== 1) {
             return;
         }
 
