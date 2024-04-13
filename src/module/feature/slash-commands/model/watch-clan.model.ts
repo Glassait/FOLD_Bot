@@ -280,7 +280,20 @@ export class WatchClanModel {
         let reason: string = interaction.options.get(MAPPING.BLACKLIST_PLAYER.optionsName[1])?.value as string;
         reason = reason.trim();
 
-        const [id, name] = idAndName.split('#');
+        let [id, name] = idAndName.split('#');
+
+        if (!id || !name) {
+            const searchResult: WargamingSuccessType<PlayerData[]> = await this.wotApi.fetchPlayerData(idAndName);
+
+            if (!searchResult) {
+                await interaction.editReply({ content: "The player pass doesn't exist" });
+                return;
+            }
+
+            id = String(searchResult.data[0].account_id);
+            name = searchResult.data[0].nickname;
+        }
+
         const added: boolean = this.feature.addBlacklistedPlayer(id, name, reason);
 
         if (!added) {

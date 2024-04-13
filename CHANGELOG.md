@@ -1,13 +1,19 @@
 <style>
 .label {
-    color: #3fb950;;
     line-height: 22px;
     padding: 2px 10px;
-    border: max(1px, 0.0625rem) solid #238636;
     border-radius: 2em;
     display: inline-block;
     font-weight: 500;
     white-space: nowrap;
+}
+.latest {
+    color: #3fb950;;
+    border: max(1px, 0.0625rem) solid #238636;
+}
+.pre-release {
+    color: #d29922;;
+    border: max(1px, 0.0625rem) solid #9e6a03;
 }
 </style>
 
@@ -18,17 +24,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.0.0]
+## [3.0.0] <span data-view-component="true" class="label pre-release">Pre-release</span>
 
 ### Added
 
 -   This changelog whit better description
+-   More and more markdown + code documentation
 
 ### Changed
 
 -   Changed the injector to use the new decorator of typescript 5 and update all classes
+-   Multiple optimisation
+-   Blacklist player directly given in name option are now accepted
 
-## [2.3.0] - Apr 5, 2024 <span data-view-component="true" class="label">Latest</span>
+## [2.3.0] - Apr 5, 2024 <span data-view-component="true" class="label latest">Latest</span>
 
 ### Added
 
@@ -53,6 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 -   Double error in log
 -   Fix bug when back-upping json file when backup folder doesn't exist
+-   No longer reload server command with empty array
 
 ## [2.2.10] - Apr 2, 2024
 
@@ -185,7 +195,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   Move json to src/module/core folder
 -   Update the `BotEvent` type to allow auto-completion
 -   Update the event architecture by removing `export default event`, more info
-    in [readme](src/module/feature/events/readme.md)
+    in [readme](src/module/feature/events/README.md)
 -   Removed SPG from trivia game
 
 ## [2.2.5] - Jan 22, 2024
