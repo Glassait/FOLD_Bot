@@ -209,7 +209,7 @@ export class TriviaSingleton {
                 playerEmbed.setDescription("Aucun joueur n'a envoyé de réponse ou répondu correctement à cette question");
             } else {
                 playerEmbed.setFields({
-                    name: `Top 3`,
+                    name: 'Top 3',
                     value: player.reduce(
                         (previousValue: string, currentValue: [string, TriviaPlayerStatistic], currentIndex: number): string => {
                             this.logger.debug(

@@ -128,7 +128,9 @@ export class WotApiModel {
      * @template GSuccess - The type of the successful data.
      * @template GData - The generic type representing either WargamingSuccessType or WargamingErrorType.
      */
-    private async getDataFromUrl<GSuccess, GData extends WargamingSuccessType<{}> | WargamingErrorType>(url: string): Promise<GSuccess> {
+    private async getDataFromUrl<GSuccess, GData extends WargamingSuccessType<object> | WargamingErrorType>(
+        url: string
+    ): Promise<GSuccess> {
         let numberOfTry: number = 0;
         let data: GData;
 

@@ -48,7 +48,7 @@ export class RandomUtil {
         }
 
         while (result.length < length) {
-            let randomNumber: number = this.getRandomNumber(max, min);
+            const randomNumber: number = this.getRandomNumber(max, min);
 
             if (allowRepeat || !uniqueNumbers.has(randomNumber)) {
                 result.push(randomNumber);

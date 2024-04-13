@@ -16,7 +16,6 @@ export interface BotEvent {
      * The function to execute when the event occurs.
      *
      * @param {...any} args - Arguments passed to the event handler.
-     * @returns {Promise<void>} - A Promise resolving when the event handling is complete.
      */
     execute: (...args: any[]) => Promise<void>;
 }

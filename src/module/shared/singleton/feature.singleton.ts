@@ -166,7 +166,7 @@ export class FeatureSingleton extends CoreFile<FeatureType> {
      */
     public removeClan(clanIdOrName: string): Clan | undefined {
         clanIdOrName = clanIdOrName.trim().replace(/["']/g, '').toUpperCase();
-        let { id, clan } = this.getClanFromIdOrName(clanIdOrName);
+        const { id, clan } = this.getClanFromIdOrName(clanIdOrName);
 
         if (!id || !clan) {
             return undefined;

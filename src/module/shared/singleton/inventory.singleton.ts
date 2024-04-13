@@ -109,7 +109,7 @@ export class InventorySingleton extends CoreFile<InventoryType> {
      * @throws Error If the index is out of bound
      */
     public getNewsLetterAtIndex(index: number): WebSiteState {
-        let webSiteState: WebSiteState = this._data.newsLetter.website[index];
+        const webSiteState: WebSiteState = this._data.newsLetter.website[index];
 
         if (!webSiteState) {
             this.logger.error(`Index out of bound ${index} in newsletter array`);
@@ -228,7 +228,7 @@ export class InventorySingleton extends CoreFile<InventoryType> {
      * @returns The Discord channel.
      */
     private async fetchChannel(client: Client, channel: Channel): Promise<TextChannel> {
-        let chan: TextChannel | undefined = <TextChannel>client.channels.cache.get(channel.id);
+        const chan: TextChannel | undefined = <TextChannel>client.channels.cache.get(channel.id);
 
         if (!chan) {
             const g: Guild = await client.guilds.fetch(channel.guild);

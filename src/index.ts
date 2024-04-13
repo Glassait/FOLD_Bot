@@ -1,7 +1,7 @@
 import { Client, GatewayIntentBits } from 'discord.js';
+import { basename } from 'node:path';
 import { token } from './module/core/config.json';
 import { Logger } from './module/shared/classes/logger';
-import { basename } from 'node:path';
 
 const logger: Logger = new Logger(basename(__filename));
 
@@ -32,7 +32,7 @@ client.login(token).then((value: string): void => {
  * @see https://discordjs.guide/popular-topics/errors.html#how-to-diagnose-api-errors
  */
 process.on('unhandledRejection', error => {
-    logger.error(`Unhandled promise rejection`, error);
+    logger.error('Unhandled promise rejection', error);
 });
 
 /**

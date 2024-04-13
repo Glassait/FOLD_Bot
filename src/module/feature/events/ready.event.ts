@@ -13,7 +13,7 @@ module.exports = {
     name: Events.ClientReady,
     once: true,
     async execute(client: Client): Promise<void> {
-        let imp = require('../../shared/classes/logger');
+        const imp = require('../../shared/classes/logger');
         const logger: Logger = new imp.Logger(basename(__filename));
 
         const inventory: InventorySingleton = InventorySingleton.instance;
@@ -22,7 +22,7 @@ module.exports = {
         logger.info(`${EmojiEnum.MUSCLE} Logged in as {}`, client.user?.tag as string);
 
         const status = SentenceUtil.getRandomStatus();
-        logger.debug(`Status of the bot set to {} and {}`, status[0], status[1]);
+        logger.debug('Status of the bot set to {} and {}', status[0], status[1]);
 
         client.user?.setPresence({
             activities: [
@@ -47,7 +47,7 @@ module.exports = {
         }
 
         if (inventory.getFeatureFlipping('trivia_month')) {
-            let req = require('./models/trivia-month.model');
+            const req = require('./models/trivia-month.model');
             const triviaMonth: TriviaMonthModel = new req.TriviaMonthModel();
 
             await triviaMonth.initialise(client);
@@ -55,7 +55,7 @@ module.exports = {
         }
 
         if (inventory.getFeatureFlipping('search_clan')) {
-            let red = require('./models/search-clan.model');
+            const red = require('./models/search-clan.model');
             const searchClanModel: SearchClanModel = new red.SearchClanModel();
 
             await searchClanModel.searchClan();

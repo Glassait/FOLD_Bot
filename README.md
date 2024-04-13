@@ -60,11 +60,6 @@ The technical documentation can be found [here](./src/README.md)
 
 ## Roadmap
 
--   [ ] Rework Decorator with TS 5
--   [ ] Remove Auto-reply and Auto-disconnect slash-command
--   [ ] Better documentation
--   [ ] Optimized code
-
 See the [open issues](https://github.com/Glassait/freePuntosBot/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement) for a
 full list of proposed features (and known issues).
 

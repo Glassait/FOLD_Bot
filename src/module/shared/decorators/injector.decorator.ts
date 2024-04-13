@@ -27,7 +27,9 @@ type Constructor = new (...args: any[]) => any;
 export function Injectable<GDependence extends 'Inventory' | 'Feature' | 'Statistic' | 'Trivia' | 'Axios' | 'WotApi'>(
     dependence: GDependence,
     timeout: number = TimeEnum.MINUTE
+    // eslint-disable-next-line @typescript-eslint/ban-types
 ): Function {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     return function actual<GClass>(_target: GClass, _context: ClassFieldDecoratorContext<GClass, any>) {
         return function (this: GClass, field: any) {
             switch (dependence) {
@@ -51,10 +53,11 @@ export function Injectable<GDependence extends 'Inventory' | 'Feature' | 'Statis
                         httpsAgent: new AgentHttps({ keepAlive: true, timeout: timeout }),
                     });
                     break;
-                case 'WotApi':
+                case 'WotApi': {
                     const req = require('../apis/wot-api.model');
                     field = new req.WotApiModel();
                     break;
+                }
                 default:
                     throw new Error(`Unsupported dependence type: ${dependence}`);
             }
@@ -68,7 +71,7 @@ export function Injectable<GDependence extends 'Inventory' | 'Feature' | 'Statis
  * Decorator function to inject a logger instance into a class.
  *
  * @param {GClass} value - The class to inject the logger into.
- * @param {ClassDecoratorContext<GClass>} _context - The decorator context (unused).
+ * @param {ClassDecoratorContext} _context - The decorator context (unused).
  *
  * @returns {GClass} - The class with the logger injected.
  *
@@ -77,6 +80,7 @@ export function Injectable<GDependence extends 'Inventory' | 'Feature' | 'Statis
  * @injection
  * private readonly logger: Logger;
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function LoggerInjector<GClass extends Constructor>(value: GClass, _context: ClassDecoratorContext<GClass>): GClass {
     return class extends value {
         constructor(...args: any[]) {

@@ -118,15 +118,15 @@ export class FoldRecruitmentModel {
                 clan.imageUrl = (await this.wotApiModel.fetchClanImage(clan.name)).data[0]?.emblems?.x64?.portal;
                 this.feature.updateClan(clanId, clan);
             } catch (error) {
-                this.logger.error(`An error occurred while fetching the image of the clan`, error);
+                this.logger.error('An error occurred while fetching the image of the clan', error);
             }
         }
 
         try {
-            this.logger.debug(`Fetching activity of the clan with url: {}`, url);
+            this.logger.debug('Fetching activity of the clan with url: {}', url);
             return await this.manageClanActivities(clanId, clan, (await this.axios.get(url)).data);
         } catch (error) {
-            this.logger.error(`An error occurred while fetching the activity of the clan`, error);
+            this.logger.error('An error occurred while fetching the activity of the clan', error);
         }
     }
 
@@ -149,7 +149,7 @@ export class FoldRecruitmentModel {
     private async manageClanActivities(clanId: string, clan: Clan, data: FoldRecruitmentData): Promise<void> {
         const { datum, extracted } = this.extractPlayerFromFeed(data, clanId);
 
-        this.logger.debug(`{} players leaves the clan`, datum.length);
+        this.logger.debug('{} players leaves the clan', datum.length);
 
         for (const player of datum) {
             await this.buildAndSendEmbedForPlayer(player, clanId, clan);

@@ -124,7 +124,7 @@ export class StatisticSingleton extends CoreFile<Statistic> {
      * instance.updateClanStatistics(clanID, leavingPlayerCount);
      */
     public updateClanStatistics(clanId: string, leavingPlayer: number): void {
-        this.logger.debug(`Updating statistic for {}, by adding {}`, clanId, String(leavingPlayer));
+        this.logger.debug('Updating statistic for {}, by adding {}', clanId, String(leavingPlayer));
 
         const clanStats: FoldRecruitmentClanStatistic = this._data.fold_recruitment.clan[clanId] ?? {};
         const monthStats: MonthlyFoldRecruitmentClanStatistic = clanStats[this.currentMonth] ?? {

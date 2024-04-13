@@ -44,10 +44,10 @@ export class WebSiteScraper {
         this.axios
             .get(newsLetter.liveUrl)
             .then((response: AxiosResponse<string, any>): void => {
-                this.logger.debug(`Fetching newsletter for {} end successfully`, newsLetter.name);
+                this.logger.debug('Fetching newsletter for {} end successfully', newsLetter.name);
                 this.getLastNews(response.data, newsLetter)
                     .then((): void => {
-                        this.logger.debug(`Scraping newsletter {} end successfully`, newsLetter.name);
+                        this.logger.debug('Scraping newsletter {} end successfully', newsLetter.name);
                     })
                     .catch(reason => {
                         this.logger.error(`Scrapping newsletter for \`${newsLetter.name}\` failed: ${reason}`);

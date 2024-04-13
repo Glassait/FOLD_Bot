@@ -54,6 +54,7 @@ export class LoggerSingleton {
      * @param {string} msg - The message to log.
      */
     public debug(context: Context, msg: string): void {
+        // eslint-disable-next-line no-console
         console.debug(`${EmojiEnum.DEBUG} : ${msg}`);
         this.addToLog('DEBUG', context.context, msg);
     }
@@ -65,6 +66,7 @@ export class LoggerSingleton {
      * @param {string} msg - The message to log.
      */
     public info(context: Context, msg: string): void {
+        // eslint-disable-next-line no-console
         console.info(`${EmojiEnum.INFO} : ${msg}`);
         this.addToLog('INFO', context.context, msg);
     }
@@ -76,6 +78,7 @@ export class LoggerSingleton {
      * @param {string} msg - The message to log.
      */
     public warning(context: Context, msg: string): void {
+        // eslint-disable-next-line no-console
         console.warn(`${EmojiEnum.WARNING} : ${msg}`);
         this.addToLog('WARNING', context.context, msg);
     }
@@ -87,6 +90,7 @@ export class LoggerSingleton {
      * @param {string} msg - The message to log.
      */
     public error(context: Context, msg: string): void {
+        // eslint-disable-next-line no-console
         console.error(`${EmojiEnum.ERROR} : ${msg}`);
         this.addToLog('ERROR', EmojiEnum.ERROR + context.context, msg);
     }

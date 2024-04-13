@@ -14,7 +14,7 @@ export class FileUtil {
      *
      * @throws {Error} - If the path doesn't refer to a JSON file.
      */
-    public static writeIntoJson(path: string, data: Object): void {
+    public static writeIntoJson(path: string, data: object): void {
         if (!path.endsWith('.json')) {
             throw new Error("The path doesn't refer to a JSON file");
         }

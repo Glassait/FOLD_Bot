@@ -1,6 +1,6 @@
 {
 	"name": "fold_bot",
-	"version": "2.3.0-5",
+	"version": "2.3.0-6",
 	"description": "A bot for the FOLD_ discord server and WoT clan",
 	"main": "src/index.ts",
 	"engines": {
@@ -10,7 +10,8 @@
 		"start": "ts-node .",
 		"start:mock": "ts-node . -- DEV",
 		"build": "tsc --build",
-		"clean": "tsc --build --clean"
+		"clean": "tsc --build --clean",
+		"lint": "eslint . --ext .ts"
 	},
 	"repository": {
 		"type": "git",

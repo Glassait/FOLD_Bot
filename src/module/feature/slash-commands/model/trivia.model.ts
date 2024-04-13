@@ -93,7 +93,7 @@ export class TriviaModel {
         .setColor(Colors.Blurple)
         .setFields(
             {
-                name: `Obus :`,
+                name: 'Obus :',
                 value: `\`${ShellEnum.ARMOR_PIERCING} 390\``,
                 inline: true,
             },
@@ -198,7 +198,8 @@ export class TriviaModel {
 
         if (!allTanks || allTanks.length === 0) {
             await interaction.editReply({
-                content: `Le jeu ne semble pas encore initialisé, merci de réessayer dans quelque minutes. Si le problème persist merci de contacter <@313006042340524033>`,
+                content:
+                    'Le jeu ne semble pas encore initialisé, merci de réessayer dans quelque minutes. Si le problème persist merci de contacter <@313006042340524033>',
             });
             return;
         }
@@ -414,7 +415,7 @@ export class TriviaModel {
             })
             .on('collect', async (interaction: ButtonInteraction<'cached'>): Promise<void> => {
                 try {
-                    let hasAlreadyAnswer: boolean = !!playerAnswer?.interaction;
+                    const hasAlreadyAnswer: boolean = !!playerAnswer?.interaction;
                     let changedAnswer: boolean = false;
 
                     if (hasAlreadyAnswer) {
@@ -439,7 +440,7 @@ export class TriviaModel {
                         changedAnswer = true;
                     } else {
                         await playerAnswer.interaction?.editReply({
-                            content: `Ta réponse semble être la même que celle que tu as sélectionnée précédemment.`,
+                            content: 'Ta réponse semble être la même que celle que tu as sélectionnée précédemment.',
                         });
                     }
 
@@ -495,7 +496,7 @@ export class TriviaModel {
         allTanks.forEach((vehicle: VehicleData): void => {
             const vehicleAmmo: Ammo = vehicle.default_profile.ammo[datum.ammoIndex];
             if (vehicle.name !== datum.tank.name && this.checkVehicleAmmoDetail(vehicleAmmo, ammo)) {
-                this.logger.debug(`Another tank has the same shell {}`, vehicle.name);
+                this.logger.debug('Another tank has the same shell {}', vehicle.name);
                 otherAnswer.push(this.createAnswerEmbed(false, vehicle, isGoodAnswer));
             }
         });
@@ -605,10 +606,10 @@ export class TriviaModel {
      * @param {string} username - The username of the player.
      */
     private async updateStatistic(playerAnswer: PlayerAnswer, isGoodAnswer: boolean, username: string): Promise<void> {
-        this.logger.debug(`Start updating {} statistic`, username);
+        this.logger.debug('Start updating {} statistic', username);
         await this.updatePlayerStatistic(username, playerAnswer, isGoodAnswer);
         this.datum.delete(username);
-        this.logger.debug(`End updating {} statistic`, username);
+        this.logger.debug('End updating {} statistic', username);
     }
 
     /**
@@ -701,7 +702,7 @@ export class TriviaModel {
                     }),
             ],
         });
-        this.logger.debug(`Player {} found the right answer`, playerName);
+        this.logger.debug('Player {} found the right answer', playerName);
     }
 
     /**
@@ -722,7 +723,7 @@ export class TriviaModel {
         allTanks: VehicleData[],
         datum: TriviaSelected
     ): Promise<void> {
-        this.logger.debug(`Player {} failed to find the right answer`, playerName);
+        this.logger.debug('Player {} failed to find the right answer', playerName);
 
         if (!playerAnswer) {
             return;

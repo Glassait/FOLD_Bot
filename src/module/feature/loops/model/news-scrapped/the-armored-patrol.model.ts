@@ -13,8 +13,8 @@ export class TheArmoredPatrol extends NewsScrapper {
      * @param {WebSiteState} webSiteState - The state of the website.
      */
     public async scrap(webSiteState: WebSiteState): Promise<void> {
-        let containers: any[] = this.$(webSiteState.selector).get();
-        let index: number = containers.findIndex(
+        const containers: any[] = this.$(webSiteState.selector).get();
+        const index: number = containers.findIndex(
             (container: any): boolean => container.children[1].children[1].children[0].attribs.href == webSiteState.lastUrl
         );
 

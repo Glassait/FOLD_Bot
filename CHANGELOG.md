@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 -   This changelog whit better description
 -   More and more markdown + code documentation
+-   Eslint for better code style
 
 ### Changed
 
