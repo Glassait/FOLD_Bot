@@ -1,5 +1,6 @@
 import { Context } from './context';
 import { LoggerSingleton } from '../singleton/logger.singleton';
+import { StringUtil } from '../utils/string.util';
 
 /**
  * This class use the LoggerSingleton to write log
@@ -7,16 +8,18 @@ import { LoggerSingleton } from '../singleton/logger.singleton';
 export class Logger {
     /**
      * The context of the class
-     * @private
      */
     private readonly context: Context;
     /**
      * The instance of the {@link LoggerSingleton}
-     * @private
      */
     private readonly logger: LoggerSingleton = LoggerSingleton.instance;
 
-    constructor(context: Context) {
+    constructor(context: string | Context) {
+        if (typeof context === 'string') {
+            context = new Context(context);
+        }
+
         this.context = context;
     }
 
@@ -26,8 +29,8 @@ export class Logger {
      * @param {string} msg - The main message to log.
      * @param {...string} args - Code snippets to include in the message.
      */
-    public debug(msg: string, ...args: string[]): void {
-        this.logger.debug(this.context, this.transformToCode(msg, ...args));
+    public debug(msg: string, ...args: any[]): void {
+        this.logger.debug(this.context, StringUtil.transformToCode(msg, ...args));
     }
 
     /**
@@ -36,8 +39,8 @@ export class Logger {
      * @param {string} msg - The main message to log.
      * @param {...string} args - Code snippets to include in the message.
      */
-    public info(msg: string, ...args: string[]): void {
-        this.logger.info(this.context, this.transformToCode(msg, ...args));
+    public info(msg: string, ...args: any[]): void {
+        this.logger.info(this.context, StringUtil.transformToCode(msg, ...args));
     }
 
     /**
@@ -46,8 +49,8 @@ export class Logger {
      * @param {string} msg - The main message to log.
      * @param {...string} args - Code snippets to include in the message.
      */
-    public warn(msg: string, ...args: string[]): void {
-        this.logger.warning(this.context, this.transformToCode(msg, ...args));
+    public warn(msg: string, ...args: any[]): void {
+        this.logger.warning(this.context, StringUtil.transformToCode(msg, ...args));
     }
 
     /**
@@ -64,6 +67,7 @@ export class Logger {
      * Retrieves the details of the error, including the stack trace.
      *
      * @param {Error | string | any} error - The error object or information.
+     *
      * @returns {string} - The formatted error details.
      */
     private getErrorDetails(error: Error | string | any): string {
@@ -74,24 +78,5 @@ export class Logger {
         } else {
             return JSON.stringify(error);
         }
-    }
-
-    /**
-     * Replaces placeholders in a given text with provided code snippets.
-     *
-     * @param {string} text - The original text containing placeholders.
-     * @param {...string} args - Code snippets to replace the placeholders.
-     * @returns {string} - The modified text with placeholders replaced.
-     */
-    private transformToCode(text: string, ...args: string[]): string {
-        if (text.split('{}').length > 0 && text.split('{}').length - 1 !== args.length) {
-            throw new Error('Mismatch between the number of placeholders and the number of code snippets provided.');
-        }
-
-        args.forEach((codeText: string): void => {
-            text = text.replace('{}', `\`${codeText}\``);
-        });
-
-        return text;
     }
 }

@@ -1,7 +1,7 @@
 import { MockEnum } from '../enums/mock.enum';
 import { Logger } from '../classes/logger';
-import { Context } from '../classes/context';
 import { EmojiEnum } from '../enums/emoji.enum';
+import { basename } from 'node:path';
 
 /**
  * A utility class for environment-related operations.
@@ -9,9 +9,8 @@ import { EmojiEnum } from '../enums/emoji.enum';
 export class EnvUtil {
     /**
      * A logger instance for the EnvUtil class.
-     * @private
      */
-    private static logger: Logger = new Logger(new Context('ENV-UTIL'));
+    private static logger: Logger = new Logger(basename(__filename));
 
     /**
      * Returns a boolean indicating whether the application is running in development mode.

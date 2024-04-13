@@ -103,3 +103,6 @@ class Example {
 
 -   [medium.com](https://medium.com/@islizeqiang/a-quick-guide-to-typescript-5-0-decorators-d06cabe09e8c#:~:text=Decorators%20are%20a%20powerful%20feature,without%20altering%20their%20original%20implementation.)
 -   [devblogs.microsoft](https://devblogs.microsoft.com/typescript/announcing-typescript-5-0/#decorators)
+
+
+---

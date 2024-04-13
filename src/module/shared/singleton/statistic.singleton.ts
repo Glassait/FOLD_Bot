@@ -1,23 +1,18 @@
 import { Logger } from '../classes/logger';
-import { Context } from '../classes/context';
-import {
-    FoldRecruitmentClanStatisticType,
-    MonthlyFoldRecruitmentClanStatisticType,
-    StatisticType,
-    TriviaStatistic,
-} from '../types/statistic.type';
+import { FoldRecruitmentClanStatistic, MonthlyFoldRecruitmentClanStatistic, Statistic, TriviaStatistic } from '../types/statistic.type';
 import { DateUtil } from '../utils/date.util';
 import { CoreFile } from '../classes/core-file';
+import { basename } from 'node:path';
 
 /**
  * This class keep track of the statistics for the different games
  */
-export class StatisticSingleton extends CoreFile<StatisticType> {
+export class StatisticSingleton extends CoreFile<Statistic> {
     //region PRIVATE READONLY
     /**
      * Represents the initial value for the statistics data.
      */
-    private static readonly INITIAL_VALUE: StatisticType = {
+    private static readonly INITIAL_VALUE: Statistic = {
         version: 2,
         trivia: {
             version: 4,
@@ -48,7 +43,7 @@ export class StatisticSingleton extends CoreFile<StatisticType> {
     private constructor() {
         super('./src/module/core', './src/module/core/backup', 'statistic.json', StatisticSingleton.INITIAL_VALUE);
 
-        this.logger = new Logger(new Context(StatisticSingleton.name));
+        this.logger = new Logger(basename(__filename));
 
         this._data = this.verifyData(StatisticSingleton.INITIAL_VALUE, JSON.parse(this.readFile().toString()));
 
@@ -126,8 +121,8 @@ export class StatisticSingleton extends CoreFile<StatisticType> {
     public updateClanStatistics(clanId: string, leavingPlayer: number): void {
         this.logger.debug(`Updating statistic for {}, by adding {}`, clanId, String(leavingPlayer));
 
-        const clanStats: FoldRecruitmentClanStatisticType = this._data.fold_recruitment.clan[clanId] ?? {};
-        const monthStats: MonthlyFoldRecruitmentClanStatisticType = clanStats[this.currentMonth] ?? {
+        const clanStats: FoldRecruitmentClanStatistic = this._data.fold_recruitment.clan[clanId] ?? {};
+        const monthStats: MonthlyFoldRecruitmentClanStatistic = clanStats[this.currentMonth] ?? {
             leaving_player: 0,
         };
 
@@ -143,14 +138,14 @@ export class StatisticSingleton extends CoreFile<StatisticType> {
      *
      * @param {string} clanId - The ID of the clan for which to retrieve the statistics.
      *
-     * @returns {FoldRecruitmentClanStatisticType} - The fold recruitment statistics for the specified clan.
+     * @returns {FoldRecruitmentClanStatistic} - The fold recruitment statistics for the specified clan.
      *
      * @example
      * const clanID = 'ABC123';
      * const clanStatistics = instance.getClanStatistics(clanID);
      * console.log(clanStatistics); // Clan statistics object for the specified ID
      */
-    public getClanStatistics(clanId: string): FoldRecruitmentClanStatisticType {
+    public getClanStatistics(clanId: string): FoldRecruitmentClanStatistic {
         return this._data.fold_recruitment.clan[clanId];
     }
 

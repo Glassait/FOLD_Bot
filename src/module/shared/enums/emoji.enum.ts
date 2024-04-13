@@ -86,4 +86,8 @@ export enum EmojiEnum {
      * Represent reminding action
      */
     CLOCHE = '🔔',
+    /**
+     * Represent building action
+     */
+    HAMMER = '🔨',
 }

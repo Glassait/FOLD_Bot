@@ -22,9 +22,9 @@ type Constructor = new (...args: any[]) => any;
  *
  * @returns {Function} - Decorator function.
  *
- * @throws {Error} Throws an error if an unsupported dependence type is provided.
+ * @throws {Error} - Throws an error if an unsupported dependence type is provided.
  */
-export function Injectable<GDependence extends 'Inventory' | 'Feature' | 'Statistic' | 'Trivia' | 'Axios'>(
+export function Injectable<GDependence extends 'Inventory' | 'Feature' | 'Statistic' | 'Trivia' | 'Axios' | 'WotApi'>(
     dependence: GDependence,
     timeout: number = TimeEnum.MINUTE
 ) {
@@ -51,6 +51,10 @@ export function Injectable<GDependence extends 'Inventory' | 'Feature' | 'Statis
                         httpsAgent: new https.Agent({ keepAlive: true, timeout: timeout }),
                     });
                     break;
+                case 'WotApi':
+                    const req = require('../apis/wot-api.model');
+                    field = new req.WotApiModel();
+                    break;
                 default:
                     throw new Error(`Unsupported dependence type: ${dependence}`);
             }
@@ -69,6 +73,9 @@ export function Injectable<GDependence extends 'Inventory' | 'Feature' | 'Statis
  * @returns {GClass} - The class with the logger injected.
  *
  * @template GClass - The class type to inject the logger into.
+ *
+ * @injection
+ * private readonly logger: Logger;
  */
 export function LoggerInjector<GClass extends Constructor>(value: GClass, _context: ClassDecoratorContext<GClass>): GClass {
     return class extends value {

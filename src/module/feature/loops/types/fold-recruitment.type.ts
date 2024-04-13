@@ -7,7 +7,7 @@ export type GlobalClanActivity = {
     created_at: string;
     accounts_ids: number[];
     accounts_info: {
-        [key: string]: {
+        [account: string]: {
             url: string;
             role: string;
             name: string;

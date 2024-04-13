@@ -1,12 +1,19 @@
-![GitHub repo file count (file extension)](https://img.shields.io/github/directory-file-count/Glassait/freePuntosBot/src%2Fmodule%2Ffeature%2Fhandlers?type=file&extension=ts&style=flat-square&label=Handler)
-
-# Handler
+# Handler ![GitHub repo file count (file extension)](https://img.shields.io/github/directory-file-count/Glassait/FOLD_Bot/src%2Fmodule%2Ffeature%2Fhandlers?type=file&extension=ts&style=flat-square&label=Handler)
 
 In the folder you will find all the handlers of the bot.
 
 Basically a handler is a script who is executed at the start of the bot
 
-# Create new handler
+
+<details>
+   <summary>Summary</summary>
+
+-   [Create new handler](#create-new-handler)
+-   [Log](#log)
+
+</details>
+
+## Create new handler
 
 1. Create new typescript file in the folder with the patter
     ```text
@@ -17,7 +24,7 @@ Basically a handler is a script who is executed at the start of the bot
     ```typescript
     import { Client } from 'discord.js';
 
-    module.exports = async (_client: Client): Promise<void> => {
+    module.exports = async (client: Client): Promise<void> => {
         // Thing to handler at the start of the bot
     };
     ```
@@ -33,13 +40,12 @@ If you want to add persistent log in to execute of the event, follow the followi
 
     ```typescript
     import { Logger } from '../../shared/classes/logger';
-    import { Context } from '../../../utils/context.class';
+    import { basename } from 'node:path';
 
-    const logger: Logger = new Logger(new Context('NAME-HANDLER'));
+    const logger: Logger = new Logger(basename(__filename));
     ```
 
-2. In the context give the name of the handler
-3. Call the level you want with the `logger`, ex:
+2. Call the level you want with the `logger`, ex:
     ```typescript
     logger.info('Message to the log');
     ```

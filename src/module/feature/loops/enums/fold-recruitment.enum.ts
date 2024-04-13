@@ -1,15 +1,27 @@
 /**
- * Enum for the placeholder for the player id and player name
+ * Enumeration for Fold recruitment properties.
  */
-export enum ConstantsEnum {
+export enum FoldRecruitmentEnum {
+    /**
+     * Represents the player ID property.
+     */
     PLAYER_ID = 'PLAYER_ID',
+    /**
+     * Represents the player name property.
+     */
     PLAYER_NAME = 'PLAYER_NAME',
+    /**
+     * Represents the clan ID property.
+     */
     CLAN_ID = 'CLAN_ID',
 }
 
 /**
- * Represent all the type of activities for clan
+ * Enumeration for World of Tanks clan activities.
  */
 export enum WotClanActivity {
+    /**
+     * Represents the action of leaving a clan.
+     */
     LEAVE_CLAN = 'leave_clan',
 }

@@ -20,7 +20,7 @@ export const command: SlashCommandModel = new SlashCommandModel(
         const inventory: InventorySingleton = InventorySingleton.instance;
         const channel: TextChannel = await inventory.getChannelForFoldRecruitment(client as Client);
 
-        const numberOfEmbed: number = Math.floor(feature.potentialClan.length / 40);
+        const numberOfEmbed: number = Math.floor(feature.potentialClan.length / 40) || 1;
         let index: number = 0;
 
         for (let i = 0; i < numberOfEmbed; i++) {

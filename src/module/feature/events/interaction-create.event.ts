@@ -1,12 +1,18 @@
-import { Client, Events, Interaction } from 'discord.js';
+import { AutocompleteInteraction, ChatInputCommandInteraction, Client, Events, Interaction } from 'discord.js';
 import { BotEvent } from './types/bot-event.type';
-import { Context } from '../../shared/classes/context';
 import { Logger } from '../../shared/classes/logger';
 import { SlashCommandModel } from '../slash-commands/model/slash-command.model';
-import { EnvUtil } from '../../shared/utils/env.util';
+import { basename } from 'node:path';
 
-const logger: Logger = new Logger(new Context('INTERACTION-CREATE-EVENT'));
+const logger: Logger = new Logger(basename(__filename));
 
+/**
+ * Retrieves the corresponding slash command model based on the provided command name.
+ *
+ * @param {{ commandName: string }} interaction - The interaction object containing the command name.
+ *
+ * @returns {SlashCommandModel | undefined} - The corresponding slash command model if found, otherwise undefined.
+ */
 function getCommand(interaction: { commandName: string }): SlashCommandModel | undefined {
     try {
         return require(`../slash-commands/${interaction.commandName}.slash-command`).command;
@@ -15,49 +21,57 @@ function getCommand(interaction: { commandName: string }): SlashCommandModel | u
     }
 }
 
-export const event: BotEvent = {
+/**
+ * Handles the execution of chat input commands.
+ *
+ * @param {ChatInputCommandInteraction} interaction - The interaction object representing the chat input command.
+ * @param {Client} client - The Discord client instance.
+ */
+async function chatInputCommand(interaction: ChatInputCommandInteraction, client: Client): Promise<void> {
+    const command: SlashCommandModel | undefined = getCommand(interaction);
+
+    if (!command) {
+        throw Error(`Command ${interaction.commandName} not found`);
+    }
+
+    try {
+        logger.info(
+            `User {} send slash command : {}`,
+            interaction.user.username,
+            command.name + (interaction?.options.getSubcommand(false) ? ' ' + interaction?.options.getSubcommand() : '')
+        );
+        await command.execute(interaction, client);
+    } catch (error) {
+        logger.error(`${error}`, error);
+    }
+}
+
+/**
+ * Handles autocomplete interactions for slash commands.
+ *
+ * @param {AutocompleteInteraction} interaction - The autocomplete interaction object.
+ */
+async function autocomplete(interaction: AutocompleteInteraction): Promise<void> {
+    const command: SlashCommandModel | undefined = getCommand(interaction);
+
+    if (!command) {
+        throw Error(`Command ${interaction.commandName} not found`);
+    }
+
+    try {
+        await command.autocomplete(interaction);
+    } catch (error) {
+        logger.error(`${error}`, error);
+    }
+}
+
+module.exports = {
     name: Events.InteractionCreate,
     async execute(client: Client, interaction: Interaction): Promise<void> {
         if (interaction.isChatInputCommand()) {
-            if (EnvUtil.isDev() && interaction.guildId !== '1218558386761891901') {
-                await interaction.reply({
-                    content:
-                        "Je suis actuellement entrain d'être améliorer par mon créateur, cette commande ne fonctionne pas !\nMerci d'éssayer plus tard :)",
-                    ephemeral: true,
-                });
-                return;
-            }
-
-            const command: SlashCommandModel | undefined = getCommand(interaction);
-
-            if (!command) {
-                logger.error(`No slash commands matching \`${interaction.commandName}\` was found.`);
-                return;
-            }
-
-            try {
-                logger.info(
-                    `User {} send slash command : {}`,
-                    interaction.user.username,
-                    command.name + (interaction.options.data.length > 0 ? ' ' + interaction?.options.getSubcommand() : '')
-                );
-                await command.execute(interaction, client);
-            } catch (error) {
-                logger.error(`${error}`, error);
-            }
+            await chatInputCommand(interaction, client);
         } else if (interaction.isAutocomplete()) {
-            const command: SlashCommandModel | undefined = getCommand(interaction);
-
-            if (!command) {
-                console.error(`No command matching ${interaction.commandName} was found.`);
-                return;
-            }
-
-            try {
-                await command.autocomplete(interaction);
-            } catch (error) {
-                console.error(error);
-            }
+            await autocomplete(interaction);
         }
     },
-};
+} as BotEvent;

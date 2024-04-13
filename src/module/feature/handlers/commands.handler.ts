@@ -2,14 +2,14 @@ import { Client, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, Routes, 
 import { readdirSync } from 'fs';
 import { join } from 'path';
 import { client_id, token } from '../../core/config.json';
-import { Context } from '../../shared/classes/context';
 import { Logger } from '../../shared/classes/logger';
 import { SlashCommandModel } from '../slash-commands/model/slash-command.model';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
+import { basename } from 'node:path';
 
 module.exports = async (_client: Client): Promise<void> => {
-    const logger: Logger = new Logger(new Context('COMMANDS-HANDLER'));
+    const logger: Logger = new Logger(basename(__filename));
     const inventory: InventorySingleton = InventorySingleton.instance;
     const slashCommandsDir: string = join(__dirname, '../slash-commands');
     const body: { [key: Snowflake]: RESTPostAPIChatInputApplicationCommandsJSONBody[] } = {};

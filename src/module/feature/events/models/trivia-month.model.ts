@@ -1,12 +1,15 @@
 import { Injectable, LoggerInjector } from '../../../shared/decorators/injector.decorator';
 import { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
-import { ChannelType, Client, Colors, EmbedBuilder, TextChannel, ThreadAutoArchiveDuration } from 'discord.js';
+import { Client, Colors, EmbedBuilder, TextChannel } from 'discord.js';
 import { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
-import { DailyTrivia, MonthlyTriviaOverallStatistic, TriviaPlayerStatisticType } from '../../../shared/types/statistic.type';
+import { MonthlyTriviaOverallStatistic, MonthlyTriviaPlayerStatistic, TriviaPlayerStatistic } from '../../../shared/types/statistic.type';
 import { MEDAL } from '../../../shared/utils/variables.util';
 import { Logger } from '../../../shared/classes/logger';
 import { DateUtil } from '../../../shared/utils/date.util';
 import { TimeEnum } from '../../../shared/enums/time.enum';
+import { EmojiEnum } from '../../../shared/enums/emoji.enum';
+import { StringUtil } from '../../../shared/utils/string.util';
+import { MathUtil } from '../../../shared/utils/math.util';
 
 @LoggerInjector
 export class TriviaMonthModel {
@@ -26,9 +29,14 @@ export class TriviaMonthModel {
      */
     private month: string = DateUtil.getPreviousMonth();
     /**
-     * The list of all player's statistics
+     * Represents the list of player statistics.
+     * Each entry is a tuple containing the player's name and their monthly statistics.
+     *
+     * The first element of the tuple is the player's name (string).
+     *
+     * The second element of the tuple is the player's monthly statistics (MonthlyTriviaPlayerStatisticType).
      */
-    private playerClassement: [string, TriviaPlayerStatisticType][];
+    private playerClassement: [string, MonthlyTriviaPlayerStatistic][];
     /**
      * The list of embed for the message
      */
@@ -40,57 +48,51 @@ export class TriviaMonthModel {
      * This includes creating the trivia month message, fetching the trivia channel, and initializing necessary data.
      *
      * @param {Client} client - The Discord client instance.
-     * @returns {Promise<void>} - A promise that resolves once the mandatory tasks are completed.
-     *
-     * @example
-     * const discordClient = // ... obtained Discord client instance
-     * await instance.fetchMandatory(discordClient); // Fetching data to run properly
      */
-    public async fetchMandatory(client: Client): Promise<void> {
+    public async initialise(client: Client): Promise<void> {
         this.logger.info('First of the month, creation of the trivia month message');
         this.channel = await this.inventory.getChannelForTrivia(client);
 
         this.playerClassement = Object.entries(this.statistic.trivia.player)
-            .filter((player: [string, TriviaPlayerStatisticType]) => player[1][this.month])
+            .reduce((newArray: [string, MonthlyTriviaPlayerStatistic][], [name, statistics]: [string, TriviaPlayerStatistic]) => {
+                if (statistics[this.month]) {
+                    newArray.push([name, statistics[this.month]]);
+                }
+
+                return newArray;
+            }, [])
             .sort(
-                (a: [string, TriviaPlayerStatisticType], b: [string, TriviaPlayerStatisticType]) =>
-                    b[1][this.month].elo - a[1][this.month].elo
+                ([, aStatistics]: [string, MonthlyTriviaPlayerStatistic], [, bStatistics]: [string, MonthlyTriviaPlayerStatistic]) =>
+                    bStatistics.elo - aStatistics.elo
             );
     }
 
     /**
      * Sends the trivia month message to the designated channel.
-     * Also creates a thread for feedback and discussions.
      */
-    public async sendToChannel(): Promise<void> {
-        this.logger.debug('Sending trivia month message...');
+    public async createEmbedAndSendToChannel(): Promise<void> {
+        this.createEmbed();
+
+        this.logger.debug(`${EmojiEnum.LETTER} Sending trivia month message`);
         await this.channel.send({ embeds: this.listEmbed });
-
-        const thread = await this.channel.threads.create({
-            name: 'Retour sur le jeu',
-            autoArchiveDuration: ThreadAutoArchiveDuration.OneWeek,
-            type: ChannelType.PublicThread,
-        });
-
-        await thread.send({ content: 'Vous pouvez mettre ici tous les avis, retour ou critiques que vous voulez. Je lis tout :)' });
     }
 
     /**
      * Creates multiple embeds for various statistics and information related to the trivia game.
-     *
-     * @example
-     * const triviaMonth = new TriviaMonthModel();
-     * await triviaMonth.fetchMandatory(client)
-     * triviaMonth.createEmbed();
      */
-    public createEmbed(): void {
+    private createEmbed(): void {
+        this.logger.debug(`${EmojiEnum.HAMMER} Start building embed for trivia month`);
         this.embedIntroduction();
         this.embedScoreboard();
-        this.embedQuickPlayer();
-        this.embedSlowPlayer();
-        this.embedWinStreakPlayer();
+
+        if (this.playerClassement.length > 0) {
+            this.logger.debug('Enough players to build embed for trivia month');
+            this.embedQuickPlayer();
+            this.embedSlowPlayer();
+            this.embedWinStreakPlayer();
+        }
+
         this.embedOverall();
-        this.embedFeedBack();
     }
 
     /**
@@ -110,8 +112,8 @@ export class TriviaMonthModel {
      * Create the scoreboard embed
      */
     private embedScoreboard(): void {
-        let index = 0;
-        let embed = new EmbedBuilder()
+        let index: number = 0;
+        let embed: EmbedBuilder = new EmbedBuilder()
             .setTitle('Tableau des scores')
             .setDescription(
                 'Nous allons visualiser dans un premier temps le score des joueurs. \n(Plus de détails avec la commande `/trivia statistics)`'
@@ -136,23 +138,27 @@ export class TriviaMonthModel {
                     name: 'Leaderboard',
                     value:
                         'Les trois meilleurs joueurs du mois sont : \n\n' +
-                        this.playerClassement.slice(0, 3).reduce((text: string, player: [string, TriviaPlayerStatisticType]) => {
-                            text += `${MEDAL[index]} ${player[0]} avec \`${player[1][this.month].elo}\` points\n`;
-                            index++;
-                            return text;
-                        }, ''),
+                        this.playerClassement
+                            .slice(0, 3)
+                            .reduce(
+                                (text: string, [name, statistics]: [string, MonthlyTriviaPlayerStatistic]) =>
+                                    text + StringUtil.transformToCode(`${MEDAL[index++]} ${name} avec {} points\n`, statistics.elo),
+                                ''
+                            ),
                 });
 
-            if (this.playerClassement.slice(3, -1)) {
+            if (this.playerClassement.length > 3) {
                 embed.addFields({
                     name: 'Scoreboard',
                     value:
                         'Voila le reste du classement :\n\n' +
-                        this.playerClassement.slice(3, -1).reduce((text: string, player: [string, TriviaPlayerStatisticType]) => {
-                            text += `${index + 1} : ${player[0]} avec \`${player[1][this.month].elo}\` points\n`;
-                            index++;
-                            return text;
-                        }, ''),
+                        this.playerClassement
+                            .slice(3, -1)
+                            .reduce(
+                                (text: string, [name, statistics]: [string, MonthlyTriviaPlayerStatistic]) =>
+                                    text + StringUtil.transformToCode(`${1 + ++index} : ${name} avec {} points\n`, statistics.elo),
+                                ''
+                            ),
                 });
             }
         }
@@ -164,27 +170,22 @@ export class TriviaMonthModel {
      */
     private embedQuickPlayer(): void {
         this.playerClassement.sort(
-            (a: [string, TriviaPlayerStatisticType], b: [string, TriviaPlayerStatisticType]) =>
-                Math.min(...Object.values(a[1][this.month].daily).flatMap((value: DailyTrivia) => value.answer_time)) -
-                Math.min(...Object.values(b[1][this.month].daily).flatMap((value: DailyTrivia) => value.answer_time))
+            ([, aStatistics]: [string, MonthlyTriviaPlayerStatistic], [, bStatistics]: [string, MonthlyTriviaPlayerStatistic]) =>
+                MathUtil.getMinFromArrayOfObject(Object.values(aStatistics.daily), 'answer_time') -
+                MathUtil.getMinFromArrayOfObject(Object.values(bStatistics.daily), 'answer_time')
         );
 
-        const quickPlayer: [string, TriviaPlayerStatisticType] = this.playerClassement[0];
-
-        if (!quickPlayer || quickPlayer?.length <= 0) {
-            return;
-        }
+        const [name, statistics]: [string, MonthlyTriviaPlayerStatistic] = this.playerClassement[0];
 
         this.listEmbed.push(
             new EmbedBuilder()
                 .setTitle('Le joueur le plus rapide')
                 .setDescription(
-                    `Tel un EBR 75, \`${quickPlayer[0]}\` détruit ces ennemies plus vite que l'éclair.` +
-                        `Ainsi il a répondu le plus rapidement en \`${
-                            Math.min(
-                                ...Object.values(quickPlayer[1][this.month].daily).flatMap((value: DailyTrivia) => value.answer_time)
-                            ) / TimeEnum.SECONDE
-                        }\` secondes.`
+                    StringUtil.transformToCode(
+                        `Tel un EBR 75, {} détruit ces ennemies plus vite que l'éclair. Ainsi il a répondu le plus rapidement en {} secondes.`,
+                        name,
+                        MathUtil.getMinFromArrayOfObject(Object.values(statistics.daily), 'answer_time') / TimeEnum.SECONDE
+                    )
                 )
                 .setColor(Colors.DarkGold)
                 .setImage('https://images6.alphacoders.com/131/1315267.jpeg')
@@ -195,21 +196,17 @@ export class TriviaMonthModel {
      * Create embed for the slowest player
      */
     private embedSlowPlayer(): void {
-        const slowPlayer: [string, TriviaPlayerStatisticType] = this.playerClassement[this.playerClassement.length - 1];
-
-        if (!slowPlayer || slowPlayer?.length <= 0) {
-            return;
-        }
+        const [name, statistics] = this.playerClassement.at(-1) as [string, MonthlyTriviaPlayerStatistic];
 
         this.listEmbed.push(
             new EmbedBuilder()
                 .setTitle('Le joueur le plus lent')
                 .setDescription(
-                    `\`${slowPlayer[0]}\` est un véritable mur d'acier IRL, du coup il prend son temps pour répondre.` +
-                        ` Son temps le plus long est de \`${
-                            Math.min(...Object.values(slowPlayer[1][this.month].daily).flatMap((value: DailyTrivia) => value.answer_time)) /
-                            1000
-                        }\` secondes.`
+                    StringUtil.transformToCode(
+                        `{} est un véritable mur d'acier IRL, du coup il prend son temps pour répondre. Son temps le plus long est de {} secondes.`,
+                        name,
+                        MathUtil.getMaxFromArrayOfObject(Object.values(statistics.daily), 'answer_time') / TimeEnum.SECONDE
+                    )
                 )
                 .setColor(Colors.DarkGold)
                 .setImage('https://static-ptl-eu.gcdn.co/dcont/fb/image/wot_wallpaperseptember2015_eng_1024x600_eng.jpg')
@@ -221,22 +218,21 @@ export class TriviaMonthModel {
      */
     private embedWinStreakPlayer(): void {
         this.playerClassement.sort(
-            (a: [string, TriviaPlayerStatisticType], b: [string, TriviaPlayerStatisticType]) =>
-                b[1][this.month].win_streak.max - a[1][this.month].win_streak.max
+            ([, aStatistics]: [string, MonthlyTriviaPlayerStatistic], [, bStatistics]: [string, MonthlyTriviaPlayerStatistic]) =>
+                bStatistics.win_streak.max - aStatistics.win_streak.max
         );
-        const winStreakPlayer: [string, TriviaPlayerStatisticType] = this.playerClassement[0];
-
-        if (!winStreakPlayer || winStreakPlayer?.length <= 0) {
-            return;
-        }
+        const [name, statistics]: [string, MonthlyTriviaPlayerStatistic] = this.playerClassement[0];
 
         this.listEmbed.push(
             new EmbedBuilder()
                 .setTitle("Le joueur avec le plus de bonnes réponses d'affilée")
                 .setDescription(
-                    `\`${winStreakPlayer[0]}\` est tel un Léopard, il rate jamais ça cible. \`${
-                        winStreakPlayer[0]
-                    }\` a correctement répondu \`${winStreakPlayer[1][this.month].win_streak.max}\` fois d'affilée. `
+                    StringUtil.transformToCode(
+                        `{} est tel un Léopard, il rate jamais ça cible. {} a correctement répondu {} fois d'affilée.`,
+                        name,
+                        name,
+                        statistics.win_streak.max
+                    )
                 )
                 .setColor(Colors.DarkGold)
                 .setImage(
@@ -255,31 +251,17 @@ export class TriviaMonthModel {
             return;
         }
 
-        const embedOverall = new EmbedBuilder()
-            .setTitle('Statistique générale')
-            .setDescription('Pour finir voici des statistiques inutiles.')
-            .setColor(Colors.DarkGold)
-            .setFields(
-                { name: 'Nombre total de parties :', value: `\`${overallStatistic.number_of_game}\`` },
-                {
-                    name: 'Nombre de jours sans participation :',
-                    value: `\`${overallStatistic.day_without_participation}\``,
-                }
-            );
-
-        this.listEmbed.push(embedOverall);
-    }
-
-    /**
-     * Creates an Embed message to collect feedback in a thread.
-     */
-    private embedFeedBack(): void {
         this.listEmbed.push(
             new EmbedBuilder()
-                .setTitle("Retour d'utilisation")
+                .setTitle('Statistique générale')
+                .setDescription('Pour finir voici des statistiques inutiles.')
                 .setColor(Colors.DarkGold)
-                .setDescription(
-                    "Merci d'avoir participé tout au long de ce mois. Si vous avez des feedbacks à me faire (positif ou négatif), merci de les écrire dans le thread juste en dessous. Merci beaucoup (❤️ω❤️)"
+                .setFields(
+                    { name: 'Nombre total de parties :', value: `\`${overallStatistic.number_of_game}\`` },
+                    {
+                        name: 'Nombre de jours sans participation :',
+                        value: `\`${overallStatistic.day_without_participation}\``,
+                    }
                 )
         );
     }

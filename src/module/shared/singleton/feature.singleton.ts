@@ -1,7 +1,7 @@
 import { Clan, FeatureType, PlayerBlacklisted, WatchClan } from '../types/feature.type';
 import { Logger } from '../classes/logger';
-import { Context } from '../classes/context';
 import { CoreFile } from '../classes/core-file';
+import { basename } from 'node:path';
 
 export class FeatureSingleton extends CoreFile<FeatureType> {
     /**
@@ -21,7 +21,7 @@ export class FeatureSingleton extends CoreFile<FeatureType> {
     private constructor() {
         super('./src/module/core', './src/module/core/backup', 'feature.json', FeatureSingleton.INITIAL_VALUE);
 
-        this.logger = new Logger(new Context(FeatureSingleton.name));
+        this.logger = new Logger(basename(__filename));
 
         try {
             const json: Buffer = this.readFile();
@@ -159,8 +159,7 @@ export class FeatureSingleton extends CoreFile<FeatureType> {
      * const clanIdOrName = 'MyClan';
      * const removedClans = FeatureSingleton.removeClan(clanIdOrName);
      * if (removedClans.length > 0) {
-     *   console.log(`${clanIdOrName} has been removed from the watched clans.`);
-     *   console.log('Removed Clan Details:', removedClans);
+     *   console.log(`${clanIdOrName} has been removed from the watched clans.`, 'Removed Clan Details:', removedClans);
      * } else {
      *   console.log(`${clanIdOrName} was not found in the watched clans.`);
      * }
@@ -222,7 +221,12 @@ export class FeatureSingleton extends CoreFile<FeatureType> {
      * feature.updateClan(id, updatedClan);
      */
     public updateClan(clanId: string, clan: Clan): void {
+        if (!this._data.watch_clan[clanId]) {
+            throw new Error(`${clanId} is not in the list of watched clans`);
+        }
+
         this._data.watch_clan[clanId] = clan;
+
         this.logger.debug('Clan updated with value : {}', JSON.stringify(clan));
         this.writeData();
     }
@@ -306,7 +310,7 @@ export class FeatureSingleton extends CoreFile<FeatureType> {
      *
      * @param {string} url - The URL of the potential clan to add.
      *
-     * @throws {Error} Throws an error if the URL is not provided.
+     * @throws {Error} - Throws an error if the URL is not provided.
      */
     public addPotentialClan(url: string): void {
         if (!url) {

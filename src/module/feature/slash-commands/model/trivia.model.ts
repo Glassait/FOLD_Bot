@@ -24,8 +24,8 @@ import { TimeUtil } from '../../../shared/utils/time.util';
 import { PlayerAnswer } from '../types/trivia-game.type';
 import {
     DailyTrivia,
-    MonthlyTriviaPlayerStatisticType,
-    TriviaPlayerStatisticType,
+    MonthlyTriviaPlayerStatistic,
+    TriviaPlayerStatistic,
     TriviaStatistic,
     WinStreak,
 } from '../../../shared/types/statistic.type';
@@ -135,7 +135,7 @@ export class TriviaModel {
         string,
         {
             daily: DailyTrivia;
-            stats: MonthlyTriviaPlayerStatisticType;
+            stats: MonthlyTriviaPlayerStatistic;
             interaction: ChatInputCommandInteraction;
         }
     >;
@@ -346,9 +346,9 @@ export class TriviaModel {
         }
 
         const playerStats = Object.entries(this.triviaStatistic.player)
-            .filter((player: [string, TriviaPlayerStatisticType]) => player[1][this.statistic.currentMonth])
+            .filter((player: [string, TriviaPlayerStatistic]) => player[1][this.statistic.currentMonth])
             .sort(
-                (a: [string, TriviaPlayerStatisticType], b: [string, TriviaPlayerStatisticType]) =>
+                (a: [string, TriviaPlayerStatistic], b: [string, TriviaPlayerStatistic]) =>
                     b[1][this.statistic.currentMonth].elo - a[1][this.statistic.currentMonth].elo
             );
 
@@ -363,7 +363,7 @@ export class TriviaModel {
             name: 'Joueur - Elo',
             value: playerStats
                 .map(
-                    (player: [string, TriviaPlayerStatisticType], index: number): string =>
+                    (player: [string, TriviaPlayerStatistic], index: number): string =>
                         `${username === player[0] ? '`--> ' : ''}${index < 3 ? MEDAL[index] : index + 1}. ${player[0]} - ${
                             player[1][this.statistic.currentMonth].elo
                         }${username === player[0] ? ' <--`' : ''}`
