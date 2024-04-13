@@ -1,4 +1,4 @@
-import { DiscordId } from './feature.type';
+import type { DiscordId } from './feature.type';
 
 /**
  * Type describing a Discord channel.
@@ -200,7 +200,7 @@ export type FoldRecruitment = {
      * @replace APPLICATION_ID
      * @replace PLAYER_NAME
      */
-    search_player_url: string;
+    player_url: string;
     /**
      * The wot url to get the personal data of a player
      *
@@ -247,10 +247,6 @@ export type InventoryType = {
          * The channel configuration for the fold recruitment feature.
          */
         fold_recruitment: Channel;
-        /**
-         * The channel configuration for the fold month message.
-         */
-        fold_month: Channel;
         [key: string]: Channel;
     };
     /**

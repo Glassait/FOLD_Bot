@@ -6,26 +6,23 @@
 ![GitHub contributors](https://img.shields.io/github/contributors/Glassait/freePuntosBot?logo=github&style=for-the-badge&color=purple)
 
 <header style="display: flex; align-items: center; flex-direction: column">
-<img src="logo.png" alt="free puntos logo" width="300" height="auto">
-
-# <h1>Free Puntos Bot</h1>
-
-<div>
-<a href="https://github.com/Glassait/freePuntosBot/issues">Report bug</a> · <a href="https://github.com/Glassait/freePuntosBot/issues">Request feature</a>
-</div>
+   <img src="logo.png" alt="free puntos logo" width="300" height="auto">
+   
+   # FOLD Bot
+   
+   <div>
+   <a href="https://github.com/Glassait/freePuntosBot/issues">Report bug</a> · <a href="https://github.com/Glassait/freePuntosBot/issues">Request feature</a>
+   </div>
 </header>
 
----
+## 🛠️ Languages and Tools
 
-## 🛠️ Languages and Tools 🛠️
-
-<div style="display: flex; gap: 1rem;; align-items: center">
+<div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap">
     <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/typescript/typescript-original.svg" width="100" height="auto" alt="Typescript">
-    <img src="https://discord.js.org/static/logo.svg" width="200" alt="discord.js">
+    <img src="https://discord.js.org/static/logo.svg" width="150" alt="discord.js">
+    <img src="https://miro.medium.com/v2/resize:fit:1200/1*cQ8JTEvKMKaBhovYI2mncQ.png" width="150" alt="axios">
+    <img src="https://gregberge.com/static/a15f8dc6cde9d6dc9e94a2edb43b6108/2ceb4/banner.png" width="150" alt="Prettier">
 </div>
-<br>
-
----
 
 ## Getting Started
 
@@ -56,218 +53,33 @@ This project need node v18.16.0 or higher
     ```sh
      npm run start:mock
     ```
-    <br>
 
----
+## Documentation
+
+The technical documentation can be found [here](./src/README.md)
 
 ## Roadmap
 
--   [x] Better handle of overall error
--   [ ] Make trivia games uses the second canon on tanks that have multiple canon
--   [ ] Used chained catch to better handle
-
-See the [open issues](https://github.com/Glassait/freePuntosBot/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement) for a full list of proposed features (and known issues).
-<br>
-
----
+See the [open issues](https://github.com/Glassait/freePuntosBot/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement) for a
+full list of proposed features (and known issues).
 
 ## Contributing
 
-Before creating an issue, please ensure that it hasn't already been reported/suggested, and double-check the documentation.
+Before creating an issue, please ensure that it hasn't already been reported/suggested, and double-check the
+documentation.
 See the contribution guide if you'd like to submit a PR.
 
 Don't forget to update all the readme and the sequence diagram.
-<br>
-
----
 
 ## Acknowledgments
 
-Use this space to list resources you find helpful and would like to give credit to. I've included a few of my favorites to kick things off!
+Use this space to list resources you find helpful and would like to give credit to. I've included a few of my favorites
+to kick things off!
 
 -   [Badge Shields](https://shields.io)
 -   [Readme template](https://github.com/othneildrew/Best-README-Template/blob/master/README.md?plain=1)
+-   [readme.so](https://readme.so/fr) - Perfect to create readme
 
 ## Changelog
 
-### 2.3.0
-
--   Rework json related singleton to better readability, documentation and efficiency
--   Fix bug when back-upping json file when backup folder doesn't exist
--   Add slash command to see list of all observed clans
--   Change the time to answer trivia question
--   Disabled the reducing points of trivia player when yesterday tanks not fetch
--   Update the slash command to blacklist player with autocompletion ans search with wot api
--   Update the slash command to unblacklist player with autocompletion
--   Change the data format of blacklist player to store with ID and not name
-
-### 2.2.10
-
--   Add the al_capone trophy slash command
--   Rework the trivia game, everything explain here [#138](https://github.com/Glassait/freePuntosBot/issues/138)
--   Put url for fol-recruitment in inventory
--   Rework last activity of clan (moved in feature.json)
--   Grammatical error
--   Blacklist player for fold recruitment
-
-### 2.2.9
-
--   Fix trivia month messages
--   Disabled Trivia game
--   Add more caught for error and exception
--   Add feature flipping in inventory
--   Change the fold recruitment message by changing th wot url with the wargaming url and adding author to the embed with the clan image, clan name and redirection to the wot portail of the clan
--   Send message when no player found after the fold recruitment scan
--   Automatically backup core files
--   Wot express news now show if new is for RU ou EU
--   Fix last news not found for wot express
-
-### 2.2.8
-
--   Add statistics for fold-recruitment on clan leaving players
--   Fix index when another tanks are also the right answer
--   Fix [statistics injector](src/module/shared/decorators/injector.decorator.ts)
--   Fix clan without last activity
--   Better docs
--   Remove trace log
--   Add code placeholders method for log
--   Fix timeout axios
--   Add check when no newsletter website given
-
-### 2.2.7
-
--   Method to generate schedule for loop ([forLoopTimeSleep](src/module/shared/utils/time.util.ts))
--   Add schedule for fold recruitment
--   Schedule for loop take hour and minute
--   [Command watch clan](src/module/feature/slash-commands/watch-clan.slash-command.ts) remove now accept name of clan in addition of id
--   Watch commands (add/remove) now send message in channel
--   Add in inventory ban words for news. Check the href of news and
--   Fix loosing message for trivia game (give right shell, type, special and pen)
--   Add trace log in error message
--   Watch-clan remove command now have autocomplete
-
-### 2.2.6
-
--   Add two hours for the fold recruitment
--   Update the [BotEvent](src/module/feature/events/types/bot-event.type.ts) type to allow auto-completion
--   Update the event architecture by removing `export default event`, more info in [readme](src/module/feature/events/readme.md)
--   Move json to [core](src/module/core)
--   Removed SPG from trivia game
--   Model for trivia month message and new overall statistic
--   Add gold ammo and penetration to the trivia game
-
-### 2.2.5
-
--   Add message of the month for the trivia game ([ready.event](src/module/feature/events/ready.event.ts))
-
-### 2.2.4
-
--   Put trivia schedule in inventory
--   Fix wording lose trivia
--   Make collector check same answer in trivia game
--   Update formula for elo
--   Fix replacement when player have id in name
--   Trivia game doesn't give same tanks every round
-
-### 2.2.3
-
--   Add trivia statistics command to visualise the player statistics for each month of participation
--   Change win strick type to add current number of win strick and max number of win strick
-
-### 2.2.2
-
--   Add feature flipping for the header message of clan during the recruitment
--   Add feature flipping for the end message of the recruitment
-
-### 2.2.1
-
--   Rework axios to use more catch
--   Update config for axios
--   Add waiting on clan if too much fetch
--   Update decorator doc
-
-### 2.2.0
-
--   Pass bot to multi guild support
-
-### 2.1.0
-
--   Watch clan to detect leaving player
--   send message to change when leaving player detected
-
-### 2.0.1
-
--   Fix date in trivia game
--   Rework loop in trivia game
--   Set trivia game time to 5 min and add countdown
--   Add more logs
--   Trivia game only send to 18h30, 19h30 and 20h30
-
-### 2.0.0
-
--   Create this changelog :)
--   Create the trivia game
--   Optimise the decorator
--   Clean code
-
-### 1.2.1
-
--   Move file to there optimal position to respect the module/feature and module/shared design
--   Fix log in singleton class
--   Update documentation
--   Optimise/Simplify the SlashCommandModel class and all slash-commands
-
-### 1.2.0
-
--   Add GitHub issues/feature template
--   Update dependency
--   Update prettier conf
--   Update sequence diagrams for Auto-reply
--   Update logic of Auto-reply
--   Update documentation
--   Create logger decorator
--   Create logger class to simply the use of log method
-
-### 1.1.1
-
--   Fix readme
-
-### 1.1.0
-
--   Rewrite all the documentations about the projet in readme and code
--   Create new sequence diagrams and update existing one
--   Used a new architecture in module/feature and module/shared
-
-### 1.0.5
-
--   Remove SendUtils class
--   Update sequence diagrams
--   Add more log for error
-
-### 1.0.4
-
--   Update and optimise log class
--   Create new sequence diagrams
--   Optimise feature class
--   Update global log
-
-### 1.0.3
-
--   Add more log
--   Fix Wot Express newsletter
-
-### 1.0.2
-
--   Update dependency
-
-### 1.0.1
-
--   Add versing and auto-release GitHub action
-
-### 1.0.0
-
--   Projet creation
--   Base architecture
--   Slash-command
--   Handler
--   Events
+You can see the changelog [here](./CHANGELOG.md)

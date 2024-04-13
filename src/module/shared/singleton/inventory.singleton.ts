@@ -1,10 +1,10 @@
-import { Channel, FoldRecruitment, InventoryType, Trivia, WebSiteState } from '../types/inventory.type';
-import { EnvUtil } from '../utils/env.util';
-import { Logger } from '../classes/logger';
-import { Client, TextChannel } from 'discord.js';
-import { Context } from '../classes/context';
-import { DiscordId } from '../types/feature.type';
+import type { Client, Guild, TextChannel } from 'discord.js';
+import { basename } from 'node:path';
 import { CoreFile } from '../classes/core-file';
+import { Logger } from '../classes/logger';
+import type { DiscordId } from '../types/feature.type';
+import type { Channel, FoldRecruitment, InventoryType, Trivia, WebSiteState } from '../types/inventory.type';
+import { EnvUtil } from '../utils/env.util';
 
 /**
  * Class used to manage the inventory.json file
@@ -24,7 +24,7 @@ export class InventorySingleton extends CoreFile<InventoryType> {
     private constructor() {
         super('./src/module/core', './src/module/core/backup', 'inventory.json');
 
-        this.logger = new Logger(new Context(InventorySingleton.name));
+        this.logger = new Logger(basename(__filename));
 
         this._data = JSON.parse(this.readFile().toString());
 
@@ -109,7 +109,7 @@ export class InventorySingleton extends CoreFile<InventoryType> {
      * @throws Error If the index is out of bound
      */
     public getNewsLetterAtIndex(index: number): WebSiteState {
-        let webSiteState = this._data.newsLetter.website[index];
+        const webSiteState: WebSiteState = this._data.newsLetter.website[index];
 
         if (!webSiteState) {
             this.logger.error(`Index out of bound ${index} in newsletter array`);
@@ -182,32 +182,17 @@ export class InventorySingleton extends CoreFile<InventoryType> {
         this.logger.debug('Channel instance fetch for the fold recruitment');
         return await this.fetchChannel(client, this._data.channels.fold_recruitment);
     }
-
-    /**
-     * Fetch the text channel instance for the fold month.
-     *
-     * @param {Client} client - The Discord client instance.
-     *
-     * @returns {Promise<TextChannel>} - A promise that resolves to the text channel instance for the fold month.
-     *
-     * @example
-     * const discordClient = // ... obtained Discord client instance
-     * const foldMonthChannel = await instance.getChannelForFoldMonth(discordClient);
-     * console.log(foldMonthChannel); // Text channel instance for the fold month
-     */
-    public async getChannelForFoldMonth(client: Client): Promise<TextChannel> {
-        this.logger.debug('Channel instance fetch for the fold month message');
-        return await this.fetchChannel(client, this._data.channels.fold_month);
-    }
     //endregion
 
     /**
      * Get the commands registered in the inventory
-     * @param name The name of the command
-     * @returns The list of the discord id
+     *
+     * @param {string} name - The name of the command
+     *
+     * @returns {DiscordId[]} - The list of the discord server id
      */
     public getCommands(name: string): DiscordId[] {
-        const command = this._data.commands[name];
+        const command: DiscordId[] = this._data.commands[name];
 
         if (!command) {
             throw new Error(`No command found with name ${name}`);
@@ -243,10 +228,10 @@ export class InventorySingleton extends CoreFile<InventoryType> {
      * @returns The Discord channel.
      */
     private async fetchChannel(client: Client, channel: Channel): Promise<TextChannel> {
-        let chan: TextChannel | undefined = <TextChannel>client.channels.cache.get(channel.id);
+        const chan: TextChannel | undefined = <TextChannel>client.channels.cache.get(channel.id);
 
         if (!chan) {
-            const g = await client.guilds.fetch(channel.guild);
+            const g: Guild = await client.guilds.fetch(channel.guild);
             return <TextChannel>await g.channels.fetch(channel.id);
         }
 

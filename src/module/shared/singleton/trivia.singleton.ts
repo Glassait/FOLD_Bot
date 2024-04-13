@@ -1,20 +1,20 @@
-import { Logger } from '../classes/logger';
-import { Context } from '../classes/context';
-import { RandomUtil } from '../utils/random.util';
-import { TankopediaVehiclesSuccess, VehicleData } from '../types/wot-api.type';
-import { ShellEnum, ShellType } from '../../feature/slash-commands/enums/shell.enum';
-import { InventorySingleton } from './inventory.singleton';
-import { Trivia } from '../types/inventory.type';
-import { WotApiModel } from '../apis/wot-api.model';
+import { type Client, Colors, EmbedBuilder, type TextChannel } from 'discord.js';
+import { basename } from 'node:path';
 import { application_id_wot } from '../../core/config.json';
-import { WotApiConstants } from '../enums/wot-api.enum';
-import { TriviaSelected } from '../types/trivia.type';
-import { StatisticSingleton } from './statistic.singleton';
-import { TriviaPlayerStatisticType, TriviaStatistic } from '../types/statistic.type';
-import { Client, Colors, EmbedBuilder, TextChannel } from 'discord.js';
-import { DateUtil } from '../utils/date.util';
-import { MEDAL } from '../utils/variables.util';
+import { ShellEnum, ShellType } from '../../feature/slash-commands/enums/shell.enum';
+import type { WotApiModel } from '../apis/wot-api.model';
+import { Logger } from '../classes/logger';
 import { TimeEnum } from '../enums/time.enum';
+import { WotApiConstants } from '../enums/wot-api.enum';
+import type { Trivia } from '../types/inventory.type';
+import type { TriviaPlayerStatistic, TriviaStatistic } from '../types/statistic.type';
+import type { TriviaSelected } from '../types/trivia.type';
+import type { TankopediaVehiclesSuccess, VehicleData } from '../types/wot-api.type';
+import { DateUtil } from '../utils/date.util';
+import { RandomUtil } from '../utils/random.util';
+import { MEDAL } from '../utils/variables.util';
+import { InventorySingleton } from './inventory.singleton';
+import { StatisticSingleton } from './statistic.singleton';
 
 /**
  * Class used to manage the trivia game
@@ -61,7 +61,7 @@ export class TriviaSingleton {
 
         this.wotApi = new api();
         this.inventory = InventorySingleton.instance;
-        this.logger = new Logger(new Context(TriviaSingleton.name));
+        this.logger = new Logger(basename(__filename));
         this.statistic = StatisticSingleton.instance;
 
         this.trivia = this.inventory.trivia;
@@ -153,11 +153,11 @@ export class TriviaSingleton {
         for (const selected of dayTankElement) {
             const index: number = dayTankElement.indexOf(selected);
 
-            const player: [string, TriviaPlayerStatisticType][] = Object.entries(this.triviaStatistique.player)
-                .filter((value: [string, TriviaPlayerStatisticType]): boolean => {
+            const player: [string, TriviaPlayerStatistic][] = Object.entries(this.triviaStatistique.player)
+                .filter((value: [string, TriviaPlayerStatistic]): boolean => {
                     return value[1][this.statistic.currentMonth].daily[previousDay]?.answer[index] === selected.tank.name;
                 })
-                .sort((a: [string, TriviaPlayerStatisticType], b: [string, TriviaPlayerStatisticType]) => {
+                .sort((a: [string, TriviaPlayerStatistic], b: [string, TriviaPlayerStatistic]) => {
                     return (
                         a[1][this.statistic.currentMonth].daily[previousDay].answer_time[index] -
                         b[1][this.statistic.currentMonth].daily[previousDay].answer_time[index]
@@ -209,9 +209,9 @@ export class TriviaSingleton {
                 playerEmbed.setDescription("Aucun joueur n'a envoyé de réponse ou répondu correctement à cette question");
             } else {
                 playerEmbed.setFields({
-                    name: `Top 3`,
+                    name: 'Top 3',
                     value: player.reduce(
-                        (previousValue: string, currentValue: [string, TriviaPlayerStatisticType], currentIndex: number): string => {
+                        (previousValue: string, currentValue: [string, TriviaPlayerStatistic], currentIndex: number): string => {
                             this.logger.debug(
                                 'The following player {} is in the top 3 for the question n°{}',
                                 currentValue[0],
@@ -288,7 +288,7 @@ export class TriviaSingleton {
     /**
      * Calculates the time taken by the player to answer the trivia question.
      *
-     * @param {[string, TriviaPlayerStatisticType]} playersResponse - Array of player username and their responses.
+     * @param {[string, TriviaPlayerStatistic]} playersResponse - Array of player username and their responses.
      * @param {number} index - The index of the question
      *
      * @returns {string} The time taken by the player to answer the trivia question in string format.
@@ -298,7 +298,7 @@ export class TriviaSingleton {
      * const time = this.calculateResponseTime(playersResponse, 0)
      * console.log(time) // 3 secondes
      */
-    private calculateResponseTime(playersResponse: [string, TriviaPlayerStatisticType], index: number): string {
+    private calculateResponseTime(playersResponse: [string, TriviaPlayerStatistic], index: number): string {
         const sec = playersResponse[1][this.statistic.currentMonth].daily[DateUtil.getPreviousDay()].answer_time[index] / TimeEnum.SECONDE;
         return sec > 60 ? `${Math.floor(sec / 60)}:${Math.round(sec % 60)} minutes` : `${sec.toFixed(2)} secondes`;
     }

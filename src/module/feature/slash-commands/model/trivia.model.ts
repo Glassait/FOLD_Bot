@@ -1,50 +1,47 @@
 import {
     ActionRowBuilder,
-    BooleanCache,
+    type BooleanCache,
     ButtonBuilder,
-    ButtonInteraction,
+    type ButtonInteraction,
     ButtonStyle,
-    CacheType,
-    ChatInputCommandInteraction,
+    type CacheType,
+    type ChatInputCommandInteraction,
     Colors,
     ComponentType,
     EmbedBuilder,
-    Message,
+    type Message,
     StringSelectMenuBuilder,
-    StringSelectMenuInteraction,
+    type StringSelectMenuInteraction,
     StringSelectMenuOptionBuilder,
 } from 'discord.js';
+import type { Logger } from '../../../shared/classes/logger';
+import { Injectable, LoggerInjector } from '../../../shared/decorators/injector.decorator';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
-import { ShellEnum, ShellType } from '../enums/shell.enum';
-import { InventoryInjector, LoggerInjector, StatisticInjector, TriviaInjector } from '../../../shared/decorators/injector.decorator';
-import { TriviaSingleton } from '../../../shared/singleton/trivia.singleton';
 import { TimeEnum } from '../../../shared/enums/time.enum';
-import { Ammo, VehicleData } from '../../../shared/types/wot-api.type';
-import { Logger } from '../../../shared/classes/logger';
-import { TimeUtil } from '../../../shared/utils/time.util';
-import { PlayerAnswer } from '../types/trivia-game.type';
-import {
+import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
+import type { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
+import type { TriviaSingleton } from '../../../shared/singleton/trivia.singleton';
+import type {
     DailyTrivia,
-    MonthlyTriviaPlayerStatisticType,
-    TriviaPlayerStatisticType,
+    MonthlyTriviaPlayerStatistic,
+    TriviaPlayerStatistic,
     TriviaStatistic,
     WinStreak,
 } from '../../../shared/types/statistic.type';
-import { TriviaSelected } from '../../../shared/types/trivia.type';
-import { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
-import { InventorySingleton } from 'src/module/shared/singleton/inventory.singleton';
+import type { TriviaSelected } from '../../../shared/types/trivia.type';
+import type { Ammo, VehicleData } from '../../../shared/types/wot-api.type';
+import { TimeUtil } from '../../../shared/utils/time.util';
 import { MEDAL } from '../../../shared/utils/variables.util';
+import { ShellEnum, ShellType } from '../enums/shell.enum';
+import type { PlayerAnswer } from '../types/trivia-game.type';
 
 @LoggerInjector
-@TriviaInjector
-@StatisticInjector
-@InventoryInjector
 export class TriviaModel {
-    //region INJECTION
-    private readonly trivia: TriviaSingleton;
+    //region INJECTABLE
     private readonly logger: Logger;
-    private readonly statistic: StatisticSingleton;
-    private readonly inventory: InventorySingleton;
+    @Injectable('Trivia') private readonly trivia: TriviaSingleton;
+    @Injectable('Statistic') private readonly statistic: StatisticSingleton;
+    @Injectable('Inventory') private readonly inventory: InventorySingleton;
     //endregion
 
     //region PRIVATE READONLY FIELDS
@@ -96,7 +93,7 @@ export class TriviaModel {
         .setColor(Colors.Blurple)
         .setFields(
             {
-                name: `Obus :`,
+                name: 'Obus :',
                 value: `\`${ShellEnum.ARMOR_PIERCING} 390\``,
                 inline: true,
             },
@@ -138,7 +135,7 @@ export class TriviaModel {
         string,
         {
             daily: DailyTrivia;
-            stats: MonthlyTriviaPlayerStatisticType;
+            stats: MonthlyTriviaPlayerStatistic;
             interaction: ChatInputCommandInteraction;
         }
     >;
@@ -201,7 +198,8 @@ export class TriviaModel {
 
         if (!allTanks || allTanks.length === 0) {
             await interaction.editReply({
-                content: `Le jeu ne semble pas encore initialisé, merci de réessayer dans quelque minutes. Si le problème persist merci de contacter <@313006042340524033>`,
+                content:
+                    'Le jeu ne semble pas encore initialisé, merci de réessayer dans quelque minutes. Si le problème persist merci de contacter <@313006042340524033>',
             });
             return;
         }
@@ -349,9 +347,9 @@ export class TriviaModel {
         }
 
         const playerStats = Object.entries(this.triviaStatistic.player)
-            .filter((player: [string, TriviaPlayerStatisticType]) => player[1][this.statistic.currentMonth])
+            .filter((player: [string, TriviaPlayerStatistic]) => player[1][this.statistic.currentMonth])
             .sort(
-                (a: [string, TriviaPlayerStatisticType], b: [string, TriviaPlayerStatisticType]) =>
+                (a: [string, TriviaPlayerStatistic], b: [string, TriviaPlayerStatistic]) =>
                     b[1][this.statistic.currentMonth].elo - a[1][this.statistic.currentMonth].elo
             );
 
@@ -366,7 +364,7 @@ export class TriviaModel {
             name: 'Joueur - Elo',
             value: playerStats
                 .map(
-                    (player: [string, TriviaPlayerStatisticType], index: number): string =>
+                    (player: [string, TriviaPlayerStatistic], index: number): string =>
                         `${username === player[0] ? '`--> ' : ''}${index < 3 ? MEDAL[index] : index + 1}. ${player[0]} - ${
                             player[1][this.statistic.currentMonth].elo
                         }${username === player[0] ? ' <--`' : ''}`
@@ -417,7 +415,7 @@ export class TriviaModel {
             })
             .on('collect', async (interaction: ButtonInteraction<'cached'>): Promise<void> => {
                 try {
-                    let hasAlreadyAnswer: boolean = !!playerAnswer?.interaction;
+                    const hasAlreadyAnswer: boolean = !!playerAnswer?.interaction;
                     let changedAnswer: boolean = false;
 
                     if (hasAlreadyAnswer) {
@@ -442,7 +440,7 @@ export class TriviaModel {
                         changedAnswer = true;
                     } else {
                         await playerAnswer.interaction?.editReply({
-                            content: `Ta réponse semble être la même que celle que tu as sélectionnée précédemment.`,
+                            content: 'Ta réponse semble être la même que celle que tu as sélectionnée précédemment.',
                         });
                     }
 
@@ -498,7 +496,7 @@ export class TriviaModel {
         allTanks.forEach((vehicle: VehicleData): void => {
             const vehicleAmmo: Ammo = vehicle.default_profile.ammo[datum.ammoIndex];
             if (vehicle.name !== datum.tank.name && this.checkVehicleAmmoDetail(vehicleAmmo, ammo)) {
-                this.logger.debug(`Another tank has the same shell {}`, vehicle.name);
+                this.logger.debug('Another tank has the same shell {}', vehicle.name);
                 otherAnswer.push(this.createAnswerEmbed(false, vehicle, isGoodAnswer));
             }
         });
@@ -608,10 +606,10 @@ export class TriviaModel {
      * @param {string} username - The username of the player.
      */
     private async updateStatistic(playerAnswer: PlayerAnswer, isGoodAnswer: boolean, username: string): Promise<void> {
-        this.logger.debug(`Start updating {} statistic`, username);
+        this.logger.debug('Start updating {} statistic', username);
         await this.updatePlayerStatistic(username, playerAnswer, isGoodAnswer);
         this.datum.delete(username);
-        this.logger.debug(`End updating {} statistic`, username);
+        this.logger.debug('End updating {} statistic', username);
     }
 
     /**
@@ -704,7 +702,7 @@ export class TriviaModel {
                     }),
             ],
         });
-        this.logger.debug(`Player {} found the right answer`, playerName);
+        this.logger.debug('Player {} found the right answer', playerName);
     }
 
     /**
@@ -725,7 +723,7 @@ export class TriviaModel {
         allTanks: VehicleData[],
         datum: TriviaSelected
     ): Promise<void> {
-        this.logger.debug(`Player {} failed to find the right answer`, playerName);
+        this.logger.debug('Player {} failed to find the right answer', playerName);
 
         if (!playerAnswer) {
             return;

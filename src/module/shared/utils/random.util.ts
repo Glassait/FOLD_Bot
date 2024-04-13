@@ -39,8 +39,8 @@ export class RandomUtil {
             throw new Error('Max and min must be integers, and max must be greater than min.');
         }
 
-        const range = max - min + 1;
-        const uniqueNumbers = new Set<number>(forbidden);
+        const range: number = max - min + 1;
+        const uniqueNumbers: Set<number> = new Set(forbidden);
         const result: number[] = [];
 
         if (!allowRepeat && range < length) {
@@ -48,7 +48,7 @@ export class RandomUtil {
         }
 
         while (result.length < length) {
-            let randomNumber: number = this.getRandomNumber(max, min);
+            const randomNumber: number = this.getRandomNumber(max, min);
 
             if (allowRepeat || !uniqueNumbers.has(randomNumber)) {
                 result.push(randomNumber);

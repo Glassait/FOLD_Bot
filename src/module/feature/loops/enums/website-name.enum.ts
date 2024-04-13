@@ -1,8 +1,13 @@
 /**
- * All the name of the website
+ * Enumeration for website names.
  */
 export enum WebsiteNameEnum {
+    /**
+     * Represents the website "Wot Express".
+     */
     WOT_EXPRESS = 'Wot Express',
-    THE_DAILY_BOUNCE = 'THE DAILY BOUNCE',
+    /**
+     * Represents the website "The Armored Patrol".
+     */
     THE_ARMORED_PATROL = 'The Armored Patrol',
 }

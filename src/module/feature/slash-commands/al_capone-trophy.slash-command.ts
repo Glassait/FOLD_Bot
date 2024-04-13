@@ -1,17 +1,17 @@
+import { SlashCommandMentionableOption } from '@discordjs/builders';
+import { Canvas, Image, type SKRSContext2D } from '@napi-rs/canvas';
 import {
     AttachmentBuilder,
     ChannelType,
-    ChatInputCommandInteraction,
-    GuildMember,
+    type ChatInputCommandInteraction,
+    type GuildMember,
     SlashCommandChannelOption,
-    TextChannel,
+    type TextChannel,
 } from 'discord.js';
-import { SlashCommandModel } from './model/slash-command.model';
-import { SlashCommandMentionableOption } from '@discordjs/builders';
 import { UserUtil } from '../../shared/utils/user.util';
-import { Canvas, Image, SKRSContext2D } from '@napi-rs/canvas';
+import { SlashCommandModel } from './model/slash-command.model';
 
-export const command: SlashCommandModel = new SlashCommandModel(
+module.exports = new SlashCommandModel(
     'al_capone-trophy',
     'Décerne le Al_capone trophée à un joueur',
     async (interaction: ChatInputCommandInteraction): Promise<void> => {

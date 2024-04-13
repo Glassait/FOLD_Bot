@@ -1,47 +1,35 @@
 import {
     ActionRowBuilder,
-    AutocompleteFocusedOption,
-    AutocompleteInteraction,
-    BooleanCache,
-    CacheType,
-    ChatInputCommandInteraction,
-    Client,
+    type AutocompleteFocusedOption,
+    type AutocompleteInteraction,
+    type BooleanCache,
+    type CacheType,
+    type ChatInputCommandInteraction,
+    type Client,
     Colors,
-    CommandInteractionOption,
+    type CommandInteractionOption,
     ComponentType,
     EmbedBuilder,
-    Message,
+    type Message,
     StringSelectMenuBuilder,
-    StringSelectMenuInteraction,
+    type StringSelectMenuInteraction,
     StringSelectMenuOptionBuilder,
-    TextChannel,
+    type TextChannel,
 } from 'discord.js';
-import {
-    AxiosInjector,
-    FeatureInjector,
-    InventoryInjector,
-    LoggerInjector,
-    StatisticInjector,
-} from '../../../shared/decorators/injector.decorator';
-import { Logger } from '../../../shared/classes/logger';
-import { FeatureSingleton } from '../../../shared/singleton/feature.singleton';
-import { InventorySingleton } from 'src/module/shared/singleton/inventory.singleton';
-import { Clan, PlayerBlacklistedDetail } from '../../../shared/types/feature.type';
-import { TimeEnum } from '../../../shared/enums/time.enum';
-import { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
-import { FoldRecruitmentClanStatisticType } from '../../../shared/types/statistic.type';
+import type { WotApiModel } from '../../../shared/apis/wot-api.model';
+import type { Logger } from '../../../shared/classes/logger';
+import { Injectable, LoggerInjector } from '../../../shared/decorators/injector.decorator';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
-import { AxiosInstance } from 'axios';
-import { ConstantsEnum } from '../../loops/enums/fold-recruitment.enum';
-import { WotApiConstants } from '../../../shared/enums/wot-api.enum';
-import { application_id_wot } from '../../../core/config.json';
-import { WargamingSuccessType } from '../../../shared/types/wargaming-api.type';
+import { TimeEnum } from '../../../shared/enums/time.enum';
+import type { FeatureSingleton } from '../../../shared/singleton/feature.singleton';
+import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
+import type { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
+import type { Clan, PlayerBlacklistedDetail } from '../../../shared/types/feature.type';
+import type { FoldRecruitmentClanStatistic } from '../../../shared/types/statistic.type';
+import type { WargamingSuccessType } from '../../../shared/types/wargaming-api.type';
+import type { PlayerData } from '../../../shared/types/wot-api.type';
 
 @LoggerInjector
-@FeatureInjector
-@InventoryInjector
-@StatisticInjector
-@AxiosInjector(TimeEnum.SECONDE * 10)
 export class WatchClanModel {
     //region PRIVATE
     /**
@@ -50,12 +38,12 @@ export class WatchClanModel {
     private confirmationEmbed: EmbedBuilder = new EmbedBuilder().setColor(Colors.Green);
     //endregion
 
-    //region INJECTOR
+    //region INJECTABLE
     private readonly logger: Logger;
-    private readonly feature: FeatureSingleton;
-    private readonly inventory: InventorySingleton;
-    private readonly statistic: StatisticSingleton;
-    private readonly axios: AxiosInstance;
+    @Injectable('Feature') private readonly feature: FeatureSingleton;
+    @Injectable('Inventory') private readonly inventory: InventorySingleton;
+    @Injectable('Statistic') private readonly statistic: StatisticSingleton;
+    @Injectable('WotApi') private readonly wotApi: WotApiModel;
     //endregion
 
     private _channel: TextChannel;
@@ -104,7 +92,7 @@ export class WatchClanModel {
             return;
         }
 
-        this.logger.info(`Clan {} - {} added to the clan to watch`, id.value as string, name.value as string);
+        this.logger.info('Clan {} - {} added to the clan to watch', id.value as string, name.value as string);
         await interaction.editReply({
             content: 'Le clan a bien été ajouté ! Le clan sera observé à partir du prochain créneaux (*^▽^*)',
         });
@@ -140,7 +128,7 @@ export class WatchClanModel {
             return;
         }
 
-        this.logger.info(`Clan {} - {} removed from the clan to watch`, idOrName.value as string, removed.name);
+        this.logger.info('Clan {} - {} removed from the clan to watch', idOrName.value as string, removed.name);
         await interaction.editReply({ content: 'Le clan a bien été supprimé !' });
 
         this.confirmationEmbed
@@ -169,7 +157,7 @@ export class WatchClanModel {
             return;
         }
 
-        const clanStats: FoldRecruitmentClanStatisticType = this.statistic.getClanStatistics(id);
+        const clanStats: FoldRecruitmentClanStatistic = this.statistic.getClanStatistics(id);
 
         if (!clanStats || Object.keys(clanStats).length === 0) {
             this.logger.warn("The following clan {} doesn't have any statistics", clan.name);
@@ -245,8 +233,19 @@ export class WatchClanModel {
         await interaction.editReply({ embeds: [embedListClan] });
     }
 
-    public async autocomplete(interaction: AutocompleteInteraction, type: 'clan' | 'add-player' | 'remove-player'): Promise<void> {
-        switch (type) {
+    /**
+     * Handles autocomplete interactions based on the provided type.
+     *
+     * @param {AutocompleteInteraction} interaction - The autocomplete interaction object.
+     * @param {'clan' | 'add-player' | 'remove-player'} interactionType - The type of autocomplete interaction.
+     *
+     * @returns {Promise<void>} - A Promise that resolves when the autocomplete is complete.
+     */
+    public async autocomplete(
+        interaction: AutocompleteInteraction,
+        interactionType: 'clan' | 'add-player' | 'remove-player'
+    ): Promise<void> {
+        switch (interactionType) {
             case 'clan':
                 await this.autocompleteClan(interaction);
                 break;
@@ -256,6 +255,9 @@ export class WatchClanModel {
             case 'remove-player':
                 await this.autocompleteRemovePlayer(interaction);
                 break;
+            default:
+                // Handle unexpected interactionType values (optional)
+                throw new Error(`Invalid interactionType: ${interactionType}`);
         }
     }
 
@@ -278,7 +280,20 @@ export class WatchClanModel {
         let reason: string = interaction.options.get(MAPPING.BLACKLIST_PLAYER.optionsName[1])?.value as string;
         reason = reason.trim();
 
-        const [id, name] = idAndName.split('#');
+        let [id, name] = idAndName.split('#');
+
+        if (!id || !name) {
+            const searchResult: WargamingSuccessType<PlayerData[]> = await this.wotApi.fetchPlayerData(idAndName);
+
+            if (!searchResult) {
+                await interaction.editReply({ content: "The player pass doesn't exist" });
+                return;
+            }
+
+            id = String(searchResult.data[0].account_id);
+            name = searchResult.data[0].nickname;
+        }
+
         const added: boolean = this.feature.addBlacklistedPlayer(id, name, reason);
 
         if (!added) {
@@ -294,7 +309,7 @@ export class WatchClanModel {
             .setTitle('Ajout de joueur sur liste noire')
             .setDescription(`Le joueur \`${name}\` a été ajouté sur liste noire !`);
 
-        await interaction.deleteReply();
+        await interaction.editReply({ content: 'Je joueur a bien été ajouté à la liste noire !' });
         await this._channel.send({
             embeds: [this.confirmationEmbed],
         });
@@ -331,7 +346,7 @@ export class WatchClanModel {
             .setTitle('Suppression de joueur sur liste noire')
             .setDescription(`Le joueur \`${name}\` a été supprimé de la liste noire !`);
 
-        await interaction.deleteReply();
+        await interaction.editReply({ content: 'Je joueur a bien été supprimé de la liste noire !' });
         await this._channel.send({
             embeds: [this.confirmationEmbed],
         });
@@ -380,13 +395,7 @@ export class WatchClanModel {
             return;
         }
 
-        const searchResult: WargamingSuccessType<{ nickname: string; account_id: number }[]> = (
-            await this.axios.get(
-                this.inventory.foldRecruitment.search_player_url
-                    .replace(ConstantsEnum.PLAYER_NAME, focusedOption.value)
-                    .replace(WotApiConstants.APPLICATION_ID, application_id_wot)
-            )
-        ).data;
+        const searchResult: WargamingSuccessType<PlayerData[]> = await this.wotApi.fetchPlayerData(focusedOption.value);
 
         await interaction.respond(
             searchResult.data

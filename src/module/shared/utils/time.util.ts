@@ -1,10 +1,10 @@
+import { basename } from 'node:path';
+import { Logger } from '../classes/logger';
 import { TimeEnum } from '../enums/time.enum';
 import { EnvUtil } from './env.util';
-import { Logger } from '../classes/logger';
-import { Context } from '../classes/context';
 
 export class TimeUtil {
-    private static readonly logger = new Logger(new Context('Time-UTIL'));
+    private static readonly logger: Logger = new Logger(basename(__filename));
 
     /**
      * Convert a JavaScript Date object to Unix timestamp (seconds since epoch).
@@ -27,6 +27,7 @@ export class TimeUtil {
      * @param {string[]} scheduler - An array of time schedules in the format 'HH:mm'.
      * @param {string} loopName - A descriptive name for the loop.
      * @param {() => Promise<void>} callback - The callback function to be executed at each scheduled interval.
+     *
      * @returns {Promise<void>} - A Promise that resolves when all scheduled intervals are completed.
      *
      * @example
@@ -40,12 +41,12 @@ export class TimeUtil {
      */
     public static async forLoopTimeSleep(scheduler: string[], loopName: string, callback: () => Promise<void>): Promise<void> {
         for (const schedule of scheduler) {
-            const startDate = new Date();
-            const targetDate = new Date();
-            const date = schedule.split(':');
+            const startDate: Date = new Date();
+            const targetDate: Date = new Date();
+            const date: string[] = schedule.split(':');
             targetDate.setHours(Number(date[0]), Number(date[1]) || 0, 0, 0);
             this.logger.info(`${loopName} loop start at {}`, String(targetDate));
-            const time = targetDate.getTime() - startDate.getTime();
+            const time: number = targetDate.getTime() - startDate.getTime();
 
             if (time > 0) {
                 await EnvUtil.sleep(time);

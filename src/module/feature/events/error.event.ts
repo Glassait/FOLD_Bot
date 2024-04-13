@@ -1,13 +1,14 @@
-import { Client, Events } from 'discord.js';
-import { BotEvent } from './types/bot-event.type';
+import type { Client } from 'discord.js';
+import { Events } from 'discord.js';
+import { basename } from 'node:path';
 import { Logger } from '../../shared/classes/logger';
-import { Context } from '../../shared/classes/context';
+import type { BotEvent } from './types/bot-event.type';
 
-const logger: Logger = new Logger(new Context('ERROR-EVENT'));
+const logger: Logger = new Logger(basename(__filename));
 
-export const event: BotEvent = {
+module.exports = {
     name: Events.Error,
     async execute(_client: Client, error: Error): Promise<void> {
         logger.error(`${error}`, error);
     },
-};
+} as BotEvent;

@@ -1,21 +1,21 @@
-import { Events } from 'discord.js';
+import type { Events } from 'discord.js';
 
 /**
- * Define the template for an event
+ * Represents a bot event to be handled.
  */
 export interface BotEvent {
     /**
-     * The name of the event
+     * The name of the event.
      */
     name: Events;
     /**
-     * True if the event is raised only one time, false/not set otherwise
+     * Specifies whether the event should only be handled once.
      */
     once?: boolean;
     /**
-     * The callback function used when the event is raised
+     * The function to execute when the event occurs.
      *
-     * @param args The list of arguments passed to the callback function. The first argument is the client
+     * @param {...any} args - Arguments passed to the event handler.
      */
-    execute: (...args: any) => Promise<void>;
+    execute: (...args: any[]) => Promise<void>;
 }

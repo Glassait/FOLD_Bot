@@ -1,6 +1,6 @@
-import { AutocompleteInteraction, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { OptionMap, OptionType } from '../types/option.type';
-import { CallbackCommand } from '../types/command.type';
+import { type AutocompleteInteraction, type ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import type { CallbackCommand } from '../types/command.type';
+import { OptionMap, type OptionType } from '../types/option.type';
 
 /**
  * Represents a model for a slash command.

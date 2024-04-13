@@ -1,5 +1,5 @@
 import { FileUtil } from '../utils/file.util';
-import { Logger } from './logger';
+import type { Logger } from './logger';
 
 /**
  * Represents a core file handler.

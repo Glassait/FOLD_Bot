@@ -1,11 +1,9 @@
 import { Client, GatewayIntentBits } from 'discord.js';
-import { readdirSync } from 'fs';
-import { join } from 'path';
+import { basename } from 'node:path';
 import { token } from './module/core/config.json';
-import { Context } from './module/shared/classes/context';
 import { Logger } from './module/shared/classes/logger';
 
-const logger: Logger = new Logger(new Context('INDEX'));
+const logger: Logger = new Logger(basename(__filename));
 
 logger.info('🤖 Bot is starting...');
 
@@ -18,13 +16,8 @@ const client: Client = new Client({
     ],
 });
 
-const handlersDir: string = join(__dirname, './module/feature/handlers');
-
-readdirSync(handlersDir).forEach((handler: string): void => {
-    if (!handler.endsWith('.ts')) return;
-
-    require(`${handlersDir}/${handler}`)(client);
-});
+// Register handlers
+require('./module/feature/handlers/handlers.handler.ts')(client);
 
 client.login(token).then((value: string): void => {
     if (value) {
@@ -34,22 +27,12 @@ client.login(token).then((value: string): void => {
     }
 });
 
-const loopsDir: string = join(__dirname, './module/feature/loops');
-
-setTimeout((): void => {
-    readdirSync(loopsDir).forEach((loop: string): void => {
-        if (!loop.endsWith('.ts')) return;
-
-        require(`${loopsDir}/${loop}`)(client);
-    });
-}, 500);
-
 /**
  * Code to tracked API Errors
  * @see https://discordjs.guide/popular-topics/errors.html#how-to-diagnose-api-errors
  */
 process.on('unhandledRejection', error => {
-    logger.error(`Unhandled promise rejection`, error);
+    logger.error('Unhandled promise rejection', error);
 });
 
 /**

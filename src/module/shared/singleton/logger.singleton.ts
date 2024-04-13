@@ -1,34 +1,37 @@
-import { existsSync, mkdirSync, writeFile } from 'fs';
-import { Context } from '../classes/context';
+import { existsSync, mkdirSync } from 'fs';
+import type { Context } from '../classes/context';
 import { EmojiEnum } from '../enums/emoji.enum';
 
 /**
  * Class used to manage the persistence of the log
  * This class implement the Singleton pattern
  */
-export class LoggerSingleton extends Context {
+export class LoggerSingleton {
+    //region PRIVATE FIELD
     /**
-     * The directory of the logs
+     * The directory where the logs are stored
      */
     private dir: string = './src/logs/';
     /**
-     * The path of the current log.
-     * @private
+     * The path to the log file
      */
     private path: string = `${this.dir}${new Date().toLocaleString('fr-FR').replace(/\//g, '-').replace(/ /g, '_').replace(/:/g, '-')}.md`;
     /**
-     * The log
-     * @private
+     * The actual log text
      */
     private log: string = '';
-
-    constructor() {
-        super(LoggerSingleton);
-    }
+    //endregion
 
     /**
+     * Private constructor for the InventorySingleton class.
+     */
+    private constructor() {
+        this.createLogFile();
+    }
+
+    //region SINGLETON
+    /**
      * The instance of the class, used for the singleton pattern
-     * @private
      */
     private static _instance: LoggerSingleton | undefined;
 
@@ -38,93 +41,86 @@ export class LoggerSingleton extends Context {
     public static get instance(): LoggerSingleton {
         if (!this._instance) {
             this._instance = new LoggerSingleton();
-            this._instance.createLogFile();
         }
         return this._instance;
     }
+    //endregion
 
+    //region LOG-METHODS
     /**
-     * Write DEBUG log in the file
-     * @param context The context of the DEBUG
-     * @param msg The message of the DEBUG
+     * Logs a debug message.
+     *
+     * @param {Context} context - The context in which the message is logged.
+     * @param {string} msg - The message to log.
      */
     public debug(context: Context, msg: string): void {
+        // eslint-disable-next-line no-console
         console.debug(`${EmojiEnum.DEBUG} : ${msg}`);
-        this.addToLog('DEBUG', 'grey', context.context, msg);
+        this.addToLog('DEBUG', context.context, msg);
     }
 
     /**
-     * Write INFO log in the file
-     * @param context The context of the INFO
-     * @param msg The message of the INFO
+     * Logs an info message.
+     *
+     * @param {Context} context - The context in which the message is logged.
+     * @param {string} msg - The message to log.
      */
     public info(context: Context, msg: string): void {
+        // eslint-disable-next-line no-console
         console.info(`${EmojiEnum.INFO} : ${msg}`);
-        this.addToLog('INFO', 'green', context.context, msg);
+        this.addToLog('INFO', context.context, msg);
     }
 
     /**
-     * Write WARNING log in the file
-     * @param context The context of the WARNING
-     * @param msg The message of the WARNING
+     * Logs a warning message.
+     *
+     * @param {Context} context - The context in which the message is logged.
+     * @param {string} msg - The message to log.
      */
     public warning(context: Context, msg: string): void {
+        // eslint-disable-next-line no-console
         console.warn(`${EmojiEnum.WARNING} : ${msg}`);
-        this.addToLog('WARNING', 'orange', context.context, msg);
+        this.addToLog('WARNING', context.context, msg);
     }
 
     /**
-     * Logs an error message and adds it to the log with the specified context.
+     * Logs an error message.
      *
-     * @param {Context} context - The context associated with the error.
-     * @param {string} msg - The error message to be logged.
+     * @param {Context} context - The context in which the message is logged.
+     * @param {string} msg - The message to log.
      */
     public error(context: Context, msg: string): void {
+        // eslint-disable-next-line no-console
         console.error(`${EmojiEnum.ERROR} : ${msg}`);
-        this.addToLog('ERROR', 'red', EmojiEnum.ERROR + context.context, msg);
+        this.addToLog('ERROR', EmojiEnum.ERROR + context.context, msg);
     }
+    //endregion
 
     /**
-     * Create the log directory and file
-     * @private
+     * Creates the log file.
      */
     private createLogFile(): void {
         if (!existsSync(this.dir)) {
             mkdirSync(this.dir);
         }
 
-        writeFile(this.path, this.log, err => {
-            if (err) {
-                this.error(this, err.message);
-                throw err;
-            }
-            this.info(this, `${EmojiEnum.FILE} Log file created`);
-        });
+        require('../utils/file.util').FileUtil.writeFile(this.path, this.log);
     }
 
     /**
-     * Method who manage the incoming logs
-     * Update the log file.
-     * @param level The level of the log
-     * @param color The color of to write
-     * @param context The context of the log
-     * @param msg The message of the log
-     * @private
+     * Adds a message to the log.
+     *
+     * @param {string} level - The log level.
+     * @param {string} context - The context in which the message is logged.
+     * @param {string} msg - The message to log.
      */
-    private addToLog(level: 'TRACE' | 'DEBUG' | 'INFO' | 'WARNING' | 'ERROR', color: string, context: string, msg: string): void {
-        this.log += `<span style="color:${color}">[${new Date().toLocaleString('fr-FR')}][${level}][${context}] ${msg} </span><br>\n`;
-        this.updateFile();
-    }
-
-    /**
-     * Update the log file
-     * @private
-     */
-    private updateFile(): void {
-        writeFile(this.path, this.log, err => {
-            if (err) {
-                this.warning(this, `🔄❌ Failed to sync the log file with error: ${err as unknown as string}`);
-            }
-        });
+    private addToLog(level: 'DEBUG' | 'INFO' | 'WARNING' | 'ERROR', context: string, msg: string): void {
+        this.log += `[${new Date().toLocaleString('fr-FR', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hourCycle: 'h24',
+        })}][${level}][${context}] ${msg.replace(/application_id=[0-9a-z]{32}/, 'application_id=*********')}  \n`;
+        require('../utils/file.util').FileUtil.writeFile(this.path, this.log);
     }
 }

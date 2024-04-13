@@ -1,8 +1,8 @@
-import { ChatInputCommandInteraction, SlashCommandSubcommandBuilder } from 'discord.js';
-import { SlashCommandModel } from './model/slash-command.model';
-import { TriviaModel } from './model/trivia.model';
+import { type ChatInputCommandInteraction, SlashCommandSubcommandBuilder } from 'discord.js';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
 import { DateUtil } from '../../shared/utils/date.util';
+import { SlashCommandModel } from './model/slash-command.model';
+import { TriviaModel } from './model/trivia.model';
 
 const MAPPING = {
     STATISTICS: {
@@ -21,7 +21,7 @@ const MAPPING = {
 const trivia = new TriviaModel();
 trivia.initialize();
 
-export const command: SlashCommandModel = new SlashCommandModel(
+module.exports = new SlashCommandModel(
     'trivia',
     'Commande concernant le jeu trivia',
     async (interaction: ChatInputCommandInteraction): Promise<void> => {

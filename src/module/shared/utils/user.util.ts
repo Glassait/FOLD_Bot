@@ -1,6 +1,18 @@
-import { ChatInputCommandInteraction, CommandInteractionOption, Guild, GuildMember } from 'discord.js';
+import type { ChatInputCommandInteraction, CommandInteractionOption, Guild, GuildMember } from 'discord.js';
 
+/**
+ * Utility class for user-related operations.
+ */
 export class UserUtil {
+    /**
+     * Retrieves the guild member from the provided interaction option.
+     *
+     * @param {ChatInputCommandInteraction} interaction - The interaction object.
+     * @param {string} optionName - The name of the option containing the user ID.
+     * @param {boolean} [sendReplyIfError=false] - Whether to send a reply if an error occurs.
+     *
+     * @returns {Promise<GuildMember | undefined>} - A Promise that resolves with the guild member, if found.
+     */
     public static async getGuildMemberFromInteraction(
         interaction: ChatInputCommandInteraction,
         optionName: string,
@@ -25,9 +37,9 @@ export class UserUtil {
             return;
         }
 
-        const targetUser: GuildMember = await guild.members.fetch(targetId.toString());
-
-        if (!targetUser) {
+        try {
+            return await guild.members.fetch(targetId.toString());
+        } catch (error) {
             if (sendReplyIfError) {
                 await interaction.editReply({
                     content: "L'utilisateur n'existe pas !",
@@ -35,11 +47,5 @@ export class UserUtil {
             }
             return;
         }
-
-        return targetUser;
-    }
-
-    public static async getGuildMemberFromGuild(guild: Guild, userId: string): Promise<GuildMember> {
-        return await guild.members.fetch(userId);
     }
 }

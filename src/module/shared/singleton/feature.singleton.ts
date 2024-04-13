@@ -1,15 +1,13 @@
-import { Clan, DiscordId, FeatureType, PlayerBlacklisted, Reply, WatchClan } from '../types/feature.type';
-import { Logger } from '../classes/logger';
-import { Context } from '../classes/context';
+import { basename } from 'node:path';
 import { CoreFile } from '../classes/core-file';
+import { Logger } from '../classes/logger';
+import type { Clan, FeatureType, PlayerBlacklisted, WatchClan } from '../types/feature.type';
 
 export class FeatureSingleton extends CoreFile<FeatureType> {
     /**
      * The initial value of the feature configuration.
      */
     private static readonly INITIAL_VALUE: FeatureType = {
-        auto_disconnect: '',
-        auto_reply: [],
         watch_clan: {},
         player_blacklisted: {},
         leaving_player: [],
@@ -23,7 +21,7 @@ export class FeatureSingleton extends CoreFile<FeatureType> {
     private constructor() {
         super('./src/module/core', './src/module/core/backup', 'feature.json', FeatureSingleton.INITIAL_VALUE);
 
-        this.logger = new Logger(new Context(FeatureSingleton.name));
+        this.logger = new Logger(basename(__filename));
 
         try {
             const json: Buffer = this.readFile();
@@ -74,17 +72,6 @@ export class FeatureSingleton extends CoreFile<FeatureType> {
         this._data = this.verifyData(FeatureSingleton.INITIAL_VALUE, data);
         this.writeData();
     }
-
-    //region AUTO-DISCONNECT
-    public get autoDisconnect(): string {
-        return this._data.auto_disconnect;
-    }
-
-    public set autoDisconnect(targetId: DiscordId) {
-        this._data.auto_disconnect = targetId;
-        this.writeData();
-    }
-    //endregion
 
     //region FOLD-RECRUITMENT
     /**
@@ -172,15 +159,14 @@ export class FeatureSingleton extends CoreFile<FeatureType> {
      * const clanIdOrName = 'MyClan';
      * const removedClans = FeatureSingleton.removeClan(clanIdOrName);
      * if (removedClans.length > 0) {
-     *   console.log(`${clanIdOrName} has been removed from the watched clans.`);
-     *   console.log('Removed Clan Details:', removedClans);
+     *   console.log(`${clanIdOrName} has been removed from the watched clans.`, 'Removed Clan Details:', removedClans);
      * } else {
      *   console.log(`${clanIdOrName} was not found in the watched clans.`);
      * }
      */
     public removeClan(clanIdOrName: string): Clan | undefined {
         clanIdOrName = clanIdOrName.trim().replace(/["']/g, '').toUpperCase();
-        let { id, clan } = this.getClanFromIdOrName(clanIdOrName);
+        const { id, clan } = this.getClanFromIdOrName(clanIdOrName);
 
         if (!id || !clan) {
             return undefined;
@@ -235,7 +221,12 @@ export class FeatureSingleton extends CoreFile<FeatureType> {
      * feature.updateClan(id, updatedClan);
      */
     public updateClan(clanId: string, clan: Clan): void {
+        if (!this._data.watch_clan[clanId]) {
+            throw new Error(`${clanId} is not in the list of watched clans`);
+        }
+
         this._data.watch_clan[clanId] = clan;
+
         this.logger.debug('Clan updated with value : {}', JSON.stringify(clan));
         this.writeData();
     }
@@ -319,7 +310,7 @@ export class FeatureSingleton extends CoreFile<FeatureType> {
      *
      * @param {string} url - The URL of the potential clan to add.
      *
-     * @throws {Error} Throws an error if the URL is not provided.
+     * @throws {Error} - Throws an error if the URL is not provided.
      */
     public addPotentialClan(url: string): void {
         if (!url) {
@@ -334,58 +325,6 @@ export class FeatureSingleton extends CoreFile<FeatureType> {
         this._data.potential_clan.push(url);
         this.writeData();
         this.logger.debug('Clan {} add to the list !', url);
-    }
-    //endregion
-
-    //region AUTO-REPLY METHODS
-    /**
-     * Adds an auto-reply rule.
-     *
-     * @param {Reply} item - The auto-reply rule to add.
-     */
-    public addAutoReply(item: Reply): void {
-        this._data.auto_reply.push(item);
-        this.writeData();
-    }
-
-    /**
-     * Deletes an auto-reply rule.
-     *
-     * @param {DiscordId} activateFor - The ID of the user that triggers the auto-reply.
-     * @param {DiscordId} replyTo - The ID of the user that the auto-reply is sent to.
-     */
-    public deleteAutoReply(activateFor: DiscordId, replyTo: DiscordId): void {
-        const object: Reply | undefined = this._data.auto_reply.find(
-            (value: Reply) => value.activateFor === activateFor && value.replyTo === replyTo
-        );
-        if (!object) {
-            this.logger.warn('No auto-reply for {} to reply to {}', activateFor, replyTo);
-            return;
-        }
-
-        const index: number = this._data.auto_reply.indexOf(object);
-
-        this._data.auto_reply.splice(index, 1);
-        this.writeData();
-    }
-
-    /**
-     * Gets the auto-replies for a specific user.
-     *
-     * @param {DiscordId} replyTo - The ID of the user.
-     */
-    public getArrayFromReplyTo(replyTo: DiscordId): Reply[] {
-        return this._data.auto_reply.filter((value: Reply): boolean => value.replyTo === replyTo);
-    }
-
-    /**
-     * Checks if an auto-reply rule exists for a specific user.
-     *
-     * @param {DiscordId} activateFor - The ID of the user that triggers the auto-reply.
-     * @param {DiscordId} replyTo - The ID of the user that the auto-reply is sent to.
-     */
-    public hasAutoReplyTo(activateFor: DiscordId, replyTo: DiscordId): boolean {
-        return this._data.auto_reply.some((value: Reply) => value.activateFor === activateFor && value.replyTo === replyTo);
     }
     //endregion
 }

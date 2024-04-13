@@ -1,26 +1,26 @@
-import { Client, Events } from 'discord.js';
-import { BotEvent } from './types/bot-event.type';
-import { Context } from '../../shared/classes/context';
-import { SentenceUtil } from '../../shared/utils/sentence.util';
+import { type Client, Events } from 'discord.js';
+import { basename } from 'node:path';
 import { Logger } from '../../shared/classes/logger';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
-import { TriviaMonthModel } from './models/trivia-month.model';
-import { FoldMonthModel } from './models/fold-month.model';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
 import { TriviaSingleton } from '../../shared/singleton/trivia.singleton';
-import { SearchClanModel } from './models/search-clan.model';
+import { SentenceUtil } from '../../shared/utils/sentence.util';
+import type { SearchClanModel } from './models/search-clan.model';
+import type { TriviaMonthModel } from './models/trivia-month.model';
+import type { BotEvent } from './types/bot-event.type';
 
-export const event: BotEvent = {
+module.exports = {
     name: Events.ClientReady,
     once: true,
     async execute(client: Client): Promise<void> {
-        const logger: Logger = new Logger(new Context('READY-EVENT'));
+        const logger: Logger = new Logger(basename(__filename));
         const inventory: InventorySingleton = InventorySingleton.instance;
-        const trivia = TriviaSingleton.instance;
+        const trivia: TriviaSingleton = TriviaSingleton.instance;
 
         logger.info(`${EmojiEnum.MUSCLE} Logged in as {}`, client.user?.tag as string);
+
         const status = SentenceUtil.getRandomStatus();
-        logger.debug(`Status of the bot set to {} and {}`, status[0], status[1]);
+        logger.debug('Status of the bot set to {} and {}', status[0], status[1]);
 
         client.user?.setPresence({
             activities: [
@@ -44,24 +44,19 @@ export const event: BotEvent = {
             return;
         }
 
-        if (inventory.getFeatureFlipping('fold_month')) {
-            const foldMonth: FoldMonthModel = new FoldMonthModel();
-
-            await foldMonth.fetchChannel(client);
-            await foldMonth.sendMessage();
-        }
-
         if (inventory.getFeatureFlipping('trivia_month')) {
-            const triviaMonth = new TriviaMonthModel();
+            const req = require('./models/trivia-month.model');
+            const triviaMonth: TriviaMonthModel = new req.TriviaMonthModel();
 
-            await triviaMonth.fetchMandatory(client);
-            triviaMonth.createEmbed();
-            await triviaMonth.sendToChannel();
+            await triviaMonth.initialise(client);
+            await triviaMonth.createEmbedAndSendToChannel();
         }
 
         if (inventory.getFeatureFlipping('search_clan')) {
-            const searchClanModel: SearchClanModel = new SearchClanModel();
+            const red = require('./models/search-clan.model');
+            const searchClanModel: SearchClanModel = new red.SearchClanModel();
+
             await searchClanModel.searchClan();
         }
     },
-};
+} as BotEvent;

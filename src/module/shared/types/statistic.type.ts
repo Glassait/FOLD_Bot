@@ -1,4 +1,4 @@
-import { TriviaSelected } from './trivia.type';
+import type { TriviaSelected } from './trivia.type';
 
 //region TRIVIA
 /**
@@ -27,7 +27,7 @@ export type MonthlyTriviaOverallStatistic = {
 /**
  * Represents the overall statistics for the trivia game, categorized by month.
  */
-export type TriviaOverallStatisticType = {
+export type TriviaOverallStatistic = {
     [month: string]: MonthlyTriviaOverallStatistic;
 };
 
@@ -74,7 +74,7 @@ export type WinStreak = {
 /**
  * Represents the player-specific statistics for a specific month in the trivia game.
  */
-export type MonthlyTriviaPlayerStatisticType = {
+export type MonthlyTriviaPlayerStatistic = {
     /**
      * The elo of the player during the month
      */
@@ -92,8 +92,8 @@ export type MonthlyTriviaPlayerStatisticType = {
 /**
  * Represents the player-specific statistics for the trivia game, categorized by player.
  */
-export type TriviaPlayerStatisticType = {
-    [month: string]: MonthlyTriviaPlayerStatisticType;
+export type TriviaPlayerStatistic = {
+    [month: string]: MonthlyTriviaPlayerStatistic;
 };
 
 /**
@@ -105,9 +105,9 @@ export type TriviaStatistic = {
      * @update It each time the architecture changes
      */
     version: number;
-    overall: TriviaOverallStatisticType;
+    overall: TriviaOverallStatistic;
     player: {
-        [player: string]: TriviaPlayerStatisticType;
+        [player: string]: TriviaPlayerStatistic;
     };
 };
 //endregion
@@ -116,21 +116,21 @@ export type TriviaStatistic = {
 /**
  * Represents the monthly statistics for fold recruitment in a specific clan.
  */
-export type MonthlyFoldRecruitmentClanStatisticType = {
+export type MonthlyFoldRecruitmentClanStatistic = {
     leaving_player: number;
 };
 
 /**
  * Represents the fold recruitment statistics for multiple months, categorized by month.
  */
-export type FoldRecruitmentClanStatisticType = {
-    [month: string]: MonthlyFoldRecruitmentClanStatisticType;
+export type FoldRecruitmentClanStatistic = {
+    [month: string]: MonthlyFoldRecruitmentClanStatistic;
 };
 
 /**
  * Represents the overall fold recruitment statistics, including both version information and clan-specific data.
  */
-export type FoldRecruitmentStatisticType = {
+export type FoldRecruitmentStatistic = {
     /**
      * The version number of the fold recruitment statistics data.
      * @update It each time the architecture changes
@@ -140,7 +140,7 @@ export type FoldRecruitmentStatisticType = {
      * Clan-specific fold recruitment statistics, categorized by clan id.
      */
     clan: {
-        [clan: string]: FoldRecruitmentClanStatisticType;
+        [clan: string]: FoldRecruitmentClanStatistic;
     };
 };
 //endregion
@@ -148,7 +148,7 @@ export type FoldRecruitmentStatisticType = {
 /**
  * Represents the structure of a JSON file containing statistics data.
  */
-export type StatisticType = {
+export type Statistic = {
     /**
      * The version number of the statistics data.
      * @update It each time the architecture changes
@@ -161,5 +161,5 @@ export type StatisticType = {
     /**
      * Statistics related to fold recruitment.
      */
-    fold_recruitment: FoldRecruitmentStatisticType;
+    fold_recruitment: FoldRecruitmentStatistic;
 };

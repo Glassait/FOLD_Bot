@@ -1,6 +1,6 @@
-import { WargamingErrorType, WargamingSuccessType } from './wargaming-api.type';
-
 //region TANKOPEDIA
+import type { WargamingErrorType, WargamingSuccessType } from './wargaming-api.type';
+
 /**
  * Represents an error specific to the Tankopedia Vehicles API response.
  */
@@ -55,7 +55,7 @@ export type TankopediaVehiclesSuccess = WargamingSuccessType<
 export type TankopediaVehicle = TankopediaVehiclesError | TankopediaVehiclesSuccess;
 //endregion
 
-//region CLANS
+//region CLANS DTO
 /**
  * Represents an error response from the Clan Image API.
  */
@@ -117,6 +117,33 @@ export type ClansSuccess = WargamingSuccessType<ClansData[]>;
  *     error: { field: 'field_name', message: 'Error message', code: 500, value: 42 }
  * };
  */
-export type Clans = ClansError | ClansSuccess;
+export type ClansDto = ClansError | ClansSuccess;
 
+//endregion
+
+//region PLAYER_PERSONAL_DTO
+export type PlayerPersonalDataDetail = { clan_id: number | null };
+
+export type PlayerPersonalData = { [id: string]: PlayerPersonalDataDetail };
+
+export type PlayerPersonalDataSuccess = WargamingSuccessType<PlayerPersonalData>;
+
+export type PlayerPersonalDataError = WargamingErrorType;
+
+export type PlayerPersonalDto = PlayerPersonalDataError | PlayerPersonalDataSuccess;
+//endregion
+
+//region PLAYER DTO
+export type PlayerData = {
+    nickname: string;
+    account_id: number;
+};
+
+export type PlayersData = PlayerData[];
+
+export type PlayerDataSuccess = WargamingSuccessType<PlayersData>;
+
+export type PlayerDataError = WargamingErrorType;
+
+export type PlayerDto = PlayerDataError | PlayerDataSuccess;
 //endregion
