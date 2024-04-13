@@ -1,7 +1,7 @@
-import { Clan, FeatureType, PlayerBlacklisted, WatchClan } from '../types/feature.type';
-import { Logger } from '../classes/logger';
-import { CoreFile } from '../classes/core-file';
 import { basename } from 'node:path';
+import { CoreFile } from '../classes/core-file';
+import { Logger } from '../classes/logger';
+import type { Clan, FeatureType, PlayerBlacklisted, WatchClan } from '../types/feature.type';
 
 export class FeatureSingleton extends CoreFile<FeatureType> {
     /**

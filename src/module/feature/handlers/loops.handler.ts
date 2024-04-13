@@ -1,11 +1,11 @@
-import { Client } from 'discord.js';
-import { join } from 'path';
+import type { Client } from 'discord.js';
 import { readdirSync } from 'fs';
-import { EmojiEnum } from '../../shared/enums/emoji.enum';
-import { Logger } from '../../shared/classes/logger';
 import { basename } from 'node:path';
-import { BotLoop } from '../loops/types/bot-loop.type';
+import { join } from 'path';
+import { Logger } from '../../shared/classes/logger';
+import { EmojiEnum } from '../../shared/enums/emoji.enum';
 import { TimeEnum } from '../../shared/enums/time.enum';
+import type { BotLoop } from '../loops/types/bot-loop.type';
 
 module.exports = async (client: Client): Promise<void> => {
     const logger: Logger = new Logger(basename(__filename));

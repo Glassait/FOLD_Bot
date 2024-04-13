@@ -1,14 +1,14 @@
-import { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
-import { CheerioAPI, load } from 'cheerio';
-import { Client, TextChannel } from 'discord.js';
-import { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
+import type { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
+import { type CheerioAPI, load } from 'cheerio';
+import type { Client, TextChannel } from 'discord.js';
+import type { Logger } from '../../../shared/classes/logger';
 import { Injectable, LoggerInjector } from '../../../shared/decorators/injector.decorator';
-import { Logger } from '../../../shared/classes/logger';
-import { WebsiteNameEnum } from '../enums/website-name.enum';
-import { WebSiteState } from '../../../shared/types/inventory.type';
-import { TimeEnum } from '../../../shared/enums/time.enum';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
-import { WotExpress } from './news-scrapped/wot-express.model';
+import { TimeEnum } from '../../../shared/enums/time.enum';
+import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
+import type { WebSiteState } from '../../../shared/types/inventory.type';
+import { WebsiteNameEnum } from '../enums/website-name.enum';
+import type { WotExpress } from './news-scrapped/wot-express.model';
 
 @LoggerInjector
 export class WebSiteScraper {

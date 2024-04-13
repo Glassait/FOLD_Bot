@@ -1,15 +1,19 @@
+import { type Client, Colors, EmbedBuilder, type TextChannel } from 'discord.js';
+import type { Logger } from '../../../shared/classes/logger';
 import { Injectable, LoggerInjector } from '../../../shared/decorators/injector.decorator';
-import { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
-import { Client, Colors, EmbedBuilder, TextChannel } from 'discord.js';
-import { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
-import { MonthlyTriviaOverallStatistic, MonthlyTriviaPlayerStatistic, TriviaPlayerStatistic } from '../../../shared/types/statistic.type';
-import { MEDAL } from '../../../shared/utils/variables.util';
-import { Logger } from '../../../shared/classes/logger';
-import { DateUtil } from '../../../shared/utils/date.util';
-import { TimeEnum } from '../../../shared/enums/time.enum';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
-import { StringUtil } from '../../../shared/utils/string.util';
+import { TimeEnum } from '../../../shared/enums/time.enum';
+import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
+import type { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
+import type {
+    MonthlyTriviaOverallStatistic,
+    MonthlyTriviaPlayerStatistic,
+    TriviaPlayerStatistic,
+} from '../../../shared/types/statistic.type';
+import { DateUtil } from '../../../shared/utils/date.util';
 import { MathUtil } from '../../../shared/utils/math.util';
+import { StringUtil } from '../../../shared/utils/string.util';
+import { MEDAL } from '../../../shared/utils/variables.util';
 
 @LoggerInjector
 export class TriviaMonthModel {

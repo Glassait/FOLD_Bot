@@ -1,6 +1,6 @@
-import { EnvUtil } from '../../../../shared/utils/env.util';
 import { TimeEnum } from '../../../../shared/enums/time.enum';
-import { WebSiteState } from '../../../../shared/types/inventory.type';
+import type { WebSiteState } from '../../../../shared/types/inventory.type';
+import { EnvUtil } from '../../../../shared/utils/env.util';
 import { NewsScrapper } from './news-scrapper.model';
 
 /**

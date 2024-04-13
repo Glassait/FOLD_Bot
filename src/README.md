@@ -19,7 +19,7 @@ When implementing generic type you need to put the letter `G` follow by the usag
 
 Example : `GClass`, `GInteraction`, etc
 
-### Comment
+## Comment
 
 For the comment I only use Js DOC in method/function/class. I find that in code comment make the code more difficult to read. It's better to write good function/method/field/variable with appropriate name.
 
@@ -39,3 +39,11 @@ function example() {}
 ```
 
 Do the same for all @throw, @template, etc. Only when it's present and necessaries.
+
+## Import
+
+In TypeScript there are two types of import : the `import` and the `import type`
+
+The first one is used to import the module that can be used
+
+The second is used to import the module `AS TYPE`, that means when compiling in javascript the import does not exist, allowing use to easily type thing without importing the type

@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync } from 'fs';
-import { Context } from '../classes/context';
+import type { Context } from '../classes/context';
 import { EmojiEnum } from '../enums/emoji.enum';
 
 /**

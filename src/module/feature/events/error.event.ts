@@ -1,7 +1,8 @@
-import { Client, Events } from 'discord.js';
-import { BotEvent } from './types/bot-event.type';
-import { Logger } from '../../shared/classes/logger';
+import type { Client } from 'discord.js';
+import { Events } from 'discord.js';
 import { basename } from 'node:path';
+import { Logger } from '../../shared/classes/logger';
+import type { BotEvent } from './types/bot-event.type';
 
 const logger: Logger = new Logger(basename(__filename));
 

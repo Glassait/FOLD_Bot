@@ -1,12 +1,12 @@
+import type { SlashCommandStringOption } from '@discordjs/builders';
 import {
-    AutocompleteInteraction,
-    ChatInputCommandInteraction,
-    Client,
+    type AutocompleteInteraction,
+    type ChatInputCommandInteraction,
+    type Client,
     PermissionsBitField,
     SlashCommandSubcommandBuilder,
 } from 'discord.js';
 import { SlashCommandModel } from './model/slash-command.model';
-import { SlashCommandStringOption } from '@discordjs/builders';
 import { WatchClanModel } from './model/watch-clan.model';
 
 const MAPPING = {
@@ -36,7 +36,7 @@ const MAPPING = {
 };
 const watchClan: WatchClanModel = new WatchClanModel();
 
-export const command: SlashCommandModel = new SlashCommandModel(
+module.exports = new SlashCommandModel(
     'watch-clan',
     'Observe des clans afin de détecté les joueurs qui partent',
     async (interaction: ChatInputCommandInteraction, client?: Client): Promise<void> => {

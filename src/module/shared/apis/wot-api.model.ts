@@ -1,7 +1,14 @@
-import { AxiosInstance } from 'axios';
+import type { AxiosInstance } from 'axios';
+import { application_id_wot } from '../../core/config.json';
+import { FoldRecruitmentEnum } from '../../feature/loops/enums/fold-recruitment.enum';
+import type { Logger } from '../classes/logger';
 import { Injectable, LoggerInjector } from '../decorators/injector.decorator';
-import { Logger } from '../classes/logger';
-import {
+import { EmojiEnum } from '../enums/emoji.enum';
+import { TimeEnum } from '../enums/time.enum';
+import { WotApiConstants } from '../enums/wot-api.enum';
+import type { InventorySingleton } from '../singleton/inventory.singleton';
+import type { WargamingErrorType, WargamingSuccessType } from '../types/wargaming-api.type';
+import type {
     ClansDto,
     ClansSuccess,
     PlayerDataSuccess,
@@ -11,13 +18,6 @@ import {
     TankopediaVehicle,
     TankopediaVehiclesSuccess,
 } from '../types/wot-api.type';
-import { application_id_wot } from '../../core/config.json';
-import { EmojiEnum } from '../enums/emoji.enum';
-import { InventorySingleton } from '../singleton/inventory.singleton';
-import { WotApiConstants } from '../enums/wot-api.enum';
-import { WargamingErrorType, WargamingSuccessType } from '../types/wargaming-api.type';
-import { TimeEnum } from '../enums/time.enum';
-import { FoldRecruitmentEnum } from '../../feature/loops/enums/fold-recruitment.enum';
 
 @LoggerInjector
 export class WotApiModel {

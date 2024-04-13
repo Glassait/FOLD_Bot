@@ -1,12 +1,12 @@
-import { Logger } from '../classes/logger';
-import { Context } from '../classes/context';
-import { InventorySingleton } from '../singleton/inventory.singleton';
 import axios from 'axios';
-import { StatisticSingleton } from '../singleton/statistic.singleton';
+import { Agent } from 'node:http';
+import { Agent as AgentHttps } from 'node:https';
+import { Context } from '../classes/context';
+import { Logger } from '../classes/logger';
 import { TimeEnum } from '../enums/time.enum';
-import https from 'https';
-import http from 'http';
 import { FeatureSingleton } from '../singleton/feature.singleton';
+import { InventorySingleton } from '../singleton/inventory.singleton';
+import { StatisticSingleton } from '../singleton/statistic.singleton';
 import { TriviaSingleton } from '../singleton/trivia.singleton';
 
 /**
@@ -27,7 +27,7 @@ type Constructor = new (...args: any[]) => any;
 export function Injectable<GDependence extends 'Inventory' | 'Feature' | 'Statistic' | 'Trivia' | 'Axios' | 'WotApi'>(
     dependence: GDependence,
     timeout: number = TimeEnum.MINUTE
-) {
+): Function {
     return function actual<GClass>(_target: GClass, _context: ClassFieldDecoratorContext<GClass, any>) {
         return function (this: GClass, field: any) {
             switch (dependence) {
@@ -47,8 +47,8 @@ export function Injectable<GDependence extends 'Inventory' | 'Feature' | 'Statis
                     field = axios.create({
                         timeout: timeout,
                         headers: { 'Content-Type': 'application/json;' },
-                        httpAgent: new http.Agent({ keepAlive: true, timeout: timeout }),
-                        httpsAgent: new https.Agent({ keepAlive: true, timeout: timeout }),
+                        httpAgent: new Agent({ keepAlive: true, timeout: timeout }),
+                        httpsAgent: new AgentHttps({ keepAlive: true, timeout: timeout }),
                     });
                     break;
                 case 'WotApi':

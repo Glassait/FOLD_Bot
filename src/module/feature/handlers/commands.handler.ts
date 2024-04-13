@@ -1,12 +1,12 @@
-import { Client, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, Routes, Snowflake } from 'discord.js';
+import { type Client, REST, type RESTPostAPIChatInputApplicationCommandsJSONBody, Routes, type Snowflake } from 'discord.js';
 import { readdirSync } from 'fs';
+import { basename } from 'node:path';
 import { join } from 'path';
 import { client_id, token } from '../../core/config.json';
 import { Logger } from '../../shared/classes/logger';
-import { SlashCommandModel } from '../slash-commands/model/slash-command.model';
-import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
-import { basename } from 'node:path';
+import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
+import type { SlashCommandModel } from '../slash-commands/model/slash-command.model';
 
 module.exports = async (_client: Client): Promise<void> => {
     const logger: Logger = new Logger(basename(__filename));
@@ -17,7 +17,7 @@ module.exports = async (_client: Client): Promise<void> => {
     readdirSync(slashCommandsDir).forEach((file: string): void => {
         if (!file.endsWith('.ts')) return;
 
-        const command: SlashCommandModel = require(`${slashCommandsDir}/${file}`).command;
+        const command: SlashCommandModel = require(`${slashCommandsDir}/${file}`);
         inventory.getCommands(command.name).forEach((value: string): void => {
             const guild: RESTPostAPIChatInputApplicationCommandsJSONBody[] = body[value] ?? [];
             guild.push(command.data.toJSON());

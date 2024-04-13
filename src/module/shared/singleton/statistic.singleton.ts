@@ -1,8 +1,13 @@
-import { Logger } from '../classes/logger';
-import { FoldRecruitmentClanStatistic, MonthlyFoldRecruitmentClanStatistic, Statistic, TriviaStatistic } from '../types/statistic.type';
-import { DateUtil } from '../utils/date.util';
-import { CoreFile } from '../classes/core-file';
 import { basename } from 'node:path';
+import { CoreFile } from '../classes/core-file';
+import { Logger } from '../classes/logger';
+import type {
+    FoldRecruitmentClanStatistic,
+    MonthlyFoldRecruitmentClanStatistic,
+    Statistic,
+    TriviaStatistic,
+} from '../types/statistic.type';
+import { DateUtil } from '../utils/date.util';
 
 /**
  * This class keep track of the statistics for the different games

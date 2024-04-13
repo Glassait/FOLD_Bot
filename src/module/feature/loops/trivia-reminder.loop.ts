@@ -1,10 +1,10 @@
-import { Client, Colors, EmbedBuilder, TextChannel } from 'discord.js';
-import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
+import { type Client, Colors, EmbedBuilder, type TextChannel } from 'discord.js';
+import { basename } from 'node:path';
 import { Logger } from '../../shared/classes/logger';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
+import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
 import { TimeUtil } from '../../shared/utils/time.util';
-import { BotLoop } from './types/bot-loop.type';
-import { basename } from 'node:path';
+import type { BotLoop } from './types/bot-loop.type';
 
 module.exports = {
     name: 'Fold Recruitment',

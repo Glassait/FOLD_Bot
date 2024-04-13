@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, CommandInteractionOption, Guild, GuildMember } from 'discord.js';
+import type { ChatInputCommandInteraction, CommandInteractionOption, Guild, GuildMember } from 'discord.js';
 
 /**
  * Utility class for user-related operations.

@@ -1,9 +1,9 @@
-import { ChatInputCommandInteraction, Client, Colors, EmbedBuilder, PermissionsBitField, TextChannel } from 'discord.js';
-import { SlashCommandModel } from './model/slash-command.model';
+import { type ChatInputCommandInteraction, type Client, Colors, EmbedBuilder, PermissionsBitField, type TextChannel } from 'discord.js';
 import { FeatureSingleton } from '../../shared/singleton/feature.singleton';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
+import { SlashCommandModel } from './model/slash-command.model';
 
-export const command: SlashCommandModel = new SlashCommandModel(
+module.exports = new SlashCommandModel(
     'search-clan',
     "Affiche l'ensemble des clans détectés après l'analyse des joueurs",
     async (interaction: ChatInputCommandInteraction, client?: Client): Promise<void> => {

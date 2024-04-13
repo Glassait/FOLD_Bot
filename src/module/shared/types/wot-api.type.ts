@@ -1,6 +1,6 @@
-import { WargamingErrorType, WargamingSuccessType } from './wargaming-api.type';
-
 //region TANKOPEDIA
+import type { WargamingErrorType, WargamingSuccessType } from './wargaming-api.type';
+
 /**
  * Represents an error specific to the Tankopedia Vehicles API response.
  */

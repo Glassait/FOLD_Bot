@@ -1,10 +1,10 @@
-import { Channel, FoldRecruitment, InventoryType, Trivia, WebSiteState } from '../types/inventory.type';
-import { EnvUtil } from '../utils/env.util';
-import { Logger } from '../classes/logger';
-import { Client, Guild, TextChannel } from 'discord.js';
-import { DiscordId } from '../types/feature.type';
-import { CoreFile } from '../classes/core-file';
+import type { Client, Guild, TextChannel } from 'discord.js';
 import { basename } from 'node:path';
+import { CoreFile } from '../classes/core-file';
+import { Logger } from '../classes/logger';
+import type { DiscordId } from '../types/feature.type';
+import type { Channel, FoldRecruitment, InventoryType, Trivia, WebSiteState } from '../types/inventory.type';
+import { EnvUtil } from '../utils/env.util';
 
 /**
  * Class used to manage the inventory.json file

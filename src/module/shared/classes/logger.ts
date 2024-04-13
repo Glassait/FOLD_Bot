@@ -1,6 +1,6 @@
-import { Context } from './context';
 import { LoggerSingleton } from '../singleton/logger.singleton';
 import { StringUtil } from '../utils/string.util';
+import { Context } from './context';
 
 /**
  * This class use the LoggerSingleton to write log

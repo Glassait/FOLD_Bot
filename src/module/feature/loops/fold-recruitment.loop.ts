@@ -1,12 +1,12 @@
-import { Client } from 'discord.js';
+import type { Client } from 'discord.js';
+import { basename } from 'node:path';
 import { Logger } from '../../shared/classes/logger';
-import { FeatureSingleton } from '../../shared/singleton/feature.singleton';
-import { FoldRecruitmentModel } from './model/fold-recruitment.model';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
+import type { FeatureSingleton } from '../../shared/singleton/feature.singleton';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
 import { TimeUtil } from '../../shared/utils/time.util';
-import { BotLoop } from './types/bot-loop.type';
-import { basename } from 'node:path';
+import type { FoldRecruitmentModel } from './model/fold-recruitment.model';
+import type { BotLoop } from './types/bot-loop.type';
 
 module.exports = {
     name: 'Fold Recruitment',

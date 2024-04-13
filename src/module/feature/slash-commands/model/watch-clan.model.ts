@@ -1,33 +1,33 @@
 import {
     ActionRowBuilder,
-    AutocompleteFocusedOption,
-    AutocompleteInteraction,
-    BooleanCache,
-    CacheType,
-    ChatInputCommandInteraction,
-    Client,
+    type AutocompleteFocusedOption,
+    type AutocompleteInteraction,
+    type BooleanCache,
+    type CacheType,
+    type ChatInputCommandInteraction,
+    type Client,
     Colors,
-    CommandInteractionOption,
+    type CommandInteractionOption,
     ComponentType,
     EmbedBuilder,
-    Message,
+    type Message,
     StringSelectMenuBuilder,
-    StringSelectMenuInteraction,
+    type StringSelectMenuInteraction,
     StringSelectMenuOptionBuilder,
-    TextChannel,
+    type TextChannel,
 } from 'discord.js';
+import type { WotApiModel } from '../../../shared/apis/wot-api.model';
+import type { Logger } from '../../../shared/classes/logger';
 import { Injectable, LoggerInjector } from '../../../shared/decorators/injector.decorator';
-import { Logger } from '../../../shared/classes/logger';
-import { FeatureSingleton } from '../../../shared/singleton/feature.singleton';
-import { InventorySingleton } from 'src/module/shared/singleton/inventory.singleton';
-import { Clan, PlayerBlacklistedDetail } from '../../../shared/types/feature.type';
-import { TimeEnum } from '../../../shared/enums/time.enum';
-import { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
-import { FoldRecruitmentClanStatistic } from '../../../shared/types/statistic.type';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
-import { WargamingSuccessType } from '../../../shared/types/wargaming-api.type';
-import { PlayerData } from '../../../shared/types/wot-api.type';
-import { WotApiModel } from '../../../shared/apis/wot-api.model';
+import { TimeEnum } from '../../../shared/enums/time.enum';
+import type { FeatureSingleton } from '../../../shared/singleton/feature.singleton';
+import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
+import type { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
+import type { Clan, PlayerBlacklistedDetail } from '../../../shared/types/feature.type';
+import type { FoldRecruitmentClanStatistic } from '../../../shared/types/statistic.type';
+import type { WargamingSuccessType } from '../../../shared/types/wargaming-api.type';
+import type { PlayerData } from '../../../shared/types/wot-api.type';
 
 @LoggerInjector
 export class WatchClanModel {

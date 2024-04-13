@@ -1,4 +1,4 @@
-import { Client } from 'discord.js';
+import type { Client } from 'discord.js';
 
 /**
  * Represents a callback function for executing a chat input command interaction.

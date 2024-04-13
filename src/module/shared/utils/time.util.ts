@@ -1,10 +1,10 @@
+import { basename } from 'node:path';
+import { Logger } from '../classes/logger';
 import { TimeEnum } from '../enums/time.enum';
 import { EnvUtil } from './env.util';
-import { Logger } from '../classes/logger';
-import { basename } from 'node:path';
 
 export class TimeUtil {
-    private static readonly logger = new Logger(basename(__filename));
+    private static readonly logger: Logger = new Logger(basename(__filename));
 
     /**
      * Convert a JavaScript Date object to Unix timestamp (seconds since epoch).

@@ -1,8 +1,8 @@
-import { AutocompleteInteraction, ChatInputCommandInteraction, Client, Events, Interaction } from 'discord.js';
-import { BotEvent } from './types/bot-event.type';
-import { Logger } from '../../shared/classes/logger';
-import { SlashCommandModel } from '../slash-commands/model/slash-command.model';
+import { type AutocompleteInteraction, type ChatInputCommandInteraction, type Client, Events, type Interaction } from 'discord.js';
 import { basename } from 'node:path';
+import { Logger } from '../../shared/classes/logger';
+import type { SlashCommandModel } from '../slash-commands/model/slash-command.model';
+import type { BotEvent } from './types/bot-event.type';
 
 const logger: Logger = new Logger(basename(__filename));
 

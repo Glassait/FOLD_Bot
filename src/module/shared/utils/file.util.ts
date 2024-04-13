@@ -1,4 +1,5 @@
-import { constants, existsSync, mkdir, readFileSync, writeFile } from 'fs';
+import { existsSync, mkdir, readFileSync, writeFile } from 'fs';
+import { R_OK } from 'node:constants';
 import { EmojiEnum } from '../enums/emoji.enum';
 
 /**
@@ -48,7 +49,7 @@ export class FileUtil {
             throw new Error("The path doesn't refer to a folder");
         }
 
-        mkdir(path, constants.R_OK, err => {
+        mkdir(path, R_OK, err => {
             if (err) {
                 throw new Error(
                     `${EmojiEnum.RED_CROSS} Failed to create the following folder ${path.split('/').pop() as string} with error:`,

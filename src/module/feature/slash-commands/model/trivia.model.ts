@@ -1,39 +1,39 @@
 import {
     ActionRowBuilder,
-    BooleanCache,
+    type BooleanCache,
     ButtonBuilder,
-    ButtonInteraction,
+    type ButtonInteraction,
     ButtonStyle,
-    CacheType,
-    ChatInputCommandInteraction,
+    type CacheType,
+    type ChatInputCommandInteraction,
     Colors,
     ComponentType,
     EmbedBuilder,
-    Message,
+    type Message,
     StringSelectMenuBuilder,
-    StringSelectMenuInteraction,
+    type StringSelectMenuInteraction,
     StringSelectMenuOptionBuilder,
 } from 'discord.js';
+import type { Logger } from '../../../shared/classes/logger';
+import { Injectable, LoggerInjector } from '../../../shared/decorators/injector.decorator';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
-import { ShellEnum, ShellType } from '../enums/shell.enum';
-import { TriviaSingleton } from '../../../shared/singleton/trivia.singleton';
 import { TimeEnum } from '../../../shared/enums/time.enum';
-import { Ammo, VehicleData } from '../../../shared/types/wot-api.type';
-import { Logger } from '../../../shared/classes/logger';
-import { TimeUtil } from '../../../shared/utils/time.util';
-import { PlayerAnswer } from '../types/trivia-game.type';
-import {
+import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
+import type { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
+import type { TriviaSingleton } from '../../../shared/singleton/trivia.singleton';
+import type {
     DailyTrivia,
     MonthlyTriviaPlayerStatistic,
     TriviaPlayerStatistic,
     TriviaStatistic,
     WinStreak,
 } from '../../../shared/types/statistic.type';
-import { TriviaSelected } from '../../../shared/types/trivia.type';
-import { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
-import { InventorySingleton } from 'src/module/shared/singleton/inventory.singleton';
+import type { TriviaSelected } from '../../../shared/types/trivia.type';
+import type { Ammo, VehicleData } from '../../../shared/types/wot-api.type';
+import { TimeUtil } from '../../../shared/utils/time.util';
 import { MEDAL } from '../../../shared/utils/variables.util';
-import { Injectable, LoggerInjector } from '../../../shared/decorators/injector.decorator';
+import { ShellEnum, ShellType } from '../enums/shell.enum';
+import type { PlayerAnswer } from '../types/trivia-game.type';
 
 @LoggerInjector
 export class TriviaModel {

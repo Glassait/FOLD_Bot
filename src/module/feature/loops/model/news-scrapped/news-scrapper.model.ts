@@ -1,10 +1,10 @@
-import { WebSiteState } from '../../../../shared/types/inventory.type';
-import { CheerioAPI } from 'cheerio';
-import { EmojiEnum } from '../../../../shared/enums/emoji.enum';
-import { Colors, EmbedBuilder, TextChannel } from 'discord.js';
+import type { CheerioAPI } from 'cheerio';
+import { Colors, EmbedBuilder, type TextChannel } from 'discord.js';
+import type { Logger } from '../../../../shared/classes/logger';
 import { Injectable, LoggerInjector } from '../../../../shared/decorators/injector.decorator';
-import { InventorySingleton } from '../../../../shared/singleton/inventory.singleton';
-import { Logger } from '../../../../shared/classes/logger';
+import { EmojiEnum } from '../../../../shared/enums/emoji.enum';
+import type { InventorySingleton } from '../../../../shared/singleton/inventory.singleton';
+import type { WebSiteState } from '../../../../shared/types/inventory.type';
 
 /**
  * Class responsible for scraping news and sending them to a designated channel.

@@ -1,13 +1,13 @@
-import { Client, Events } from 'discord.js';
-import { BotEvent } from './types/bot-event.type';
-import { SentenceUtil } from '../../shared/utils/sentence.util';
-import { Logger } from '../../shared/classes/logger';
+import { type Client, Events } from 'discord.js';
+import { basename } from 'node:path';
+import type { Logger } from '../../shared/classes/logger';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
-import { TriviaMonthModel } from './models/trivia-month.model';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
 import { TriviaSingleton } from '../../shared/singleton/trivia.singleton';
-import { SearchClanModel } from './models/search-clan.model';
-import { basename } from 'node:path';
+import { SentenceUtil } from '../../shared/utils/sentence.util';
+import type { SearchClanModel } from './models/search-clan.model';
+import type { TriviaMonthModel } from './models/trivia-month.model';
+import type { BotEvent } from './types/bot-event.type';
 
 module.exports = {
     name: Events.ClientReady,

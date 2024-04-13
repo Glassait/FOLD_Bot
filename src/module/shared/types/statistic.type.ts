@@ -1,6 +1,6 @@
-import { TriviaSelected } from './trivia.type';
-
 //region TRIVIA
+import type { TriviaSelected } from './trivia.type';
+
 /**
  * The list of daily tanks selected
  */

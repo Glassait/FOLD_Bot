@@ -1,10 +1,10 @@
+import type { WotApiModel } from '../../../shared/apis/wot-api.model';
+import type { Logger } from '../../../shared/classes/logger';
 import { Injectable, LoggerInjector } from '../../../shared/decorators/injector.decorator';
-import { Logger } from '../../../shared/classes/logger';
-import { FeatureSingleton } from '../../../shared/singleton/feature.singleton';
-import { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
+import type { FeatureSingleton } from '../../../shared/singleton/feature.singleton';
+import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
+import type { PlayerPersonalDataSuccess } from '../../../shared/types/wot-api.type';
 import { FoldRecruitmentEnum } from '../../loops/enums/fold-recruitment.enum';
-import { WotApiModel } from '../../../shared/apis/wot-api.model';
-import { PlayerPersonalDataSuccess } from '../../../shared/types/wot-api.type';
 
 @LoggerInjector
 export class SearchClanModel {

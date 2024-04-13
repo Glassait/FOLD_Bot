@@ -1,10 +1,10 @@
-import { Client } from 'discord.js';
+import type { Client } from 'discord.js';
 import { readdirSync } from 'fs';
+import { basename } from 'node:path';
 import { join } from 'path';
-import { BotEvent } from '../events/types/bot-event.type';
 import { Logger } from '../../shared/classes/logger';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
-import { basename } from 'node:path';
+import type { BotEvent } from '../events/types/bot-event.type';
 
 module.exports = async (client: Client): Promise<void> => {
     const logger: Logger = new Logger(basename(__filename));

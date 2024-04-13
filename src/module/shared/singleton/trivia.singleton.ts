@@ -1,20 +1,20 @@
-import { Logger } from '../classes/logger';
-import { RandomUtil } from '../utils/random.util';
-import { TankopediaVehiclesSuccess, VehicleData } from '../types/wot-api.type';
-import { ShellEnum, ShellType } from '../../feature/slash-commands/enums/shell.enum';
-import { InventorySingleton } from './inventory.singleton';
-import { Trivia } from '../types/inventory.type';
-import { WotApiModel } from '../apis/wot-api.model';
-import { application_id_wot } from '../../core/config.json';
-import { WotApiConstants } from '../enums/wot-api.enum';
-import { TriviaSelected } from '../types/trivia.type';
-import { StatisticSingleton } from './statistic.singleton';
-import { TriviaPlayerStatistic, TriviaStatistic } from '../types/statistic.type';
-import { Client, Colors, EmbedBuilder, TextChannel } from 'discord.js';
-import { DateUtil } from '../utils/date.util';
-import { MEDAL } from '../utils/variables.util';
-import { TimeEnum } from '../enums/time.enum';
+import { type Client, Colors, EmbedBuilder, type TextChannel } from 'discord.js';
 import { basename } from 'node:path';
+import { application_id_wot } from '../../core/config.json';
+import { ShellEnum, ShellType } from '../../feature/slash-commands/enums/shell.enum';
+import type { WotApiModel } from '../apis/wot-api.model';
+import { Logger } from '../classes/logger';
+import { TimeEnum } from '../enums/time.enum';
+import { WotApiConstants } from '../enums/wot-api.enum';
+import type { Trivia } from '../types/inventory.type';
+import type { TriviaPlayerStatistic, TriviaStatistic } from '../types/statistic.type';
+import type { TriviaSelected } from '../types/trivia.type';
+import type { TankopediaVehiclesSuccess, VehicleData } from '../types/wot-api.type';
+import { DateUtil } from '../utils/date.util';
+import { RandomUtil } from '../utils/random.util';
+import { MEDAL } from '../utils/variables.util';
+import { InventorySingleton } from './inventory.singleton';
+import { StatisticSingleton } from './statistic.singleton';
 
 /**
  * Class used to manage the trivia game

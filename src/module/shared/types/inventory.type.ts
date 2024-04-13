@@ -1,4 +1,4 @@
-import { DiscordId } from './feature.type';
+import type { DiscordId } from './feature.type';
 
 /**
  * Type describing a Discord channel.

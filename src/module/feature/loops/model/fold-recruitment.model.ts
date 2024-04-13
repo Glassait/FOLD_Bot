@@ -1,17 +1,17 @@
-import { Injectable, LoggerInjector } from '../../../shared/decorators/injector.decorator';
-import { Logger } from '../../../shared/classes/logger';
-import { AxiosInstance } from 'axios';
-import { ClanActivity, FoldRecruitmentData, LeaveClanActivity, Players } from '../types/fold-recruitment.type';
-import { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
-import { Client, Colors, EmbedBuilder, TextChannel } from 'discord.js';
-import { Clan, PlayerBlacklistedDetail } from '../../../shared/types/feature.type';
-import { FoldRecruitmentEnum, WotClanActivity } from '../enums/fold-recruitment.enum';
-import { TimeEnum } from '../../../shared/enums/time.enum';
-import { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
+import type { AxiosInstance } from 'axios';
+import { type Client, Colors, EmbedBuilder, type TextChannel } from 'discord.js';
 import { WotApiModel } from '../../../shared/apis/wot-api.model';
+import type { Logger } from '../../../shared/classes/logger';
+import { Injectable, LoggerInjector } from '../../../shared/decorators/injector.decorator';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
-import { FeatureSingleton } from '../../../shared/singleton/feature.singleton';
+import { TimeEnum } from '../../../shared/enums/time.enum';
+import type { FeatureSingleton } from '../../../shared/singleton/feature.singleton';
+import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
+import type { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
+import type { Clan, PlayerBlacklistedDetail } from '../../../shared/types/feature.type';
 import { StringUtil } from '../../../shared/utils/string.util';
+import { FoldRecruitmentEnum, WotClanActivity } from '../enums/fold-recruitment.enum';
+import type { ClanActivity, FoldRecruitmentData, LeaveClanActivity, Players } from '../types/fold-recruitment.type';
 
 @LoggerInjector
 export class FoldRecruitmentModel {
