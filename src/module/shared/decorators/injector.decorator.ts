@@ -1,13 +1,8 @@
 import axios from 'axios';
-import { Agent } from 'node:http';
+import { Agent as AgentHttp } from 'node:http';
 import { Agent as AgentHttps } from 'node:https';
 import { Context } from '../classes/context';
-import { Logger } from '../classes/logger';
 import { TimeEnum } from '../enums/time.enum';
-import { FeatureSingleton } from '../singleton/feature.singleton';
-import { InventorySingleton } from '../singleton/inventory.singleton';
-import { StatisticSingleton } from '../singleton/statistic.singleton';
-import { TriviaSingleton } from '../singleton/trivia.singleton';
 
 /**
  * Base type to define a class
@@ -17,14 +12,16 @@ type Constructor = new (...args: any[]) => any;
 /**
  * Decorator function to inject singleton instances based on the provided dependence type.
  *
- * @param {('Inventory' | 'Feature' | 'Statistic' | 'Trivia' | 'Axios')} dependence - The type of dependence to inject.
+ * @param {GDependence} dependence - The type of dependence to inject.
  * @param {number} [timeout=TimeEnum.Minute] - The timeout of the axios instance in seconds, used when dependence = 'Axios'
  *
  * @returns {Function} - Decorator function.
  *
  * @throws {Error} - Throws an error if an unsupported dependence type is provided.
+ *
+ * @template {'Inventory' | 'Feature' | 'Statistic' | 'Trivia' | 'Axios' | 'WotApi' | 'Database'} GDependence - The class to inject
  */
-export function Injectable<GDependence extends 'Inventory' | 'Feature' | 'Statistic' | 'Trivia' | 'Axios' | 'WotApi'>(
+export function Injectable<GDependence extends 'Inventory' | 'Feature' | 'Statistic' | 'Trivia' | 'Axios' | 'WotApi' | 'Database'>(
     dependence: GDependence,
     timeout: number = TimeEnum.MINUTE
     // eslint-disable-next-line @typescript-eslint/ban-types
@@ -34,28 +31,64 @@ export function Injectable<GDependence extends 'Inventory' | 'Feature' | 'Statis
         return function (this: GClass, field: any) {
             switch (dependence) {
                 case 'Inventory':
-                    field = InventorySingleton.instance;
+                    field = require('../singleton/inventory.singleton').InventorySingleton.instance;
                     break;
                 case 'Feature':
-                    field = FeatureSingleton.instance;
+                    field = require('../singleton/feature.singleton').FeatureSingleton.instance;
                     break;
                 case 'Statistic':
-                    field = StatisticSingleton.instance;
+                    field = require('../singleton/statistic.singleton').StatisticSingleton.instance;
                     break;
                 case 'Trivia':
-                    field = TriviaSingleton.instance;
+                    field = require('../singleton/trivia.singleton').TriviaSingleton.instance;
                     break;
                 case 'Axios':
                     field = axios.create({
                         timeout: timeout,
                         headers: { 'Content-Type': 'application/json;' },
-                        httpAgent: new Agent({ keepAlive: true, timeout: timeout }),
+                        httpAgent: new AgentHttp({ keepAlive: true, timeout: timeout }),
                         httpsAgent: new AgentHttps({ keepAlive: true, timeout: timeout }),
                     });
                     break;
                 case 'WotApi': {
                     const req = require('../apis/wot-api.model');
                     field = new req.WotApiModel();
+                    break;
+                }
+                case 'Database':
+                    field = require('../singleton/database.singleton').DatabaseSingleton.instance;
+                    break;
+                default:
+                    throw new Error(`Unsupported dependence type: ${dependence}`);
+            }
+
+            return field;
+        };
+    };
+}
+
+/**
+ * Decorator function to inject table instances based on the provided dependence type.
+ *
+ * @param {GDependence} dependence - The type of dependence to inject.
+ *
+ * @returns {Function} - Decorator function.
+ *
+ * @throws {Error} - Throws an error if an unsupported dependence type is provided.
+ *
+ * @template {'Watch-Clan'} GDependence - The table class to inject
+ */
+export function TableInjectable<GDependence extends 'Watch-Clan'>(
+    dependence: GDependence
+    // eslint-disable-next-line @typescript-eslint/ban-types
+): Function {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    return function actual<GTable>(_target: GTable, _context: ClassFieldDecoratorContext<GTable, any>) {
+        return function (this: GTable, field: any) {
+            switch (dependence) {
+                case 'Watch-Clan': {
+                    const req = require('../tables/watch-clan.table');
+                    field = new req.WatchClanTable();
                     break;
                 }
                 default:
@@ -85,7 +118,9 @@ export function LoggerInjector<GClass extends Constructor>(value: GClass, _conte
     return class extends value {
         constructor(...args: any[]) {
             super(...args);
-            this.logger = new Logger(new Context(value.name));
+
+            const req = require('../classes/logger');
+            this.logger = new req.Logger(new Context(value.name));
         }
     };
 }

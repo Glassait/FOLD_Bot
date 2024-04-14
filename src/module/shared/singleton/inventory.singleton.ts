@@ -2,6 +2,7 @@ import type { Client, Guild, TextChannel } from 'discord.js';
 import { basename } from 'node:path';
 import { CoreFile } from '../classes/core-file';
 import { Logger } from '../classes/logger';
+import { EmojiEnum } from '../enums/emoji.enum';
 import type { DiscordId } from '../types/feature.type';
 import type { Channel, FoldRecruitment, InventoryType, Trivia, WebSiteState } from '../types/inventory.type';
 import { EnvUtil } from '../utils/env.util';
@@ -35,7 +36,7 @@ export class InventorySingleton extends CoreFile<InventoryType> {
         }
 
         this.backupData();
-        this.logger.info('{} instance initialized', InventorySingleton.name);
+        this.logger.info(`${EmojiEnum.HAMMER} {} instance initialized`, InventorySingleton.name);
     }
 
     //region SINGLETON

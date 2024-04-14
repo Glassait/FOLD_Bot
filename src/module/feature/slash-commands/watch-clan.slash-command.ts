@@ -4,6 +4,7 @@ import {
     type ChatInputCommandInteraction,
     type Client,
     PermissionsBitField,
+    type SlashCommandIntegerOption,
     SlashCommandSubcommandBuilder,
 } from 'discord.js';
 import { SlashCommandModel } from './model/slash-command.model';
@@ -16,10 +17,6 @@ const MAPPING = {
     },
     REMOVE: {
         name: 'remove',
-        optionsName: ['id-ou-name'],
-    },
-    STATS: {
-        name: 'statistics',
         optionsName: ['id-ou-name'],
     },
     LIST: {
@@ -43,27 +40,24 @@ module.exports = new SlashCommandModel(
         await interaction.deferReply({ ephemeral: true });
 
         if (!watchClan.channel && client) {
-            await watchClan.fetchChannel(client);
+            await watchClan.initialise(client);
         }
 
         switch (interaction.options.getSubcommand()) {
             case MAPPING.ADD.name:
-                await watchClan.addClanToWatch(interaction, MAPPING);
+                await watchClan.addClanToWatch(interaction, MAPPING.ADD.optionsName);
                 break;
             case MAPPING.REMOVE.name:
-                await watchClan.removeClanFromWatch(interaction, MAPPING);
-                break;
-            case MAPPING.STATS.name:
-                await watchClan.clanStatistics(interaction, MAPPING);
+                await watchClan.removeClanFromWatch(interaction, MAPPING.REMOVE.optionsName);
                 break;
             case MAPPING.LIST.name:
                 await watchClan.clanList(interaction);
                 break;
             case MAPPING.BLACKLIST_PLAYER.name:
-                await watchClan.addPlayerToBlacklist(interaction, MAPPING);
+                await watchClan.addPlayerToBlacklist(interaction, MAPPING.BLACKLIST_PLAYER.optionsName);
                 break;
             case MAPPING.UNBLACKLIST_PLAYER.name:
-                await watchClan.removePlayerToBlacklist(interaction, MAPPING);
+                await watchClan.removePlayerToBlacklist(interaction, MAPPING.UNBLACKLIST_PLAYER.optionsName);
                 break;
             default:
                 await interaction.editReply({
@@ -77,7 +71,7 @@ module.exports = new SlashCommandModel(
             new SlashCommandSubcommandBuilder()
                 .setName(MAPPING.ADD.name)
                 .setDescription('Ajoute un clan à la liste des clans à observer.')
-                .addStringOption((builder: SlashCommandStringOption) =>
+                .addIntegerOption((builder: SlashCommandIntegerOption) =>
                     builder.setName(MAPPING.ADD.optionsName[0]).setDescription("L'id du clan à observer").setRequired(true)
                 )
                 .addStringOption((builder: SlashCommandStringOption) =>
@@ -89,16 +83,6 @@ module.exports = new SlashCommandModel(
                 .addStringOption((builder: SlashCommandStringOption) =>
                     builder
                         .setName(MAPPING.REMOVE.optionsName[0])
-                        .setDescription("L'id ou le nom du clan à supprimer")
-                        .setRequired(true)
-                        .setAutocomplete(true)
-                ),
-            new SlashCommandSubcommandBuilder()
-                .setName(MAPPING.STATS.name)
-                .setDescription("Consulte le nombre de départ d'un clan sur le mois")
-                .addStringOption((builder: SlashCommandStringOption) =>
-                    builder
-                        .setName(MAPPING.STATS.optionsName[0])
                         .setDescription("L'id ou le nom du clan à supprimer")
                         .setRequired(true)
                         .setAutocomplete(true)
@@ -135,9 +119,6 @@ module.exports = new SlashCommandModel(
         autocomplete: async (interaction: AutocompleteInteraction): Promise<void> => {
             switch (interaction.options.getSubcommand()) {
                 case MAPPING.REMOVE.name:
-                    await watchClan.autocomplete(interaction, 'clan');
-                    break;
-                case MAPPING.STATS.name:
                     await watchClan.autocomplete(interaction, 'clan');
                     break;
                 case MAPPING.BLACKLIST_PLAYER.name:

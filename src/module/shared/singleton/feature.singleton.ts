@@ -1,14 +1,13 @@
 import { basename } from 'node:path';
 import { CoreFile } from '../classes/core-file';
 import { Logger } from '../classes/logger';
-import type { Clan, FeatureType, PlayerBlacklisted, WatchClan } from '../types/feature.type';
+import type { FeatureType, PlayerBlacklisted } from '../types/feature.type';
 
 export class FeatureSingleton extends CoreFile<FeatureType> {
     /**
      * The initial value of the feature configuration.
      */
     private static readonly INITIAL_VALUE: FeatureType = {
-        watch_clan: {},
         player_blacklisted: {},
         leaving_player: [],
         potential_clan: [],
@@ -75,13 +74,6 @@ export class FeatureSingleton extends CoreFile<FeatureType> {
 
     //region FOLD-RECRUITMENT
     /**
-     * Gets the list of clans to watch.
-     */
-    public get watchClans(): WatchClan {
-        return this._data.watch_clan;
-    }
-
-    /**
      * Get the list of blacklisted players.
      */
     public get playerBlacklisted(): PlayerBlacklisted {
@@ -118,119 +110,6 @@ export class FeatureSingleton extends CoreFile<FeatureType> {
     //endregion
 
     //region FOLD-RECRUITMENT METHODS
-    /**
-     * Adds a clan to the list of watched clans.
-     *
-     * @param {string} clanId - The unique identifier of the clan.
-     * @param {Clan} clan - The clan object to be added, containing at least 'id' and 'name' properties.
-     *
-     * @returns {boolean} - Returns `true` if the clan was successfully added, and `false` if the clan with the same ID already exists in the list.
-     *
-     * @example
-     * const newClan = { id: '123', name: 'MyClan' };
-     * const isAdded = YourClass.addClan(newClan);
-     * if (isAdded) {
-     *   console.log(`${newClan.name} has been added to the watched clans.`);
-     * } else {
-     *   console.log(`A clan with ID ${newClan.id} already exists in the watched clans.`);
-     * }
-     */
-    public addClan(clanId: string, clan: Clan): boolean {
-        clanId = clanId.trim().replace(/["']/g, '');
-        clan.name = clan.name.trim().replace(/["']/g, '').toUpperCase();
-        clan.last_activity = new Date().toISOString();
-        if (this._data.watch_clan[clanId]) {
-            return false;
-        }
-
-        this._data.watch_clan[clanId] = clan;
-        this.writeData();
-
-        return true;
-    }
-
-    /**
-     * Removes a clan from the list of watched clans based on its ID or name.
-     *
-     * @param {string} clanIdOrName - The ID or name of the clan to be removed.
-     * @returns {Clan[]} - Returns an array containing the removed clan objects if successfully removed, and an empty array if the clan was not found in the list.
-     *
-     * @example
-     * const clanIdOrName = 'MyClan';
-     * const removedClans = FeatureSingleton.removeClan(clanIdOrName);
-     * if (removedClans.length > 0) {
-     *   console.log(`${clanIdOrName} has been removed from the watched clans.`, 'Removed Clan Details:', removedClans);
-     * } else {
-     *   console.log(`${clanIdOrName} was not found in the watched clans.`);
-     * }
-     */
-    public removeClan(clanIdOrName: string): Clan | undefined {
-        clanIdOrName = clanIdOrName.trim().replace(/["']/g, '').toUpperCase();
-        const { id, clan } = this.getClanFromIdOrName(clanIdOrName);
-
-        if (!id || !clan) {
-            return undefined;
-        }
-
-        delete this._data.watch_clan[id];
-        this.writeData();
-
-        return clan;
-    }
-
-    /**
-     * Get the clan watched from the data with an id or a name
-     *
-     * @param {string} clanIdOrName - The id or name of the clan to get
-     *
-     * @return {[string, Clan]} - The clan found in the data, undefined otherwise
-     *
-     * @example
-     * const name = "FOLD_"
-     * const [id, clan] = feature.getWatchClanFromIdOrName(name);
-     * if (!clan) {
-     *     throw new Error(`Clan ${name} not found`);
-     * } else {
-     *     console.log(`Clan ${clan.name} found`);
-     * }
-     */
-    public getClanFromIdOrName(clanIdOrName: string): { id?: string; clan?: Clan } {
-        if (this._data.watch_clan[clanIdOrName]) {
-            return { id: clanIdOrName, clan: this._data.watch_clan[clanIdOrName] };
-        }
-
-        const filter: [string, Clan] = Object.entries(this._data.watch_clan).filter(
-            (clan: [string, Clan]): boolean => clan[1].name === clanIdOrName
-        )[0];
-
-        if (!filter) {
-            return {};
-        }
-        return { id: filter[0], clan: filter[1] };
-    }
-
-    /**
-     * Updates information about a clan in the watch list.
-     *
-     * @param {string} clanId - The unique identifier of the clan.
-     * @param {Clan} clan - The updated clan information.
-     *
-     * @example
-     * const updatedClan: Clan = { name: 'Updated Clan', imageUrl: 'https://example.com/updated_clan_image.jpg' };
-     * const id: '123';
-     * feature.updateClan(id, updatedClan);
-     */
-    public updateClan(clanId: string, clan: Clan): void {
-        if (!this._data.watch_clan[clanId]) {
-            throw new Error(`${clanId} is not in the list of watched clans`);
-        }
-
-        this._data.watch_clan[clanId] = clan;
-
-        this.logger.debug('Clan updated with value : {}', JSON.stringify(clan));
-        this.writeData();
-    }
-
     /**
      * Adds a player to the blacklist with the specified reason.
      *

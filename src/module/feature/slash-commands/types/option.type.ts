@@ -1,5 +1,5 @@
 import type { SlashCommandMentionableOption, SlashCommandStringOption } from '@discordjs/builders';
-import type { SlashCommandBuilder, SlashCommandChannelOption, SlashCommandSubcommandBuilder } from 'discord.js';
+import type { SlashCommandBuilder, SlashCommandChannelOption, SlashCommandIntegerOption, SlashCommandSubcommandBuilder } from 'discord.js';
 
 /**
  * Define all slash commands options used.
@@ -8,6 +8,7 @@ import type { SlashCommandBuilder, SlashCommandChannelOption, SlashCommandSubcom
  */
 export type OptionType =
     | SlashCommandStringOption
+    | SlashCommandIntegerOption
     | SlashCommandMentionableOption
     | SlashCommandSubcommandBuilder
     | SlashCommandChannelOption;
@@ -17,6 +18,7 @@ export type OptionType =
  */
 export const OptionMap: Record<string, (value: any, data: SlashCommandBuilder) => void> = {
     SlashCommandStringOption: (value: any, data: SlashCommandBuilder) => data.addStringOption(value),
+    SlashCommandIntegerOption: (value: any, data: SlashCommandBuilder) => data.addIntegerOption(value),
     SlashCommandMentionableOption: (value: any, data: SlashCommandBuilder) => data.addMentionableOption(value),
     SlashCommandSubcommandBuilder: (value: any, data: SlashCommandBuilder) => data.addSubcommand(value),
     SlashCommandChannelOption: (value: any, data: SlashCommandBuilder) => data.addChannelOption(value),

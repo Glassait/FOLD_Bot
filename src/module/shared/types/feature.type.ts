@@ -4,38 +4,6 @@
 export type DiscordId = string; // NOSONAR
 
 /**
- * Represents information about a clan.
- *
- * @example
- * const myClan: Clan = { id: '123', name: 'My Clan', imageUrl: 'https://example.com/clan_image.jpg' };
- * console.log(myClan); // { id: '123', name: 'My Clan', imageUrl: 'https://example.com/clan_image.jpg' }
- */
-export type Clan = {
-    /**
-     * The name of the clan.
-     */
-    name: string;
-    /**
-     * The optional URL of the clan's image.
-     */
-    imageUrl?: string;
-    /**
-     * The last time a leaving activity was detected
-     */
-    last_activity?: string;
-};
-
-/**
- * Represents the list of clans being watched from the fold recruitment.
- */
-export type WatchClan = {
-    /**
-     * The list of clans watch from the fold recruitment
-     */
-    [id: string]: Clan;
-};
-
-/**
  * Represents the details of a blacklisted player.
  *
  * @example {
@@ -90,10 +58,6 @@ export type PlayerBlacklisted = {
  * }
  */
 export type FeatureType = {
-    /**
-     * The list of clan to watch, organized with a unique identifier of the clan.
-     */
-    watch_clan: WatchClan;
     /**
      * The list of blacklisted players from the fold recruitment
      */

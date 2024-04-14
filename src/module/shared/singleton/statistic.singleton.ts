@@ -1,6 +1,7 @@
 import { basename } from 'node:path';
 import { CoreFile } from '../classes/core-file';
 import { Logger } from '../classes/logger';
+import { EmojiEnum } from '../enums/emoji.enum';
 import type {
     FoldRecruitmentClanStatistic,
     MonthlyFoldRecruitmentClanStatistic,
@@ -63,7 +64,7 @@ export class StatisticSingleton extends CoreFile<Statistic> {
         }
 
         this.backupData();
-        this.logger.info('{} instance initialized', StatisticSingleton.name);
+        this.logger.info(`${EmojiEnum.HAMMER} {} instance initialized`, StatisticSingleton.name);
     }
 
     //region SINGLETON

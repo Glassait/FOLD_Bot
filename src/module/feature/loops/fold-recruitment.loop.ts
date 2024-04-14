@@ -2,8 +2,8 @@ import type { Client } from 'discord.js';
 import { basename } from 'node:path';
 import { Logger } from '../../shared/classes/logger';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
-import type { FeatureSingleton } from '../../shared/singleton/feature.singleton';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
+import type { WatchClanTable } from '../../shared/tables/watch-clan.table';
 import { TimeUtil } from '../../shared/utils/time.util';
 import type { FoldRecruitmentModel } from './model/fold-recruitment.model';
 import type { BotLoop } from './types/bot-loop.type';
@@ -18,24 +18,22 @@ module.exports = {
             logger.warn("Fold recruitment disabled, if it's normal, dont mind this message !");
             return;
         }
+        let req = require('../../shared/tables/watch-clan.table');
+        const watchClan: WatchClanTable = new req.WatchClanTable();
 
-        const feature: FeatureSingleton = require('../../shared/singleton/feature.singleton').FeatureSingleton.instance;
-
-        const req = require('./model/fold-recruitment.model');
-
+        req = require('./model/fold-recruitment.model');
         const recruitmentModel: FoldRecruitmentModel = new req.FoldRecruitmentModel();
         await recruitmentModel.initialise(client);
 
         await TimeUtil.forLoopTimeSleep(inventory.foldRecruitment.schedule, `${EmojiEnum.LOOP} Recruitment`, async (): Promise<void> => {
-            feature.backupData();
             inventory.backupData();
             require('../../shared/singleton/statistic.singleton').StatisticSingleton.instance.backupData();
 
             recruitmentModel.noPlayerFound = true;
 
-            for (const [clanId, clan] of Object.entries(feature.watchClans)) {
+            for (const clan of await watchClan.getAll()) {
                 logger.debug(`${EmojiEnum.MALE} Start recruitment for {}`, clan.name);
-                await recruitmentModel.fetchClanActivity(clanId, clan);
+                await recruitmentModel.fetchClanActivity(clan);
                 logger.debug(`${EmojiEnum.MALE} End recruitment for {}`, clan.name);
             }
 

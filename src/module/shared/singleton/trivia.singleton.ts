@@ -4,6 +4,7 @@ import { application_id_wot } from '../../core/config.json';
 import { ShellEnum, ShellType } from '../../feature/slash-commands/enums/shell.enum';
 import type { WotApiModel } from '../apis/wot-api.model';
 import { Logger } from '../classes/logger';
+import { EmojiEnum } from '../enums/emoji.enum';
 import { TimeEnum } from '../enums/time.enum';
 import { WotApiConstants } from '../enums/wot-api.enum';
 import type { Trivia } from '../types/inventory.type';
@@ -69,6 +70,8 @@ export class TriviaSingleton {
 
         this._allTanks = [];
         this._datum = [];
+
+        this.logger.info(`${EmojiEnum.HAMMER} {} instance initialized`, TriviaSingleton.name);
     }
 
     //region SINGLETON
@@ -77,7 +80,6 @@ export class TriviaSingleton {
     static get instance(): TriviaSingleton {
         if (!this._instance) {
             this._instance = new TriviaSingleton();
-            this._instance.logger.info('{} instance initialized', 'Trivia');
         }
 
         return this._instance;

@@ -29,4 +29,15 @@ export class StringUtil {
 
         return text.replace(/{}/g, (): string => `\`${args.shift()}\``);
     }
+
+    /**
+     * Sanitizes a string by removing leading and trailing whitespace, as well as single and double quotes.
+     *
+     * @param {string} text - The text to sanitize.
+     *
+     * @returns {string} - The sanitized text.
+     */
+    public static sanitize(text: string): string {
+        return text.trim().replace(/["']/g, '');
+    }
 }

@@ -1,8 +1,10 @@
 import type { WotApiModel } from '../../../shared/apis/wot-api.model';
 import type { Logger } from '../../../shared/classes/logger';
-import { Injectable, LoggerInjector } from '../../../shared/decorators/injector.decorator';
+import { Injectable, LoggerInjector, TableInjectable } from '../../../shared/decorators/injector.decorator';
 import type { FeatureSingleton } from '../../../shared/singleton/feature.singleton';
 import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
+import type { WatchClanTable } from '../../../shared/tables/watch-clan.table';
+import type { Clan } from '../../../shared/types/watch-clan.type';
 import type { PlayerPersonalDataSuccess } from '../../../shared/types/wot-api.type';
 import { FoldRecruitmentEnum } from '../../loops/enums/fold-recruitment.enum';
 
@@ -13,6 +15,7 @@ export class SearchClanModel {
     @Injectable('Feature') private readonly feature: FeatureSingleton;
     @Injectable('Inventory') private readonly inventory: InventorySingleton;
     @Injectable('WotApi') private readonly wotApi: WotApiModel;
+    @TableInjectable('Watch-Clan') private readonly watchClan: WatchClanTable;
     //endregion
 
     /**
@@ -24,12 +27,9 @@ export class SearchClanModel {
 
         for (const playerId of this.feature.leavingPlayer) {
             const result: PlayerPersonalDataSuccess = await this.wotApi.fetchPlayerPersonalData(playerId);
+            const clans: Clan[] = await this.watchClan.selectClan(String(result.data[playerId].clan_id as number));
 
-            if (
-                result.data[playerId].clan_id !== null &&
-                result.data[playerId].clan_id !== 500312605 &&
-                this.feature.watchClans[result.data[playerId].clan_id as number] === undefined
-            ) {
+            if (result.data[playerId].clan_id !== null && result.data[playerId].clan_id !== 500312605 && clans.length === 0) {
                 this.feature.addPotentialClan(
                     this.inventory.foldRecruitment.clan_url.replace(FoldRecruitmentEnum.CLAN_ID, String(result.data[playerId].clan_id))
                 );
