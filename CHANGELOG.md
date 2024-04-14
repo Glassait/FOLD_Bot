@@ -39,6 +39,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   Blacklist player directly given in name option are now accepted
 -   Rework all imports with `type` when necessary
 -   Transform some `import` to `require` for better processing
+-   Change the way of writing the event from `export const event` to `modules.exports`
+
+### Removed
+
+-   Fold month message
+-   Auto-reply and auto-disconnect slash command
 
 ## [2.3.0] - Apr 5, 2024 <span data-view-component="true" class="label latest">Latest</span>
 

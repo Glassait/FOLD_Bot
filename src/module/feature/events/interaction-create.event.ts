@@ -15,7 +15,7 @@ const logger: Logger = new Logger(basename(__filename));
  */
 function getCommand(interaction: { commandName: string }): SlashCommandModel | undefined {
     try {
-        return require(`../slash-commands/${interaction.commandName}.slash-command`).command;
+        return require(`../slash-commands/${interaction.commandName}.slash-command`);
     } catch (err) {
         return undefined;
     }
