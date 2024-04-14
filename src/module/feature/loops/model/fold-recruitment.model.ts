@@ -7,8 +7,9 @@ import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
 import type { FeatureSingleton } from '../../../shared/singleton/feature.singleton';
 import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
+import type { BlacklistedPlayerTable } from '../../../shared/tables/blacklisted-player.table';
 import type { WatchClanTable } from '../../../shared/tables/watch-clan.table';
-import type { PlayerBlacklistedDetail } from '../../../shared/types/feature.type';
+import type { BlacklistedPlayer } from '../../../shared/types/blacklisted-player.type';
 import type { Clan } from '../../../shared/types/watch-clan.type';
 import { StringUtil } from '../../../shared/utils/string.util';
 import { FoldRecruitmentEnum, WotClanActivity } from '../enums/fold-recruitment.enum';
@@ -32,6 +33,7 @@ export class FoldRecruitmentModel {
     @Injectable('Inventory') private readonly inventory: InventorySingleton;
     @Injectable('Feature') private readonly feature: FeatureSingleton;
     @TableInjectable('Watch-Clan') private readonly watchClan: WatchClanTable;
+    @TableInjectable('Blacklisted-Player') private readonly blacklistedPlayer: BlacklistedPlayerTable;
     //endregion
 
     //region PRIVATE FIELDS
@@ -171,7 +173,7 @@ export class FoldRecruitmentModel {
      * @param {Clan} clan - The clan from which the player has left.
      */
     private async buildAndSendEmbedForPlayer(player: Players, clan: Clan): Promise<void> {
-        const blacklisted: PlayerBlacklistedDetail | undefined = this.feature.playerBlacklisted[player.id];
+        const blacklisted: BlacklistedPlayer | undefined = (await this.blacklistedPlayer.getPlayer(player.id)).shift();
 
         const embedPlayer: EmbedBuilder = new EmbedBuilder()
             .setAuthor({

@@ -12,9 +12,9 @@ import type { Logger } from '../../../shared/classes/logger';
 import { Injectable, LoggerInjector, TableInjectable } from '../../../shared/decorators/injector.decorator';
 import type { FeatureSingleton } from '../../../shared/singleton/feature.singleton';
 import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
-import type { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
+import type { BlacklistedPlayerTable } from '../../../shared/tables/blacklisted-player.table';
 import type { WatchClanTable } from '../../../shared/tables/watch-clan.table';
-import type { PlayerBlacklistedDetail } from '../../../shared/types/feature.type';
+import type { BlacklistedPlayer } from '../../../shared/types/blacklisted-player.type';
 import type { WargamingSuccessType } from '../../../shared/types/wargaming-api.type';
 import type { Clan } from '../../../shared/types/watch-clan.type';
 import type { PlayerData } from '../../../shared/types/wot-api.type';
@@ -33,9 +33,9 @@ export class WatchClanModel {
     private readonly logger: Logger;
     @Injectable('Feature') private readonly feature: FeatureSingleton;
     @Injectable('Inventory') private readonly inventory: InventorySingleton;
-    @Injectable('Statistic') private readonly statistic: StatisticSingleton;
     @Injectable('WotApi') private readonly wotApi: WotApiModel;
     @TableInjectable('Watch-Clan') private readonly watchClan: WatchClanTable;
+    @TableInjectable('Blacklisted-Player') private readonly blacklistedPlayer: BlacklistedPlayerTable;
     //endregion
 
     private _channel: TextChannel;
@@ -71,12 +71,22 @@ export class WatchClanModel {
         let name: string = interaction.options.get(optionsName[1])?.value as string;
         name = StringUtil.sanitize(name).toUpperCase();
 
+        const clan: Clan[] = await this.watchClan.selectClan(String(id));
+
+        if (clan.length > 0) {
+            this.logger.warn('Clan {} already exists', id);
+            await interaction.editReply({ content: 'Le clan existe déjà !' });
+            return;
+        }
+
         const added: boolean = await this.watchClan.addClan({ id: id, name: name });
 
         if (!added) {
-            this.logger.warn('Clan {} already exists', id);
-            await interaction.editReply({ content: 'Le clan existe déjà !' });
-
+            this.logger.warn('An error occur during adding clan to the database');
+            await interaction.editReply({
+                content:
+                    "Une erreur est survenue lors de l'ajout du clan à l'observateur. Merci de réessayer plus tard ou de contacter <@313006042340524033>",
+            });
             return;
         }
 
@@ -109,9 +119,9 @@ export class WatchClanModel {
             await interaction.editReply({ content: "Le clan n'apparaît pas dans la liste des clans observés !" });
             return;
         }
-        if (clans.length > 0) {
-            this.logger.warn('Id or name {} lead to multiple result !', idOrName);
-            await interaction.editReply({ content: "Plusieurs résultats sont sortis, merci d'affiner la recherche !" });
+        if (clans.length > 1) {
+            this.logger.warn('Input {} lead to multiple result', idOrName);
+            await interaction.editReply({ content: "Le champ renseigné conduit à plusieurs résultats. Merci d'affiner la recherche !" });
             return;
         }
 
@@ -166,6 +176,112 @@ export class WatchClanModel {
     }
 
     /**
+     * Callback used for the slash command. Allow user to blacklist player in the fold recruitment
+     *
+     * @param {ChatInputCommandInteraction} interaction - The slash command interaction
+     * @param {string[]} optionsName - The list of options name.
+     */
+    public async blacklistPlayer(interaction: ChatInputCommandInteraction, optionsName: string[]): Promise<void> {
+        let idAndName: string = interaction.options.get(optionsName[0])?.value as string;
+        idAndName = StringUtil.sanitize(idAndName);
+        let reason: string = interaction.options.get(optionsName[1])?.value as string;
+        reason = StringUtil.escape(reason);
+
+        // TODO check value return by autocomplete
+        let [id, name] = idAndName.split('#');
+
+        if (!id || !name) {
+            const searchResult: WargamingSuccessType<PlayerData[]> = await this.wotApi.fetchPlayerData(idAndName);
+
+            if (!searchResult) {
+                await interaction.editReply({ content: "The player pass doesn't exist" });
+                return;
+            }
+
+            id = String(searchResult.data[0].account_id);
+            name = searchResult.data[0].nickname;
+        }
+
+        const player: BlacklistedPlayer[] = await this.blacklistedPlayer.getPlayer(Number(id));
+
+        if (player.length > 0) {
+            this.logger.debug('Player {} already blacklisted !', player);
+            await interaction.editReply({
+                content: `Le joueur \`${name}\` est déjà dans la liste noire !`,
+            });
+            return;
+        }
+
+        const added: boolean = await this.blacklistedPlayer.addPlayer({ id: Number(id), name: name, reason: reason });
+
+        if (!added) {
+            this.logger.debug('An error occur when adding player to blacklist');
+            await interaction.editReply({
+                content: `Une erreur est survenue lors de l'ajout du joueur en liste noire. Merci de réessayer plus tard ou de contacter <@313006042340524033>`,
+            });
+            return;
+        }
+
+        this.logger.debug('Player {} added to blacklist !', idAndName);
+        this.confirmationEmbed
+            .setTitle('Ajout de joueur sur liste noire')
+            .setDescription(`Le joueur \`${name}\` a été ajouté sur liste noire !`);
+
+        await interaction.editReply({ content: 'Je joueur a bien été ajouté à la liste noire !' });
+        await this._channel.send({
+            embeds: [this.confirmationEmbed],
+        });
+    }
+
+    /**
+     * Callback used for the slash command. Allow user to remove from the blacklist a player in the fold recruitment
+     *
+     * @param {ChatInputCommandInteraction} interaction - The slash command interaction
+     * @param {string[]} optionsName - The list of options name.
+     */
+    public async removePlayerToBlacklist(interaction: ChatInputCommandInteraction, optionsName: string[]): Promise<void> {
+        let idAndName: string = interaction.options.get(optionsName[0])?.value as string;
+        idAndName = StringUtil.sanitize(idAndName);
+        const [id, name] = idAndName.split('#');
+
+        const player: BlacklistedPlayer[] = await this.blacklistedPlayer.getPlayer(Number(id));
+
+        if (player.length === 0) {
+            this.logger.debug('Player {} is not blacklisted !', player);
+            await interaction.editReply({
+                content: `Le joueur \`${idAndName}\` n'est pas sur la liste noire !`,
+            });
+            return;
+        }
+        if (player.length > 1) {
+            this.logger.warn('Input {} lead to multiple result');
+            await interaction.editReply({
+                content: "Le champ renseigné conduit à plusieurs résultats. Merci d'affiner la recherche !",
+            });
+        }
+
+        const removed: boolean = await this.blacklistedPlayer.removePlayer(player[0]);
+
+        if (!removed) {
+            this.logger.debug('An error occur during deletion of player inside the database', idAndName);
+            await interaction.editReply({
+                content: `Une erreur est survenue lors de la suppression du joueur. Merci de réessayer plus tard ou de contacter <@313006042340524033>`,
+            });
+            return;
+        }
+
+        this.logger.debug('Player {} removed form blacklist !', idAndName);
+        this.confirmationEmbed
+            .setTitle('Suppression de joueur sur liste noire')
+            .setDescription(`Le joueur \`${name}\` a été supprimé de la liste noire !`);
+
+        await interaction.editReply({ content: 'Le joueur a bien été supprimé de la liste noire !' });
+        await this._channel.send({
+            embeds: [this.confirmationEmbed],
+        });
+    }
+
+    /**
      * Handles autocomplete interactions based on the provided type.
      *
      * @param {AutocompleteInteraction} interaction - The autocomplete interaction object.
@@ -191,85 +307,6 @@ export class WatchClanModel {
     }
 
     /**
-     * Callback used for the slash command. Allow user to blacklist player in the fold recruitment
-     *
-     * @param {ChatInputCommandInteraction} interaction - The slash command interaction
-     * @param {string[]} optionsName - The list of options name.
-     */
-    public async addPlayerToBlacklist(interaction: ChatInputCommandInteraction, optionsName: string[]): Promise<void> {
-        let idAndName: string = interaction.options.get(optionsName[0])?.value as string;
-        idAndName = idAndName.trim();
-        let reason: string = interaction.options.get(optionsName[1])?.value as string;
-        reason = reason.trim();
-
-        let [id, name] = idAndName.split('#');
-
-        if (!id || !name) {
-            const searchResult: WargamingSuccessType<PlayerData[]> = await this.wotApi.fetchPlayerData(idAndName);
-
-            if (!searchResult) {
-                await interaction.editReply({ content: "The player pass doesn't exist" });
-                return;
-            }
-
-            id = String(searchResult.data[0].account_id);
-            name = searchResult.data[0].nickname;
-        }
-
-        const added: boolean = this.feature.addBlacklistedPlayer(id, name, reason);
-
-        if (!added) {
-            this.logger.debug('Player {} already blacklisted !', idAndName);
-            await interaction.editReply({
-                content: `Le joueur \`${name}\` est déjà dans la liste noire !`,
-            });
-            return;
-        }
-
-        this.logger.debug('Player {} added to blacklist !', idAndName);
-        this.confirmationEmbed
-            .setTitle('Ajout de joueur sur liste noire')
-            .setDescription(`Le joueur \`${name}\` a été ajouté sur liste noire !`);
-
-        await interaction.editReply({ content: 'Je joueur a bien été ajouté à la liste noire !' });
-        await this._channel.send({
-            embeds: [this.confirmationEmbed],
-        });
-    }
-
-    /**
-     * Callback used for the slash command. Allow user to remove from the blacklist a player in the fold recruitment
-     *
-     * @param {ChatInputCommandInteraction} interaction - The slash command interaction
-     * @param {string[]} optionsName - The list of options name.
-     */
-    public async removePlayerToBlacklist(interaction: ChatInputCommandInteraction, optionsName: string[]): Promise<void> {
-        let idAndName: string = interaction.options.get(optionsName[0])?.value as string;
-        idAndName = idAndName.trim();
-
-        const [id, name] = idAndName.split('#');
-        const removed: boolean = this.feature.removeBlacklistedPlayer(id);
-
-        if (!removed) {
-            this.logger.debug('Player {} is not blacklisted !', idAndName);
-            await interaction.editReply({
-                content: `Le joueur \`${idAndName}\` n'est pas sur la liste noire !`,
-            });
-            return;
-        }
-
-        this.logger.debug('Player {} removed form blacklist !', idAndName);
-        this.confirmationEmbed
-            .setTitle('Suppression de joueur sur liste noire')
-            .setDescription(`Le joueur \`${name}\` a été supprimé de la liste noire !`);
-
-        await interaction.editReply({ content: 'Je joueur a bien été supprimé de la liste noire !' });
-        await this._channel.send({
-            embeds: [this.confirmationEmbed],
-        });
-    }
-
-    /**
      * Handles the autocomplete logic for clan-related interactions.
      *
      * @param {AutocompleteInteraction} interaction - The autocomplete interaction triggered by the user.
@@ -279,18 +316,13 @@ export class WatchClanModel {
      * await instance.autocomplete(autocompleteInteraction);
      */
     private async autocompleteRemovePlayer(interaction: AutocompleteInteraction): Promise<void> {
-        const focusedOption: AutocompleteFocusedOption = interaction.options.getFocused(true);
-
-        const filtered: [string, PlayerBlacklistedDetail][] = Object.entries(this.feature.playerBlacklisted).filter(
-            (player: [string, PlayerBlacklistedDetail]) =>
-                player[0].includes(focusedOption.value) || player[1].name.includes(focusedOption.value)
-        );
+        const idOrName: string = interaction.options.getFocused(true).value;
 
         await interaction.respond(
-            filtered
-                .map((player: [string, PlayerBlacklistedDetail]): { name: string; value: string } => ({
-                    name: `${player[1].name} | ${player[0]}`,
-                    value: `${player[0]}#${player[1].name}`,
+            (await this.blacklistedPlayer.findPlayer(idOrName))
+                .map((player: BlacklistedPlayer): { name: string; value: string } => ({
+                    name: `${player.name}`,
+                    value: `${player.id}#${player.name}`,
                 }))
                 .slice(0, 24)
         );

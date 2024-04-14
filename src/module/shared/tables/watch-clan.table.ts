@@ -94,7 +94,7 @@ export class WatchClanTable extends Table {
         return await this.select(
             new SelectBuilder(this.tableName)
                 .columns('*')
-                .where([`id LIKE '${clanIdOrName}'`, `name LIKE '${clanIdOrName}'`], ['OR'])
+                .where([`id LIKE '%${clanIdOrName}%'`, `name LIKE '%${clanIdOrName}%'`], ['OR'])
                 .compute()
         );
     }
@@ -116,8 +116,8 @@ export class WatchClanTable extends Table {
      * @returns {Promise<boolean>} A promise that resolves to true if the operation is successful, otherwise false.
      */
     public async removeClan(clanIdOrName: string): Promise<boolean> {
-        return await this.remove(
-            new DeleteBuilder(this.tableName).where([`id LIKE '${clanIdOrName}'`, `name LIKE '${clanIdOrName}'`], ['OR']).compute()
+        return await this.delete(
+            new DeleteBuilder(this.tableName).where([`id LIKE '%${clanIdOrName}%'`, `name LIKE '%${clanIdOrName}%'`], ['OR']).compute()
         );
     }
 }

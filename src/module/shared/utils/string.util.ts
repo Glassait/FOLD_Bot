@@ -40,4 +40,8 @@ export class StringUtil {
     public static sanitize(text: string): string {
         return text.trim().replace(/["']/g, '');
     }
+
+    public static escape(text: string): string {
+        return text.trim().replace(/"/g, '\\"').replace(/'/g, "\\'");
+    }
 }

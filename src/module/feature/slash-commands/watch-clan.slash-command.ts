@@ -54,7 +54,7 @@ module.exports = new SlashCommandModel(
                 await watchClan.clanList(interaction);
                 break;
             case MAPPING.BLACKLIST_PLAYER.name:
-                await watchClan.addPlayerToBlacklist(interaction, MAPPING.BLACKLIST_PLAYER.optionsName);
+                await watchClan.blacklistPlayer(interaction, MAPPING.BLACKLIST_PLAYER.optionsName);
                 break;
             case MAPPING.UNBLACKLIST_PLAYER.name:
                 await watchClan.removePlayerToBlacklist(interaction, MAPPING.UNBLACKLIST_PLAYER.optionsName);

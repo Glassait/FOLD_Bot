@@ -1,7 +1,7 @@
 import { basename } from 'node:path';
 import { CoreFile } from '../classes/core-file';
 import { Logger } from '../classes/logger';
-import type { FeatureType, PlayerBlacklisted } from '../types/feature.type';
+import type { FeatureType } from '../types/feature.type';
 
 export class FeatureSingleton extends CoreFile<FeatureType> {
     /**
@@ -74,13 +74,6 @@ export class FeatureSingleton extends CoreFile<FeatureType> {
 
     //region FOLD-RECRUITMENT
     /**
-     * Get the list of blacklisted players.
-     */
-    public get playerBlacklisted(): PlayerBlacklisted {
-        return this._data.player_blacklisted;
-    }
-
-    /**
      * Gets the array of leaving player IDs.
      *
      * @returns {number[]} - The array of leaving player IDs.
@@ -110,47 +103,6 @@ export class FeatureSingleton extends CoreFile<FeatureType> {
     //endregion
 
     //region FOLD-RECRUITMENT METHODS
-    /**
-     * Adds a player to the blacklist with the specified reason.
-     *
-     * @param {string} id - The id of the player to blacklist.
-     * @param {string} name - The name of the player to blacklist.
-     * @param {string} reason - The reason for blacklisting the player.
-     *
-     * @returns {boolean} - True if the player was successfully added to the blacklist, false if the player was already blacklisted.
-     */
-    public addBlacklistedPlayer(id: string, name: string, reason: string): boolean {
-        if (this._data.player_blacklisted[id]) {
-            return false;
-        }
-
-        this._data.player_blacklisted[id] = {
-            name: name,
-            reason: reason,
-        };
-        this.writeData();
-
-        return true;
-    }
-
-    /**
-     * Removes a player from the blacklist.
-     *
-     * @param {string} id - The id of the player to blacklist.
-     *
-     * @returns {boolean} - True if the player was successfully removed from the blacklist, false if the player was not found in the blacklist.
-     */
-    public removeBlacklistedPlayer(id: string): boolean {
-        if (!this._data.player_blacklisted[id]) {
-            return false;
-        }
-
-        delete this._data.player_blacklisted[id];
-        this.writeData();
-
-        return true;
-    }
-
     /**
      * Adds a leaving player ID to the data and writes the updated data to the file.
      *

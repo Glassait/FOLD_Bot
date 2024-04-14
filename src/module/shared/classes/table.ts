@@ -1,7 +1,6 @@
 import type { QueryResult } from 'mysql2/promise';
 import { Injectable } from '../decorators/injector.decorator';
 import type { DatabaseSingleton } from '../singleton/database.singleton';
-import type { Clan } from '../types/watch-clan.type';
 import type { Logger } from './logger';
 
 /**
@@ -68,7 +67,7 @@ export class Table {
      *
      * @throws {Error} - If the SQL query is not a DELETE statement.
      */
-    protected async remove(sql: string): Promise<boolean> {
+    protected async delete(sql: string): Promise<boolean> {
         this.validateQueryType(sql, 'DELETE');
         const rows = await this.query(sql);
         return 'serverStatus' in rows && rows.serverStatus === this.sqlReturn.REMOVE;
@@ -79,13 +78,15 @@ export class Table {
      *
      * @param {string} sql - The SQL query for selecting records.
      *
-     * @returns {Promise<Clan[]>} - A Promise that resolves to an array of Clan objects.
+     * @returns {Promise<T[]>} - A Promise that resolves to an array of Clan objects.
      *
      * @throws {Error} - If the SQL query is not a SELECT statement.
+     *
+     * @template T - The type return by the query select
      */
-    protected async select(sql: string): Promise<Clan[]> {
+    protected async select<T>(sql: string): Promise<T[]> {
         this.validateQueryType(sql, 'SELECT');
-        return (await this.query(sql)) as Clan[];
+        return (await this.query(sql)) as T[];
     }
 
     /**
