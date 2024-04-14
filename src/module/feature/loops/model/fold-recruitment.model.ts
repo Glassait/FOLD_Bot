@@ -8,6 +8,7 @@ import { TimeEnum } from '../../../shared/enums/time.enum';
 import type { FeatureSingleton } from '../../../shared/singleton/feature.singleton';
 import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
 import type { BlacklistedPlayerTable } from '../../../shared/tables/blacklisted-player.table';
+import type { LeavingPlayerTable } from '../../../shared/tables/leaving-player.table';
 import type { WatchClanTable } from '../../../shared/tables/watch-clan.table';
 import type { BlacklistedPlayer } from '../../../shared/types/blacklisted-player.type';
 import type { Clan } from '../../../shared/types/watch-clan.type';
@@ -34,6 +35,7 @@ export class FoldRecruitmentModel {
     @Injectable('Feature') private readonly feature: FeatureSingleton;
     @TableInjectable('Watch-Clan') private readonly watchClan: WatchClanTable;
     @TableInjectable('Blacklisted-Player') private readonly blacklistedPlayer: BlacklistedPlayerTable;
+    @TableInjectable('LeavingPLayer') private readonly leavingPlayer: LeavingPlayerTable;
     //endregion
 
     //region PRIVATE FIELDS
@@ -156,7 +158,7 @@ export class FoldRecruitmentModel {
 
         for (const player of datum) {
             await this.buildAndSendEmbedForPlayer(player, clan);
-            this.feature.addLeavingPlayer(player.id);
+            await this.leavingPlayer.addPlayer(player.id);
         }
 
         if (extracted.length > 0) {

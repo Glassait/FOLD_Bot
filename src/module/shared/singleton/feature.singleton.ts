@@ -8,8 +8,6 @@ export class FeatureSingleton extends CoreFile<FeatureType> {
      * The initial value of the feature configuration.
      */
     private static readonly INITIAL_VALUE: FeatureType = {
-        player_blacklisted: {},
-        leaving_player: [],
         potential_clan: [],
     };
 
@@ -74,15 +72,6 @@ export class FeatureSingleton extends CoreFile<FeatureType> {
 
     //region FOLD-RECRUITMENT
     /**
-     * Gets the array of leaving player IDs.
-     *
-     * @returns {number[]} - The array of leaving player IDs.
-     */
-    public get leavingPlayer(): number[] {
-        return this._data.leaving_player;
-    }
-
-    /**
      * Gets the array of potential clan names.
      *
      * @returns {string[]} - The array of potential clan names.
@@ -103,39 +92,6 @@ export class FeatureSingleton extends CoreFile<FeatureType> {
     //endregion
 
     //region FOLD-RECRUITMENT METHODS
-    /**
-     * Adds a leaving player ID to the data and writes the updated data to the file.
-     *
-     * @param {number} id - The ID of the leaving player to add.
-     */
-    public addLeavingPlayer(id: number): void {
-        if (this._data.leaving_player.find((value: number): boolean => value === id)) {
-            this.logger.debug('Player {} already in list !', String(id));
-            return;
-        }
-
-        this._data.leaving_player.push(id);
-        this.writeData();
-        this.logger.debug('Player {} add to the list !', String(id));
-    }
-
-    /**
-     * Removes a leaving player ID from the data and writes the updated data to the file.
-     *
-     * @param {number} id - The ID of the leaving player to remove.
-     */
-    public removeLeavingPlayer(id: number): void {
-        const index: number = this._data.leaving_player.findIndex((value: number): boolean => value === id);
-        if (index === -1) {
-            this.logger.debug('Player {} is not in the list !', String(id));
-            return;
-        }
-
-        this._data.leaving_player.splice(index, 1);
-        this.writeData();
-        this.logger.debug('Player {} removed from the list !', String(id));
-    }
-
     /**
      * Adds a potential clan URL to the list if it's not already present.
      *

@@ -23,10 +23,6 @@ export type DiscordId = string; // NOSONAR
  */
 export type FeatureType = {
     /**
-     * The list of leaving player detected by the bot
-     */
-    leaving_player: number[];
-    /**
      * The list of potential clan to watch
      */
     potential_clan: string[];
