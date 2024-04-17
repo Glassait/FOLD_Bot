@@ -11,8 +11,8 @@ import type { WotApiModel } from '../../../shared/apis/wot-api.model';
 import type { Logger } from '../../../shared/classes/logger';
 import { Injectable, LoggerInjector, TableInjectable } from '../../../shared/decorators/injector.decorator';
 import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
-import type { BlacklistedPlayerTable } from '../../../shared/tables/blacklisted-player.table';
-import type { WatchClanTable } from '../../../shared/tables/watch-clan.table';
+import type { BlacklistedPlayersTable } from '../../../shared/tables/blacklisted-players.table';
+import type { WatchClansTable } from '../../../shared/tables/watch-clans.table';
 import type { BlacklistedPlayer } from '../../../shared/types/blacklisted-player.type';
 import type { WargamingSuccessType } from '../../../shared/types/wargaming-api.type';
 import type { Clan } from '../../../shared/types/watch-clan.type';
@@ -32,8 +32,8 @@ export class WatchClanModel {
     private readonly logger: Logger;
     @Injectable('Inventory') private readonly inventory: InventorySingleton;
     @Injectable('WotApi') private readonly wotApi: WotApiModel;
-    @TableInjectable('WatchClan') private readonly watchClan: WatchClanTable;
-    @TableInjectable('BlacklistedPlayer') private readonly blacklistedPlayer: BlacklistedPlayerTable;
+    @TableInjectable('WatchClans') private readonly watchClans: WatchClansTable;
+    @TableInjectable('BlacklistedPlayers') private readonly blacklistedPlayers: BlacklistedPlayersTable;
     //endregion
 
     private _channel: TextChannel;
@@ -69,7 +69,7 @@ export class WatchClanModel {
         let name: string = interaction.options.get(optionsName[1])?.value as string;
         name = StringUtil.sanitize(name).toUpperCase();
 
-        const clan: Clan[] = await this.watchClan.selectClan(String(id));
+        const clan: Clan[] = await this.watchClans.selectClan(String(id));
 
         if (clan.length > 0) {
             this.logger.warn('Clan {} already exists', id);
@@ -77,7 +77,7 @@ export class WatchClanModel {
             return;
         }
 
-        const added: boolean = await this.watchClan.addClan({ id: id, name: name });
+        const added: boolean = await this.watchClans.addClan({ id: id, name: name });
 
         if (!added) {
             this.logger.warn('An error occur during adding clan to the database');
@@ -110,7 +110,7 @@ export class WatchClanModel {
         let idOrName: string = interaction.options.get(optionsName[0])?.value as string;
         idOrName = StringUtil.sanitize(idOrName).toUpperCase();
 
-        const clans: Clan[] = await this.watchClan.selectClan(idOrName);
+        const clans: Clan[] = await this.watchClans.selectClan(idOrName);
 
         if (clans.length === 0) {
             this.logger.warn("Clan {} doesn't exist in the clan to watch", idOrName);
@@ -124,7 +124,7 @@ export class WatchClanModel {
         }
 
         const clan: Clan = clans.shift() as Clan;
-        const removed: boolean = await this.watchClan.removeClan(String(clan.id));
+        const removed: boolean = await this.watchClans.removeClan(String(clan.id));
 
         if (!removed) {
             this.logger.error('Error occurs when removing clan from database');
@@ -151,7 +151,7 @@ export class WatchClanModel {
      * @param {ChatInputCommandInteraction} interaction - The interaction that triggered the command.
      */
     public async clanList(interaction: ChatInputCommandInteraction): Promise<void> {
-        const listClanNames: string[] = (await this.watchClan.getAll())
+        const listClanNames: string[] = (await this.watchClans.getAll())
             .map((clan: Clan) => clan.name)
             .sort((a: string, b: string): number => (a < b ? -1 : 1));
 
@@ -200,7 +200,7 @@ export class WatchClanModel {
             name = searchResult.data[0].nickname;
         }
 
-        const player: BlacklistedPlayer[] = await this.blacklistedPlayer.getPlayer(Number(id));
+        const player: BlacklistedPlayer[] = await this.blacklistedPlayers.getPlayer(Number(id));
 
         if (player.length > 0) {
             this.logger.debug('Player {} already blacklisted !', player);
@@ -210,7 +210,7 @@ export class WatchClanModel {
             return;
         }
 
-        const added: boolean = await this.blacklistedPlayer.addPlayer({ id: Number(id), name: name, reason: reason });
+        const added: boolean = await this.blacklistedPlayers.addPlayer({ id: Number(id), name: name, reason: reason });
 
         if (!added) {
             this.logger.debug('An error occur when adding player to blacklist');
@@ -242,7 +242,7 @@ export class WatchClanModel {
         idAndName = StringUtil.sanitize(idAndName);
         const [id, name] = idAndName.split('#');
 
-        const player: BlacklistedPlayer[] = await this.blacklistedPlayer.getPlayer(Number(id));
+        const player: BlacklistedPlayer[] = await this.blacklistedPlayers.getPlayer(Number(id));
 
         if (player.length === 0) {
             this.logger.debug('Player {} is not blacklisted !', player);
@@ -258,7 +258,7 @@ export class WatchClanModel {
             });
         }
 
-        const removed: boolean = await this.blacklistedPlayer.removePlayer(player[0]);
+        const removed: boolean = await this.blacklistedPlayers.removePlayer(player[0]);
 
         if (!removed) {
             this.logger.debug('An error occur during deletion of player inside the database', idAndName);
@@ -317,7 +317,7 @@ export class WatchClanModel {
         const idOrName: string = interaction.options.getFocused(true).value;
 
         await interaction.respond(
-            (await this.blacklistedPlayer.findPlayer(idOrName))
+            (await this.blacklistedPlayers.findPlayer(idOrName))
                 .map((player: BlacklistedPlayer): { name: string; value: string } => ({
                     name: `${player.name}`,
                     value: `${player.id}#${player.name}`,
@@ -367,7 +367,7 @@ export class WatchClanModel {
         const idOrName: string = interaction.options.getFocused(true).value;
 
         await interaction.respond(
-            (await this.watchClan.selectClan(StringUtil.sanitize(idOrName).toUpperCase()))
+            (await this.watchClans.selectClan(StringUtil.sanitize(idOrName).toUpperCase()))
                 .map((clan: Clan): { name: string; value: string } => ({
                     name: `${clan.name} | ${clan.id}`,
                     value: String(clan.id),

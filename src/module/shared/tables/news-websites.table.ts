@@ -7,12 +7,12 @@ import type { NewsWebsite } from '../types/news_website.type';
  * Represents a NewsWebsiteTable class for managing news websites.
  */
 @LoggerInjector
-export class NewsWebsiteTable extends Table {
+export class NewsWebsitesTable extends Table {
     /**
      * Creates an instance of NewsWebsiteTable.
      */
     constructor() {
-        super('news_website');
+        super('news_websites');
     }
 
     /**

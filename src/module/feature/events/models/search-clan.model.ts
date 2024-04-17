@@ -2,9 +2,9 @@ import type { WotApiModel } from '../../../shared/apis/wot-api.model';
 import type { Logger } from '../../../shared/classes/logger';
 import { Injectable, LoggerInjector, TableInjectable } from '../../../shared/decorators/injector.decorator';
 import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
-import type { LeavingPlayerTable } from '../../../shared/tables/leaving-player.table';
-import type { PotentialClanTable } from '../../../shared/tables/potential-clan.table';
-import type { WatchClanTable } from '../../../shared/tables/watch-clan.table';
+import type { LeavingPlayersTable } from '../../../shared/tables/leaving-players.table';
+import type { PotentialClansTable } from '../../../shared/tables/potential-clans.table';
+import type { WatchClansTable } from '../../../shared/tables/watch-clans.table';
 import type { PotentialClan } from '../../../shared/types/potential-clan.type';
 import type { Clan } from '../../../shared/types/watch-clan.type';
 import type { PlayerPersonalDataSuccess } from '../../../shared/types/wot-api.type';
@@ -16,9 +16,9 @@ export class SearchClanModel {
     private readonly logger: Logger;
     @Injectable('Inventory') private readonly inventory: InventorySingleton;
     @Injectable('WotApi') private readonly wotApi: WotApiModel;
-    @TableInjectable('WatchClan') private readonly watchClan: WatchClanTable;
-    @TableInjectable('LeavingPLayer') private readonly leavingPlayer: LeavingPlayerTable;
-    @TableInjectable('PotentialClan') private readonly potentialClan: PotentialClanTable;
+    @TableInjectable('WatchClans') private readonly watchClans: WatchClansTable;
+    @TableInjectable('LeavingPlayers') private readonly leavingPlayers: LeavingPlayersTable;
+    @TableInjectable('PotentialClans') private readonly potentialClans: PotentialClansTable;
     //endregion
 
     /**
@@ -28,21 +28,21 @@ export class SearchClanModel {
     public async searchClan(): Promise<void> {
         this.logger.info('Starting fetching clan of leaving player');
 
-        for (const playerId of await this.leavingPlayer.getAll()) {
+        for (const playerId of await this.leavingPlayers.getAll()) {
             const result: PlayerPersonalDataSuccess = await this.wotApi.fetchPlayerPersonalData(playerId);
             const clanId = result.data[playerId].clan_id;
-            const clans: Clan[] = await this.watchClan.selectClan(String(clanId as number));
+            const clans: Clan[] = await this.watchClans.selectClan(String(clanId as number));
 
             if (clanId !== null && clanId !== 500312605 && clans.length === 0) {
-                const potentialClan: PotentialClan[] = await this.potentialClan.getClan(clanId);
+                const potentialClan: PotentialClan[] = await this.potentialClans.getClan(clanId);
 
                 if (potentialClan.length === 0) {
-                    await this.potentialClan.addClan(
+                    await this.potentialClans.addClan(
                         this.inventory.foldRecruitment.clan_url.replace(FoldRecruitmentEnum.CLAN_ID, String(clanId))
                     );
                 }
             } else {
-                await this.leavingPlayer.deletePlayer(playerId);
+                await this.leavingPlayers.deletePlayer(playerId);
             }
         }
 

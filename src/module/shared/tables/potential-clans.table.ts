@@ -7,12 +7,12 @@ import type { PotentialClan } from '../types/potential-clan.type';
  * Represents a PotentialClanTable class for managing potential clans.
  */
 @LoggerInjector
-export class PotentialClanTable extends Table {
+export class PotentialClansTable extends Table {
     /**
      * Creates an instance of PotentialClanTable.
      */
     constructor() {
-        super('potential_clan');
+        super('potential_clans');
     }
 
     /**

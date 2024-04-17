@@ -73,10 +73,10 @@ export function Injectable<GDependence extends 'Inventory' | 'Statistic' | 'Triv
  *
  * @throws {Error} - Throws an error if an unsupported dependence type is provided.
  *
- * @template {'WatchClan' | 'BlacklistedPlayer' | 'LeavingPLayer' | 'PotentialClan' | 'NewsWebsite' | 'BanWords' } GDependence - The table class to inject
+ * @template {'WatchClans' | 'BlacklistedPlayers' | 'LeavingPlayers' | 'PotentialClans' | 'NewsWebsites' | 'BanWords' } GDependence - The table class to inject
  */
 export function TableInjectable<
-    GDependence extends 'WatchClan' | 'BlacklistedPlayer' | 'LeavingPLayer' | 'PotentialClan' | 'NewsWebsite' | 'BanWords',
+    GDependence extends 'WatchClans' | 'BlacklistedPlayers' | 'LeavingPlayers' | 'PotentialClans' | 'NewsWebsites' | 'BanWords',
 >(
     dependence: GDependence
     // eslint-disable-next-line @typescript-eslint/ban-types
@@ -85,28 +85,28 @@ export function TableInjectable<
     return function actual<GTable>(_target: GTable, _context: ClassFieldDecoratorContext<GTable, any>) {
         return function (this: GTable, field: any) {
             switch (dependence) {
-                case 'WatchClan': {
-                    const req = require('../tables/watch-clan.table');
+                case 'WatchClans': {
+                    const req = require('../tables/watch-clans.table');
                     field = new req.WatchClanTable();
                     break;
                 }
-                case 'BlacklistedPlayer': {
-                    const req = require('../tables/blacklisted-player.table');
+                case 'BlacklistedPlayers': {
+                    const req = require('../tables/blacklisted-players.table');
                     field = new req.BlacklistedPlayerTable();
                     break;
                 }
-                case 'LeavingPLayer': {
-                    const req = require('../tables/leaving-player.table');
+                case 'LeavingPlayers': {
+                    const req = require('../tables/leaving-players.table');
                     field = new req.LeavingPlayerTable();
                     break;
                 }
-                case 'PotentialClan': {
-                    const req = require('../tables/potential-clan.table');
+                case 'PotentialClans': {
+                    const req = require('../tables/potential-clans.table');
                     field = new req.PotentialClanTable();
                     break;
                 }
-                case 'NewsWebsite': {
-                    const req = require('../tables/news-website.table');
+                case 'NewsWebsites': {
+                    const req = require('../tables/news-websites.table');
                     field = new req.NewsWebsiteTable();
                     break;
                 }

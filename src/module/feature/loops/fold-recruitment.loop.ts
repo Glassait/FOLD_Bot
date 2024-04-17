@@ -3,7 +3,7 @@ import { basename } from 'node:path';
 import { Logger } from '../../shared/classes/logger';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
-import type { WatchClanTable } from '../../shared/tables/watch-clan.table';
+import type { WatchClansTable } from '../../shared/tables/watch-clans.table';
 import { TimeUtil } from '../../shared/utils/time.util';
 import type { FoldRecruitmentModel } from './model/fold-recruitment.model';
 import type { BotLoop } from './types/bot-loop.type';
@@ -18,8 +18,8 @@ module.exports = {
             logger.warn("Fold recruitment disabled, if it's normal, dont mind this message !");
             return;
         }
-        let req = require('../../shared/tables/watch-clan.table');
-        const watchClan: WatchClanTable = new req.WatchClanTable();
+        let req = require('../../shared/tables/watch-clans.table');
+        const watchClan: WatchClansTable = new req.WatchClanTable();
 
         req = require('./model/fold-recruitment.model');
         const recruitmentModel: FoldRecruitmentModel = new req.FoldRecruitmentModel();

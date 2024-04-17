@@ -6,9 +6,9 @@ import { Injectable, LoggerInjector, TableInjectable } from '../../../shared/dec
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
 import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
-import type { BlacklistedPlayerTable } from '../../../shared/tables/blacklisted-player.table';
-import type { LeavingPlayerTable } from '../../../shared/tables/leaving-player.table';
-import type { WatchClanTable } from '../../../shared/tables/watch-clan.table';
+import type { BlacklistedPlayersTable } from '../../../shared/tables/blacklisted-players.table';
+import type { LeavingPlayersTable } from '../../../shared/tables/leaving-players.table';
+import type { WatchClansTable } from '../../../shared/tables/watch-clans.table';
 import type { BlacklistedPlayer } from '../../../shared/types/blacklisted-player.type';
 import type { Clan } from '../../../shared/types/watch-clan.type';
 import { StringUtil } from '../../../shared/utils/string.util';
@@ -31,9 +31,9 @@ export class FoldRecruitmentModel {
     private readonly wotApiModel: WotApiModel = new WotApiModel();
     @Injectable('Axios', TimeEnum.SECONDE * 30) private readonly axios: AxiosInstance;
     @Injectable('Inventory') private readonly inventory: InventorySingleton;
-    @TableInjectable('WatchClan') private readonly watchClan: WatchClanTable;
-    @TableInjectable('BlacklistedPlayer') private readonly blacklistedPlayer: BlacklistedPlayerTable;
-    @TableInjectable('LeavingPLayer') private readonly leavingPlayer: LeavingPlayerTable;
+    @TableInjectable('WatchClans') private readonly watchClans: WatchClansTable;
+    @TableInjectable('BlacklistedPlayers') private readonly blacklistedPlayers: BlacklistedPlayersTable;
+    @TableInjectable('LeavingPlayers') private readonly leavingPlayers: LeavingPlayersTable;
     //endregion
 
     //region PRIVATE FIELDS
@@ -120,7 +120,7 @@ export class FoldRecruitmentModel {
         if (!clan.imageUrl) {
             try {
                 clan.imageUrl = (await this.wotApiModel.fetchClanImage(clan.name)).data[0]?.emblems?.x64?.portal;
-                await this.watchClan.updateClan(clan);
+                await this.watchClans.updateClan(clan);
             } catch (error) {
                 this.logger.error('An error occurred while fetching the image of the clan', error);
             }
@@ -156,13 +156,13 @@ export class FoldRecruitmentModel {
 
         for (const player of datum) {
             await this.buildAndSendEmbedForPlayer(player, clan);
-            await this.leavingPlayer.addPlayer(player.id);
+            await this.leavingPlayers.addPlayer(player.id);
         }
 
         if (extracted.length > 0) {
             this._noPlayerFound = false;
             clan.lastActivity = extracted[0].created_at;
-            await this.watchClan.updateClan(clan);
+            await this.watchClans.updateClan(clan);
         }
     }
 
@@ -173,7 +173,7 @@ export class FoldRecruitmentModel {
      * @param {Clan} clan - The clan from which the player has left.
      */
     private async buildAndSendEmbedForPlayer(player: Players, clan: Clan): Promise<void> {
-        const blacklisted: BlacklistedPlayer | undefined = (await this.blacklistedPlayer.getPlayer(player.id)).shift();
+        const blacklisted: BlacklistedPlayer | undefined = (await this.blacklistedPlayers.getPlayer(player.id)).shift();
 
         const embedPlayer: EmbedBuilder = new EmbedBuilder()
             .setAuthor({

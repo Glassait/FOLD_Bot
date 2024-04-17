@@ -4,7 +4,7 @@ import { Logger } from '../../shared/classes/logger';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
 import { TimeEnum } from '../../shared/enums/time.enum';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
-import type { NewsWebsiteTable } from '../../shared/tables/news-website.table';
+import type { NewsWebsitesTable } from '../../shared/tables/news-websites.table';
 import type { NewsWebsite } from '../../shared/types/news_website.type';
 import { EnvUtil } from '../../shared/utils/env.util';
 import type { WebSiteScraper } from './model/web-site-scraper.model';
@@ -21,8 +21,8 @@ module.exports = {
             return;
         }
 
-        let req = require('../../shared/tables/news-website.table');
-        const newsWebsite: NewsWebsiteTable = new req.NewsWebsiteTable();
+        let req = require('../../shared/tables/news-websites.table');
+        const newsWebsite: NewsWebsitesTable = new req.NewsWebsiteTable();
         const site: NewsWebsite[] = await newsWebsite.getAll();
 
         if (site.length <= 0) {

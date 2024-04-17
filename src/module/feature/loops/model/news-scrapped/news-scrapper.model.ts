@@ -4,7 +4,7 @@ import type { Logger } from '../../../../shared/classes/logger';
 import { LoggerInjector, TableInjectable } from '../../../../shared/decorators/injector.decorator';
 import { EmojiEnum } from '../../../../shared/enums/emoji.enum';
 import type { BanWordsTable } from '../../../../shared/tables/ban-words.table';
-import type { NewsWebsiteTable } from '../../../../shared/tables/news-website.table';
+import type { NewsWebsitesTable } from '../../../../shared/tables/news-websites.table';
 import type { NewsWebsite } from '../../../../shared/types/news_website.type';
 
 /**
@@ -14,7 +14,7 @@ import type { NewsWebsite } from '../../../../shared/types/news_website.type';
 export class NewsScrapper {
     //region INJECTABLE
     private readonly logger: Logger;
-    @TableInjectable('NewsWebsite') private readonly newsWebsite: NewsWebsiteTable;
+    @TableInjectable('NewsWebsites') private readonly newsWebsites: NewsWebsitesTable;
     @TableInjectable('BanWords') private readonly banWords: BanWordsTable;
     //endregion
 
@@ -39,7 +39,7 @@ export class NewsScrapper {
      * @param {string} [image] - The URL of the image associated with the news article.
      */
     protected async sendNews(url: string, title: string, description: string, newsWebsite: NewsWebsite, image?: string): Promise<void> {
-        const updated: boolean = await this.newsWebsite.updateWebsite(newsWebsite.name, url);
+        const updated: boolean = await this.newsWebsites.updateWebsite(newsWebsite.name, url);
 
         if (updated) {
             newsWebsite.lastUrl = url;

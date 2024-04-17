@@ -7,9 +7,9 @@ import type { Clan } from '../types/watch-clan.type';
  * Represents a table for watching clans in the database.
  */
 @LoggerInjector
-export class WatchClanTable extends Table {
+export class WatchClansTable extends Table {
     constructor() {
-        super('watch_clan');
+        super('watch_clans');
     }
 
     /**

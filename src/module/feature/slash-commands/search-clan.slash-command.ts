@@ -1,6 +1,6 @@
 import { type ChatInputCommandInteraction, type Client, Colors, EmbedBuilder, PermissionsBitField, type TextChannel } from 'discord.js';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
-import { PotentialClanTable } from '../../shared/tables/potential-clan.table';
+import { PotentialClansTable } from '../../shared/tables/potential-clans.table';
 import type { PotentialClan } from '../../shared/types/potential-clan.type';
 import { SlashCommandModel } from './model/slash-command.model';
 
@@ -8,7 +8,7 @@ module.exports = new SlashCommandModel(
     'search-clan',
     "Affiche l'ensemble des clans détectés après l'analyse des joueurs",
     async (interaction: ChatInputCommandInteraction, client?: Client): Promise<void> => {
-        const potentialClan: PotentialClanTable = new PotentialClanTable();
+        const potentialClan: PotentialClansTable = new PotentialClansTable();
         const clans: PotentialClan[] = await potentialClan.getAll();
 
         if (clans.length === 0) {
