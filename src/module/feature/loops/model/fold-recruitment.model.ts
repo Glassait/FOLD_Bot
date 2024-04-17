@@ -5,7 +5,6 @@ import type { Logger } from '../../../shared/classes/logger';
 import { Injectable, LoggerInjector, TableInjectable } from '../../../shared/decorators/injector.decorator';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
-import type { FeatureSingleton } from '../../../shared/singleton/feature.singleton';
 import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
 import type { BlacklistedPlayerTable } from '../../../shared/tables/blacklisted-player.table';
 import type { LeavingPlayerTable } from '../../../shared/tables/leaving-player.table';
@@ -32,9 +31,8 @@ export class FoldRecruitmentModel {
     private readonly wotApiModel: WotApiModel = new WotApiModel();
     @Injectable('Axios', TimeEnum.SECONDE * 30) private readonly axios: AxiosInstance;
     @Injectable('Inventory') private readonly inventory: InventorySingleton;
-    @Injectable('Feature') private readonly feature: FeatureSingleton;
-    @TableInjectable('Watch-Clan') private readonly watchClan: WatchClanTable;
-    @TableInjectable('Blacklisted-Player') private readonly blacklistedPlayer: BlacklistedPlayerTable;
+    @TableInjectable('WatchClan') private readonly watchClan: WatchClanTable;
+    @TableInjectable('BlacklistedPlayer') private readonly blacklistedPlayer: BlacklistedPlayerTable;
     @TableInjectable('LeavingPLayer') private readonly leavingPlayer: LeavingPlayerTable;
     //endregion
 

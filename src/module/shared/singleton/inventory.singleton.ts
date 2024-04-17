@@ -3,8 +3,7 @@ import { basename } from 'node:path';
 import { CoreFile } from '../classes/core-file';
 import { Logger } from '../classes/logger';
 import { EmojiEnum } from '../enums/emoji.enum';
-import type { DiscordId } from '../types/feature.type';
-import type { Channel, FoldRecruitment, InventoryType, Trivia, WebSiteState } from '../types/inventory.type';
+import type { Channel, DiscordId, FoldRecruitment, InventoryType, Trivia, WebSiteState } from '../types/inventory.type';
 import { EnvUtil } from '../utils/env.util';
 
 /**

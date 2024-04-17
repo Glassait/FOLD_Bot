@@ -81,7 +81,7 @@ class Computer {
      * const deleteQuery = Computer.computeDelete('users', [["name LIKE 'John'", 'age = 23' ], ['AND']]);
      */
     public static computeDelete(tableName: string, where: string[][]): string {
-        return `DELETE FROM ${tableName} WHERE ${this.reduceWhere(where)}`;
+        return `DELETE FROM ${tableName} ${where ? 'WHERE' + this.reduceWhere(where) : ''}`;
     }
 
     /**
@@ -359,10 +359,6 @@ export class DeleteBuilder extends Where {
      * new DeleteBuilder('users').where(['id = 1']).compute();
      */
     public compute(): string {
-        if (!this._conditions || this._conditions.length === 0) {
-            throw new Error('Conditions is mandatory to create DELETE query !');
-        }
-
         return Computer.computeDelete(this.tableName, this._conditions);
     }
 }

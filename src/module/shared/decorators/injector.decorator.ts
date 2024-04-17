@@ -19,9 +19,9 @@ type Constructor = new (...args: any[]) => any;
  *
  * @throws {Error} - Throws an error if an unsupported dependence type is provided.
  *
- * @template {'Inventory' | 'Feature' | 'Statistic' | 'Trivia' | 'Axios' | 'WotApi' | 'Database'} GDependence - The class to inject
+ * @template {'Inventory' | 'Statistic' | 'Trivia' | 'Axios' | 'WotApi' | 'Database'} GDependence - The class to inject
  */
-export function Injectable<GDependence extends 'Inventory' | 'Feature' | 'Statistic' | 'Trivia' | 'Axios' | 'WotApi' | 'Database'>(
+export function Injectable<GDependence extends 'Inventory' | 'Statistic' | 'Trivia' | 'Axios' | 'WotApi' | 'Database'>(
     dependence: GDependence,
     timeout: number = TimeEnum.MINUTE
     // eslint-disable-next-line @typescript-eslint/ban-types
@@ -32,9 +32,6 @@ export function Injectable<GDependence extends 'Inventory' | 'Feature' | 'Statis
             switch (dependence) {
                 case 'Inventory':
                     field = require('../singleton/inventory.singleton').InventorySingleton.instance;
-                    break;
-                case 'Feature':
-                    field = require('../singleton/feature.singleton').FeatureSingleton.instance;
                     break;
                 case 'Statistic':
                     field = require('../singleton/statistic.singleton').StatisticSingleton.instance;
@@ -76,9 +73,9 @@ export function Injectable<GDependence extends 'Inventory' | 'Feature' | 'Statis
  *
  * @throws {Error} - Throws an error if an unsupported dependence type is provided.
  *
- * @template {'Watch-Clan' | 'Blacklisted-Player' | 'LeavingPLayer'} GDependence - The table class to inject
+ * @template {'WatchClan' | 'BlacklistedPlayer' | 'LeavingPLayer' | 'PotentialClan'} GDependence - The table class to inject
  */
-export function TableInjectable<GDependence extends 'Watch-Clan' | 'Blacklisted-Player' | 'LeavingPLayer'>(
+export function TableInjectable<GDependence extends 'WatchClan' | 'BlacklistedPlayer' | 'LeavingPLayer' | 'PotentialClan'>(
     dependence: GDependence
     // eslint-disable-next-line @typescript-eslint/ban-types
 ): Function {
@@ -86,12 +83,12 @@ export function TableInjectable<GDependence extends 'Watch-Clan' | 'Blacklisted-
     return function actual<GTable>(_target: GTable, _context: ClassFieldDecoratorContext<GTable, any>) {
         return function (this: GTable, field: any) {
             switch (dependence) {
-                case 'Watch-Clan': {
+                case 'WatchClan': {
                     const req = require('../tables/watch-clan.table');
                     field = new req.WatchClanTable();
                     break;
                 }
-                case 'Blacklisted-Player': {
+                case 'BlacklistedPlayer': {
                     const req = require('../tables/blacklisted-player.table');
                     field = new req.BlacklistedPlayerTable();
                     break;
@@ -99,6 +96,11 @@ export function TableInjectable<GDependence extends 'Watch-Clan' | 'Blacklisted-
                 case 'LeavingPLayer': {
                     const req = require('../tables/leaving-player.table');
                     field = new req.LeavingPlayerTable();
+                    break;
+                }
+                case 'PotentialClan': {
+                    const req = require('../tables/potential-clan.table');
+                    field = new req.PotentialClanTable();
                     break;
                 }
                 default:

@@ -78,7 +78,7 @@ export class Table {
      *
      * @param {string} sql - The SQL query for selecting records.
      *
-     * @returns {Promise<T[]>} - A Promise that resolves to an array of Clan objects.
+     * @returns {Promise<T[]>} - A Promise that resolves to an array of {@link T} objects.
      *
      * @throws {Error} - If the SQL query is not a SELECT statement.
      *

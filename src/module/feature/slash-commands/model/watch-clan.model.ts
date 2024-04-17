@@ -10,7 +10,6 @@ import {
 import type { WotApiModel } from '../../../shared/apis/wot-api.model';
 import type { Logger } from '../../../shared/classes/logger';
 import { Injectable, LoggerInjector, TableInjectable } from '../../../shared/decorators/injector.decorator';
-import type { FeatureSingleton } from '../../../shared/singleton/feature.singleton';
 import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
 import type { BlacklistedPlayerTable } from '../../../shared/tables/blacklisted-player.table';
 import type { WatchClanTable } from '../../../shared/tables/watch-clan.table';
@@ -31,11 +30,10 @@ export class WatchClanModel {
 
     //region INJECTABLE
     private readonly logger: Logger;
-    @Injectable('Feature') private readonly feature: FeatureSingleton;
     @Injectable('Inventory') private readonly inventory: InventorySingleton;
     @Injectable('WotApi') private readonly wotApi: WotApiModel;
-    @TableInjectable('Watch-Clan') private readonly watchClan: WatchClanTable;
-    @TableInjectable('Blacklisted-Player') private readonly blacklistedPlayer: BlacklistedPlayerTable;
+    @TableInjectable('WatchClan') private readonly watchClan: WatchClanTable;
+    @TableInjectable('BlacklistedPlayer') private readonly blacklistedPlayer: BlacklistedPlayerTable;
     //endregion
 
     private _channel: TextChannel;

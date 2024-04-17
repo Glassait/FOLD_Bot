@@ -1,15 +1,17 @@
 import { type ChatInputCommandInteraction, type Client, Colors, EmbedBuilder, PermissionsBitField, type TextChannel } from 'discord.js';
-import { FeatureSingleton } from '../../shared/singleton/feature.singleton';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
+import { PotentialClanTable } from '../../shared/tables/potential-clan.table';
+import type { PotentialClan } from '../../shared/types/potential-clan.type';
 import { SlashCommandModel } from './model/slash-command.model';
 
 module.exports = new SlashCommandModel(
     'search-clan',
     "Affiche l'ensemble des clans détectés après l'analyse des joueurs",
     async (interaction: ChatInputCommandInteraction, client?: Client): Promise<void> => {
-        const feature: FeatureSingleton = FeatureSingleton.instance;
+        const potentialClan: PotentialClanTable = new PotentialClanTable();
+        const clans: PotentialClan[] = await potentialClan.getAll();
 
-        if (feature.potentialClan.length === 0) {
+        if (clans.length === 0) {
             await interaction.reply({
                 ephemeral: true,
                 content: 'Aucun clan potentiel est présent dans la liste',
@@ -20,7 +22,7 @@ module.exports = new SlashCommandModel(
         const inventory: InventorySingleton = InventorySingleton.instance;
         const channel: TextChannel = await inventory.getChannelForFoldRecruitment(client as Client);
 
-        const numberOfEmbed: number = Math.floor(feature.potentialClan.length / 40) || 1;
+        const numberOfEmbed: number = Math.floor(clans.length / 40) || 1;
         let index: number = 0;
 
         for (let i = 0; i < numberOfEmbed; i++) {
@@ -28,8 +30,8 @@ module.exports = new SlashCommandModel(
 
             for (let j = 0; j < 3; j++) {
                 let message: string = '';
-                while (message.length < 950 && index < feature.potentialClan.length) {
-                    const potentialClan: string = feature.potentialClan[index];
+                while (message.length < 950 && index < clans.length) {
+                    const potentialClan: string = clans[index].url;
                     message += `[${potentialClan.slice(35, 44)}](${potentialClan})\n`;
                     index++;
                 }
@@ -46,7 +48,7 @@ module.exports = new SlashCommandModel(
             await channel.send({ embeds: [embed] });
         }
 
-        feature.potentialClan = [];
+        await potentialClan.deleteAll();
     },
     {
         permission: PermissionsBitField.Flags.MoveMembers,

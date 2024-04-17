@@ -1,4 +1,7 @@
-import type { DiscordId } from './feature.type';
+/**
+ * Way to refer to discord id
+ */
+export type DiscordId = string; // NOSONAR
 
 /**
  * Type describing a Discord channel.

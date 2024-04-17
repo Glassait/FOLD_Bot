@@ -1,7 +1,7 @@
 import { GatewayIntentBits } from 'discord.js';
 import { basename } from 'node:path';
 import { Logger } from './module/shared/classes/logger';
-import { WatchClanTable } from './module/shared/tables/watch-clan.table';
+import { PotentialClanTable } from './module/shared/tables/potential-clan.table';
 
 const logger: Logger = new Logger(basename(__filename));
 
@@ -49,9 +49,7 @@ process.on('uncaughtException', (err: Error): void => {
 });
 
 setTimeout(async (): Promise<void> => {
-    const table = new WatchClanTable();
-
-    // const result = table.removeClan('1');
+    const table = new PotentialClanTable();
 
     throw new Error('END');
 });
