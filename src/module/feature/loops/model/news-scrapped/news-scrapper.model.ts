@@ -1,9 +1,9 @@
 import type { CheerioAPI } from 'cheerio';
 import { Colors, EmbedBuilder, type TextChannel } from 'discord.js';
 import type { Logger } from '../../../../shared/classes/logger';
-import { Injectable, LoggerInjector, TableInjectable } from '../../../../shared/decorators/injector.decorator';
+import { LoggerInjector, TableInjectable } from '../../../../shared/decorators/injector.decorator';
 import { EmojiEnum } from '../../../../shared/enums/emoji.enum';
-import type { InventorySingleton } from '../../../../shared/singleton/inventory.singleton';
+import type { BanWordsTable } from '../../../../shared/tables/ban-words.table';
 import type { NewsWebsiteTable } from '../../../../shared/tables/news-website.table';
 import type { NewsWebsite } from '../../../../shared/types/news_website.type';
 
@@ -14,8 +14,8 @@ import type { NewsWebsite } from '../../../../shared/types/news_website.type';
 export class NewsScrapper {
     //region INJECTABLE
     private readonly logger: Logger;
-    @Injectable('Inventory') private readonly inventory: InventorySingleton;
     @TableInjectable('NewsWebsite') private readonly newsWebsite: NewsWebsiteTable;
+    @TableInjectable('BanWords') private readonly banWords: BanWordsTable;
     //endregion
 
     /**
@@ -45,7 +45,7 @@ export class NewsScrapper {
             newsWebsite.lastUrl = url;
         }
 
-        if (this.checkHrefContainBanWord(url)) {
+        if (await this.checkHrefContainBanWord(url)) {
             this.logger.debug(`${EmojiEnum.TRASH} {} contains ban words !`, url);
             return;
         }
@@ -70,9 +70,9 @@ export class NewsScrapper {
      *
      * @param {string} href - The URL to check.
      *
-     * @returns {boolean} - True if the URL contains banned words, otherwise false.
+     * @returns {Promise<boolean>} - True if the URL contains banned words, otherwise false.
      */
-    private checkHrefContainBanWord(href: string): boolean {
-        return this.inventory.banWords.some((banWord: string): boolean => href.includes(banWord));
+    private async checkHrefContainBanWord(href: string): Promise<boolean> {
+        return (await this.banWords.getAll()).some((banWord: string): boolean => href.includes(banWord));
     }
 }

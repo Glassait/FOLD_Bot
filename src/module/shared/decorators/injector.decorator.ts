@@ -73,9 +73,11 @@ export function Injectable<GDependence extends 'Inventory' | 'Statistic' | 'Triv
  *
  * @throws {Error} - Throws an error if an unsupported dependence type is provided.
  *
- * @template {'WatchClan' | 'BlacklistedPlayer' | 'LeavingPLayer' | 'PotentialClan' | 'NewsWebsite' } GDependence - The table class to inject
+ * @template {'WatchClan' | 'BlacklistedPlayer' | 'LeavingPLayer' | 'PotentialClan' | 'NewsWebsite' | 'BanWords' } GDependence - The table class to inject
  */
-export function TableInjectable<GDependence extends 'WatchClan' | 'BlacklistedPlayer' | 'LeavingPLayer' | 'PotentialClan' | 'NewsWebsite'>(
+export function TableInjectable<
+    GDependence extends 'WatchClan' | 'BlacklistedPlayer' | 'LeavingPLayer' | 'PotentialClan' | 'NewsWebsite' | 'BanWords',
+>(
     dependence: GDependence
     // eslint-disable-next-line @typescript-eslint/ban-types
 ): Function {
@@ -106,6 +108,11 @@ export function TableInjectable<GDependence extends 'WatchClan' | 'BlacklistedPl
                 case 'NewsWebsite': {
                     const req = require('../tables/news-website.table');
                     field = new req.NewsWebsiteTable();
+                    break;
+                }
+                case 'BanWords': {
+                    const req = require('../tables/ban-words.table');
+                    field = new req.BanWordsTable();
                     break;
                 }
                 default:

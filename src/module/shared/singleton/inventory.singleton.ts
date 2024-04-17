@@ -56,17 +56,6 @@ export class InventorySingleton extends CoreFile<InventoryType> {
     }
     //endregion
 
-    //region SCRAPPING
-    /**
-     * Getter for the array of banned words used in the newsletter.
-     *
-     * @returns {string[]} - An array of banned words for the newsletter.
-     */
-    public get banWords(): string[] {
-        return this._data.newsLetter.banWords;
-    }
-    //endregion
-
     //region TRIVIA
     /**
      * Get the trivia information from the inventory

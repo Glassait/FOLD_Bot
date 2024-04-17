@@ -18,16 +18,6 @@ export type Channel = {
 };
 
 /**
- * Type defining the architecture of a newsletter.
- */
-export type NewsLetter = {
-    /**
-     * Array of banned words for the newsletter.
-     */
-    banWords: string[];
-};
-
-/**
  * Type defining the structure for the trivia game.
  */
 export type Trivia = {
@@ -191,10 +181,6 @@ export type FoldRecruitment = {
  * Type defining the structure of the inventory.json file.
  */
 export type InventoryType = {
-    /**
-     * The newsletter section of the inventory.
-     */
-    newsLetter: NewsLetter;
     /**
      * The game section of the inventory.
      */
