@@ -1,5 +1,5 @@
 import { TimeEnum } from '../../../../shared/enums/time.enum';
-import type { WebSiteState } from '../../../../shared/types/inventory.type';
+import type { NewsWebsite } from '../../../../shared/types/news_website.type';
 import { EnvUtil } from '../../../../shared/utils/env.util';
 import { NewsScrapper } from './news-scrapper.model';
 
@@ -10,9 +10,9 @@ export class TheArmoredPatrol extends NewsScrapper {
     /**
      * Scrapes news from The Armored Patrol website.
      *
-     * @param {WebSiteState} webSiteState - The state of the website.
+     * @param {NewsWebsite} webSiteState - The website to scrap and get the news.
      */
-    public async scrap(webSiteState: WebSiteState): Promise<void> {
+    public async scrap(webSiteState: NewsWebsite): Promise<void> {
         const containers: any[] = this.$(webSiteState.selector).get();
         const index: number = containers.findIndex(
             (container: any): boolean => container.children[1].children[1].children[0].attribs.href == webSiteState.lastUrl
@@ -33,9 +33,9 @@ export class TheArmoredPatrol extends NewsScrapper {
      *
      * @param {any[]} containers - The list of containers containing news articles.
      * @param {number} index - The index of the container to scrape.
-     * @param {WebSiteState} webSiteState - The state of the website.
+     * @param {NewsWebsite} webSiteState - The website to scrap and get the news.
      */
-    private async armoredPatrol(containers: any[], index: number, webSiteState: WebSiteState): Promise<void> {
+    private async armoredPatrol(containers: any[], index: number, webSiteState: NewsWebsite): Promise<void> {
         const link: any = this.$(`article#${containers[index].attribs.id} a`).get()[0];
 
         await this.sendNews(

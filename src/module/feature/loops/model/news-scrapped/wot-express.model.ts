@@ -1,5 +1,5 @@
 import { TimeEnum } from '../../../../shared/enums/time.enum';
-import type { WebSiteState } from '../../../../shared/types/inventory.type';
+import type { NewsWebsite } from '../../../../shared/types/news_website.type';
 import { EnvUtil } from '../../../../shared/utils/env.util';
 import { NewsScrapper } from './news-scrapper.model';
 
@@ -15,21 +15,21 @@ export class WotExpress extends NewsScrapper {
     /**
      * Scrapes news from the Wot Express website.
      *
-     * @param {WebSiteState} webSiteState - The state of the website.
+     * @param {NewsWebsite} newsWebsite - The website to scrap and get the news.
      */
-    public async scrap(webSiteState: WebSiteState): Promise<void> {
-        const links: any[] = this.$(webSiteState.selector).get();
-        let index: number = links.findIndex((link: any): boolean => link.attribs.href == webSiteState.lastUrl);
+    public async scrap(newsWebsite: NewsWebsite): Promise<void> {
+        const links: any[] = this.$(newsWebsite.selector).get();
+        let index: number = links.findIndex((link: any): boolean => link.attribs.href == newsWebsite.lastUrl);
 
         if (index === -1) {
             index = this.defaultIndex;
         }
 
-        if (!webSiteState.lastUrl) {
-            await this.wotExpress(links, 1, webSiteState);
+        if (!newsWebsite.lastUrl) {
+            await this.wotExpress(links, 1, newsWebsite);
         } else if (index > 0) {
             for (let i = index - 1; i >= 1; i--) {
-                await this.wotExpress(links, i, webSiteState);
+                await this.wotExpress(links, i, newsWebsite);
                 await EnvUtil.sleep(TimeEnum.MINUTE);
             }
         }
@@ -40,16 +40,16 @@ export class WotExpress extends NewsScrapper {
      *
      * @param {any[]} links - The list of links on the page.
      * @param {number} index - The index of the link to scrape.
-     * @param {WebSiteState} webSiteState - The state of the website.
+     * @param {NewsWebsite} newsWebsite - The website to scrap and get the news.
      */
-    private async wotExpress(links: any[], index: number, webSiteState: WebSiteState): Promise<void> {
+    private async wotExpress(links: any[], index: number, newsWebsite: NewsWebsite): Promise<void> {
         const isEu = links[index].children[2]?.attribs.class?.includes('eu');
 
         await this.sendNews(
             links[index].attribs.href,
-            `${webSiteState.name} : ${isEu ? 'EU news' : 'RU news'}`,
-            `Nouvelle rumeur venant de ${webSiteState.name}`,
-            webSiteState,
+            `${newsWebsite.name} : ${isEu ? 'EU news' : 'RU news'}`,
+            `Nouvelle rumeur venant de ${newsWebsite.name}`,
+            newsWebsite,
             links[index].children[0].attribs.style.split('url(/')[1].split(')')[0]
         );
     }

@@ -5,6 +5,7 @@ import type { InventorySingleton } from '../../../shared/singleton/inventory.sin
 import type { LeavingPlayerTable } from '../../../shared/tables/leaving-player.table';
 import type { PotentialClanTable } from '../../../shared/tables/potential-clan.table';
 import type { WatchClanTable } from '../../../shared/tables/watch-clan.table';
+import type { PotentialClan } from '../../../shared/types/potential-clan.type';
 import type { Clan } from '../../../shared/types/watch-clan.type';
 import type { PlayerPersonalDataSuccess } from '../../../shared/types/wot-api.type';
 import { FoldRecruitmentEnum } from '../../loops/enums/fold-recruitment.enum';
@@ -33,7 +34,7 @@ export class SearchClanModel {
             const clans: Clan[] = await this.watchClan.selectClan(String(clanId as number));
 
             if (clanId !== null && clanId !== 500312605 && clans.length === 0) {
-                const potentialClan = await this.potentialClan.getClan(clanId);
+                const potentialClan: PotentialClan[] = await this.potentialClan.getClan(clanId);
 
                 if (potentialClan.length === 0) {
                     await this.potentialClan.addClan(

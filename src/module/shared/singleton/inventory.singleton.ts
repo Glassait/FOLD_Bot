@@ -3,7 +3,7 @@ import { basename } from 'node:path';
 import { CoreFile } from '../classes/core-file';
 import { Logger } from '../classes/logger';
 import { EmojiEnum } from '../enums/emoji.enum';
-import type { Channel, DiscordId, FoldRecruitment, InventoryType, Trivia, WebSiteState } from '../types/inventory.type';
+import type { Channel, DiscordId, FoldRecruitment, InventoryType, Trivia } from '../types/inventory.type';
 import { EnvUtil } from '../utils/env.util';
 
 /**
@@ -58,13 +58,6 @@ export class InventorySingleton extends CoreFile<InventoryType> {
 
     //region SCRAPPING
     /**
-     * Get the number of newsletter in the inventory
-     */
-    public get numberOfNewsletter(): number {
-        return this._data.newsLetter.website.length;
-    }
-
-    /**
      * Getter for the array of banned words used in the newsletter.
      *
      * @returns {string[]} - An array of banned words for the newsletter.
@@ -104,47 +97,10 @@ export class InventorySingleton extends CoreFile<InventoryType> {
 
     //region METHOD SCRAPPING
     /**
-     * Get the website at the index
-     * @param index The index of the website
-     * @throws Error If the index is out of bound
-     */
-    public getNewsLetterAtIndex(index: number): WebSiteState {
-        const webSiteState: WebSiteState = this._data.newsLetter.website[index];
-
-        if (!webSiteState) {
-            this.logger.error(`Index out of bound ${index} in newsletter array`);
-            throw new Error(`Index out of bound ${index} in newsletter array`);
-        }
-
-        return webSiteState;
-    }
-
-    /**
      * Get the channel in the discord server to send the news
      */
     public async getNewsLetterChannel(client: Client): Promise<TextChannel> {
         return await this.fetchChannel(client, this._data.channels.newsletter);
-    }
-
-    /**
-     * Update the last news send by the bot.
-     * Update the inventory.json file
-     * @param url The new url
-     * @param newsLetterName The name of the website
-     */
-    public updateLastUrlOfWebsite(url: string, newsLetterName: string): void {
-        const webSite: WebSiteState | undefined = this._data.newsLetter.website.find(
-            (value: WebSiteState): boolean => value.name === newsLetterName
-        );
-
-        if (!webSite) {
-            this.logger.error(`This website ${newsLetterName} is not registered in the inventory`);
-            return;
-        }
-
-        const index: number = this._data.newsLetter.website.indexOf(webSite);
-        this._data.newsLetter.website[index].lastUrl = url;
-        this.writeData();
     }
     //endregion
 

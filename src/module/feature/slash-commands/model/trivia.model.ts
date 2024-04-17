@@ -69,7 +69,7 @@ export class TriviaModel {
             },
             {
                 name: 'Minuteur',
-                value: `Tu as \`1 minute\` pour répondre à la question. À la fin du minuteur, le bot t'enverra ton résultat : bonne ou mauvaise réponse ainsi que les informations sur le char à trouver et sur le char que tu as sélectionné.\n\nLorsque tu répond à la question en moins de \`10 secondes\`, tu obtiens un bonus de \`25%\` sur les points obtenus en cas de bonne réponse. ${EmojiEnum.WARNING} **Le temps de réponse change si la tu sélectionne une autre réponse**`,
+                value: `Tu as \`30 secondes\` pour répondre à la question. À la fin du minuteur, le bot t'enverra ton résultat : bonne ou mauvaise réponse ainsi que les informations sur le char à trouver et sur le char que tu as sélectionné.\n\nLorsque tu répond à la question en moins de \`10 secondes\`, tu obtiens un bonus de \`25%\` sur les points obtenus en cas de bonne réponse. ${EmojiEnum.WARNING} **Le temps de réponse change si tu sélectionnes une autre réponse**`,
             },
             {
                 name: 'Bouton',
