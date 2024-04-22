@@ -9,6 +9,8 @@ import { TimeEnum } from '../enums/time.enum';
  */
 type Constructor = new (...args: any[]) => any;
 
+type DependenceInjection = 'Inventory' | 'Statistic' | 'Trivia' | 'Axios' | 'WotApi' | 'Database';
+
 /**
  * Decorator function to inject singleton instances based on the provided dependence type.
  *
@@ -19,9 +21,9 @@ type Constructor = new (...args: any[]) => any;
  *
  * @throws {Error} - Throws an error if an unsupported dependence type is provided.
  *
- * @template {'Inventory' | 'Statistic' | 'Trivia' | 'Axios' | 'WotApi' | 'Database'} GDependence - The class to inject
+ * @template {DependenceInjection} GDependence - The class to inject
  */
-export function Injectable<GDependence extends 'Inventory' | 'Statistic' | 'Trivia' | 'Axios' | 'WotApi' | 'Database'>(
+export function Injectable<GDependence extends DependenceInjection>(
     dependence: GDependence,
     timeout: number = TimeEnum.MINUTE
     // eslint-disable-next-line @typescript-eslint/ban-types
@@ -65,20 +67,21 @@ export function Injectable<GDependence extends 'Inventory' | 'Statistic' | 'Triv
 }
 
 /**
+ * All types of SQL table to inject
+ */
+type TableInjectable = 'WatchClans' | 'BlacklistedPlayers' | 'LeavingPlayers' | 'PotentialClans' | 'NewsWebsites' | 'BanWords' | 'Channels';
+
+/**
  * Decorator function to inject table instances based on the provided dependence type.
  *
- * @param {GDependence} dependence - The type of dependence to inject.
+ * @param {TableInjectable} dependence - The type of dependence to inject.
  *
  * @returns {Function} - Decorator function.
  *
  * @throws {Error} - Throws an error if an unsupported dependence type is provided.
- *
- * @template {'WatchClans' | 'BlacklistedPlayers' | 'LeavingPlayers' | 'PotentialClans' | 'NewsWebsites' | 'BanWords' } GDependence - The table class to inject
  */
-export function TableInjectable<
-    GDependence extends 'WatchClans' | 'BlacklistedPlayers' | 'LeavingPlayers' | 'PotentialClans' | 'NewsWebsites' | 'BanWords',
->(
-    dependence: GDependence
+export function TableInjectable(
+    dependence: TableInjectable
     // eslint-disable-next-line @typescript-eslint/ban-types
 ): Function {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

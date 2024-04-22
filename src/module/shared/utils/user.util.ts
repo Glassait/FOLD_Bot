@@ -1,4 +1,5 @@
-import type { ChatInputCommandInteraction, CommandInteractionOption, Guild, GuildMember } from 'discord.js';
+import type { ChatInputCommandInteraction, Client, CommandInteractionOption, Guild, GuildMember, TextChannel } from 'discord.js';
+import type { Channel } from '../types/channel.type';
 
 /**
  * Utility class for user-related operations.
@@ -47,5 +48,24 @@ export class UserUtil {
             }
             return;
         }
+    }
+
+    /**
+     * Get the text channel from the cache and if is not loaded, fetch it from the guild manager
+     *
+     * @param {Client} client - The Discord client instance.
+     * @param {Channel} channel - The channel to fetch from the client.
+     *
+     * @returns {TextChannel} - The Discord text channel.
+     */
+    public static async fetchChannelFromClient(client: Client, channel: Channel): Promise<TextChannel> {
+        const chan: TextChannel | undefined = <TextChannel>client.channels.cache.get(channel.id);
+
+        if (!chan) {
+            const g: Guild = await client.guilds.fetch(channel.guild);
+            return <TextChannel>await g.channels.fetch(channel.id);
+        }
+
+        return chan;
     }
 }

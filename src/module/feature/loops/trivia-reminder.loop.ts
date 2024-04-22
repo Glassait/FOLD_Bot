@@ -4,6 +4,7 @@ import { Logger } from '../../shared/classes/logger';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
 import { TimeUtil } from '../../shared/utils/time.util';
+import { UserUtil } from '../../shared/utils/user.util';
 import type { BotLoop } from './types/bot-loop.type';
 
 module.exports = {
@@ -17,7 +18,10 @@ module.exports = {
             return;
         }
 
-        const channel: TextChannel = await inventory.getChannelForTrivia(client);
+        const req = require('../../shared/tables/channels.table');
+        const channels = new req.ChannelsTable();
+
+        const channel: TextChannel = await UserUtil.fetchChannelFromClient(client, await channels.getTrivia());
 
         await TimeUtil.forLoopTimeSleep(['20:00'], `${EmojiEnum.LOOP} Trivia reminder`, async (): Promise<void> => {
             await channel.send({

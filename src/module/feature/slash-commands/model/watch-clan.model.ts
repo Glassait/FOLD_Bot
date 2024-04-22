@@ -12,12 +12,14 @@ import type { Logger } from '../../../shared/classes/logger';
 import { Injectable, LoggerInjector, TableInjectable } from '../../../shared/decorators/injector.decorator';
 import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
 import type { BlacklistedPlayersTable } from '../../../shared/tables/blacklisted-players.table';
+import type { ChannelsTable } from '../../../shared/tables/channels.table';
 import type { WatchClansTable } from '../../../shared/tables/watch-clans.table';
 import type { BlacklistedPlayer } from '../../../shared/types/blacklisted-player.type';
 import type { WargamingSuccessType } from '../../../shared/types/wargaming-api.type';
 import type { Clan } from '../../../shared/types/watch-clan.type';
 import type { PlayerData } from '../../../shared/types/wot-api.type';
 import { StringUtil } from '../../../shared/utils/string.util';
+import { UserUtil } from '../../../shared/utils/user.util';
 
 @LoggerInjector
 export class WatchClanModel {
@@ -34,6 +36,7 @@ export class WatchClanModel {
     @Injectable('WotApi') private readonly wotApi: WotApiModel;
     @TableInjectable('WatchClans') private readonly watchClans: WatchClansTable;
     @TableInjectable('BlacklistedPlayers') private readonly blacklistedPlayers: BlacklistedPlayersTable;
+    @TableInjectable('Channels') private readonly channels: ChannelsTable;
     //endregion
 
     private _channel: TextChannel;
@@ -48,14 +51,12 @@ export class WatchClanModel {
      * @param {Client} client - The Discord client used to fetch the channel.
      *
      * @example
-     * ```typescript
      * const discordClient = new Client();
      * await instance.fetchChannel(discordClient);
      * console.log(instance.channel); // Updated channel information
-     * ```
      */
     public async initialise(client: Client): Promise<void> {
-        this._channel = await this.inventory.getChannelForFoldRecruitment(client);
+        this._channel = await UserUtil.fetchChannelFromClient(client, await this.channels.getFoldRecruitment());
     }
 
     /**

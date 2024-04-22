@@ -2,11 +2,12 @@ import type { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 import { type CheerioAPI, load } from 'cheerio';
 import type { Client, TextChannel } from 'discord.js';
 import type { Logger } from '../../../shared/classes/logger';
-import { Injectable, LoggerInjector } from '../../../shared/decorators/injector.decorator';
+import { Injectable, LoggerInjector, TableInjectable } from '../../../shared/decorators/injector.decorator';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
-import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
+import type { ChannelsTable } from '../../../shared/tables/channels.table';
 import type { NewsWebsite } from '../../../shared/types/news_website.type';
+import { UserUtil } from '../../../shared/utils/user.util';
 import { WebsiteNameEnum } from '../enums/website-name.enum';
 import type { WotExpress } from './news-scrapped/wot-express.model';
 
@@ -15,7 +16,7 @@ export class WebSiteScraper {
     //region INJECTABLE
     private readonly logger: Logger;
     @Injectable('Axios', TimeEnum.SECONDE * 10) private readonly axios: AxiosInstance;
-    @Injectable('Inventory') private readonly inventory: InventorySingleton;
+    @TableInjectable('Channels') private readonly channels: ChannelsTable;
     //endregion
 
     /**
@@ -29,7 +30,7 @@ export class WebSiteScraper {
      * @param {Client} client - The Discord client instance
      */
     public async initialise(client: Client): Promise<void> {
-        this.channel = await this.inventory.getNewsLetterChannel(client);
+        this.channel = await UserUtil.fetchChannelFromClient(client, await this.channels.getNewsWebsite());
     }
 
     /**

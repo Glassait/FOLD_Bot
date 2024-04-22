@@ -7,12 +7,14 @@ import { Logger } from '../classes/logger';
 import { EmojiEnum } from '../enums/emoji.enum';
 import { TimeEnum } from '../enums/time.enum';
 import { WotApiConstants } from '../enums/wot-api.enum';
+import { ChannelsTable } from '../tables/channels.table';
 import type { Trivia } from '../types/inventory.type';
 import type { TriviaPlayerStatistic, TriviaStatistic } from '../types/statistic.type';
 import type { TriviaSelected } from '../types/trivia.type';
 import type { TankopediaVehiclesSuccess, VehicleData } from '../types/wot-api.type';
 import { DateUtil } from '../utils/date.util';
 import { RandomUtil } from '../utils/random.util';
+import { UserUtil } from '../utils/user.util';
 import { MEDAL } from '../utils/variables.util';
 import { InventorySingleton } from './inventory.singleton';
 import { StatisticSingleton } from './statistic.singleton';
@@ -27,6 +29,7 @@ export class TriviaSingleton {
     private readonly wotApi: WotApiModel;
     private readonly inventory: InventorySingleton;
     private readonly statistic: StatisticSingleton;
+    private readonly channels: ChannelsTable;
     //endregion
 
     //region PRIVATE READONLY FIELDS
@@ -64,6 +67,7 @@ export class TriviaSingleton {
         this.inventory = InventorySingleton.instance;
         this.logger = new Logger(basename(__filename));
         this.statistic = StatisticSingleton.instance;
+        this.channels = new ChannelsTable();
 
         this.trivia = this.inventory.trivia;
         this.triviaStatistique = this.statistic.trivia;
@@ -140,7 +144,7 @@ export class TriviaSingleton {
 
     public async sendTriviaResultForYesterday(client: Client): Promise<void> {
         this.logger.debug('Start collecting data to send the trivia result');
-        this.channel = await this.inventory.getChannelForTrivia(client);
+        this.channel = await UserUtil.fetchChannelFromClient(client, await this.channels.getTrivia());
 
         const previousDay: string = DateUtil.getPreviousDay();
         const month: string = DateUtil.getCorrectMonthForPreviousDay();

@@ -84,9 +84,9 @@ export class Table {
      *
      * @template T - The type return by the query select
      */
-    protected async select<T>(sql: string): Promise<T[]> {
+    protected async select<T>(sql: string): Promise<T> {
         this.validateQueryType(sql, 'SELECT');
-        return (await this.query(sql)) as T[];
+        return (await this.query(sql)) as T;
     }
 
     /**

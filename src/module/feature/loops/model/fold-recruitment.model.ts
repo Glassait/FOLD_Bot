@@ -7,11 +7,13 @@ import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
 import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
 import type { BlacklistedPlayersTable } from '../../../shared/tables/blacklisted-players.table';
+import type { ChannelsTable } from '../../../shared/tables/channels.table';
 import type { LeavingPlayersTable } from '../../../shared/tables/leaving-players.table';
 import type { WatchClansTable } from '../../../shared/tables/watch-clans.table';
 import type { BlacklistedPlayer } from '../../../shared/types/blacklisted-player.type';
 import type { Clan } from '../../../shared/types/watch-clan.type';
 import { StringUtil } from '../../../shared/utils/string.util';
+import { UserUtil } from '../../../shared/utils/user.util';
 import { FoldRecruitmentEnum, WotClanActivity } from '../enums/fold-recruitment.enum';
 import type { ClanActivity, FoldRecruitmentData, LeaveClanActivity, Players } from '../types/fold-recruitment.type';
 
@@ -34,6 +36,7 @@ export class FoldRecruitmentModel {
     @TableInjectable('WatchClans') private readonly watchClans: WatchClansTable;
     @TableInjectable('BlacklistedPlayers') private readonly blacklistedPlayers: BlacklistedPlayersTable;
     @TableInjectable('LeavingPlayers') private readonly leavingPlayers: LeavingPlayersTable;
+    @TableInjectable('Channels') private readonly channels: ChannelsTable;
     //endregion
 
     //region PRIVATE FIELDS
@@ -98,7 +101,7 @@ export class FoldRecruitmentModel {
      * @param {Client} client - The Discord client instance.
      */
     public async initialise(client: Client): Promise<void> {
-        this.channel = await this.inventory.getChannelForFoldRecruitment(client);
+        this.channel = await UserUtil.fetchChannelFromClient(client, await this.channels.getFoldRecruitment());
 
         this.url = this.inventory.foldRecruitment.newsfeed_url;
         this.clanUrl = this.inventory.foldRecruitment.clan_url;

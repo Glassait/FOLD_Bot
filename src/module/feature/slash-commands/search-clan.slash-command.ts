@@ -1,7 +1,7 @@
 import { type ChatInputCommandInteraction, type Client, Colors, EmbedBuilder, PermissionsBitField, type TextChannel } from 'discord.js';
-import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
 import { PotentialClansTable } from '../../shared/tables/potential-clans.table';
 import type { PotentialClan } from '../../shared/types/potential-clan.type';
+import { UserUtil } from '../../shared/utils/user.util';
 import { SlashCommandModel } from './model/slash-command.model';
 
 module.exports = new SlashCommandModel(
@@ -19,8 +19,10 @@ module.exports = new SlashCommandModel(
             return;
         }
 
-        const inventory: InventorySingleton = InventorySingleton.instance;
-        const channel: TextChannel = await inventory.getChannelForFoldRecruitment(client as Client);
+        const req = require('../../shared/tables/channels.table');
+        const channels = new req.ChannelsTable();
+
+        const channel: TextChannel = await UserUtil.fetchChannelFromClient(client as Client, await channels.getFoldRecruitment());
 
         const numberOfEmbed: number = Math.floor(clans.length / 40) || 1;
         let index: number = 0;

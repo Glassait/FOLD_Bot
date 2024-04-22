@@ -1,10 +1,10 @@
 import { type Client, Colors, EmbedBuilder, type TextChannel } from 'discord.js';
 import type { Logger } from '../../../shared/classes/logger';
-import { Injectable, LoggerInjector } from '../../../shared/decorators/injector.decorator';
+import { Injectable, LoggerInjector, TableInjectable } from '../../../shared/decorators/injector.decorator';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
-import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
 import type { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
+import type { ChannelsTable } from '../../../shared/tables/channels.table';
 import type {
     MonthlyTriviaOverallStatistic,
     MonthlyTriviaPlayerStatistic,
@@ -13,14 +13,15 @@ import type {
 import { DateUtil } from '../../../shared/utils/date.util';
 import { MathUtil } from '../../../shared/utils/math.util';
 import { StringUtil } from '../../../shared/utils/string.util';
+import { UserUtil } from '../../../shared/utils/user.util';
 import { MEDAL } from '../../../shared/utils/variables.util';
 
 @LoggerInjector
 export class TriviaMonthModel {
     //region INJECTABLE
     private readonly logger: Logger;
-    @Injectable('Inventory') private readonly inventory: InventorySingleton;
     @Injectable('Statistic') private readonly statistic: StatisticSingleton;
+    @TableInjectable('Channels') private readonly channels: ChannelsTable;
     //endregion
 
     //region PRIVATE
@@ -55,7 +56,7 @@ export class TriviaMonthModel {
      */
     public async initialise(client: Client): Promise<void> {
         this.logger.info('First of the month, creation of the trivia month message');
-        this.channel = await this.inventory.getChannelForTrivia(client);
+        this.channel = await UserUtil.fetchChannelFromClient(client, await this.channels.getTrivia());
 
         this.playerClassement = Object.entries(this.statistic.trivia.player)
             .reduce((newArray: [string, MonthlyTriviaPlayerStatistic][], [name, statistics]: [string, TriviaPlayerStatistic]) => {

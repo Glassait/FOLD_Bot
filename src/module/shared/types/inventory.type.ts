@@ -4,20 +4,6 @@
 export type DiscordId = string; // NOSONAR
 
 /**
- * Type describing a Discord channel.
- */
-export type Channel = {
-    /**
-     * The Discord ID of the guild to which the channel belongs.
-     */
-    guild: DiscordId;
-    /**
-     * The Discord ID of the channel
-     */
-    id: DiscordId;
-};
-
-/**
  * Type defining the structure for the trivia game.
  */
 export type Trivia = {
@@ -194,24 +180,6 @@ export type InventoryType = {
      * The recruitment section of the inventory.
      */
     fold_recruitment: FoldRecruitment;
-    /**
-     * Channels configuration for various features.
-     */
-    channels: {
-        /**
-         * The channel configuration for the newsletter feature.
-         */
-        newsletter: Channel;
-        /**
-         * The channel configuration for the trivia feature.
-         */
-        trivia: Channel;
-        /**
-         * The channel configuration for the fold recruitment feature.
-         */
-        fold_recruitment: Channel;
-        [key: string]: Channel;
-    };
     /**
      * Object mapping command keys to Discord IDs.
      */
