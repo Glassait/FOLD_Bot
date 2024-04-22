@@ -26,12 +26,5 @@
 		"trivia": [],
 		"al_capone-trophy": [],
 		"search-clan": []
-	},
-	"feature_flipping": {
-		"trivia": false,
-		"trivia_month": false,
-		"fold_recruitment": false,
-		"scrap_website": false,
-		"search_clan": false
 	}
 }

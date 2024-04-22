@@ -1,5 +1,6 @@
 import { type ChatInputCommandInteraction, SlashCommandSubcommandBuilder } from 'discord.js';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
+import { FeatureFlippingTable } from '../../shared/tables/feature-flipping.table';
 import { DateUtil } from '../../shared/utils/date.util';
 import { SlashCommandModel } from './model/slash-command.model';
 import { TriviaModel } from './model/trivia.model';
@@ -26,8 +27,9 @@ module.exports = new SlashCommandModel(
     'Commande concernant le jeu trivia',
     async (interaction: ChatInputCommandInteraction): Promise<void> => {
         await interaction.deferReply({ ephemeral: true });
+        const features: FeatureFlippingTable = new FeatureFlippingTable();
 
-        if (!InventorySingleton.instance.getFeatureFlipping('trivia')) {
+        if (!(await features.getFeature('trivia'))) {
             await interaction.editReply({
                 content: "Le jeu trivia n'est pas activé par l'administrateur <@313006042340524033>.",
             });

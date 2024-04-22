@@ -69,59 +69,40 @@ export function Injectable<GDependence extends DependenceInjection>(
 /**
  * All types of SQL table to inject
  */
-type TableInjectable = 'WatchClans' | 'BlacklistedPlayers' | 'LeavingPlayers' | 'PotentialClans' | 'NewsWebsites' | 'BanWords' | 'Channels';
+const tableMap = {
+    WatchClans: require('../tables/watch-clans.table').WatchClanTable,
+    BlacklistedPlayers: require('../tables/blacklisted-players.table').BlacklistedPlayerTable,
+    LeavingPlayers: require('../tables/leaving-players.table').LeavingPlayerTable,
+    PotentialClans: require('../tables/potential-clans.table').PotentialClanTable,
+    NewsWebsites: require('../tables/news-websites.table').NewsWebsiteTable,
+    BanWords: require('../tables/ban-words.table').BanWordsTable,
+    Channels: require('../tables/channels.table').ChannelsTable,
+    FeatureFlipping: require('../tables/feature-flipping.table').FeatureFlippingTable,
+};
 
 /**
  * Decorator function to inject table instances based on the provided dependence type.
  *
- * @param {TableInjectable} dependence - The type of dependence to inject.
+ * @param {keyof typeof tableMap} dependence - The type of dependence to inject.
  *
  * @returns {Function} - Decorator function.
  *
  * @throws {Error} - Throws an error if an unsupported dependence type is provided.
  */
 export function TableInjectable(
-    dependence: TableInjectable
+    dependence: keyof typeof tableMap
     // eslint-disable-next-line @typescript-eslint/ban-types
 ): Function {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     return function actual<GTable>(_target: GTable, _context: ClassFieldDecoratorContext<GTable, any>) {
         return function (this: GTable, field: any) {
-            switch (dependence) {
-                case 'WatchClans': {
-                    const req = require('../tables/watch-clans.table');
-                    field = new req.WatchClanTable();
-                    break;
-                }
-                case 'BlacklistedPlayers': {
-                    const req = require('../tables/blacklisted-players.table');
-                    field = new req.BlacklistedPlayerTable();
-                    break;
-                }
-                case 'LeavingPlayers': {
-                    const req = require('../tables/leaving-players.table');
-                    field = new req.LeavingPlayerTable();
-                    break;
-                }
-                case 'PotentialClans': {
-                    const req = require('../tables/potential-clans.table');
-                    field = new req.PotentialClanTable();
-                    break;
-                }
-                case 'NewsWebsites': {
-                    const req = require('../tables/news-websites.table');
-                    field = new req.NewsWebsiteTable();
-                    break;
-                }
-                case 'BanWords': {
-                    const req = require('../tables/ban-words.table');
-                    field = new req.BanWordsTable();
-                    break;
-                }
-                default:
-                    throw new Error(`Unsupported dependence type: ${dependence}`);
+            const req = tableMap[dependence];
+
+            if (!req) {
+                throw new Error(`Unsupported dependence type: ${dependence}`);
             }
 
+            field = new req();
             return field;
         };
     };

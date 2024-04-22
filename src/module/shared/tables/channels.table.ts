@@ -14,9 +14,6 @@ export class ChannelsTable extends Table {
      */
     private readonly DEV_CHANNEL: Channel = { guild: '1218558386761891901', id: '1218558387361546412' };
 
-    /**
-     * Creates an instance of ChannelsTable.
-     */
     constructor() {
         super('channels');
     }

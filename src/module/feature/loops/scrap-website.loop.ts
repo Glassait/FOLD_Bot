@@ -3,7 +3,7 @@ import { basename } from 'node:path';
 import { Logger } from '../../shared/classes/logger';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
 import { TimeEnum } from '../../shared/enums/time.enum';
-import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
+import { FeatureFlippingTable } from '../../shared/tables/feature-flipping.table';
 import type { NewsWebsitesTable } from '../../shared/tables/news-websites.table';
 import type { NewsWebsite } from '../../shared/types/news_website.type';
 import { EnvUtil } from '../../shared/utils/env.util';
@@ -14,9 +14,9 @@ module.exports = {
     name: 'WebSiteScraper',
     execute: async (client: Client): Promise<void> => {
         const logger: Logger = new Logger(basename(__filename));
-        const inventory: InventorySingleton = InventorySingleton.instance;
+        const features: FeatureFlippingTable = new FeatureFlippingTable();
 
-        if (!inventory.getFeatureFlipping('scrap_website')) {
+        if (!(await features.getFeature('scrap_website'))) {
             logger.warn("Scrap website feature disabled, if it's normal, dont mind this message!");
             return;
         }

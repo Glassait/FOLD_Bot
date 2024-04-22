@@ -8,9 +8,6 @@ import type { PotentialClan } from '../types/potential-clan.type';
  */
 @LoggerInjector
 export class PotentialClansTable extends Table {
-    /**
-     * Creates an instance of PotentialClanTable.
-     */
     constructor() {
         super('potential_clans');
     }

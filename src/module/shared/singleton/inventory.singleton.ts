@@ -2,19 +2,13 @@ import { basename } from 'node:path';
 import { CoreFile } from '../classes/core-file';
 import { Logger } from '../classes/logger';
 import { EmojiEnum } from '../enums/emoji.enum';
-import type { Channel, DiscordId, FoldRecruitment, InventoryType, Trivia } from '../types/inventory.type';
-import { EnvUtil } from '../utils/env.util';
+import type { DiscordId, FoldRecruitment, InventoryType, Trivia } from '../types/inventory.type';
 
 /**
  * Class used to manage the inventory.json file
  * This class implement the Singleton pattern
  */
 export class InventorySingleton extends CoreFile<InventoryType> {
-    /**
-     * The id of the dev channel for testing purposes
-     */
-    private readonly DEV_CHANNEL: Channel = { guild: '1218558386761891901', id: '1218558387361546412' };
-
     /**
      * Private constructor for the InventorySingleton class.
      * Initializes the instance by reading the json core file and performs additional setup.
@@ -26,12 +20,6 @@ export class InventorySingleton extends CoreFile<InventoryType> {
         this.logger = new Logger(basename(__filename));
 
         this._data = JSON.parse(this.readFile().toString());
-
-        if (EnvUtil.isDev() && 'channels' in this._data) {
-            Object.keys(this._data.channels).forEach((channel: string): void => {
-                this._data.channels[channel] = this.DEV_CHANNEL;
-            });
-        }
 
         this.backupData();
         this.logger.info(`${EmojiEnum.HAMMER} {} instance initialized`, InventorySingleton.name);
@@ -98,23 +86,5 @@ export class InventorySingleton extends CoreFile<InventoryType> {
         }
 
         return command;
-    }
-
-    /**
-     * Retrieves the state of a feature flipping based on its name.
-     *
-     * @param {string} feature - The name of the feature.
-     * @returns {boolean | undefined} - Returns the state of the feature if found, or `undefined` if the feature is not present.
-     *
-     * @example
-     * const isFeatureEnabled = instance.getFeatureFlipping('myFeature');
-     * if (isFeatureEnabled !== undefined) {
-     *   console.log(`Feature 'myFeature' is ${isFeatureEnabled ? 'enabled' : 'disabled'}`);
-     * } else {
-     *   console.log(`Feature 'myFeature' not found`);
-     * }
-     */
-    public getFeatureFlipping(feature: string): boolean | undefined {
-        return this._data.feature_flipping[feature];
     }
 }

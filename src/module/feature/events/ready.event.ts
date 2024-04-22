@@ -2,8 +2,8 @@ import { type Client, Events } from 'discord.js';
 import { basename } from 'node:path';
 import { Logger } from '../../shared/classes/logger';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
-import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
 import { TriviaSingleton } from '../../shared/singleton/trivia.singleton';
+import { FeatureFlippingTable } from '../../shared/tables/feature-flipping.table';
 import { SentenceUtil } from '../../shared/utils/sentence.util';
 import type { SearchClanModel } from './models/search-clan.model';
 import type { TriviaMonthModel } from './models/trivia-month.model';
@@ -14,7 +14,7 @@ module.exports = {
     once: true,
     async execute(client: Client): Promise<void> {
         const logger: Logger = new Logger(basename(__filename));
-        const inventory: InventorySingleton = InventorySingleton.instance;
+        const features: FeatureFlippingTable = new FeatureFlippingTable();
         const trivia: TriviaSingleton = TriviaSingleton.instance;
 
         logger.info(`${EmojiEnum.MUSCLE} Logged in as {}`, client.user?.tag as string);
@@ -32,7 +32,7 @@ module.exports = {
             status: 'online',
         });
 
-        if (inventory.getFeatureFlipping('trivia')) {
+        if (await features.getFeature('trivia')) {
             await trivia.fetchTankOfTheDay();
             await trivia.sendTriviaResultForYesterday(client);
             await trivia.reduceEloOfInactifPlayer();
@@ -44,7 +44,7 @@ module.exports = {
             return;
         }
 
-        if (inventory.getFeatureFlipping('trivia_month')) {
+        if (await features.getFeature('trivia_month')) {
             const req = require('./models/trivia-month.model');
             const triviaMonth: TriviaMonthModel = new req.TriviaMonthModel();
 
@@ -52,7 +52,7 @@ module.exports = {
             await triviaMonth.createEmbedAndSendToChannel();
         }
 
-        if (inventory.getFeatureFlipping('search_clan')) {
+        if (await features.getFeature('search_clan')) {
             const red = require('./models/search-clan.model');
             const searchClanModel: SearchClanModel = new red.SearchClanModel();
 

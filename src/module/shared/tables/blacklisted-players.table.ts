@@ -8,9 +8,6 @@ import type { BlacklistedPlayer } from '../types/blacklisted-player.type';
  */
 @LoggerInjector
 export class BlacklistedPlayersTable extends Table {
-    /**
-     * Constructs a new instance of BlacklistedPlayerTable.
-     */
     constructor() {
         super('blacklisted_players');
     }

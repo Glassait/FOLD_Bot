@@ -186,20 +186,4 @@ export type InventoryType = {
     commands: {
         [key: string]: DiscordId[];
     };
-    /**
-     * Feature flipping configuration to enable or disable specific features dynamically.
-     *
-     * @example
-     * const inventory: InventoryType = {
-     *   // ... other fields ...
-     *   feature_flipping: {
-     *     feature1: true,
-     *     feature2: false,
-     *     // ...
-     *   },
-     * };
-     */
-    feature_flipping: {
-        [key: string]: boolean;
-    };
 };

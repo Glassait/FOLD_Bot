@@ -2,7 +2,7 @@ import { type Client, Colors, EmbedBuilder, type TextChannel } from 'discord.js'
 import { basename } from 'node:path';
 import { Logger } from '../../shared/classes/logger';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
-import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
+import { FeatureFlippingTable } from '../../shared/tables/feature-flipping.table';
 import { TimeUtil } from '../../shared/utils/time.util';
 import { UserUtil } from '../../shared/utils/user.util';
 import type { BotLoop } from './types/bot-loop.type';
@@ -11,9 +11,9 @@ module.exports = {
     name: 'Fold Recruitment',
     execute: async (client: Client): Promise<void> => {
         const logger: Logger = new Logger(basename(__filename));
-        const inventory: InventorySingleton = InventorySingleton.instance;
+        const features: FeatureFlippingTable = new FeatureFlippingTable();
 
-        if (!inventory.getFeatureFlipping('trivia')) {
+        if (!(await features.getFeature('trivia'))) {
             logger.warn("Trivia feature disabled, if it's normal, dont mind this message!");
             return;
         }

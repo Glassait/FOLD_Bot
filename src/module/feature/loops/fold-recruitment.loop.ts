@@ -3,6 +3,7 @@ import { basename } from 'node:path';
 import { Logger } from '../../shared/classes/logger';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
+import { FeatureFlippingTable } from '../../shared/tables/feature-flipping.table';
 import type { WatchClansTable } from '../../shared/tables/watch-clans.table';
 import { TimeUtil } from '../../shared/utils/time.util';
 import type { FoldRecruitmentModel } from './model/fold-recruitment.model';
@@ -12,12 +13,14 @@ module.exports = {
     name: 'Fold Recruitment',
     execute: async (client: Client): Promise<void> => {
         const logger: Logger = new Logger(basename(__filename));
+        const features: FeatureFlippingTable = new FeatureFlippingTable();
         const inventory: InventorySingleton = InventorySingleton.instance;
 
-        if (!inventory.getFeatureFlipping('fold_recruitment')) {
+        if (!(await features.getFeature('fold_recruitment'))) {
             logger.warn("Fold recruitment disabled, if it's normal, dont mind this message !");
             return;
         }
+
         let req = require('../../shared/tables/watch-clans.table');
         const watchClan: WatchClansTable = new req.WatchClanTable();
 

@@ -7,9 +7,6 @@ import { LoggerInjector } from '../decorators/injector.decorator';
  */
 @LoggerInjector
 export class BanWordsTable extends Table {
-    /**
-     * Creates an instance of BanWordsTable.
-     */
     constructor() {
         super('ban_words');
     }

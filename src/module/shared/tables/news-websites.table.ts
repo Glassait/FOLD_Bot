@@ -8,9 +8,6 @@ import type { NewsWebsite } from '../types/news_website.type';
  */
 @LoggerInjector
 export class NewsWebsitesTable extends Table {
-    /**
-     * Creates an instance of NewsWebsiteTable.
-     */
     constructor() {
         super('news_websites');
     }

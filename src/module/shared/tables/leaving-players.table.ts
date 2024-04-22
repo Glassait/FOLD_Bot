@@ -7,9 +7,6 @@ import { LoggerInjector } from '../decorators/injector.decorator';
  */
 @LoggerInjector
 export class LeavingPlayersTable extends Table {
-    /**
-     * Constructs a new instance of LeavingPlayerTable.
-     */
     constructor() {
         super('leaving_players');
     }
