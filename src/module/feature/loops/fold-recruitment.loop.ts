@@ -1,8 +1,8 @@
 import type { Client } from 'discord.js';
 import { basename } from 'node:path';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
-import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
 import { FeatureFlippingTable } from '../../shared/tables/feature-flipping.table';
+import type { FoldRecruitmentTable } from '../../shared/tables/fold-recruitment.table';
 import type { WatchClansTable } from '../../shared/tables/watch-clans.table';
 import { Logger } from '../../shared/utils/logger';
 import { TimeUtil } from '../../shared/utils/time.util';
@@ -13,10 +13,9 @@ module.exports = {
     name: 'Fold Recruitment',
     execute: async (client: Client): Promise<void> => {
         const logger: Logger = new Logger(basename(__filename));
-        const features: FeatureFlippingTable = new FeatureFlippingTable();
-        const inventory: InventorySingleton = InventorySingleton.instance;
+        const featuresFlipping: FeatureFlippingTable = new FeatureFlippingTable();
 
-        if (!(await features.getFeature('fold_recruitment'))) {
+        if (!(await featuresFlipping.getFeature('fold_recruitment'))) {
             logger.warn("Fold recruitment disabled, if it's normal, dont mind this message !");
             return;
         }
@@ -24,12 +23,14 @@ module.exports = {
         let req = require('../../shared/tables/watch-clans.table');
         const watchClan: WatchClansTable = new req.WatchClanTable();
 
+        req = require('../../shared/tables/fold-recruitment.table');
+        const foldRecruitment: FoldRecruitmentTable = new req.FoldRecruitmentTable();
+
         req = require('./model/fold-recruitment.model');
         const recruitmentModel: FoldRecruitmentModel = new req.FoldRecruitmentModel();
         await recruitmentModel.initialise(client);
 
-        await TimeUtil.forLoopTimeSleep(inventory.foldRecruitment.schedule, `${EmojiEnum.LOOP} Recruitment`, async (): Promise<void> => {
-            inventory.backupData();
+        await TimeUtil.forLoopTimeSleep(await foldRecruitment.getSchedule(), `${EmojiEnum.LOOP} Recruitment`, async (): Promise<void> => {
             require('../../shared/singleton/statistic.singleton').StatisticSingleton.instance.backupData();
 
             recruitmentModel.noPlayerFound = true;

@@ -77,6 +77,7 @@ let tableMap: {
     FeatureFlipping: Constructor;
     Commands: Constructor;
     WotApi: Constructor;
+    FoldRecruitment: Constructor;
 };
 
 /**
@@ -103,6 +104,7 @@ export function TableInjectable(
         FeatureFlipping: require('../tables/feature-flipping.table').FeatureFlippingTable,
         Commands: require('../tables/commands.table').CommandsTable,
         WotApi: require('../tables/wot-api.table').WotApiTable,
+        FoldRecruitment: require('../tables/fold-recruitment.table').FoldRecruitmentTable,
     };
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

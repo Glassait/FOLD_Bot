@@ -95,70 +95,6 @@ export type Trivia = {
 };
 
 /**
- * Type defining the architecture for describing recruitment.
- */
-export type FoldRecruitment = {
-    /**
-     * Array of schedules for recruitment.
-     */
-    schedule: string[];
-    /**
-     * The wot api url to get the clan image
-     *
-     * @replace APPLICATION_ID
-     * @replace CLAN_NAME
-     */
-    image_url: string;
-    /**
-     * The wot api url to get the clan activity
-     *
-     * @replace CLAN_ID
-     */
-    newsfeed_url: string;
-    /**
-     * The wargaming url to display the main page of the clan
-     *
-     * @replace CLAN_ID
-     */
-    clan_url: string;
-    /**
-     * The tomato url to display the main statistics of the player
-     *
-     * @replace PLAYER_NAME
-     * @replace PLAYER_ID
-     */
-    tomato_url: string;
-    /**
-     * The wargaming url to display the main statistics of the player
-     *
-     * @replace PLAYER_NAME
-     * @replace PLAYER_ID
-     */
-    wargaming_url: string;
-    /**
-     * The wot life url to display the main statistics of the player
-     *
-     * @replace PLAYER_NAME
-     * @replace PLAYER_ID
-     */
-    wot_life_url: string;
-    /**
-     * The wot url to search the id player of player with a name
-     *
-     * @replace APPLICATION_ID
-     * @replace PLAYER_NAME
-     */
-    player_url: string;
-    /**
-     * The wot url to get the personal data of a player
-     *
-     * @replace APPLICATION_ID
-     * @replace PLAYER_ID
-     */
-    player_personal_data: string;
-};
-
-/**
  * Type defining the structure of the inventory.json file.
  */
 export type InventoryType = {
@@ -171,8 +107,4 @@ export type InventoryType = {
          */
         trivia: Trivia;
     };
-    /**
-     * The recruitment section of the inventory.
-     */
-    fold_recruitment: FoldRecruitment;
 };

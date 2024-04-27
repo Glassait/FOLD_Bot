@@ -4,9 +4,9 @@ import { WotApiModel } from '../../../shared/apis/wot-api.model';
 import { Injectable, LoggerInjector, TableInjectable } from '../../../shared/decorators/injector.decorator';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
-import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
 import type { BlacklistedPlayersTable } from '../../../shared/tables/blacklisted-players.table';
 import type { ChannelsTable } from '../../../shared/tables/channels.table';
+import type { FoldRecruitmentTable } from '../../../shared/tables/fold-recruitment.table';
 import type { LeavingPlayersTable } from '../../../shared/tables/leaving-players.table';
 import type { WatchClansTable } from '../../../shared/tables/watch-clans.table';
 import type { BlacklistedPlayer } from '../../../shared/types/blacklisted-player.type';
@@ -32,11 +32,11 @@ export class FoldRecruitmentModel {
     private readonly logger: Logger;
     private readonly wotApiModel: WotApiModel = new WotApiModel();
     @Injectable('Axios', TimeEnum.SECONDE * 30) private readonly axios: AxiosInstance;
-    @Injectable('Inventory') private readonly inventory: InventorySingleton;
     @TableInjectable('WatchClans') private readonly watchClans: WatchClansTable;
     @TableInjectable('BlacklistedPlayers') private readonly blacklistedPlayers: BlacklistedPlayersTable;
     @TableInjectable('LeavingPlayers') private readonly leavingPlayers: LeavingPlayersTable;
     @TableInjectable('Channels') private readonly channels: ChannelsTable;
+    @TableInjectable('FoldRecruitment') private readonly foldRecruitment: FoldRecruitmentTable;
     //endregion
 
     //region PRIVATE FIELDS
@@ -103,11 +103,11 @@ export class FoldRecruitmentModel {
     public async initialise(client: Client): Promise<void> {
         this.channel = await UserUtil.fetchChannelFromClient(client, await this.channels.getFoldRecruitment());
 
-        this.url = this.inventory.foldRecruitment.newsfeed_url;
-        this.clanUrl = this.inventory.foldRecruitment.clan_url;
-        this.tomato = this.inventory.foldRecruitment.tomato_url;
-        this.wargaming = this.inventory.foldRecruitment.wargaming_url;
-        this.wotLife = this.inventory.foldRecruitment.wot_life_url;
+        this.url = await this.foldRecruitment.getUrl('newsfeed');
+        this.clanUrl = await this.foldRecruitment.getUrl('clan');
+        this.tomato = await this.foldRecruitment.getUrl('tomato');
+        this.wargaming = await this.foldRecruitment.getUrl('wargaming');
+        this.wotLife = await this.foldRecruitment.getUrl('wot_life');
     }
 
     /**

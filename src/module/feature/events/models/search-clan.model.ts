@@ -1,6 +1,6 @@
 import type { WotApiModel } from '../../../shared/apis/wot-api.model';
 import { Injectable, LoggerInjector, TableInjectable } from '../../../shared/decorators/injector.decorator';
-import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
+import type { FoldRecruitmentTable } from '../../../shared/tables/fold-recruitment.table';
 import type { LeavingPlayersTable } from '../../../shared/tables/leaving-players.table';
 import type { PotentialClansTable } from '../../../shared/tables/potential-clans.table';
 import type { WatchClansTable } from '../../../shared/tables/watch-clans.table';
@@ -14,11 +14,11 @@ import { FoldRecruitmentEnum } from '../../loops/enums/fold-recruitment.enum';
 export class SearchClanModel {
     //region INJECTABLE
     private readonly logger: Logger;
-    @Injectable('Inventory') private readonly inventory: InventorySingleton;
     @Injectable('WotApi') private readonly wotApi: WotApiModel;
     @TableInjectable('WatchClans') private readonly watchClans: WatchClansTable;
     @TableInjectable('LeavingPlayers') private readonly leavingPlayers: LeavingPlayersTable;
     @TableInjectable('PotentialClans') private readonly potentialClans: PotentialClansTable;
+    @TableInjectable('FoldRecruitment') private readonly foldRecruitment: FoldRecruitmentTable;
     //endregion
 
     /**
@@ -38,7 +38,7 @@ export class SearchClanModel {
 
                 if (potentialClan.length === 0) {
                     await this.potentialClans.addClan(
-                        this.inventory.foldRecruitment.clan_url.replace(FoldRecruitmentEnum.CLAN_ID, String(clanId))
+                        (await this.foldRecruitment.getUrl('clan')).replace(FoldRecruitmentEnum.CLAN_ID, String(clanId))
                     );
                 }
             } else {

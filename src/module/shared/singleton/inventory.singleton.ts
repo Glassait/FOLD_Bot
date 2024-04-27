@@ -1,7 +1,7 @@
 import { basename } from 'node:path';
 import { CoreFileAbstract } from '../abstracts/core-file.abstract';
 import { EmojiEnum } from '../enums/emoji.enum';
-import type { FoldRecruitment, InventoryType, Trivia } from '../types/inventory.type';
+import type { InventoryType, Trivia } from '../types/inventory.type';
 import { Logger } from '../utils/logger';
 
 /**
@@ -59,15 +59,6 @@ export class InventorySingleton extends CoreFileAbstract<InventoryType> {
     public set trivia(trivia: Trivia) {
         this._data.game.trivia = trivia;
         this.writeData();
-    }
-    //endregion
-
-    //region FOLD RECRUITMENT
-    /**
-     * Get the fold recruitment object from the inventory.
-     */
-    public get foldRecruitment(): FoldRecruitment {
-        return this._data.fold_recruitment;
     }
     //endregion
 }
