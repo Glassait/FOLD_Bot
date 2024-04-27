@@ -93,14 +93,15 @@ If you want to add persistent log in to execute of the event, follow the followi
 1. Add the logger and the context to the file
 
     ```typescript
-    import { Logger } from '../../shared/classes/logger';
-    import { Context } from '../../shared/classes/context';
+    import { Logger } from '../../shared/utils/logger';
+    import { basename } from 'node:path';
 
-    const logger: Logger = new Logger(new Context('NAME-SLASH-COMMAND'));
+    const logger: Logger = new Logger(basename(__filename));
     ```
 
 2. In the context give the name of the slash-command
 3. Call the level you want with the `logger`, ex:
+
     ```typescript
     logger.info('Message to the log');
     ```

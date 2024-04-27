@@ -1,5 +1,5 @@
+import { TableAbstract } from '../abstracts/table.abstract';
 import { SelectBuilder } from '../builders/query.builder';
-import { Table } from '../classes/table';
 import { LoggerInjector } from '../decorators/injector.decorator';
 
 /**
@@ -17,7 +17,7 @@ type FeatureFlippingName =
  * Represents a table to manage feature flipping in the database.
  */
 @LoggerInjector
-export class FeatureFlippingTable extends Table {
+export class FeatureFlippingTable extends TableAbstract {
     constructor() {
         super('feature_flipping');
     }

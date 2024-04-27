@@ -8,4 +8,5 @@
 export enum WotApiConstants {
     APPLICATION_ID = 'APPLICATION_ID',
     CLAN_NAME = 'CLAN_NAME',
+    PAGE_NUMBER = 'PAGE_NUMBER',
 }

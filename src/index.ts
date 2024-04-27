@@ -1,7 +1,7 @@
 import { GatewayIntentBits } from 'discord.js';
 import { basename } from 'node:path';
-import { Logger } from './module/shared/classes/logger';
-import { PotentialClansTable } from './module/shared/tables/potential-clans.table';
+import { WotApiTable } from './module/shared/tables/wot-api.table';
+import { Logger } from './module/shared/utils/logger';
 
 const logger: Logger = new Logger(basename(__filename));
 
@@ -49,7 +49,9 @@ process.on('uncaughtException', (err: Error): void => {
 });
 
 setTimeout(async (): Promise<void> => {
-    const table = new PotentialClansTable();
+    const table = new WotApiTable();
+
+    const value = await table.getUrl('trivia');
 
     throw new Error('END');
 });

@@ -1,12 +1,12 @@
+import { TableAbstract } from '../abstracts/table.abstract';
 import { SelectBuilder } from '../builders/query.builder';
-import { Table } from '../classes/table';
 import { LoggerInjector } from '../decorators/injector.decorator';
 
 /**
  * Represents a BanWordsTable class for managing banned words.
  */
 @LoggerInjector
-export class BanWordsTable extends Table {
+export class BanWordsTable extends TableAbstract {
     constructor() {
         super('ban_words');
     }

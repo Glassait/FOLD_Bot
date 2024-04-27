@@ -1,12 +1,11 @@
 import type { AxiosInstance } from 'axios';
 import { application_id_wot } from '../../core/config.json';
 import { FoldRecruitmentEnum } from '../../feature/loops/enums/fold-recruitment.enum';
-import type { Logger } from '../classes/logger';
-import { Injectable, LoggerInjector } from '../decorators/injector.decorator';
+import { Injectable, LoggerInjector, TableInjectable } from '../decorators/injector.decorator';
 import { EmojiEnum } from '../enums/emoji.enum';
 import { TimeEnum } from '../enums/time.enum';
 import { WotApiConstants } from '../enums/wot-api.enum';
-import type { InventorySingleton } from '../singleton/inventory.singleton';
+import type { WotApiTable } from '../tables/wot-api.table';
 import type { WargamingErrorType, WargamingSuccessType } from '../types/wargaming-api.type';
 import type {
     ClansDto,
@@ -18,6 +17,7 @@ import type {
     TankopediaVehicle,
     TankopediaVehiclesSuccess,
 } from '../types/wot-api.type';
+import type { Logger } from '../utils/logger';
 
 @LoggerInjector
 export class WotApiModel {
@@ -35,22 +35,22 @@ export class WotApiModel {
     //region INJECTABLE
     private readonly logger: Logger;
     @Injectable('Axios', TimeEnum.SECONDE * 30) private readonly axios: AxiosInstance;
-    @Injectable('Inventory') private readonly inventory: InventorySingleton;
+    @TableInjectable('WotApi') private readonly wotApi: WotApiTable;
     //endregion
 
     /**
      * Fetches data from the Tankopedia API.
      *
-     * @param {string} url - The URL of the Tankopedia API.
+     * @param {number} pageNumber - The page number on the Tankopedia Api
      *
      * @returns {Promise<TankopediaVehiclesSuccess>} - A promise that resolves with the tankopedia data on success.
      *
      * @example
-     * const tankopediaData: TankopediaVehiclesSuccess = await instance.fetchTankopediaApi('/tankopedia/vehicles/?applicationId=your_app_id');
+     * const tankopediaData: TankopediaVehiclesSuccess = await instance.fetchTankopediaApi(2);
      * console.log(tankopediaData); // { status: 'ok', meta: { count: 1, total: 1 }, data: { ... } }
      */
-    public async fetchTankopediaApi(url: string): Promise<TankopediaVehiclesSuccess> {
-        url = this.WOT_API + url.replace('applicationId', application_id_wot);
+    public async fetchTankopediaApi(pageNumber: number): Promise<TankopediaVehiclesSuccess> {
+        const url = this.concatUrl((await this.wotApi.getUrl('trivia')).replace(WotApiConstants.PAGE_NUMBER, String(pageNumber)));
         this.logger.debug(`${EmojiEnum.SOLDIER} Fetching tankopedia api with url {}`, url);
 
         return await this.getDataFromUrl<TankopediaVehiclesSuccess, TankopediaVehicle>(url);
@@ -68,11 +68,7 @@ export class WotApiModel {
      * console.log(clanImageData); // { status: 'ok', meta: { count: 1, total: 1 }, data: [{ emblems: { x64: { wot: 'clan_wot_emblem_url', portal: 'clan_portal_emblem_url' } } }] }
      */
     public async fetchClanImage(name: string): Promise<ClansSuccess> {
-        const url: string =
-            this.WOT_API +
-            this.inventory.foldRecruitment.image_url
-                .replace(WotApiConstants.APPLICATION_ID, application_id_wot)
-                .replace(WotApiConstants.CLAN_NAME, name);
+        const url: string = this.concatUrl((await this.wotApi.getUrl('image_url')).replace(WotApiConstants.CLAN_NAME, name));
         this.logger.debug(`${EmojiEnum.SOLDIER} Fetching clans image of clan {} with url {}`, name, url);
 
         return await this.getDataFromUrl<ClansSuccess, ClansDto>(url);
@@ -86,11 +82,9 @@ export class WotApiModel {
      * @returns {Promise<PlayerPersonalDataSuccess>} - A Promise that resolves with the personal data of the player.
      */
     public async fetchPlayerPersonalData(playerId: number): Promise<PlayerPersonalDataSuccess> {
-        const url: string =
-            this.WOT_API +
-            this.inventory.foldRecruitment.player_personal_data
-                .replace(WotApiConstants.APPLICATION_ID, application_id_wot)
-                .replace(FoldRecruitmentEnum.PLAYER_ID, String(playerId));
+        const url: string = this.concatUrl(
+            (await this.wotApi.getUrl('player_personal_data')).replace(FoldRecruitmentEnum.PLAYER_ID, String(playerId))
+        );
         this.logger.debug(`${EmojiEnum.SOLDIER} Fetching personal data with url {}`, url);
 
         return await this.getDataFromUrl<PlayerPersonalDataSuccess, PlayerPersonalDto>(url);
@@ -106,12 +100,27 @@ export class WotApiModel {
     public async fetchPlayerData(playerName: string): Promise<PlayerDataSuccess> {
         const url: string =
             this.WOT_API +
-            this.inventory.foldRecruitment.player_url
+            (await this.wotApi.getUrl('player_url'))
                 .replace(WotApiConstants.APPLICATION_ID, application_id_wot)
                 .replace(FoldRecruitmentEnum.PLAYER_NAME, String(playerName));
         this.logger.debug(`${EmojiEnum.SOLDIER} Fetching player data with url {}`, url);
 
         return await this.getDataFromUrl<PlayerDataSuccess, PlayerDto>(url);
+    }
+
+    /**
+     * Concat the start of the WoT api url with the following api and replace the application ID with the value
+     *
+     * @param {string} url - The url to concat
+     *
+     * @return {string} - The url concat with the right value for the application id
+     *
+     * @example
+     * const url = this.concatUrl('/wot/api?application_id=APPLICATION_ID");
+     * console.log(url) // 'https://api.worldoftanks.eu/wot/api?application_id=123456789'
+     */
+    private concatUrl(url: string): string {
+        return this.WOT_API + url.replace(WotApiConstants.APPLICATION_ID, application_id_wot);
     }
 
     /**
@@ -122,7 +131,7 @@ export class WotApiModel {
      * @returns {Promise<GSuccess>} - A promise that resolves with the fetched data on success.
      *
      * @example
-     * const tankopediaData: TankopediaVehiclesSuccess = await instance.getDataFromUrl<TankopediaVehiclesSuccess, TankopediaVehicle>('/tankopedia/vehicles/?applicationId=your_app_id');
+     * const tankopediaData: TankopediaVehiclesSuccess = await this.getDataFromUrl<TankopediaVehiclesSuccess, TankopediaVehicle>('/tankopedia/vehicles/?applicationId=your_app_id');
      * console.log(tankopediaData); // { status: 'ok', meta: { count: 1, total: 1 }, data: { ... } }
      *
      * @template GSuccess - The type of the successful data.

@@ -1,5 +1,4 @@
 import type { WotApiModel } from '../../../shared/apis/wot-api.model';
-import type { Logger } from '../../../shared/classes/logger';
 import { Injectable, LoggerInjector, TableInjectable } from '../../../shared/decorators/injector.decorator';
 import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
 import type { LeavingPlayersTable } from '../../../shared/tables/leaving-players.table';
@@ -8,6 +7,7 @@ import type { WatchClansTable } from '../../../shared/tables/watch-clans.table';
 import type { PotentialClan } from '../../../shared/types/potential-clan.type';
 import type { Clan } from '../../../shared/types/watch-clan.type';
 import type { PlayerPersonalDataSuccess } from '../../../shared/types/wot-api.type';
+import type { Logger } from '../../../shared/utils/logger';
 import { FoldRecruitmentEnum } from '../../loops/enums/fold-recruitment.enum';
 
 @LoggerInjector

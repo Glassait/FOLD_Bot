@@ -1,6 +1,5 @@
 import { basename } from 'node:path';
-import { CoreFile } from '../classes/core-file';
-import { Logger } from '../classes/logger';
+import { CoreFileAbstract } from '../abstracts/core-file.abstract';
 import { EmojiEnum } from '../enums/emoji.enum';
 import type {
     FoldRecruitmentClanStatistic,
@@ -9,11 +8,12 @@ import type {
     TriviaStatistic,
 } from '../types/statistic.type';
 import { DateUtil } from '../utils/date.util';
+import { Logger } from '../utils/logger';
 
 /**
  * This class keep track of the statistics for the different games
  */
-export class StatisticSingleton extends CoreFile<Statistic> {
+export class StatisticSingleton extends CoreFileAbstract<Statistic> {
     //region PRIVATE READONLY
     /**
      * Represents the initial value for the statistics data.

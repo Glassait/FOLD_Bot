@@ -1,10 +1,10 @@
 import type { Client } from 'discord.js';
 import { basename } from 'node:path';
-import { Logger } from '../../shared/classes/logger';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
 import { InventorySingleton } from '../../shared/singleton/inventory.singleton';
 import { FeatureFlippingTable } from '../../shared/tables/feature-flipping.table';
 import type { WatchClansTable } from '../../shared/tables/watch-clans.table';
+import { Logger } from '../../shared/utils/logger';
 import { TimeUtil } from '../../shared/utils/time.util';
 import type { FoldRecruitmentModel } from './model/fold-recruitment.model';
 import type { BotLoop } from './types/bot-loop.type';

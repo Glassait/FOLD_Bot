@@ -1,5 +1,4 @@
 import { type Client, Colors, EmbedBuilder, type TextChannel } from 'discord.js';
-import type { Logger } from '../../../shared/classes/logger';
 import { Injectable, LoggerInjector, TableInjectable } from '../../../shared/decorators/injector.decorator';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
@@ -11,6 +10,7 @@ import type {
     TriviaPlayerStatistic,
 } from '../../../shared/types/statistic.type';
 import { DateUtil } from '../../../shared/utils/date.util';
+import type { Logger } from '../../../shared/utils/logger';
 import { MathUtil } from '../../../shared/utils/math.util';
 import { StringUtil } from '../../../shared/utils/string.util';
 import { UserUtil } from '../../../shared/utils/user.util';

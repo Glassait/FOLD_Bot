@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync } from 'fs';
-import type { Context } from '../classes/context';
+import type { ContextAbstract } from '../abstracts/context.abstract';
 import { EmojiEnum } from '../enums/emoji.enum';
 
 /**
@@ -50,10 +50,10 @@ export class LoggerSingleton {
     /**
      * Logs a debug message.
      *
-     * @param {Context} context - The context in which the message is logged.
+     * @param {ContextAbstract} context - The context in which the message is logged.
      * @param {string} msg - The message to log.
      */
-    public debug(context: Context, msg: string): void {
+    public debug(context: ContextAbstract, msg: string): void {
         // eslint-disable-next-line no-console
         console.debug(`${EmojiEnum.DEBUG} : ${msg}`);
         this.addToLog('DEBUG', context.context, msg);
@@ -62,10 +62,10 @@ export class LoggerSingleton {
     /**
      * Logs an info message.
      *
-     * @param {Context} context - The context in which the message is logged.
+     * @param {ContextAbstract} context - The context in which the message is logged.
      * @param {string} msg - The message to log.
      */
-    public info(context: Context, msg: string): void {
+    public info(context: ContextAbstract, msg: string): void {
         // eslint-disable-next-line no-console
         console.info(`${EmojiEnum.INFO} : ${msg}`);
         this.addToLog('INFO', context.context, msg);
@@ -74,10 +74,10 @@ export class LoggerSingleton {
     /**
      * Logs a warning message.
      *
-     * @param {Context} context - The context in which the message is logged.
+     * @param {ContextAbstract} context - The context in which the message is logged.
      * @param {string} msg - The message to log.
      */
-    public warning(context: Context, msg: string): void {
+    public warning(context: ContextAbstract, msg: string): void {
         // eslint-disable-next-line no-console
         console.warn(`${EmojiEnum.WARNING} : ${msg}`);
         this.addToLog('WARNING', context.context, msg);
@@ -86,10 +86,10 @@ export class LoggerSingleton {
     /**
      * Logs an error message.
      *
-     * @param {Context} context - The context in which the message is logged.
+     * @param {ContextAbstract} context - The context in which the message is logged.
      * @param {string} msg - The message to log.
      */
-    public error(context: Context, msg: string): void {
+    public error(context: ContextAbstract, msg: string): void {
         // eslint-disable-next-line no-console
         console.error(`${EmojiEnum.ERROR} : ${msg}`);
         this.addToLog('ERROR', EmojiEnum.ERROR + context.context, msg);

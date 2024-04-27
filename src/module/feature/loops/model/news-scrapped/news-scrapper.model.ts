@@ -1,11 +1,11 @@
 import type { CheerioAPI } from 'cheerio';
 import { Colors, EmbedBuilder, type TextChannel } from 'discord.js';
-import type { Logger } from '../../../../shared/classes/logger';
 import { LoggerInjector, TableInjectable } from '../../../../shared/decorators/injector.decorator';
 import { EmojiEnum } from '../../../../shared/enums/emoji.enum';
 import type { BanWordsTable } from '../../../../shared/tables/ban-words.table';
 import type { NewsWebsitesTable } from '../../../../shared/tables/news-websites.table';
 import type { NewsWebsite } from '../../../../shared/types/news_website.type';
+import type { Logger } from '../../../../shared/utils/logger';
 
 /**
  * Class responsible for scraping news and sending them to a designated channel.

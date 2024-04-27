@@ -1,5 +1,5 @@
+import { TableAbstract } from '../abstracts/table.abstract';
 import { DeleteBuilder, InsertIntoBuilder, SelectBuilder } from '../builders/query.builder';
-import { Table } from '../classes/table';
 import { LoggerInjector } from '../decorators/injector.decorator';
 import type { PotentialClan } from '../types/potential-clan.type';
 
@@ -7,7 +7,7 @@ import type { PotentialClan } from '../types/potential-clan.type';
  * Represents a PotentialClanTable class for managing potential clans.
  */
 @LoggerInjector
-export class PotentialClansTable extends Table {
+export class PotentialClansTable extends TableAbstract {
     constructor() {
         super('potential_clans');
     }

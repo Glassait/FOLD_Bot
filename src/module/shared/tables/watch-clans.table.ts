@@ -1,5 +1,5 @@
+import { TableAbstract } from '../abstracts/table.abstract';
 import { DeleteBuilder, InsertIntoBuilder, SelectBuilder, UpdateBuilder } from '../builders/query.builder';
-import { Table } from '../classes/table';
 import { LoggerInjector } from '../decorators/injector.decorator';
 import type { Clan } from '../types/watch-clan.type';
 
@@ -7,7 +7,7 @@ import type { Clan } from '../types/watch-clan.type';
  * Represents a table for watching clans in the database.
  */
 @LoggerInjector
-export class WatchClansTable extends Table {
+export class WatchClansTable extends TableAbstract {
     constructor() {
         super('watch_clans');
     }

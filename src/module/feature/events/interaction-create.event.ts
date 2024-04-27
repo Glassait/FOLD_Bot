@@ -1,6 +1,6 @@
 import { type AutocompleteInteraction, type ChatInputCommandInteraction, type Client, Events, type Interaction } from 'discord.js';
 import { basename } from 'node:path';
-import { Logger } from '../../shared/classes/logger';
+import { Logger } from '../../shared/utils/logger';
 import type { SlashCommandModel } from '../slash-commands/model/slash-command.model';
 import type { BotEvent } from './types/bot-event.type';
 

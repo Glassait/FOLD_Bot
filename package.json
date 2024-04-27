@@ -29,6 +29,22 @@
 		"url": "https://github.com/Glassait/FOLD_Bot/issues"
 	},
 	"homepage": "https://github.com/Glassait/FOLD_Bot#readme",
+	"madge": {
+		"detectiveOptions": {
+			"fontSize": "12px",
+			"layout": "sfdp",
+			"graphVizOptions": {
+				"G": {
+					"rankdir": "LR",
+					"beautify": true
+				}
+			},
+			"es6": {
+				"mixedImports": true,
+				"skipTypeImports": true
+			}
+		}
+	},
 	"dependencies": {
 		"@napi-rs/canvas": "^0.1.52",
 		"axios": "1.6.8",

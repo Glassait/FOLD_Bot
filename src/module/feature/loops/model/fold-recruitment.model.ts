@@ -1,7 +1,6 @@
 import type { AxiosInstance } from 'axios';
 import { type Client, Colors, EmbedBuilder, type TextChannel } from 'discord.js';
 import { WotApiModel } from '../../../shared/apis/wot-api.model';
-import type { Logger } from '../../../shared/classes/logger';
 import { Injectable, LoggerInjector, TableInjectable } from '../../../shared/decorators/injector.decorator';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
@@ -12,6 +11,7 @@ import type { LeavingPlayersTable } from '../../../shared/tables/leaving-players
 import type { WatchClansTable } from '../../../shared/tables/watch-clans.table';
 import type { BlacklistedPlayer } from '../../../shared/types/blacklisted-player.type';
 import type { Clan } from '../../../shared/types/watch-clan.type';
+import type { Logger } from '../../../shared/utils/logger';
 import { StringUtil } from '../../../shared/utils/string.util';
 import { UserUtil } from '../../../shared/utils/user.util';
 import { FoldRecruitmentEnum, WotClanActivity } from '../enums/fold-recruitment.enum';

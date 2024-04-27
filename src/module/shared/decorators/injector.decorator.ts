@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Agent as AgentHttp } from 'node:http';
 import { Agent as AgentHttps } from 'node:https';
-import { Context } from '../classes/context';
+import { ContextAbstract } from '../abstracts/context.abstract';
 import { TimeEnum } from '../enums/time.enum';
 
 /**
@@ -66,18 +66,17 @@ export function Injectable<GDependence extends DependenceInjection>(
     };
 }
 
-/**
- * All types of SQL table to inject
- */
-const tableMap = {
-    WatchClans: require('../tables/watch-clans.table').WatchClanTable,
-    BlacklistedPlayers: require('../tables/blacklisted-players.table').BlacklistedPlayerTable,
-    LeavingPlayers: require('../tables/leaving-players.table').LeavingPlayerTable,
-    PotentialClans: require('../tables/potential-clans.table').PotentialClanTable,
-    NewsWebsites: require('../tables/news-websites.table').NewsWebsiteTable,
-    BanWords: require('../tables/ban-words.table').BanWordsTable,
-    Channels: require('../tables/channels.table').ChannelsTable,
-    FeatureFlipping: require('../tables/feature-flipping.table').FeatureFlippingTable,
+let tableMap: {
+    WatchClans: Constructor;
+    BlacklistedPlayers: Constructor;
+    LeavingPlayers: Constructor;
+    PotentialClans: Constructor;
+    NewsWebsites: Constructor;
+    BanWords: Constructor;
+    Channels: Constructor;
+    FeatureFlipping: Constructor;
+    Commands: Constructor;
+    WotApi: Constructor;
 };
 
 /**
@@ -93,16 +92,29 @@ export function TableInjectable(
     dependence: keyof typeof tableMap
     // eslint-disable-next-line @typescript-eslint/ban-types
 ): Function {
+    tableMap = {
+        WatchClans: require('../tables/watch-clans.table').WatchClanTable,
+        BlacklistedPlayers: require('../tables/blacklisted-players.table').BlacklistedPlayerTable,
+        LeavingPlayers: require('../tables/leaving-players.table').LeavingPlayerTable,
+        PotentialClans: require('../tables/potential-clans.table').PotentialClanTable,
+        NewsWebsites: require('../tables/news-websites.table').NewsWebsiteTable,
+        BanWords: require('../tables/ban-words.table').BanWordsTable,
+        Channels: require('../tables/channels.table').ChannelsTable,
+        FeatureFlipping: require('../tables/feature-flipping.table').FeatureFlippingTable,
+        Commands: require('../tables/commands.table').CommandsTable,
+        WotApi: require('../tables/wot-api.table').WotApiTable,
+    };
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     return function actual<GTable>(_target: GTable, _context: ClassFieldDecoratorContext<GTable, any>) {
         return function (this: GTable, field: any) {
-            const req = tableMap[dependence];
+            const req: Constructor = tableMap[dependence];
 
             if (!req) {
                 throw new Error(`Unsupported dependence type: ${dependence}`);
             }
 
-            field = new req();
+            field = new req(); // NOSONAR
             return field;
         };
     };
@@ -127,8 +139,8 @@ export function LoggerInjector<GClass extends Constructor>(value: GClass, _conte
         constructor(...args: any[]) {
             super(...args);
 
-            const req = require('../classes/logger');
-            this.logger = new req.Logger(new Context(value.name));
+            const req = require('../utils/logger');
+            this.logger = new req.Logger(new ContextAbstract(value.name));
         }
     };
 }

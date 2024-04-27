@@ -1,5 +1,5 @@
+import { TableAbstract } from '../abstracts/table.abstract';
 import { SelectBuilder } from '../builders/query.builder';
-import { Table } from '../classes/table';
 import { LoggerInjector } from '../decorators/injector.decorator';
 import type { Channel } from '../types/channel.type';
 import { EnvUtil } from '../utils/env.util';
@@ -8,7 +8,7 @@ import { EnvUtil } from '../utils/env.util';
  * Represents a ChannelsTable class for managing channels.
  */
 @LoggerInjector
-export class ChannelsTable extends Table {
+export class ChannelsTable extends TableAbstract {
     /**
      * Represents the development channel.
      */

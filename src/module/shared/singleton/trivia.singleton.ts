@@ -1,18 +1,16 @@
 import { type Client, Colors, EmbedBuilder, type TextChannel } from 'discord.js';
 import { basename } from 'node:path';
-import { application_id_wot } from '../../core/config.json';
 import { ShellEnum, ShellType } from '../../feature/slash-commands/enums/shell.enum';
 import type { WotApiModel } from '../apis/wot-api.model';
-import { Logger } from '../classes/logger';
 import { EmojiEnum } from '../enums/emoji.enum';
 import { TimeEnum } from '../enums/time.enum';
-import { WotApiConstants } from '../enums/wot-api.enum';
 import { ChannelsTable } from '../tables/channels.table';
 import type { Trivia } from '../types/inventory.type';
 import type { TriviaPlayerStatistic, TriviaStatistic } from '../types/statistic.type';
 import type { TriviaSelected } from '../types/trivia.type';
 import type { TankopediaVehiclesSuccess, VehicleData } from '../types/wot-api.type';
 import { DateUtil } from '../utils/date.util';
+import { Logger } from '../utils/logger';
 import { RandomUtil } from '../utils/random.util';
 import { UserUtil } from '../utils/user.util';
 import { MEDAL } from '../utils/variables.util';
@@ -341,11 +339,7 @@ export class TriviaSingleton {
     private async fetchTankopediaResponses(tankPages: number[]): Promise<TankopediaVehiclesSuccess[]> {
         const responses: TankopediaVehiclesSuccess[] = [];
         for (const page of tankPages) {
-            responses.push(
-                await this.wotApi.fetchTankopediaApi(
-                    this.trivia.url.replace('pageNumber', String(page)).replace(WotApiConstants.APPLICATION_ID, application_id_wot)
-                )
-            );
+            responses.push(await this.wotApi.fetchTankopediaApi(page));
         }
         return responses;
     }

@@ -14,7 +14,6 @@ import {
     type StringSelectMenuInteraction,
     StringSelectMenuOptionBuilder,
 } from 'discord.js';
-import type { Logger } from '../../../shared/classes/logger';
 import { Injectable, LoggerInjector } from '../../../shared/decorators/injector.decorator';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
@@ -30,6 +29,7 @@ import type {
 } from '../../../shared/types/statistic.type';
 import type { TriviaSelected } from '../../../shared/types/trivia.type';
 import type { Ammo, VehicleData } from '../../../shared/types/wot-api.type';
+import type { Logger } from '../../../shared/utils/logger';
 import { TimeUtil } from '../../../shared/utils/time.util';
 import { MEDAL } from '../../../shared/utils/variables.util';
 import { ShellEnum, ShellType } from '../enums/shell.enum';

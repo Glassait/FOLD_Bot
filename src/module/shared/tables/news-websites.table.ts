@@ -1,5 +1,5 @@
+import { TableAbstract } from '../abstracts/table.abstract';
 import { SelectBuilder, UpdateBuilder } from '../builders/query.builder';
-import { Table } from '../classes/table';
 import { LoggerInjector } from '../decorators/injector.decorator';
 import type { NewsWebsite } from '../types/news_website.type';
 
@@ -7,7 +7,7 @@ import type { NewsWebsite } from '../types/news_website.type';
  * Represents a NewsWebsiteTable class for managing news websites.
  */
 @LoggerInjector
-export class NewsWebsitesTable extends Table {
+export class NewsWebsitesTable extends TableAbstract {
     constructor() {
         super('news_websites');
     }

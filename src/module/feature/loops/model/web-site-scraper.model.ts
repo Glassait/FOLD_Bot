@@ -1,12 +1,12 @@
 import type { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 import { type CheerioAPI, load } from 'cheerio';
 import type { Client, TextChannel } from 'discord.js';
-import type { Logger } from '../../../shared/classes/logger';
 import { Injectable, LoggerInjector, TableInjectable } from '../../../shared/decorators/injector.decorator';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
 import type { ChannelsTable } from '../../../shared/tables/channels.table';
 import type { NewsWebsite } from '../../../shared/types/news_website.type';
+import type { Logger } from '../../../shared/utils/logger';
 import { UserUtil } from '../../../shared/utils/user.util';
 import { WebsiteNameEnum } from '../enums/website-name.enum';
 import type { WotExpress } from './news-scrapped/wot-express.model';

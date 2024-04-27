@@ -1,9 +1,4 @@
 /**
- * Way to refer to discord id
- */
-export type DiscordId = string; // NOSONAR
-
-/**
  * Type defining the structure for the trivia game.
  */
 export type Trivia = {
@@ -180,10 +175,4 @@ export type InventoryType = {
      * The recruitment section of the inventory.
      */
     fold_recruitment: FoldRecruitment;
-    /**
-     * Object mapping command keys to Discord IDs.
-     */
-    commands: {
-        [key: string]: DiscordId[];
-    };
 };

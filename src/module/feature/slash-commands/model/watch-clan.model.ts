@@ -8,7 +8,6 @@ import {
     type TextChannel,
 } from 'discord.js';
 import type { WotApiModel } from '../../../shared/apis/wot-api.model';
-import type { Logger } from '../../../shared/classes/logger';
 import { Injectable, LoggerInjector, TableInjectable } from '../../../shared/decorators/injector.decorator';
 import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
 import type { BlacklistedPlayersTable } from '../../../shared/tables/blacklisted-players.table';
@@ -18,6 +17,7 @@ import type { BlacklistedPlayer } from '../../../shared/types/blacklisted-player
 import type { WargamingSuccessType } from '../../../shared/types/wargaming-api.type';
 import type { Clan } from '../../../shared/types/watch-clan.type';
 import type { PlayerData } from '../../../shared/types/wot-api.type';
+import type { Logger } from '../../../shared/utils/logger';
 import { StringUtil } from '../../../shared/utils/string.util';
 import { UserUtil } from '../../../shared/utils/user.util';
 

@@ -1,8 +1,8 @@
 import { type Client, Colors, EmbedBuilder, type TextChannel } from 'discord.js';
 import { basename } from 'node:path';
-import { Logger } from '../../shared/classes/logger';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
 import { FeatureFlippingTable } from '../../shared/tables/feature-flipping.table';
+import { Logger } from '../../shared/utils/logger';
 import { TimeUtil } from '../../shared/utils/time.util';
 import { UserUtil } from '../../shared/utils/user.util';
 import type { BotLoop } from './types/bot-loop.type';

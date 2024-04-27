@@ -1,6 +1,6 @@
+import { ContextAbstract } from '../abstracts/context.abstract';
 import { LoggerSingleton } from '../singleton/logger.singleton';
-import { StringUtil } from '../utils/string.util';
-import { Context } from './context';
+import { StringUtil } from './string.util';
 
 /**
  * This class use the LoggerSingleton to write log
@@ -9,15 +9,15 @@ export class Logger {
     /**
      * The context of the class
      */
-    private readonly context: Context;
+    private readonly context: ContextAbstract;
     /**
      * The instance of the {@link LoggerSingleton}
      */
     private readonly logger: LoggerSingleton = LoggerSingleton.instance;
 
-    constructor(context: string | Context) {
+    constructor(context: string | ContextAbstract) {
         if (typeof context === 'string') {
-            context = new Context(context);
+            context = new ContextAbstract(context);
         }
 
         this.context = context;

@@ -61,8 +61,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   The first of the month check all leaving player to get the clan
 -   Send trivia message to remind to play
 -   Autocomplete for adding / removing blacklisted player
--   Create `CoreFile` class for all singleton that manage json file
--   Rework json related singleton withe CoreFile to better readability, documentation and efficiency
+-   Create `CoreFileAbstract` class for all singleton that manage json file
+-   Rework json related singleton with CoreFileAbstract to better readability, documentation and efficiency
 -   Readme for singleton
 
 ### Changed

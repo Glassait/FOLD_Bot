@@ -1,12 +1,12 @@
+import { TableAbstract } from '../abstracts/table.abstract';
 import { DeleteBuilder, InsertIntoBuilder, SelectBuilder } from '../builders/query.builder';
-import { Table } from '../classes/table';
 import { LoggerInjector } from '../decorators/injector.decorator';
 
 /**
  * Represents a table for managing leaving players.
  */
 @LoggerInjector
-export class LeavingPlayersTable extends Table {
+export class LeavingPlayersTable extends TableAbstract {
     constructor() {
         super('leaving_players');
     }

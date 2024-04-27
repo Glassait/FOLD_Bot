@@ -1,12 +1,12 @@
 import { FileUtil } from '../utils/file.util';
-import type { Logger } from './logger';
+import type { Logger } from '../utils/logger';
 
 /**
  * Represents a core file handler.
  *
  * @template DType - The type of data stored in the file.
  */
-export class CoreFile<DType extends object> {
+export class CoreFileAbstract<DType extends object> {
     /**
      * Logger instance, initialized in the child constructor
      */
@@ -17,7 +17,7 @@ export class CoreFile<DType extends object> {
     protected _data: DType;
 
     /**
-     * Creates an instance of CoreFile.
+     * Creates an instance of CoreFileAbstract.
      *
      * @param {string} path - The path where the file is located.
      * @param {string} backupPath - The path where backup files are stored.

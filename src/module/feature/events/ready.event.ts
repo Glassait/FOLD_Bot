@@ -1,9 +1,9 @@
 import { type Client, Events } from 'discord.js';
 import { basename } from 'node:path';
-import { Logger } from '../../shared/classes/logger';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
 import { TriviaSingleton } from '../../shared/singleton/trivia.singleton';
 import { FeatureFlippingTable } from '../../shared/tables/feature-flipping.table';
+import { Logger } from '../../shared/utils/logger';
 import { SentenceUtil } from '../../shared/utils/sentence.util';
 import type { SearchClanModel } from './models/search-clan.model';
 import type { TriviaMonthModel } from './models/trivia-month.model';

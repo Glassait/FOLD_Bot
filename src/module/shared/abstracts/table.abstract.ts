@@ -1,12 +1,12 @@
 import type { QueryResult } from 'mysql2/promise';
 import { Injectable } from '../decorators/injector.decorator';
 import type { DatabaseSingleton } from '../singleton/database.singleton';
-import type { Logger } from './logger';
+import type { Logger } from '../utils/logger';
 
 /**
  * Represents a database table with common CRUD operations.
  */
-export class Table {
+export class TableAbstract {
     //region INJECTABLE
     @Injectable('Database') protected readonly database: DatabaseSingleton;
     private readonly logger: Logger;
@@ -22,7 +22,7 @@ export class Table {
     };
 
     /**
-     * Constructs a new instance of the Table class with the specified table name.
+     * Constructs a new instance of the TableAbstract class with the specified table name.
      *
      * @param {string} tableName - The name of the database table.
      */

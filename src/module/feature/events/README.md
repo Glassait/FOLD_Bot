@@ -48,7 +48,7 @@ If you want to add persistent log in to execute of the event, follow the followi
     const logger: Logger = new Logger(basename(__filename));
     ```
 
-2. Call the level you want with the [logger](../../shared/classes/logger.ts), ex:
+2. Call the level you want with the [logger](../../shared/utils/logger.ts), ex:
     ```typescript
     logger.info('Message to the log');
     ```

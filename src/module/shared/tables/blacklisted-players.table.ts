@@ -1,5 +1,5 @@
+import { TableAbstract } from '../abstracts/table.abstract';
 import { DeleteBuilder, InsertIntoBuilder, SelectBuilder } from '../builders/query.builder';
-import { Table } from '../classes/table';
 import { LoggerInjector } from '../decorators/injector.decorator';
 import type { BlacklistedPlayer } from '../types/blacklisted-player.type';
 
@@ -7,7 +7,7 @@ import type { BlacklistedPlayer } from '../types/blacklisted-player.type';
  * Represents a table for managing blacklisted players.
  */
 @LoggerInjector
-export class BlacklistedPlayersTable extends Table {
+export class BlacklistedPlayersTable extends TableAbstract {
     constructor() {
         super('blacklisted_players');
     }

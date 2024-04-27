@@ -1,7 +1,7 @@
 import { basename } from 'node:path';
-import { Logger } from '../classes/logger';
 import { EmojiEnum } from '../enums/emoji.enum';
 import { MockEnum } from '../enums/mock.enum';
+import { Logger } from './logger';
 
 /**
  * A utility class for environment-related operations.
