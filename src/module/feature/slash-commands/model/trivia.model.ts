@@ -14,12 +14,12 @@ import {
     type StringSelectMenuInteraction,
     StringSelectMenuOptionBuilder,
 } from 'discord.js';
-import { Injectable, LoggerInjector } from '../../../shared/decorators/injector.decorator';
+import { Injectable, LoggerInjector, TableInjectable } from '../../../shared/decorators/injector.decorator';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
-import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
 import type { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
 import type { TriviaSingleton } from '../../../shared/singleton/trivia.singleton';
+import type { TriviaTable } from '../../../shared/tables/trivia.table';
 import type {
     DailyTrivia,
     MonthlyTriviaPlayerStatistic,
@@ -27,6 +27,7 @@ import type {
     TriviaStatistic,
     WinStreak,
 } from '../../../shared/types/statistic.type';
+import type { Trivia } from '../../../shared/types/table.type';
 import type { TriviaSelected } from '../../../shared/types/trivia.type';
 import type { Ammo, VehicleData } from '../../../shared/types/wot-api.type';
 import type { Logger } from '../../../shared/utils/logger';
@@ -41,7 +42,7 @@ export class TriviaModel {
     private readonly logger: Logger;
     @Injectable('Trivia') private readonly trivia: TriviaSingleton;
     @Injectable('Statistic') private readonly statistic: StatisticSingleton;
-    @Injectable('Inventory') private readonly inventory: InventorySingleton;
+    @TableInjectable('Trivia') private readonly triviaTable: TriviaTable;
     //endregion
 
     //region PRIVATE READONLY FIELDS
@@ -82,6 +83,10 @@ export class TriviaModel {
             {
                 name: 'AFK',
                 value: "En cas d'absence de jeu pendant une journée, une perte de `1.8% de vos points` sera appliquée.",
+            },
+            {
+                name: 'Valeur',
+                value: `${EmojiEnum.WARNING} Les valeurs indiquées dans les paragraphes précédent peuvent être modifiées sans avoir été mis à jour dans le texte. Une communication pourra être fais dans ce cas la !`,
             }
         );
     /**
@@ -115,15 +120,19 @@ export class TriviaModel {
 
     //region PRIVATE FIELDS
     /**
-     * The maximum duration of a trivia question
+     * @see Trivia.max_duration_of_question
      * @unit minute
      */
-    private maxQuestionDuration: number;
+    private maxQuestionDuration: Trivia['max_duration_of_question'];
     /**
-     * The maximum time to get extra point for the trivia game
+     * @see Trivia.max_response_time_limit
      * @unit second
      */
-    private responseTimeLimit: number;
+    private responseTimeLimit: Trivia['max_response_time_limit'];
+    /**
+     * @see Trivia.max_number_of_question
+     */
+    private maxNumberOfQuestion: Trivia['max_number_of_question'];
     /**
      * The information stored in the statistique about the trivia game
      */
@@ -144,9 +153,11 @@ export class TriviaModel {
     /**
      * Initialize the class
      */
-    public initialize(): void {
-        this.maxQuestionDuration = TimeEnum.MINUTE * this.inventory.trivia.max_duration_of_question;
-        this.responseTimeLimit = TimeEnum.SECONDE * this.inventory.trivia.max_response_time_limit;
+    public async initialize(): Promise<void> {
+        this.maxQuestionDuration = TimeEnum.MINUTE * (await this.triviaTable.getMaxDurationOfQuestion());
+        this.responseTimeLimit = TimeEnum.SECONDE * (await this.triviaTable.getMaxResponseTimeLimit());
+        this.maxNumberOfQuestion = await this.triviaTable.getMaxNumberOfQuestion();
+
         this.triviaStatistic = this.statistic.trivia;
         this.datum = new Map();
     }
@@ -170,10 +181,10 @@ export class TriviaModel {
 
         if (
             this.triviaStatistic.player[interaction.user.username][this.statistic.currentMonth].daily[this.statistic.currentDay]
-                ?.participation >= this.inventory.trivia.max_number_of_question
+                ?.participation >= this.maxNumberOfQuestion
         ) {
             await interaction.editReply({
-                content: `Tu as atteint le nombre maximum de question par jour ! (actuellement ${this.inventory.trivia.max_number_of_question} par jour)\nReviens demain pour pouvoir rejouer !`,
+                content: `Tu as atteint le nombre maximum de question par jour ! (actuellement ${this.maxNumberOfQuestion} par jour)\nReviens demain pour pouvoir rejouer !`,
             });
             return;
         }
@@ -207,15 +218,13 @@ export class TriviaModel {
         const ammo: Ammo = datum.tank.default_profile.ammo[datum.ammoIndex];
 
         const target = new Date();
-        target.setTime(target.getTime() + this.inventory.trivia.max_duration_of_question * TimeEnum.MINUTE);
+        target.setTime(target.getTime() + this.maxQuestionDuration * TimeEnum.MINUTE);
 
         const startGameEmbed: EmbedBuilder = new EmbedBuilder()
             .setTitle('Devine le bon char')
             .setFooter({ text: 'Trivia Game' })
             .setDescription(
-                `Tu es entrain de répondre à la question n°\`${value.daily.participation + 1 || 1}\` sur ${
-                    this.inventory.trivia.max_number_of_question
-                }`
+                `Tu es entrain de répondre à la question n°\`${value.daily.participation + 1 || 1}\` sur ${this.maxNumberOfQuestion}`
             )
             .setColor(Colors.Blurple)
             .setFields(

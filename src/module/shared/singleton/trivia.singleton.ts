@@ -5,8 +5,9 @@ import type { WotApiModel } from '../apis/wot-api.model';
 import { EmojiEnum } from '../enums/emoji.enum';
 import { TimeEnum } from '../enums/time.enum';
 import { ChannelsTable } from '../tables/channels.table';
-import type { Trivia } from '../types/inventory.type';
+import type { TriviaTable } from '../tables/trivia.table';
 import type { TriviaPlayerStatistic, TriviaStatistic } from '../types/statistic.type';
+import type { Trivia } from '../types/table.type';
 import type { TriviaSelected } from '../types/trivia.type';
 import type { TankopediaVehiclesSuccess, VehicleData } from '../types/wot-api.type';
 import { DateUtil } from '../utils/date.util';
@@ -14,7 +15,6 @@ import { Logger } from '../utils/logger';
 import { RandomUtil } from '../utils/random.util';
 import { UserUtil } from '../utils/user.util';
 import { MEDAL } from '../utils/variables.util';
-import { InventorySingleton } from './inventory.singleton';
 import { StatisticSingleton } from './statistic.singleton';
 
 /**
@@ -25,9 +25,9 @@ export class TriviaSingleton {
     //region INJECTION
     private readonly logger: Logger;
     private readonly wotApi: WotApiModel;
-    private readonly inventory: InventorySingleton;
     private readonly statistic: StatisticSingleton;
     private readonly channels: ChannelsTable;
+    private readonly trivia: TriviaTable;
     //endregion
 
     //region PRIVATE READONLY FIELDS
@@ -45,33 +45,53 @@ export class TriviaSingleton {
      */
     private readonly _datum: TriviaSelected[];
     /**
-     * The information stored in the inventory about the trivia game
-     */
-    private readonly trivia: Trivia;
-    /**
      * The information stored in the statistique about the trivia game
      */
     private readonly triviaStatistique: TriviaStatistic;
     //endregion
 
     //region PRIVATE FIELDS
+    /**
+     * The channel to send the yesterday result
+     */
     private channel: TextChannel;
+    /**
+     * @see Trivia.max_number_of_question
+     */
+    private maxNumberOfQuestion: Trivia['max_number_of_question'];
+    /**
+     * @see Trivia.total_number_of_tanks
+     */
+    private totalNumberOfTanks: Trivia['total_number_of_tanks'];
+    /**
+     * @see Trivia.last_tank_page
+     */
+    private lastTankPage: Trivia['last_tank_page'];
+    /**
+     * @see Trivia.max_number_of_unique_tanks
+     */
+    private maxNumberOfUniqueTanks: Trivia['max_number_of_unique_tanks'];
     //endregion
 
     private constructor() {
         const api = require('../apis/wot-api.model').WotApiModel;
 
         this.wotApi = new api();
-        this.inventory = InventorySingleton.instance;
         this.logger = new Logger(basename(__filename));
         this.statistic = StatisticSingleton.instance;
         this.channels = new ChannelsTable();
 
-        this.trivia = this.inventory.trivia;
         this.triviaStatistique = this.statistic.trivia;
 
         this._allTanks = [];
         this._datum = [];
+
+        setTimeout(async (): Promise<void> => {
+            this.maxNumberOfQuestion = await this.trivia.getMaxNumberOfQuestion();
+            this.totalNumberOfTanks = await this.trivia.getTotalNumberOfTanks();
+            this.lastTankPage = await this.trivia.getLastTankPage();
+            this.maxNumberOfUniqueTanks = await this.trivia.getMaxNumberOfUniqueTanks();
+        });
 
         this.logger.info(`${EmojiEnum.HAMMER} {} instance initialized`, TriviaSingleton.name);
     }
@@ -109,14 +129,14 @@ export class TriviaSingleton {
             return;
         }
 
-        for (let i = 0; i < this.trivia.max_number_of_question; i++) {
+        for (let i = 0; i < this.maxNumberOfQuestion; i++) {
             this.logger.debug(`Start fetching tanks n°${i}`);
             const tankPages: number[] = this.fetchTankPages();
 
             const tankopediaResponses: TankopediaVehiclesSuccess[] = await this.fetchTankopediaResponses(tankPages);
 
-            if (tankopediaResponses[0].meta.count !== this.trivia.total_number_of_tanks) {
-                this.trivia.total_number_of_tanks = tankopediaResponses[0].meta.page_total;
+            if (tankopediaResponses[0].meta.count !== this.totalNumberOfTanks) {
+                this.totalNumberOfTanks = tankopediaResponses[0].meta.page_total;
             }
 
             this._allTanks.push(this.extractTankData(tankopediaResponses));
@@ -137,7 +157,6 @@ export class TriviaSingleton {
         this.triviaStatistique.overall[this.statistic.currentMonth].number_of_game += this._datum.length;
 
         this.statistic.trivia = this.triviaStatistique;
-        this.inventory.trivia = this.trivia;
     }
 
     public async sendTriviaResultForYesterday(client: Client): Promise<void> {
@@ -294,7 +313,7 @@ export class TriviaSingleton {
      * @param {[string, TriviaPlayerStatistic]} playersResponse - Array of player username and their responses.
      * @param {number} index - The index of the question
      *
-     * @returns {string} The time taken by the player to answer the trivia question in string format.
+     * @returns {string} - The time taken by the player to answer the trivia question in string format.
      *
      * @example
      * const playersResponse = ['glassait', { 'mars 2024': { daily: { '30/02/24': { answer_time: [3000] } } } }]
@@ -311,21 +330,25 @@ export class TriviaSingleton {
     /**
      * Fetches tank pages for tank of the day.
      *
-     * @returns {number[]} Array of tank pages to fetch.
+     * @returns {number[]} - Array of tank pages to fetch.
      */
     private fetchTankPages(): number[] {
-        const tankPages: number[] = RandomUtil.getArrayWithRandomNumber(
-            4,
-            this.trivia.total_number_of_tanks,
-            1,
-            false,
-            this.trivia.last_tank_page
-        );
+        const tankPages: number[] = RandomUtil.getArrayWithRandomNumber(4, this.totalNumberOfTanks, 1, false, this.lastTankPage);
 
-        this.trivia.last_tank_page = [
-            ...this.trivia.last_tank_page.slice(this.trivia.last_tank_page.length >= this.trivia.max_number_of_unique_tanks ? 4 : 0),
-            ...tankPages,
-        ];
+        this.lastTankPage = [...this.lastTankPage.slice(this.lastTankPage.length >= this.maxNumberOfUniqueTanks ? 4 : 0), ...tankPages];
+        this.trivia
+            .updateLastTankPage(this.lastTankPage)
+            .then((value: boolean): void => {
+                if (value) {
+                    this.logger.debug('Successfully update the array of tank');
+                    return;
+                }
+
+                this.logger.warn('Failed to update the array of last tank');
+            })
+            .catch((reason: any): void => {
+                this.logger.warn('Failed to update the array of last tank with reason : {}', reason);
+            });
         return tankPages;
     }
 
@@ -334,7 +357,7 @@ export class TriviaSingleton {
      *
      * @param {number[]} tankPages - Array of tank pages to fetch.
      *
-     * @returns {Promise<TankopediaVehiclesSuccess[]>} A Promise that resolves with an array of tankopedia responses.
+     * @returns {Promise<TankopediaVehiclesSuccess[]>} - A Promise that resolves with an array of tankopedia responses.
      */
     private async fetchTankopediaResponses(tankPages: number[]): Promise<TankopediaVehiclesSuccess[]> {
         const responses: TankopediaVehiclesSuccess[] = [];
@@ -349,7 +372,7 @@ export class TriviaSingleton {
      *
      * @param {TankopediaVehiclesSuccess[]} responses - Array of tankopedia responses.
      *
-     * @returns {VehicleData[]} Array of tank data.
+     * @returns {VehicleData[]} - Array of tank data.
      */
     private extractTankData(responses: TankopediaVehiclesSuccess[]): VehicleData[] {
         return responses.flatMap((response: TankopediaVehiclesSuccess) => Object.values(response.data)[0]);

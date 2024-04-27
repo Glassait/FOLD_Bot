@@ -9,7 +9,7 @@ import { TimeEnum } from '../enums/time.enum';
  */
 type Constructor = new (...args: any[]) => any;
 
-type DependenceInjection = 'Inventory' | 'Statistic' | 'Trivia' | 'Axios' | 'WotApi' | 'Database';
+type DependenceInjection = 'Statistic' | 'Trivia' | 'Axios' | 'WotApi' | 'Database';
 
 /**
  * Decorator function to inject singleton instances based on the provided dependence type.
@@ -32,9 +32,6 @@ export function Injectable<GDependence extends DependenceInjection>(
     return function actual<GClass>(_target: GClass, _context: ClassFieldDecoratorContext<GClass, any>) {
         return function (this: GClass, field: any) {
             switch (dependence) {
-                case 'Inventory':
-                    field = require('../singleton/inventory.singleton').InventorySingleton.instance;
-                    break;
                 case 'Statistic':
                     field = require('../singleton/statistic.singleton').StatisticSingleton.instance;
                     break;
@@ -78,6 +75,7 @@ let tableMap: {
     Commands: Constructor;
     WotApi: Constructor;
     FoldRecruitment: Constructor;
+    Trivia: Constructor;
 };
 
 /**
@@ -88,6 +86,9 @@ let tableMap: {
  * @returns {Function} - Decorator function.
  *
  * @throws {Error} - Throws an error if an unsupported dependence type is provided.
+ *
+ * @example
+ * .@Injectable("WatchClans") private readonly watchClansTable: WatchClanTable;
  */
 export function TableInjectable(
     dependence: keyof typeof tableMap
@@ -105,6 +106,7 @@ export function TableInjectable(
         Commands: require('../tables/commands.table').CommandsTable,
         WotApi: require('../tables/wot-api.table').WotApiTable,
         FoldRecruitment: require('../tables/fold-recruitment.table').FoldRecruitmentTable,
+        Trivia: require('../tables/trivia.table').TriviaTable,
     };
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -9,7 +9,6 @@ import {
 } from 'discord.js';
 import type { WotApiModel } from '../../../shared/apis/wot-api.model';
 import { Injectable, LoggerInjector, TableInjectable } from '../../../shared/decorators/injector.decorator';
-import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
 import type { BlacklistedPlayersTable } from '../../../shared/tables/blacklisted-players.table';
 import type { ChannelsTable } from '../../../shared/tables/channels.table';
 import type { WatchClansTable } from '../../../shared/tables/watch-clans.table';
@@ -32,7 +31,6 @@ export class WatchClanModel {
 
     //region INJECTABLE
     private readonly logger: Logger;
-    @Injectable('Inventory') private readonly inventory: InventorySingleton;
     @Injectable('WotApi') private readonly wotApi: WotApiModel;
     @TableInjectable('WatchClans') private readonly watchClans: WatchClansTable;
     @TableInjectable('BlacklistedPlayers') private readonly blacklistedPlayers: BlacklistedPlayersTable;

@@ -29,7 +29,7 @@ class Computer {
      * Generates an UPDATE SQL query.
      *
      * @param {string} tableName - The name of the table.
-     * @param {string[]} values - The values to update.
+     * @param {any[]} values - The values to update. If the type is different of string use {@link JSON.stringify}
      * @param {string[]} columns - The columns to update.
      * @param {string[][]} [where] - The WHERE conditions.
      *
@@ -43,7 +43,7 @@ class Computer {
      * // Generating an UPDATE query with WHERE condition
      * const updateQuery = Computer.computeUpdate('users', ['John'], ['name'], [["name LIKE 'John'", 'age = 23' ], ['AND']]);
      */
-    public static computeUpdate(tableName: string, values: string[], columns: string[], where?: string[][]): string {
+    public static computeUpdate(tableName: string, values: any[], columns: string[], where?: string[][]): string {
         return `UPDATE ${tableName} SET ${this.reduceUpdate(values, columns)} ${where ? 'WHERE ' + this.reduceWhere(where) : ''}`;
     }
 
@@ -100,15 +100,30 @@ class Computer {
     /**
      * Reduces UPDATE values to a string.
      *
-     * @param {string[]} values - The values to update.
+     * @param {any[]} values - The values to update.
      * @param {string[]} columns - The columns to update.
      *
      * @returns {string} The reduced UPDATE values string.
      */
-    private static reduceUpdate(values: string[], columns: string[]): string {
+    private static reduceUpdate(values: any[], columns: string[]): string {
         return values.reduce((set: string, value: any, index: number): string => {
-            return set + columns[index] + " = '" + value + (index === values.length - 1 ? "'" : "', ");
+            return set + columns[index] + " = '" + this.stringifyValue(value) + (index === values.length - 1 ? "'" : "', ");
         }, '');
+    }
+
+    /**
+     * Converts a value to a string representation.
+     *
+     * @param {any} value - The value to stringify.
+     *
+     * @returns {string} - The string representation of the value.
+     */
+    private static stringifyValue(value: any): string {
+        if (typeof value === 'string') {
+            return value;
+        }
+
+        return JSON.stringify(value);
     }
 }
 
@@ -254,7 +269,7 @@ export class UpdateBuilder extends Where {
      * @example
      * new UpdateBuilder('users').values('John', 'john@example.com');
      */
-    public values(...values: string[]): this {
+    public values(...values: any[]): this {
         this._values = values;
         return this;
     }
