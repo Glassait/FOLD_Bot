@@ -41,6 +41,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   Transform some `import` to `require` for better processing
 -   Change the way of writing the event from `export const event` to `modules.exports`
 
+### Fixes
+
+-   Fix the month when changing month
+-   Fix the trivia-month by filtering th null
+-   Fix the slowest player by sorting the classement
+
 ### Removed
 
 -   Fold month message
@@ -91,7 +97,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   Rework last activity of clan (moved in feature.json)
 -   Optimized `getArrayWithRandomNumber` with set
 
-### Fix
+### Fixed
 
 -   getCommand function with handling error file not found
 -   Grammatical error
@@ -474,7 +480,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[3.0.0]: https://github.com/Glassait/FOLD_Bot/compare/v2.3.0-6...v3.0.0-0
+[3.0.0]: https://github.com/Glassait/FOLD_Bot/compare/v2.3.0-6...v3.0.0-2
 [2.3.0]: https://github.com/Glassait/FOLD_Bot/compare/v2.2.10-6...v2.3.0-5
 [2.2.10]: https://github.com/Glassait/FOLD_Bot/compare/v2.2.9-8...v2.2.10-6
 [2.2.9]: https://github.com/Glassait/FOLD_Bot/compare/v2.2.8-4...v2.2.9-8
