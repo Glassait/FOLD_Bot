@@ -1,3 +1,3 @@
-import type { VehicleData } from './wot-api.type';
+import type { Tank } from './table.type';
 
-export type TriviaSelected = { ammoIndex: number; tank: VehicleData };
+export type TriviaSelected = { ammoIndex: number; tank: Tank };

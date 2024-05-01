@@ -4,14 +4,9 @@ import { LoggerInjector } from '../decorators/injector.decorator';
 import type { Trivia } from '../types/table.type';
 
 @LoggerInjector
-export class TriviaTable extends TableAbstract {
+export class TriviaDataTable extends TableAbstract {
     constructor() {
-        super('trivia');
-    }
-
-    public async getTotalNumberOfTanks(): Promise<Trivia['total_number_of_tanks']> {
-        return ((await this.select(new SelectBuilder(this.tableName).columns('total_number_of_tanks').compute())) as any)[0]
-            .total_number_of_tanks;
+        super('trivia_data');
     }
 
     public async getMaxNumberOfQuestion(): Promise<Trivia['max_number_of_question']> {

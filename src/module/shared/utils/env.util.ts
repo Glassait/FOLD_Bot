@@ -14,7 +14,8 @@ export class EnvUtil {
 
     /**
      * Returns a boolean indicating whether the application is running in development mode.
-     * @returns True if the application is running in development mode, false otherwise.
+     *
+     * @returns {boolean} - True if the application is running in development mode, false otherwise.
      */
     public static isDev(): boolean {
         return process.argv[3] === MockEnum.DEV;
@@ -22,10 +23,31 @@ export class EnvUtil {
 
     /**
      * Sleeps for the specified number of milliseconds.
-     * @param time The number of milliseconds to sleep.
+     *
+     * @param {number} time - The number of milliseconds to sleep.
      */
     public static async sleep(time: number): Promise<void> {
         this.logger.debug(`${EmojiEnum.SLEEP} Sleeping for ${time / 1000} sec`);
         await new Promise(r => setTimeout(r, time < 0 ? 0 : time));
+    }
+
+    /**
+     * Creates an asynchronous thread that executes the given function after a specified delay.
+     *
+     * @param {(...args: any[]) => Promise<any>} fun The function to execute asynchronously.
+     * @param {number} [delay=0] The delay in milliseconds before executing the function.
+     */
+    public static asyncThread(fun: (...args: any[]) => Promise<any>, delay: number = 0): void {
+        setTimeout(async (): Promise<void> => await fun(), delay);
+    }
+
+    /**
+     * Creates a thread that executes the given function after a specified delay.
+     *
+     * @param {(...args: any[]) => any} fun The function to execute.
+     * @param {number} [delay=0] The delay in milliseconds before executing the function.
+     */
+    public static thread(fun: (...args: any[]) => any, delay: number = 0): void {
+        setTimeout((): void => fun(), delay);
     }
 }

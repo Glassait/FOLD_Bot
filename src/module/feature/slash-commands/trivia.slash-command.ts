@@ -1,6 +1,6 @@
 import { type ChatInputCommandInteraction, SlashCommandSubcommandBuilder } from 'discord.js';
 import { FeatureFlippingTable } from '../../shared/tables/feature-flipping.table';
-import { TriviaTable } from '../../shared/tables/trivia.table';
+import { TriviaDataTable } from '../../shared/tables/trivia-data.table';
 import { DateUtil } from '../../shared/utils/date.util';
 import { SlashCommandModel } from './model/slash-command.model';
 import { TriviaModel } from './model/trivia.model';
@@ -24,7 +24,7 @@ trivia.initialize().then();
 let maxNumberOfQuestion = 0;
 
 setTimeout(async () => {
-    const triviaTable = new TriviaTable();
+    const triviaTable = new TriviaDataTable();
     maxNumberOfQuestion = await triviaTable.getMaxNumberOfQuestion();
 });
 

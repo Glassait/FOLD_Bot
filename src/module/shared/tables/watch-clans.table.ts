@@ -26,7 +26,7 @@ export class WatchClansTable extends TableAbstract {
             throw new Error(`Id and Name are required to add in database, given id ${clan.id} name ${clan.name}`);
         }
 
-        return await this.add(new InsertIntoBuilder(this.tableName).columns('id', 'name').values(clan.id, clan.name).compute());
+        return await this.insert(new InsertIntoBuilder(this.tableName).columns('id', 'name').values(clan.id, clan.name).compute());
     }
 
     /**
@@ -42,7 +42,9 @@ export class WatchClansTable extends TableAbstract {
         if (!clan.id || !clan.name || !clan.imageUrl || !clan.lastActivity) {
             throw new Error('All properties in CLAN are required to add in database, given :', { cause: clan });
         }
-        return await this.add(new InsertIntoBuilder(this.tableName).values(clan.id, clan.name, clan.imageUrl, clan.lastActivity).compute());
+        return await this.insert(
+            new InsertIntoBuilder(this.tableName).values(clan.id, clan.name, clan.imageUrl, clan.lastActivity).compute()
+        );
     }
 
     /**

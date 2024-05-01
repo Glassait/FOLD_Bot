@@ -19,7 +19,7 @@ import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
 import type { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
 import type { TriviaSingleton } from '../../../shared/singleton/trivia.singleton';
-import type { TriviaTable } from '../../../shared/tables/trivia.table';
+import type { TriviaDataTable } from '../../../shared/tables/trivia-data.table';
 import type {
     DailyTrivia,
     MonthlyTriviaPlayerStatistic,
@@ -27,9 +27,9 @@ import type {
     TriviaStatistic,
     WinStreak,
 } from '../../../shared/types/statistic.type';
-import type { Trivia } from '../../../shared/types/table.type';
+import type { Tank, Trivia } from '../../../shared/types/table.type';
 import type { TriviaSelected } from '../../../shared/types/trivia.type';
-import type { Ammo, VehicleData } from '../../../shared/types/wot-api.type';
+import type { Ammo } from '../../../shared/types/wot-api.type';
 import type { Logger } from '../../../shared/utils/logger';
 import { TimeUtil } from '../../../shared/utils/time.util';
 import { MEDAL } from '../../../shared/utils/variables.util';
@@ -42,7 +42,7 @@ export class TriviaModel {
     private readonly logger: Logger;
     @Injectable('Trivia') private readonly trivia: TriviaSingleton;
     @Injectable('Statistic') private readonly statistic: StatisticSingleton;
-    @TableInjectable('Trivia') private readonly triviaTable: TriviaTable;
+    @TableInjectable('TriviaData') private readonly triviaTable: TriviaDataTable;
     //endregion
 
     //region PRIVATE READONLY FIELDS
@@ -215,7 +215,7 @@ export class TriviaModel {
             return;
         }
 
-        const ammo: Ammo = datum.tank.default_profile.ammo[datum.ammoIndex];
+        const ammo: Ammo = datum.tank.ammo[datum.ammoIndex];
 
         const target = new Date();
         target.setTime(target.getTime() + this.maxQuestionDuration * TimeEnum.MINUTE);
@@ -240,7 +240,7 @@ export class TriviaModel {
                 }
             );
 
-        const row: ActionRowBuilder<ButtonBuilder> = allTanks.reduce((rowBuilder: ActionRowBuilder<ButtonBuilder>, data: VehicleData) => {
+        const row: ActionRowBuilder<ButtonBuilder> = allTanks.reduce((rowBuilder: ActionRowBuilder<ButtonBuilder>, data: Tank) => {
             rowBuilder.addComponents(new ButtonBuilder().setCustomId(`${data.name}`).setLabel(data.name).setStyle(ButtonStyle.Primary));
             return rowBuilder;
         }, new ActionRowBuilder<ButtonBuilder>());
@@ -258,6 +258,8 @@ export class TriviaModel {
      * Sends the trivia statistics for a specific month to the user.
      *
      * @param {ChatInputCommandInteraction} interaction - The interaction object representing the user command.
+     *
+     * todo Update here with database
      */
     public async sendStatistics(interaction: ChatInputCommandInteraction): Promise<void> {
         const playerStats = this.triviaStatistic.player[interaction.user.username];
@@ -339,6 +341,8 @@ export class TriviaModel {
      * Sends the scoreboard for the current month's trivia game.
      *
      * @param {ChatInputCommandInteraction} interaction - The interaction object representing the user's command interaction.
+     *
+     * Update here with database
      */
     public async sendScoreboard(interaction: ChatInputCommandInteraction): Promise<void> {
         const username = interaction.user.username;
@@ -397,7 +401,7 @@ export class TriviaModel {
      * @example
      * const { allTanks, datum } = this.getData(interaction.user.username);
      */
-    private getData(username: string): { allTanks: VehicleData[]; datum: TriviaSelected } {
+    private getData(username: string): { allTanks: Tank[]; datum: TriviaSelected } {
         const value = this.datum.get(username);
 
         return {
@@ -500,10 +504,10 @@ export class TriviaModel {
 
         const otherAnswer: EmbedBuilder[] = [];
 
-        const ammo: Ammo = datum.tank.default_profile.ammo[datum.ammoIndex];
+        const ammo: Ammo = datum.tank.ammo[datum.ammoIndex];
 
-        allTanks.forEach((vehicle: VehicleData): void => {
-            const vehicleAmmo: Ammo = vehicle.default_profile.ammo[datum.ammoIndex];
+        allTanks.forEach((vehicle: Tank): void => {
+            const vehicleAmmo: Ammo = vehicle.ammo[datum.ammoIndex];
             if (vehicle.name !== datum.tank.name && this.checkVehicleAmmoDetail(vehicleAmmo, ammo)) {
                 this.logger.debug('Another tank has the same shell {}', vehicle.name);
                 otherAnswer.push(this.createAnswerEmbed(false, vehicle, isGoodAnswer));
@@ -520,7 +524,7 @@ export class TriviaModel {
      * Create the answer embed to send to the player.
      *
      * @param {boolean} main - If this is the main answer or not
-     * @param {VehicleData} vehicle - The data of the tank
+     * @param {Tank} vehicle - The data of the tank
      * @param {boolean} isGoodAnswer - Is the player found the right answer or not
      *
      * @return {EmbedBuilder} - The response embed build by the bot to send to the player
@@ -529,33 +533,27 @@ export class TriviaModel {
      * const embed = this.createAnswerEmbed(true, {...}, true);
      * console.log(embed) // Embed{ title: "Réponse principale", color: Colors.Red, etc. }
      */
-    private createAnswerEmbed(main: boolean, vehicle: VehicleData, isGoodAnswer: boolean): EmbedBuilder {
+    private createAnswerEmbed(main: boolean, vehicle: Tank, isGoodAnswer: boolean): EmbedBuilder {
         return new EmbedBuilder()
             .setTitle(main ? 'Réponse principale' : 'Autre bonne réponse')
             .setColor(isGoodAnswer ? Colors.Green : Colors.Red)
-            .setImage(vehicle.images.big_icon)
+            .setImage(vehicle.image)
             .setDescription(main ? `Le char à deviner était : \`${vehicle.name}\`` : `Le char suivant \`${vehicle.name}\` à le mème obus !`)
             .setFooter({ text: 'Trivia Game' })
             .setFields(
                 {
                     name: 'Obus normal',
-                    value: `\`${ShellEnum[vehicle.default_profile.ammo[0].type as keyof typeof ShellEnum]} ${
-                        vehicle.default_profile.ammo[0].damage[1]
-                    }\``,
+                    value: `\`${ShellEnum[vehicle.ammo[0].type as keyof typeof ShellEnum]} ${vehicle.ammo[0].damage[1]}\``,
                     inline: true,
                 },
                 {
                     name: 'Obus spécial (ou gold)',
-                    value: `\`${ShellEnum[vehicle.default_profile.ammo[1].type as keyof typeof ShellEnum]} ${
-                        vehicle.default_profile.ammo[1].damage[1]
-                    }\``,
+                    value: `\`${ShellEnum[vehicle.ammo[1].type as keyof typeof ShellEnum]} ${vehicle.ammo[1].damage[1]}\``,
                     inline: true,
                 },
                 {
                     name: 'Obus explosif',
-                    value: `\`${ShellEnum[vehicle.default_profile.ammo[2].type as keyof typeof ShellEnum]} ${
-                        vehicle.default_profile.ammo[2].damage[1]
-                    }\``,
+                    value: `\`${ShellEnum[vehicle.ammo[2].type as keyof typeof ShellEnum]} ${vehicle.ammo[2].damage[1]}\``,
                     inline: true,
                 }
             );
@@ -596,15 +594,13 @@ export class TriviaModel {
      */
     private isAnotherTanks(playerResponse: PlayerAnswer, username: string): boolean {
         const { allTanks, datum } = this.getData(username);
-        const vehicle: VehicleData | undefined = allTanks.find(
-            (vehicle: VehicleData): boolean => vehicle.name === playerResponse?.response
-        );
+        const vehicle: Tank | undefined = allTanks.find((vehicle: Tank): boolean => vehicle.name === playerResponse?.response);
 
         if (!vehicle) {
             return false;
         }
 
-        return this.checkVehicleAmmoDetail(vehicle.default_profile.ammo[datum.ammoIndex], datum.tank.default_profile.ammo[datum.ammoIndex]);
+        return this.checkVehicleAmmoDetail(vehicle.ammo[datum.ammoIndex], datum.tank.ammo[datum.ammoIndex]);
     }
 
     /**
@@ -627,6 +623,8 @@ export class TriviaModel {
      * @param {string} playerName - The name of the player whose statistics need to be updated.
      * @param {PlayerAnswer} playerAnswer - The answer provided by the player.
      * @param {boolean} isGoodAnswer - Indicates whether the player's answer is correct or not.
+     *
+     * Todo Update here with database
      */
     private async updatePlayerStatistic(playerName: string, playerAnswer: PlayerAnswer, isGoodAnswer: boolean): Promise<void> {
         const value = this.datum.get(playerName);
@@ -721,7 +719,7 @@ export class TriviaModel {
      * @param {PlayerAnswer} playerAnswer - The player answer
      * @param {number} oldElo - The player elo before the answer
      * @param {string} playerName - The player username
-     * @param {VehicleData[]} allTanks - All the tanks available for the question
+     * @param {Tank[]} allTanks - All the tanks available for the question
      * @param {TriviaSelected} datum - The tank selected for the question
      */
     private async handleWrongAnswer(
@@ -729,7 +727,7 @@ export class TriviaModel {
         playerAnswer: PlayerAnswer,
         oldElo: number,
         playerName: string,
-        allTanks: VehicleData[],
+        allTanks: Tank[],
         datum: TriviaSelected
     ): Promise<void> {
         this.logger.debug('Player {} failed to find the right answer', playerName);
@@ -745,13 +743,13 @@ export class TriviaModel {
         }
 
         winStreak.current = 0;
-        const tank = allTanks.find((tank: VehicleData): boolean => tank.name === playerAnswer?.response);
+        const tank = allTanks.find((tank: Tank): boolean => tank.name === playerAnswer?.response);
 
         if (!tank) {
             return;
         }
 
-        const ammo = tank.default_profile.ammo[datum.ammoIndex];
+        const ammo = tank.ammo[datum.ammoIndex];
         await playerAnswer?.interaction.editReply({
             content: '',
             embeds: [
@@ -760,7 +758,7 @@ export class TriviaModel {
                     .setDescription("Tu n'a malheureusement pas trouvée la bonne réponse")
                     .setColor(Colors.Red)
                     .setFooter({ text: 'Trivia Game' })
-                    .setImage(tank.images.big_icon)
+                    .setImage(tank.image)
                     .setFields(
                         {
                             name: 'Char sélectionné',

@@ -2,6 +2,8 @@
  * * This file contain all types related to data fetch in table class
  */
 
+import { Ammo } from './wot-api.type';
+
 /**
  * Type defining the structure for the trivia game.
  */
@@ -10,10 +12,6 @@ export type Trivia = {
      * The URL associated with the trivia game.
      */
     url: string;
-    /**
-     * The total number of tanks, used when fetching the tanks from the wot api.
-     */
-    total_number_of_tanks: number;
     /**
      * Array of last tank pages for the trivia game.
      */
@@ -36,4 +34,22 @@ export type Trivia = {
      * The maximum duration for a trivia question (in minutes).
      */
     max_response_time_limit: number;
+};
+
+/**
+ * Represent the information store in the tanks table
+ */
+export type Tank = {
+    /**
+     * The name of the tank
+     */
+    name: string;
+    /**
+     * The image url of the tank
+     */
+    image: string;
+    /**
+     * The shell definition of the tank
+     */
+    ammo: Ammo[];
 };

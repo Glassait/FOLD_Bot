@@ -26,7 +26,7 @@ export class BlacklistedPlayersTable extends TableAbstract {
             throw new Error('Id or name are empty or there are requires !');
         }
 
-        return await this.add(
+        return await this.insert(
             new InsertIntoBuilder(this.tableName).columns('id', 'name', 'reason').values(player.id, player.name, player.reason).compute()
         );
     }

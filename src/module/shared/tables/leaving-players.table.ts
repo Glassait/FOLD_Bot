@@ -19,7 +19,7 @@ export class LeavingPlayersTable extends TableAbstract {
      * @returns {Promise<boolean>} A Promise that resolves to true if the player was added successfully, otherwise false.
      */
     public async addPlayer(id: number): Promise<boolean> {
-        return await this.add(new InsertIntoBuilder(this.tableName).columns('id').values(id).compute());
+        return await this.insert(new InsertIntoBuilder(this.tableName).columns('id').values(id).compute());
     }
 
     /**

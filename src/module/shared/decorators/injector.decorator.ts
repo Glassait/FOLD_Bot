@@ -75,7 +75,8 @@ let tableMap: {
     Commands: Constructor;
     WotApi: Constructor;
     FoldRecruitment: Constructor;
-    Trivia: Constructor;
+    TriviaData: Constructor;
+    Tanks: Constructor;
 };
 
 /**
@@ -106,7 +107,8 @@ export function TableInjectable(
         Commands: require('../tables/commands.table').CommandsTable,
         WotApi: require('../tables/wot-api.table').WotApiTable,
         FoldRecruitment: require('../tables/fold-recruitment.table').FoldRecruitmentTable,
-        Trivia: require('../tables/trivia.table').TriviaTable,
+        TriviaData: require('../tables/trivia-data.table').TriviaTable,
+        Tanks: require('../tables/tanks.table').TanksTable,
     };
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

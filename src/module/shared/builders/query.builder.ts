@@ -170,6 +170,7 @@ export class InsertIntoBuilder {
 
     /**
      * Constructs a new instance of InsertInto.
+     *
      * @param {string} tableName - The name of the table.
      */
     constructor(private tableName: string) {}
@@ -213,6 +214,9 @@ export class InsertIntoBuilder {
      *
      * @example
      * new InsertIntoBuilder('clan').columns('id', 'name').values(clan.id, clan.name).compute()
+     *
+     * @example
+     * new InsertIntoBuilder('clan').values(clan.id, clan.name).compute()
      */
     public compute(): string {
         if (!this._values || this._values.length === 0) {
@@ -239,6 +243,8 @@ export class UpdateBuilder extends Where {
      * Constructs a new instance of Update.
      *
      * @param {string} tableName - The name of the table.
+     *
+     * TODO Constructor take {@link TableAbstract}
      */
     constructor(private tableName: string) {
         super();

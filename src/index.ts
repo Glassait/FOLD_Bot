@@ -1,6 +1,7 @@
 import { GatewayIntentBits } from 'discord.js';
 import { basename } from 'node:path';
-import { WotApiTable } from './module/shared/tables/wot-api.table';
+import { TriviaSingleton } from './module/shared/singleton/trivia.singleton';
+import { TanksTable } from './module/shared/tables/tanks.table';
 import { Logger } from './module/shared/utils/logger';
 
 const logger: Logger = new Logger(basename(__filename));
@@ -49,9 +50,10 @@ process.on('uncaughtException', (err: Error): void => {
 });
 
 setTimeout(async (): Promise<void> => {
-    const table = new WotApiTable();
+    const table = new TanksTable();
 
-    const value = await table.getUrl('trivia');
+    const trivia = TriviaSingleton.instance;
+    await trivia.updateDatabase();
 
     throw new Error('END');
 });

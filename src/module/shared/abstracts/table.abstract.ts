@@ -5,6 +5,8 @@ import type { Logger } from '../utils/logger';
 
 /**
  * Represents a database table with common CRUD operations.
+ *
+ * TODO Make method takes builder and not string
  */
 export class TableAbstract {
     //region INJECTABLE
@@ -37,7 +39,7 @@ export class TableAbstract {
      *
      * @throws {Error} - If the SQL query is not an INSERT INTO statement.
      */
-    protected async add(sql: string): Promise<boolean> {
+    protected async insert(sql: string): Promise<boolean> {
         this.validateQueryType(sql, 'INSERT INTO');
         const rows = await this.query(sql);
         return 'serverStatus' in rows && rows.serverStatus === this.sqlReturn.CREATE;

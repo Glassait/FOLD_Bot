@@ -20,7 +20,7 @@ export class PotentialClansTable extends TableAbstract {
      * @returns {Promise<boolean>} A promise that resolves to true if the clan is successfully added, false otherwise.
      */
     public async addClan(url: string): Promise<boolean> {
-        return await this.add(new InsertIntoBuilder(this.tableName).columns('url').values(url).compute());
+        return await this.insert(new InsertIntoBuilder(this.tableName).columns('url').values(url).compute());
     }
 
     /**

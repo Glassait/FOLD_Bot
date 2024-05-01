@@ -41,18 +41,26 @@ export class WotApiModel {
     /**
      * Fetches data from the Tankopedia API.
      *
-     * @param {number} pageNumber - The page number on the Tankopedia Api
+     * @param {number} [pageNumber] - The page number on the Tankopedia Api
      *
      * @returns {Promise<TankopediaVehiclesSuccess>} - A promise that resolves with the tankopedia data on success.
      *
      * @example
      * const tankopediaData: TankopediaVehiclesSuccess = await instance.fetchTankopediaApi(2);
      * console.log(tankopediaData); // { status: 'ok', meta: { count: 1, total: 1 }, data: { ... } }
+     *
+     * @example
+     * const tankopediaData: TankopediaVehiclesSuccess = await instance.fetchTankopediaApi();
+     * console.log(tankopediaData); // { status: 'ok', meta: { count: 50, total: 50 }, data: { ... } }
      */
-    public async fetchTankopediaApi(pageNumber: number): Promise<TankopediaVehiclesSuccess> {
-        const url = this.concatUrl((await this.wotApi.getUrl('trivia')).replace(WotApiConstants.PAGE_NUMBER, String(pageNumber)));
-        this.logger.debug(`${EmojiEnum.SOLDIER} Fetching tankopedia api with url {}`, url);
+    public async fetchTankopediaApi(pageNumber?: number): Promise<TankopediaVehiclesSuccess> {
+        let url = this.concatUrl(await this.wotApi.getUrl('trivia'));
 
+        if (pageNumber) {
+            url += `&page_no=${pageNumber}`;
+        }
+
+        this.logger.debug(`${EmojiEnum.SOLDIER} Fetching tankopedia api with url {}`, url);
         return await this.getDataFromUrl<TankopediaVehiclesSuccess, TankopediaVehicle>(url);
     }
 
