@@ -120,7 +120,7 @@ export class TriviaMonthModel {
         let embed: EmbedBuilder = new EmbedBuilder()
             .setTitle('Tableau des scores')
             .setDescription(
-                'Nous allons visualiser dans un premier temps le score des joueurs. \n(Plus de détails avec la commande `/trivia statistics)`'
+                'Nous allons visualiser dans un premier temps le score des joueurs. \n(Plus de détails avec la commande `/trivia statistics`)'
             )
             .setColor(Colors.DarkGold)
             .setFields({
@@ -200,7 +200,12 @@ export class TriviaMonthModel {
      * Create embed for the slowest player
      */
     private embedSlowPlayer(): void {
-        const [name, statistics] = this.playerClassement.at(-1) as [string, MonthlyTriviaPlayerStatistic];
+        this.playerClassement.sort(
+            ([, aStatistics]: [string, MonthlyTriviaPlayerStatistic], [, bStatistics]: [string, MonthlyTriviaPlayerStatistic]) =>
+                MathUtil.getMaxFromArrayOfObject(Object.values(bStatistics.daily), 'answer_time') -
+                MathUtil.getMaxFromArrayOfObject(Object.values(aStatistics.daily), 'answer_time')
+        );
+        const [name, statistics] = this.playerClassement[0];
 
         this.listEmbed.push(
             new EmbedBuilder()

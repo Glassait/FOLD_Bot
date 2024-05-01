@@ -20,7 +20,9 @@ export class MathUtil {
      * console.log(minValue); // Output: 3
      */
     public static getMinFromArrayOfObject<T>(arr: T[], property: keyof T): number {
-        const values: T[keyof T][] = arr.flatMap((obj: T) => obj[property]);
+        const values: T[keyof T][] = arr
+            .flatMap((obj: T) => obj[property])
+            .filter((value: T[keyof T]): boolean => typeof value === 'number');
         if (!values.every((val: T[keyof T]): boolean => typeof val === 'number')) {
             throw new Error('Property values must be numbers.');
         }
@@ -45,7 +47,9 @@ export class MathUtil {
      * console.log(maxValue); // Output: 10
      */
     public static getMaxFromArrayOfObject<T>(arr: T[], property: keyof T): number {
-        const values: T[keyof T][] = arr.flatMap((obj: T) => obj[property]);
+        const values: T[keyof T][] = arr
+            .flatMap((obj: T) => obj[property])
+            .filter((value: T[keyof T]): boolean => typeof value === 'number');
         if (!values.every((val: T[keyof T]): boolean => typeof val === 'number')) {
             throw new Error('Property values must be numbers.');
         }

@@ -62,16 +62,49 @@ export class DateUtil {
     /**
      * Gets a formatted string representing the current day.
      *
+     * @returns {Date} - The previous day.
+     *
+     * @example
+     * const previousDay = DateUtil.getPreviousDayAsDate();
+     * console.log(previousDay); // Tue Apr 30 2024 09:23:35 GMT+0200 (heure d’été d’Europe centrale)
+     */
+    public static getPreviousDayAsDate(): Date {
+        const date: Date = new Date();
+        date.setDate(date.getDate() - 1);
+        return date;
+    }
+
+    /**
+     * Gets a formatted string representing the previous day.
+     *
      * @returns {string} - A formatted string representing the current day in the format "dd/mm/yy".
      *
      * @example
-     * const currentMonth = DateUtil.getCurrentDay();
-     * console.log(currentMonth); // "23/03/24"
+     * const previousDay = DateUtil.getPreviousDay();
+     * console.log(previousDay); // "23/03/24"
      */
     public static getPreviousDay(): string {
-        const date = new Date();
-        date.setDate(date.getDate() - 1);
-        return this.convertDateToDayMonthYearString(date);
+        return this.convertDateToDayMonthYearString(this.getPreviousDayAsDate());
+    }
+
+    /**
+     * Get the correct month for previous day.
+     *
+     * @return {string} - The current month if the previous day is part of the month, otherwise the previous month
+     *
+     * @example
+     * // Today : 11/06/2024
+     * // Yesterday : 10/06/2024
+     * const month = DateUtil.getCorrectMonthForPreviousDay();
+     * console.log(month); // "June 2024"
+     * @example
+     * // Today : 01/07/2024
+     * // Yesterday : 30/06/2024
+     * const month = DateUtil.getCorrectMonthForPreviousDay();
+     * console.log(month); // "June 2024"
+     */
+    public static getCorrectMonthForPreviousDay(): string {
+        return new Date().getMonth() !== DateUtil.getPreviousDayAsDate().getMonth() ? this.getPreviousMonth() : this.getCurrentMonth();
     }
 
     /**

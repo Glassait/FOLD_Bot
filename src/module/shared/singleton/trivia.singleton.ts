@@ -140,8 +140,10 @@ export class TriviaSingleton {
         this.logger.debug('Start collecting data to send the trivia result');
         this.channel = await this.inventory.getChannelForTrivia(client);
 
-        const previousDay = DateUtil.getPreviousDay();
-        const dayTankElement = this.triviaStatistique.overall[this.statistic.currentMonth].day_tank[previousDay];
+        const previousDay: string = DateUtil.getPreviousDay();
+        const month: string = DateUtil.getCorrectMonthForPreviousDay();
+
+        const dayTankElement = this.triviaStatistique.overall[month].day_tank[previousDay];
 
         if (!dayTankElement) {
             this.logger.debug('No tanks fetch yesterday ! Not sending result');
@@ -155,13 +157,10 @@ export class TriviaSingleton {
 
             const player: [string, TriviaPlayerStatistic][] = Object.entries(this.triviaStatistique.player)
                 .filter((value: [string, TriviaPlayerStatistic]): boolean => {
-                    return value[1][this.statistic.currentMonth].daily[previousDay]?.answer[index] === selected.tank.name;
+                    return value[1][month].daily[previousDay]?.answer[index] === selected.tank.name;
                 })
                 .sort((a: [string, TriviaPlayerStatistic], b: [string, TriviaPlayerStatistic]) => {
-                    return (
-                        a[1][this.statistic.currentMonth].daily[previousDay].answer_time[index] -
-                        b[1][this.statistic.currentMonth].daily[previousDay].answer_time[index]
-                    );
+                    return a[1][month].daily[previousDay].answer_time[index] - b[1][month].daily[previousDay].answer_time[index];
                 })
                 .slice(0, 3);
 
@@ -234,7 +233,7 @@ export class TriviaSingleton {
             });
         }
 
-        this.triviaStatistique.overall[this.statistic.currentMonth].day_without_participation += dayWithoutParticipation ? 1 : 0;
+        this.triviaStatistique.overall[month].day_without_participation += dayWithoutParticipation ? 1 : 0;
         this.statistic.trivia = this.triviaStatistique;
     }
 
@@ -244,7 +243,7 @@ export class TriviaSingleton {
      * The Elo reduction factor is 1.8%.
      */
     public async reduceEloOfInactifPlayer(): Promise<void> {
-        if (!this.triviaStatistique.overall[this.statistic.currentMonth].day_tank[DateUtil.getPreviousDay()]) {
+        if (!this.triviaStatistique.overall[DateUtil.getCorrectMonthForPreviousDay()].day_tank[DateUtil.getPreviousDay()]) {
             this.logger.debug('No tanks fetch yesterday ! Not reducing elo of inactif player');
             return;
         }
@@ -299,7 +298,9 @@ export class TriviaSingleton {
      * console.log(time) // 3 secondes
      */
     private calculateResponseTime(playersResponse: [string, TriviaPlayerStatistic], index: number): string {
-        const sec = playersResponse[1][this.statistic.currentMonth].daily[DateUtil.getPreviousDay()].answer_time[index] / TimeEnum.SECONDE;
+        const sec =
+            playersResponse[1][DateUtil.getCorrectMonthForPreviousDay()].daily[DateUtil.getPreviousDay()].answer_time[index] /
+            TimeEnum.SECONDE;
         return sec > 60 ? `${Math.floor(sec / 60)}:${Math.round(sec % 60)} minutes` : `${sec.toFixed(2)} secondes`;
     }
 
