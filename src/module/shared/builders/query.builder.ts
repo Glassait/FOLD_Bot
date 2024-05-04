@@ -1,7 +1,9 @@
+import type { TableAbstract } from '../abstracts/table.abstract';
+import type { ColumnsInterface, ComputeInterface, ValuesInterface } from './interfaces/query.interface';
+import type { Condition } from './types/query.type';
+
 /**
  * Represents a utility class for generating SQL queries.
- *
- *
  */
 class Computer {
     /**
@@ -11,7 +13,7 @@ class Computer {
      * @param {(number | string)[]} values - The values to insert.
      * @param {string[]} [columns] - The columns to insert into.
      *
-     * @returns {string} The generated SQL query.
+     * @returns {string} - The generated INSERT INTO SQL query.
      *
      * @example
      * // Insert into without giving column
@@ -21,8 +23,8 @@ class Computer {
      * // Insert into with giving column
      * const insertQuery = Computer.computeInsertInto('users', ['John', 23], ['name', 'age']);
      */
-    public static computeInsertInto(tableName: string, values: (number | string)[], columns?: string[]): string {
-        return `INSERT INTO ${tableName} ${columns ? '(' + columns.join(', ') + ')' : ''} VALUES (${values.map((value: number | string): string => "'" + value + "'").join(', ')})`;
+    public static computeInsertInto(tableName: string, values: any[], columns?: string[]): string {
+        return `INSERT INTO ${tableName} ${columns ? '(' + columns.join(', ') + ')' : ''} VALUES (${values.map((value: number | string): string => "'" + this.stringifyValue(value) + "'").join(', ')})`;
     }
 
     /**
@@ -31,9 +33,9 @@ class Computer {
      * @param {string} tableName - The name of the table.
      * @param {any[]} values - The values to update. If the type is different of string use {@link JSON.stringify}
      * @param {string[]} columns - The columns to update.
-     * @param {string[][]} [where] - The WHERE conditions.
+     * @param {Conditions} [conditions] - The {@link Conditions} instance to get the condition.
      *
-     * @returns {string} The generated SQL query.
+     * @returns {string} - The generated UPDATE SQL query.
      *
      * @example
      * // Generating an UPDATE query without WHERE condition
@@ -42,9 +44,10 @@ class Computer {
      * @example
      * // Generating an UPDATE query with WHERE condition
      * const updateQuery = Computer.computeUpdate('users', ['John'], ['name'], [["name LIKE 'John'", 'age = 23' ], ['AND']]);
+     * // Here the condition is put as table of string, but is à instance of {@link Conditions}
      */
-    public static computeUpdate(tableName: string, values: any[], columns: string[], where?: string[][]): string {
-        return `UPDATE ${tableName} SET ${this.reduceUpdate(values, columns)} ${where ? 'WHERE ' + this.reduceWhere(where) : ''}`;
+    public static computeUpdate(tableName: string, values: any[], columns: string[], conditions?: Conditions): string {
+        return `UPDATE ${tableName} SET ${this.reduceUpdate(values, columns)} ${conditions ? conditions.buildConditions() : ''}`;
     }
 
     /**
@@ -52,9 +55,9 @@ class Computer {
      *
      * @param {string} tableName - The name of the table.
      * @param {string[]} columns - The columns to select.
-     * @param {string[][]} [where] - The WHERE conditions.
+     * @param {Conditions} [conditions] - The {@link Conditions} instance to get the condition.
      *
-     * @returns {string} The generated SQL query.
+     * @returns {string} - The generated SELECT SQL query.
      *
      * @example
      * // Generating a SELECT query without WHERE condition
@@ -63,38 +66,27 @@ class Computer {
      * @example
      * // Generating a SELECT query  with WHERE condition
      * const selectQuery = Computer.computeSelect('users', ['name', 'email'], [["name LIKE 'John'", 'age = 23' ], ['AND']]);
+     * // Here the condition is put as table of string, but is à instance of {@link Conditions}
      */
-    public static computeSelect(tableName: string, columns: string[], where?: string[][]): string {
-        return `SELECT ${columns.join(', ')} FROM ${tableName} ${where ? 'WHERE ' + this.reduceWhere(where) : ''}`;
+    public static computeSelect(tableName: string, columns: string[], conditions?: Conditions): string {
+        return `SELECT ${columns.join(', ')} FROM ${tableName} ${conditions ? conditions.buildConditions() : ''}`;
     }
 
     /**
      * Generates a DELETE SQL query.
      *
      * @param {string} tableName - The name of the table.
-     * @param {string[][]} where - The WHERE conditions.
+     * @param {Conditions} [conditions] - The {@link Conditions} instance to get the condition.
      *
-     * @returns {string} The generated SQL query.
+     * @returns {string} - The generated DELETE SQL query.
      *
      * @example
      * // Generating a DELETE query
      * const deleteQuery = Computer.computeDelete('users', [["name LIKE 'John'", 'age = 23' ], ['AND']]);
+     * // Here the condition is put as table of string, but is à instance of {@link Conditions}
      */
-    public static computeDelete(tableName: string, where: string[][]): string {
-        return `DELETE FROM ${tableName} ${where ? 'WHERE' + this.reduceWhere(where) : ''}`;
-    }
-
-    /**
-     * Reduces WHERE conditions to a string.
-     *
-     * @param {string[][]} wheres - The WHERE conditions.
-     *
-     * @returns {string} The reduced WHERE conditions string.
-     */
-    private static reduceWhere(wheres: string[][]): string {
-        return wheres[0].reduce((where: string, condition: any, index: number) => {
-            return where + condition + (index === wheres.length - 2 ? ' ' + wheres[1][index] + ' ' : '');
-        }, '');
+    public static computeDelete(tableName: string, conditions?: Conditions): string {
+        return `DELETE FROM ${tableName} ${conditions ? conditions.buildConditions() : ''}`;
     }
 
     /**
@@ -123,67 +115,139 @@ class Computer {
             return value;
         }
 
+        if (value instanceof Date) {
+            return value.toISOString().replace('T', ' ').replace('Z', '');
+        }
+
         return JSON.stringify(value);
     }
 }
 
 /**
- * Represents a WHERE condition builder.
+ * Builder that help to build conditional query like where of inner join.
  */
-class Where {
-    protected _conditions: string[][];
+class Conditions {
+    /**
+     * The inner join condition
+     */
+    protected _innerJoin: { tableName: string; condition: Condition };
+
+    /**
+     * The where condition
+     */
+    protected _where: Condition;
+
+    /**
+     * Build the condition
+     */
+    public buildConditions(): string {
+        let conditions: string = '';
+
+        if (this._where) {
+            conditions += ' WHERE ' + this.reduceConditionsAndVerdes(this._where);
+        }
+
+        if (this._innerJoin) {
+            conditions += ` INNER JOIN ${this._innerJoin.tableName} ON ${this.reduceConditionsAndVerdes(this._innerJoin.condition)}`;
+        }
+
+        return conditions;
+    }
 
     /**
      * Sets the WHERE conditions.
      *
-     * @param {string[]} conditions - The WHERE conditions.
-     * @param {('OR' | 'AND')[]} [verde] - The 'OR' or 'AND' operators.
+     * @param {Condition['conditions']} conditions - The WHERE conditions.
+     * @param {Condition['verdes']} [verde] - The 'OR' or 'AND' operators.
      *
-     * @returns {this} The current instance of Where.
+     * @returns {this} - The instance of the class extending the {@link Conditions} class.
      *
-     * @throws {Error} If the length of verde is not equal to the length of conditions minus one.
+     * @throws {Error} - If the length of verde is not equal to the length of conditions minus one.
      *
      * @example
      * new DeleteBuilder('tableName').where([["name LIKE 'John'", 'age = 23' ], ['AND']])
      */
-    public where(conditions: string[], verde?: ('OR' | 'AND')[]): this {
+    public where(conditions: Condition['conditions'], verde?: Condition['verdes']): this {
         if (verde && verde.length !== conditions.length - 1) {
-            throw new Error('Verde length différent of condition length (minus one)');
+            throw new Error('Verde length different of condition length (minus one)');
         }
 
-        this._conditions = [conditions];
+        this._where = { conditions: conditions };
 
         if (verde) {
-            this._conditions.push(verde);
+            this._where.verdes = verde;
         }
 
         return this;
+    }
+
+    /**
+     * Set the INNER JOIN condition
+     *
+     * @param {string} tableName - The name of the table to join
+     * @param {Condition['conditions']} conditions - The conditions.
+     * @param {Condition['verdes']} [verde] - The 'OR' or 'AND' operators.
+     *
+     * @returns {this} - The instance of the class extending the {@link Conditions} class.
+     *
+     * @throws {Error} - If the length of verde is not equal to the length of conditions minus one.
+     */
+    public innerJoin(tableName: string, conditions: Condition['conditions'], verde?: Condition['verdes']): this {
+        if (verde && verde.length !== conditions.length - 1) {
+            throw new Error('Verde length different of condition length (minus one)');
+        }
+
+        this._innerJoin = {
+            tableName: tableName,
+            condition: {
+                conditions: conditions,
+            },
+        };
+
+        if (verde) {
+            this._innerJoin.condition.verdes = verde;
+        }
+
+        return this;
+    }
+
+    /**
+     * Reduces WHERE conditions to a string.
+     *
+     * @param {Condition} conditions - The condition and verbe to reduce
+     *
+     * @returns {string} The reduced WHERE conditions string.
+     */
+    private reduceConditionsAndVerdes(conditions: Condition): string {
+        return conditions.conditions.reduce((where: string, condition: any, index: number): string => {
+            return where + condition + (index === conditions.conditions.length - 2 ? ` ${(conditions.verdes as string[])[index]} ` : '');
+        }, '');
     }
 }
 
 /**
  * Represents an INSERT INTO query builder.
  */
-export class InsertIntoBuilder {
+export class InsertIntoBuilder implements ComputeInterface, ColumnsInterface, ValuesInterface {
+    /**
+     * The columns to add value when inserting new line
+     */
     private _columns: string[];
-    private _values: (number | string)[];
 
     /**
-     * Constructs a new instance of InsertInto.
-     *
-     * @param {string} tableName - The name of the table.
+     * The values to insert in the columns when inserting new line
      */
-    constructor(private tableName: string) {}
+    private _values: any[];
+
+    constructor(private table: TableAbstract) {}
 
     /**
      * Sets the columns for the INSERT INTO query.
      *
-     * @param {...string} columns - The column names.
-     *
-     * @returns {this} The current instance of InsertInto.
-     *
      * @example
      * new InsertIntoBuilder('clan').columns('id', 'name');
+     *
+     * @inheritdoc
      */
     public columns(...columns: string[]): this {
         this._columns = columns;
@@ -193,22 +257,18 @@ export class InsertIntoBuilder {
     /**
      * Sets the values for the INSERT INTO query.
      *
-     * @param {...(number | string)} values - The values to insert.
-     *
-     * @returns {this} The current instance of InsertInto.
-     *
      * @example
      * new InsertIntoBuilder('clan').values(clan.id, clan.name).compute()
+     *
+     * @inheritdoc
      */
-    public values(...values: (number | string)[]): this {
+    public values(...values: any[]): this {
         this._values = values;
         return this;
     }
 
     /**
      * Generates the INSERT INTO query.
-     *
-     * @returns {string} The generated INSERT INTO query.
      *
      * @throws {Error} If values are not provided or if the number of columns does not match the number of values.
      *
@@ -217,6 +277,8 @@ export class InsertIntoBuilder {
      *
      * @example
      * new InsertIntoBuilder('clan').values(clan.id, clan.name).compute()
+     *
+     * @inheritdoc
      */
     public compute(): string {
         if (!this._values || this._values.length === 0) {
@@ -228,37 +290,35 @@ export class InsertIntoBuilder {
             );
         }
 
-        return Computer.computeInsertInto(this.tableName, this._values, this._columns);
+        return Computer.computeInsertInto(this.table.tableName, this._values, this._columns);
     }
 }
 
 /**
  * Represents an UPDATE query builder.
  */
-export class UpdateBuilder extends Where {
+export class UpdateBuilder extends Conditions implements ComputeInterface, ColumnsInterface, ValuesInterface {
+    /**
+     * The columns to update in the table
+     */
     private _columns: string[];
-    private _values: string[];
 
     /**
-     * Constructs a new instance of Update.
-     *
-     * @param {string} tableName - The name of the table.
-     *
-     * TODO Constructor take {@link TableAbstract}
+     * The value to put in the columns in the table
      */
-    constructor(private tableName: string) {
+    private _values: string[];
+
+    constructor(private table: TableAbstract) {
         super();
     }
 
     /**
      * Sets the columns for the UPDATE query.
      *
-     * @param {...string} columns - The column names.
-     *
-     * @returns {this} The current instance of Update.
-     *
      * @example
      * new UpdateBuilder('users').columns('name', 'email');
+     *
+     * @inheritdoc
      */
     public columns(...columns: string[]): this {
         this._columns = columns;
@@ -268,12 +328,10 @@ export class UpdateBuilder extends Where {
     /**
      * Sets the values for the UPDATE query.
      *
-     * @param {...string} values - The values to update.
-     *
-     * @returns {this} The current instance of Update.
-     *
      * @example
      * new UpdateBuilder('users').values('John', 'john@example.com');
+     *
+     * @inheritdoc
      */
     public values(...values: any[]): this {
         this._values = values;
@@ -283,54 +341,50 @@ export class UpdateBuilder extends Where {
     /**
      * Generates the UPDATE query.
      *
-     * @returns {string} The generated UPDATE query.
-     *
-     * @throws {Error} If values or columns are not provided or if the number of columns does not match the number of values.
+     * @throws {Error} - If values or columns are not provided or if the number of columns does not match the number of values.
      *
      * @example
      * new UpdateBuilder('users').columns('name', 'email').values('John', 'john@example.com').where(['id = 1', 'isActive = true'], ['AND']).compute();
+     *
+     * @inheritdoc
      */
     public compute(): string {
         if (!this._values || this._values.length === 0) {
             throw new Error('Values is mandatory to create UPDATE query !');
         }
+
         if (!this._columns || this._columns.length === 0) {
             throw new Error('Columns is mandatory to create UPDATE query !');
         }
+
         if (this._columns.length !== this._values?.length) {
             throw new Error(
                 `The number of columns (${this._columns.length}) must be the same as the number of values (${this._values?.length})`
             );
         }
 
-        return Computer.computeUpdate(this.tableName, this._values, this._columns, this._conditions);
+        return Computer.computeUpdate(this.table.tableName, this._values, this._columns, this);
     }
 }
 
 /**
  * Represents a SELECT query builder.
  */
-export class SelectBuilder extends Where {
+export class SelectBuilder extends Conditions implements ComputeInterface, ColumnsInterface {
+    /**
+     * The columns to select in the table
+     */
     private _columns: string[];
 
-    /**
-     * Constructs a new instance of Select.
-     *
-     * @param {string} tableName - The name of the table.
-     */
-    constructor(private tableName: string) {
+    constructor(private table: TableAbstract) {
         super();
     }
 
     /**
-     * Sets the columns for the SELECT query.
-     *
-     * @param {...string} columns - The column names.
-     *
-     * @returns {this} The current instance of Select.
-     *
      * @example
      * new SelectBuilder('users').columns('name', 'email');
+     *
+     * @inheritdoc
      */
     public columns(...columns: string[]): this {
         this._columns = columns;
@@ -340,46 +394,41 @@ export class SelectBuilder extends Where {
     /**
      * Generates the SELECT query.
      *
-     * @returns {string} The generated SELECT query.
-     *
-     * @throws {Error} If columns are not provided.
+     * @throws {Error} - If columns are not provided.
      *
      * @example
      * new SelectBuilder('users').columns('name', 'email').where(['isActive = true']).compute();
+     *
+     * @inheritdoc
      */
     public compute(): string {
         if (!this._columns || this._columns.length === 0) {
-            throw new Error('Values is mandatory to create SELECT query !');
+            throw new Error('Columns are mandatory to create SELECT query !');
         }
 
-        return Computer.computeSelect(this.tableName, this._columns, this._conditions);
+        return Computer.computeSelect(this.table.tableName, this._columns, this);
     }
 }
 
 /**
  * Represents a DELETE query builder.
  */
-export class DeleteBuilder extends Where {
-    /**
-     * Constructs a new instance of Delete.
-     *
-     * @param {string} tableName - The name of the table.
-     */
-    constructor(private tableName: string) {
+export class DeleteBuilder extends Conditions implements ComputeInterface {
+    constructor(private table: TableAbstract) {
         super();
     }
 
     /**
      * Generates the DELETE query.
      *
-     * @returns {string} The generated DELETE query.
-     *
-     * @throws {Error} If conditions are not provided.
+     * @throws {Error} - If conditions are not provided.
      *
      * @example
      * new DeleteBuilder('users').where(['id = 1']).compute();
+     *
+     * @inheritdoc
      */
     public compute(): string {
-        return Computer.computeDelete(this.tableName, this._conditions);
+        return Computer.computeDelete(this.table.tableName, this);
     }
 }

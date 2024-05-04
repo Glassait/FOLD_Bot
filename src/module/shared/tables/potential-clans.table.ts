@@ -20,7 +20,7 @@ export class PotentialClansTable extends TableAbstract {
      * @returns {Promise<boolean>} A promise that resolves to true if the clan is successfully added, false otherwise.
      */
     public async addClan(url: string): Promise<boolean> {
-        return await this.insert(new InsertIntoBuilder(this.tableName).columns('url').values(url).compute());
+        return await this.insert(new InsertIntoBuilder(this).columns('url').values(url));
     }
 
     /**
@@ -31,12 +31,7 @@ export class PotentialClansTable extends TableAbstract {
      * @returns {Promise<PotentialClan[]>} A promise that resolves to an array of PotentialClan objects.
      */
     public async getClan(clanId: number): Promise<PotentialClan[]> {
-        return await this.select(
-            new SelectBuilder(this.tableName)
-                .columns('url')
-                .where([`url LIKE '%${clanId}%'`])
-                .compute()
-        );
+        return await this.select(new SelectBuilder(this).columns('url').where([`url LIKE '%${clanId}%'`]));
     }
 
     /**
@@ -45,7 +40,7 @@ export class PotentialClansTable extends TableAbstract {
      * @returns {Promise<PotentialClan[]>} A promise that resolves to an array of PotentialClan objects.
      */
     public async getAll(): Promise<PotentialClan[]> {
-        return await this.select(new SelectBuilder(this.tableName).columns('url').compute());
+        return await this.select(new SelectBuilder(this).columns('url'));
     }
 
     /**
@@ -54,6 +49,6 @@ export class PotentialClansTable extends TableAbstract {
      * @returns {Promise<boolean>} A promise that resolves to true if all clans are successfully deleted, false otherwise.
      */
     public async deleteAll(): Promise<boolean> {
-        return await this.delete(new DeleteBuilder(this.tableName).compute());
+        return await this.delete(new DeleteBuilder(this));
     }
 }

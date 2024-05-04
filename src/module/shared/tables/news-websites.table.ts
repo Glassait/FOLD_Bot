@@ -18,7 +18,7 @@ export class NewsWebsitesTable extends TableAbstract {
      * @returns {Promise<NewsWebsite[]>} A promise that resolves to an array of NewsWebsite objects.
      */
     public async getAll(): Promise<NewsWebsite[]> {
-        return await this.select(new SelectBuilder(this.tableName).columns('*').compute());
+        return await this.select(new SelectBuilder(this).columns('*'));
     }
 
     /**
@@ -31,11 +31,10 @@ export class NewsWebsitesTable extends TableAbstract {
      */
     public async updateWebsite(name: string, lastUrl: string): Promise<boolean> {
         return await this.update(
-            new UpdateBuilder(this.tableName)
+            new UpdateBuilder(this)
                 .columns('last_url')
                 .values(lastUrl)
                 .where([`name = '${name}'`])
-                .compute()
         );
     }
 }

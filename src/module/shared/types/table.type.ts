@@ -7,7 +7,7 @@ import { Ammo } from './wot-api.type';
 /**
  * Type defining the structure for the trivia game.
  */
-export type Trivia = {
+export type TriviaData = {
     /**
      * The URL associated with the trivia game.
      */
@@ -52,4 +52,52 @@ export type Tank = {
      * The shell definition of the tank
      */
     ammo: Ammo[];
+};
+
+/**
+ * Represent the information store in the database about a trivia player
+ */
+export type TriviaPlayer = {
+    /**
+     * A generated id
+     */
+    id: number;
+    /**
+     * The name od the player
+     */
+    name: string;
+};
+
+/**
+ * Represent the information store in the database about the trivia answer
+ */
+export type TriviaAnswer = {
+    /**
+     * Generated id
+     */
+    id: number;
+    /**
+     * The player id to link with the player table
+     */
+    player_id: number;
+    /**
+     * The Trivia id to link with the trivia table
+     */
+    trivia_id: number;
+    /**
+     * The date of the answer
+     */
+    date: Date;
+    /**
+     * If the answer is a right answer
+     */
+    right_answer: boolean;
+    /**
+     * The time taken by the player to answer the question
+     */
+    answer_time: number;
+    /**
+     * The elo at the end of the trivia
+     */
+    elo: number;
 };

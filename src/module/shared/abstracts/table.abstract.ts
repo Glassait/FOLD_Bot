@@ -1,12 +1,11 @@
 import type { QueryResult } from 'mysql2/promise';
+import { DeleteBuilder, type InsertIntoBuilder, SelectBuilder, UpdateBuilder } from '../builders/query.builder';
 import { Injectable } from '../decorators/injector.decorator';
 import type { DatabaseSingleton } from '../singleton/database.singleton';
 import type { Logger } from '../utils/logger';
 
 /**
  * Represents a database table with common CRUD operations.
- *
- * TODO Make method takes builder and not string
  */
 export class TableAbstract {
     //region INJECTABLE
@@ -24,22 +23,25 @@ export class TableAbstract {
     };
 
     /**
-     * Constructs a new instance of the TableAbstract class with the specified table name.
-     *
-     * @param {string} tableName - The name of the database table.
+     * Getter pour {@link _tableName}
      */
-    constructor(protected readonly tableName: string) {}
+    public get tableName(): string {
+        return this._tableName;
+    }
+
+    constructor(private readonly _tableName: string) {}
 
     /**
      * Inserts a new record into the database table.
      *
-     * @param {string} sql - The SQL query for inserting a record.
+     * @param {InsertIntoBuilder} builder - The Insert Into builder to compute the SQL query inserting a record.
      *
      * @returns {Promise<boolean>} - A Promise that resolves to true if the operation is successful, false otherwise.
      *
      * @throws {Error} - If the SQL query is not an INSERT INTO statement.
      */
-    protected async insert(sql: string): Promise<boolean> {
+    protected async insert(builder: InsertIntoBuilder): Promise<boolean> {
+        const sql = builder.compute();
         this.validateQueryType(sql, 'INSERT INTO');
         const rows = await this.query(sql);
         return 'serverStatus' in rows && rows.serverStatus === this.sqlReturn.CREATE;
@@ -48,13 +50,14 @@ export class TableAbstract {
     /**
      * Updates an existing record in the database table.
      *
-     * @param {string} sql - The SQL query for updating a record.
+     * @param {UpdateBuilder} builder - The Update builder to compute SQL query updating record.
      *
      * @returns {Promise<boolean>} - A Promise that resolves to true if the operation is successful, false otherwise.
      *
      * @throws {Error} - If the SQL query is not an UPDATE statement.
      */
-    protected async update(sql: string): Promise<boolean> {
+    protected async update(builder: UpdateBuilder): Promise<boolean> {
+        const sql = builder.compute();
         this.validateQueryType(sql, 'UPDATE');
         const rows = await this.query(sql);
         return 'serverStatus' in rows && rows.serverStatus === this.sqlReturn.UPDATE;
@@ -63,13 +66,14 @@ export class TableAbstract {
     /**
      * Removes a record from the database table.
      *
-     * @param {string} sql - The SQL query for deleting a record.
+     * @param {DeleteBuilder} builder - The Delete builder to compute SQL query for deleting a record.
      *
      * @returns {Promise<boolean>} - A Promise that resolves to true if the operation is successful, false otherwise.
      *
      * @throws {Error} - If the SQL query is not a DELETE statement.
      */
-    protected async delete(sql: string): Promise<boolean> {
+    protected async delete(builder: DeleteBuilder): Promise<boolean> {
+        const sql = builder.compute();
         this.validateQueryType(sql, 'DELETE');
         const rows = await this.query(sql);
         return 'serverStatus' in rows && rows.serverStatus === this.sqlReturn.REMOVE;
@@ -78,7 +82,7 @@ export class TableAbstract {
     /**
      * Retrieves records from the database table based on the specified SQL query.
      *
-     * @param {string} sql - The SQL query for selecting records.
+     * @param {SelectBuilder} builder - The Select builder to compute SQL query for selecting records.
      *
      * @returns {Promise<T[]>} - A Promise that resolves to an array of {@link T} objects.
      *
@@ -86,7 +90,8 @@ export class TableAbstract {
      *
      * @template T - The type return by the query select
      */
-    protected async select<T>(sql: string): Promise<T> {
+    protected async select<T>(builder: SelectBuilder): Promise<T> {
+        const sql = builder.compute();
         this.validateQueryType(sql, 'SELECT');
         return (await this.query(sql)) as T;
     }

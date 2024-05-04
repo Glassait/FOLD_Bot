@@ -19,7 +19,7 @@ export class LeavingPlayersTable extends TableAbstract {
      * @returns {Promise<boolean>} A Promise that resolves to true if the player was added successfully, otherwise false.
      */
     public async addPlayer(id: number): Promise<boolean> {
-        return await this.insert(new InsertIntoBuilder(this.tableName).columns('id').values(id).compute());
+        return await this.insert(new InsertIntoBuilder(this).columns('id').values(id));
     }
 
     /**
@@ -30,7 +30,7 @@ export class LeavingPlayersTable extends TableAbstract {
      * @returns {Promise<boolean>} A Promise that resolves to true if the player was deleted successfully, otherwise false.
      */
     public async deletePlayer(id: number): Promise<boolean> {
-        return await this.delete(new DeleteBuilder(this.tableName).where([`id = ${id}`]).compute());
+        return await this.delete(new DeleteBuilder(this).where([`id = ${id}`]));
     }
 
     /**
@@ -39,6 +39,6 @@ export class LeavingPlayersTable extends TableAbstract {
      * @returns {Promise<number[]>} A Promise that resolves to an array of leaving player IDs.
      */
     public async getAll(): Promise<number[]> {
-        return await this.select(new SelectBuilder(this.tableName).columns('*').compute());
+        return await this.select(new SelectBuilder(this).columns('*'));
     }
 }

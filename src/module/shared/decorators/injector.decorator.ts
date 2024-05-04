@@ -64,19 +64,27 @@ export function Injectable<GDependence extends DependenceInjection>(
 }
 
 let tableMap: {
+    // Commons
+    Channels: Constructor;
+    FeatureFlipping: Constructor;
+    Commands: Constructor;
+    // Fold Recruitment
     WatchClans: Constructor;
     BlacklistedPlayers: Constructor;
     LeavingPlayers: Constructor;
     PotentialClans: Constructor;
+    FoldRecruitment: Constructor;
+    // Newsletter
     NewsWebsites: Constructor;
     BanWords: Constructor;
-    Channels: Constructor;
-    FeatureFlipping: Constructor;
-    Commands: Constructor;
     WotApi: Constructor;
-    FoldRecruitment: Constructor;
+    // Trivia game
     TriviaData: Constructor;
     Tanks: Constructor;
+    Players: Constructor;
+    PlayersAnswer: Constructor;
+    Trivia: Constructor;
+    Winstreak: Constructor;
 };
 
 /**
@@ -95,21 +103,31 @@ export function TableInjectable(
     dependence: keyof typeof tableMap
     // eslint-disable-next-line @typescript-eslint/ban-types
 ): Function {
-    tableMap = {
-        WatchClans: require('../tables/watch-clans.table').WatchClanTable,
-        BlacklistedPlayers: require('../tables/blacklisted-players.table').BlacklistedPlayerTable,
-        LeavingPlayers: require('../tables/leaving-players.table').LeavingPlayerTable,
-        PotentialClans: require('../tables/potential-clans.table').PotentialClanTable,
-        NewsWebsites: require('../tables/news-websites.table').NewsWebsiteTable,
-        BanWords: require('../tables/ban-words.table').BanWordsTable,
-        Channels: require('../tables/channels.table').ChannelsTable,
-        FeatureFlipping: require('../tables/feature-flipping.table').FeatureFlippingTable,
-        Commands: require('../tables/commands.table').CommandsTable,
-        WotApi: require('../tables/wot-api.table').WotApiTable,
-        FoldRecruitment: require('../tables/fold-recruitment.table').FoldRecruitmentTable,
-        TriviaData: require('../tables/trivia-data.table').TriviaTable,
-        Tanks: require('../tables/tanks.table').TanksTable,
-    };
+    if (!tableMap) {
+        tableMap = {
+            // Commons
+            Channels: require('../tables/channels.table').ChannelsTable,
+            FeatureFlipping: require('../tables/feature-flipping.table').FeatureFlippingTable,
+            Commands: require('../tables/commands.table').CommandsTable,
+            // Fold Recruitment
+            WatchClans: require('../tables/watch-clans.table').WatchClanTable,
+            BlacklistedPlayers: require('../tables/blacklisted-players.table').BlacklistedPlayerTable,
+            LeavingPlayers: require('../tables/leaving-players.table').LeavingPlayerTable,
+            PotentialClans: require('../tables/potential-clans.table').PotentialClanTable,
+            FoldRecruitment: require('../tables/fold-recruitment.table').FoldRecruitmentTable,
+            // Newsletter
+            NewsWebsites: require('../tables/news-websites.table').NewsWebsiteTable,
+            BanWords: require('../tables/ban-words.table').BanWordsTable,
+            WotApi: require('../tables/wot-api.table').WotApiTable,
+            // Trivia game
+            TriviaData: require('../tables/trivia-data.table').TriviaTable,
+            Tanks: require('../tables/tanks.table').TanksTable,
+            Players: require('../tables/players.table').PlayersTable,
+            PlayersAnswer: require('../tables/players-answers.table').PlayersAnswersTable,
+            Trivia: require('../tables/trivia.table').TriviaTable,
+            Winstreak: require('../tables/winstreak.table').WinstreakTable,
+        };
+    }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     return function actual<GTable>(_target: GTable, _context: ClassFieldDecoratorContext<GTable, any>) {

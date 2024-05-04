@@ -21,7 +21,7 @@ export class FoldRecruitmentTable extends TableAbstract {
      * @returns {Promise<string>} - The URL associated with the specified type of Fold Recruitment.
      */
     public async getUrl(url: FoldRecruitmentUrl): Promise<string> {
-        return ((await this.select(new SelectBuilder(this.tableName).columns(`${url}_url`).compute())) as any)[0][`${url}_url`];
+        return ((await this.select(new SelectBuilder(this).columns(`${url}_url`))) as any)[0][`${url}_url`];
     }
 
     /**
@@ -30,6 +30,6 @@ export class FoldRecruitmentTable extends TableAbstract {
      * @returns {Promise<string[]>} - The schedule stored in the Fold Recruitment table.
      */
     public async getSchedule(): Promise<string[]> {
-        return JSON.parse(((await this.select(new SelectBuilder(this.tableName).columns('schedule').compute())) as any)[0].schedule);
+        return JSON.parse(((await this.select(new SelectBuilder(this).columns('schedule'))) as any)[0].schedule);
     }
 }

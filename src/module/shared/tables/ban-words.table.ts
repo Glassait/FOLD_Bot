@@ -17,6 +17,6 @@ export class BanWordsTable extends TableAbstract {
      * @returns {Promise<string[]>} A promise that resolves to an array of banned words.
      */
     public async getAll(): Promise<string[]> {
-        return await this.select(new SelectBuilder(this.tableName).columns('*').compute());
+        return await this.select(new SelectBuilder(this).columns('*'));
     }
 }

@@ -17,16 +17,16 @@ export class WatchClansTable extends TableAbstract {
      *
      * @param {Omit<Clan, 'lastActivity' | 'imageUrl'>} clan - The clan to add.
      *
-     * @returns {Promise<boolean>} A promise that resolves to true if the operation is successful, otherwise false.
+     * @returns {Promise<boolean>} - A promise that resolves to true if the operation is successful, otherwise false.
      *
-     * @throws {Error} If id or name is missing in the clan data.
+     * @throws {Error} - If id or name is missing in the clan data.
      */
     public async addClan(clan: Omit<Clan, 'lastActivity' | 'imageUrl'>): Promise<boolean> {
         if (!clan.id || !clan.name) {
             throw new Error(`Id and Name are required to add in database, given id ${clan.id} name ${clan.name}`);
         }
 
-        return await this.insert(new InsertIntoBuilder(this.tableName).columns('id', 'name').values(clan.id, clan.name).compute());
+        return await this.insert(new InsertIntoBuilder(this).columns('id', 'name').values(clan.id, clan.name));
     }
 
     /**
@@ -34,17 +34,15 @@ export class WatchClansTable extends TableAbstract {
      *
      * @param {Required<Clan>} clan - The clan with all properties to add.
      *
-     * @returns {Promise<boolean>} A promise that resolves to true if the operation is successful, otherwise false.
+     * @returns {Promise<boolean>} - A promise that resolves to true if the operation is successful, otherwise false.
      *
-     * @throws {Error} If any required property is missing in the clan data.
+     * @throws {Error} - If any required property is missing in the clan data.
      */
     public async addClanFull(clan: Required<Clan>): Promise<boolean> {
         if (!clan.id || !clan.name || !clan.imageUrl || !clan.lastActivity) {
             throw new Error('All properties in CLAN are required to add in database, given :', { cause: clan });
         }
-        return await this.insert(
-            new InsertIntoBuilder(this.tableName).values(clan.id, clan.name, clan.imageUrl, clan.lastActivity).compute()
-        );
+        return await this.insert(new InsertIntoBuilder(this).values(clan.id, clan.name, clan.imageUrl, clan.lastActivity));
     }
 
     /**
@@ -52,9 +50,9 @@ export class WatchClansTable extends TableAbstract {
      *
      * @param {Clan} clan - The clan with updated details.
      *
-     * @returns {Promise<boolean>} A promise that resolves to true if the operation is successful, otherwise false.
+     * @returns {Promise<boolean>} - A promise that resolves to true if the operation is successful, otherwise false.
      *
-     * @throws {Error} If id is missing in the clan data or if neither lastActivity nor imageUrl is provided for update.
+     * @throws {Error} - If id is missing in the clan data or if neither lastActivity nor imageUrl is provided for update.
      */
     public async updateClan(clan: Clan): Promise<boolean> {
         if (!clan.id) {
@@ -77,11 +75,10 @@ export class WatchClansTable extends TableAbstract {
         }
 
         return await this.update(
-            new UpdateBuilder(this.tableName)
+            new UpdateBuilder(this)
                 .columns(...columns)
                 .values(...values)
                 .where([`id = ${clan.id}`])
-                .compute()
         );
     }
 
@@ -90,24 +87,21 @@ export class WatchClansTable extends TableAbstract {
      *
      * @param {string} clanIdOrName - The id or name of the clan.
      *
-     * @returns {Promise<Clan[]>} A promise that resolves to an array of clans matching the id or name.
+     * @returns {Promise<Clan[]>} - A promise that resolves to an array of clans matching the id or name.
      */
     public async selectClan(clanIdOrName: string): Promise<Clan[]> {
         return await this.select(
-            new SelectBuilder(this.tableName)
-                .columns('*')
-                .where([`id LIKE '%${clanIdOrName}%'`, `name LIKE '%${clanIdOrName}%'`], ['OR'])
-                .compute()
+            new SelectBuilder(this).columns('*').where([`id LIKE '%${clanIdOrName}%'`, `name LIKE '%${clanIdOrName}%'`], ['OR'])
         );
     }
 
     /**
      * Retrieves all clans from the database.
      *
-     * @returns {Promise<Clan[]>} A promise that resolves to an array of all clans.
+     * @returns {Promise<Clan[]>} - A promise that resolves to an array of all clans.
      */
     public async getAll(): Promise<Clan[]> {
-        return await this.select(new SelectBuilder(this.tableName).columns('*').compute());
+        return await this.select(new SelectBuilder(this).columns('*'));
     }
 
     /**
@@ -115,11 +109,9 @@ export class WatchClansTable extends TableAbstract {
      *
      * @param {string} clanIdOrName - The id or name of the clan to remove.
      *
-     * @returns {Promise<boolean>} A promise that resolves to true if the operation is successful, otherwise false.
+     * @returns {Promise<boolean>} - A promise that resolves to true if the operation is successful, otherwise false.
      */
     public async removeClan(clanIdOrName: string): Promise<boolean> {
-        return await this.delete(
-            new DeleteBuilder(this.tableName).where([`id LIKE '%${clanIdOrName}%'`, `name LIKE '%${clanIdOrName}%'`], ['OR']).compute()
-        );
+        return await this.delete(new DeleteBuilder(this).where([`id LIKE '%${clanIdOrName}%'`, `name LIKE '%${clanIdOrName}%'`], ['OR']));
     }
 }

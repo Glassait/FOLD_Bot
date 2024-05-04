@@ -26,9 +26,7 @@ export class BlacklistedPlayersTable extends TableAbstract {
             throw new Error('Id or name are empty or there are requires !');
         }
 
-        return await this.insert(
-            new InsertIntoBuilder(this.tableName).columns('id', 'name', 'reason').values(player.id, player.name, player.reason).compute()
-        );
+        return await this.insert(new InsertIntoBuilder(this).columns('id', 'name', 'reason').values(player.id, player.name, player.reason));
     }
 
     /**
@@ -45,7 +43,7 @@ export class BlacklistedPlayersTable extends TableAbstract {
             throw new Error('Id or name are empty or there are requires !');
         }
 
-        return await this.delete(new DeleteBuilder(this.tableName).where([`id = ${player.id}`]).compute());
+        return await this.delete(new DeleteBuilder(this).where([`id = ${player.id}`]));
     }
 
     /**
@@ -56,7 +54,7 @@ export class BlacklistedPlayersTable extends TableAbstract {
      * @returns {Promise<BlacklistedPlayer[]>} A Promise that resolves to an array of blacklisted players.
      */
     public async getPlayer(id: number): Promise<BlacklistedPlayer[]> {
-        return await this.select(new SelectBuilder(this.tableName).where([`id = ${id}`]).compute());
+        return await this.select(new SelectBuilder(this).where([`id = ${id}`]));
     }
 
     /**
@@ -67,8 +65,6 @@ export class BlacklistedPlayersTable extends TableAbstract {
      * @returns {Promise<BlacklistedPlayer[]>} A Promise that resolves to an array of blacklisted players.
      */
     public async findPlayer(idOrName: string): Promise<BlacklistedPlayer[]> {
-        return await this.select(
-            new SelectBuilder(this.tableName).where([`id LIKE '%${idOrName}%'`, `name LIKE '%${idOrName}%'`], ['OR']).compute()
-        );
+        return await this.select(new SelectBuilder(this).where([`id LIKE '%${idOrName}%'`, `name LIKE '%${idOrName}%'`], ['OR']));
     }
 }

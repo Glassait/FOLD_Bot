@@ -22,12 +22,7 @@ export class CommandsTable extends TableAbstract {
      */
     public async getCommand(name: CommandName): Promise<string[]> {
         return (
-            (await this.select(
-                new SelectBuilder(this.tableName)
-                    .columns('discord_id')
-                    .where([`name LIKE '${name}'`])
-                    .compute()
-            )) as any
+            (await this.select(new SelectBuilder(this).columns('discord_id').where([`name LIKE '${name}'`]))) as any
         )[0].discord_id.split(',');
     }
 }
