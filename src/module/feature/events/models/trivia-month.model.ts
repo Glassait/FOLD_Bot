@@ -6,9 +6,8 @@ import type { ChannelsTable } from '../../../shared/tables/channels.table';
 import type { PlayersAnswersTable } from '../../../shared/tables/players-answers.table';
 import type { PlayersTable } from '../../../shared/tables/players.table';
 import type { TriviaTable } from '../../../shared/tables/trivia.table';
-import type { WinstreakTable } from '../../../shared/tables/winstreak.table';
-import type { WinStreak } from '../../../shared/types/statistic.type';
-import type { TriviaAnswer, TriviaPlayer } from '../../../shared/types/table.type';
+import type { WinStreakTable } from '../../../shared/tables/win-streak.table';
+import type { TriviaAnswer, TriviaPlayer, WinStreak } from '../../../shared/types/table.type';
 import { DateUtil } from '../../../shared/utils/date.util';
 import type { Logger } from '../../../shared/utils/logger';
 import { MathUtil } from '../../../shared/utils/math.util';
@@ -23,7 +22,7 @@ export class TriviaMonthModel {
     @TableInjectable('Channels') private readonly channels: ChannelsTable;
     @TableInjectable('PlayersAnswer') private readonly playersAnswersTable: PlayersAnswersTable;
     @TableInjectable('Players') private readonly playersTable: PlayersTable;
-    @TableInjectable('Winstreak') private readonly winstreakTable: WinstreakTable;
+    @TableInjectable('WinStreak') private readonly winStreakTable: WinStreakTable;
     @TableInjectable('Trivia') private readonly triviaTable: TriviaTable;
     //endregion
 
@@ -67,7 +66,7 @@ export class TriviaMonthModel {
         const promises: Promise<TriviaAnswer[]>[] = players.map(({ id }) =>
             this.playersAnswersTable.getPeriodAnswerOfPlayer(id, this.month.getMonth(), this.month.getFullYear())
         );
-        const winPromise: Promise<WinStreak>[] = players.map(({ id }) => this.winstreakTable.getWinstreakFromDate(id, this.month));
+        const winPromise: Promise<WinStreak>[] = players.map(({ id }) => this.winStreakTable.getWinStreakFromDate(id, this.month));
 
         const winstreaks: Awaited<WinStreak>[] = await Promise.all(winPromise);
 

@@ -10,7 +10,7 @@ export class TriviaMapper {
 
     public static transformTriviaRawInTriviaQuestion(raw: TriviaRaw): TriviaQuestion {
         return {
-            id: raw.id,
+            id: raw.trivia_id,
             ammoIndex: raw.ammo_index,
             tank: {
                 id: raw.tank_id,

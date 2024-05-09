@@ -31,8 +31,6 @@ module.exports = {
         await recruitmentModel.initialise(client);
 
         await TimeUtil.forLoopTimeSleep(await foldRecruitment.getSchedule(), `${EmojiEnum.LOOP} Recruitment`, async (): Promise<void> => {
-            require('../../shared/singleton/statistic.singleton').StatisticSingleton.instance.backupData();
-
             recruitmentModel.noPlayerFound = true;
 
             for (const clan of await watchClan.getAll()) {

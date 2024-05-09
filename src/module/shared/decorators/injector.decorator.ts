@@ -81,7 +81,7 @@ let tableMap: {
     Players: Constructor;
     PlayersAnswer: Constructor;
     Trivia: Constructor;
-    Winstreak: Constructor;
+    WinStreak: Constructor;
 };
 
 /**
@@ -122,7 +122,7 @@ export function TableInjectable(
             Players: require('../tables/players.table').PlayersTable,
             PlayersAnswer: require('../tables/players-answers.table').PlayersAnswersTable,
             Trivia: require('../tables/trivia.table').TriviaTable,
-            Winstreak: require('../tables/winstreak.table').WinstreakTable,
+            WinStreak: require('../tables/win-streak.table').WinstreakTable,
         };
     }
 

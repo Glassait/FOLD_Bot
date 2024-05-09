@@ -21,9 +21,8 @@ import type { TriviaSingleton } from '../../../shared/singleton/trivia.singleton
 import type { PlayersAnswersTable } from '../../../shared/tables/players-answers.table';
 import type { PlayersTable } from '../../../shared/tables/players.table';
 import type { TriviaDataTable } from '../../../shared/tables/trivia-data.table';
-import type { WinstreakTable } from '../../../shared/tables/winstreak.table';
-import type { WinStreak } from '../../../shared/types/statistic.type';
-import type { Tank, TriviaAnswer, TriviaData, TriviaPlayer } from '../../../shared/types/table.type';
+import type { WinStreakTable } from '../../../shared/tables/win-streak.table';
+import type { Tank, TriviaAnswer, TriviaData, TriviaPlayer, WinStreak } from '../../../shared/types/table.type';
 import type { TriviaSelected } from '../../../shared/types/trivia.type';
 import type { Ammo } from '../../../shared/types/wot-api.type';
 import { DateUtil } from '../../../shared/utils/date.util';
@@ -42,7 +41,7 @@ export class TriviaModel {
     @TableInjectable('TriviaData') private readonly triviaTable: TriviaDataTable;
     @TableInjectable('Players') private readonly playersTable: PlayersTable;
     @TableInjectable('PlayersAnswer') private readonly playerAnswerTable: PlayersAnswersTable;
-    @TableInjectable('Winstreak') private readonly winstreakTable: WinstreakTable;
+    @TableInjectable('WinStreak') private readonly winStreakTable: WinStreakTable;
     //endregion
 
     //region PRIVATE READONLY FIELDS
@@ -317,7 +316,7 @@ export class TriviaModel {
                 date.setFullYear(year);
 
                 const stats: TriviaAnswer[] = await this.playerAnswerTable.getPeriodAnswerOfPlayer(player.id, month, year);
-                const winstreak: WinStreak = await this.winstreakTable.getWinstreakFromDate(player.id, date);
+                const winstreak: WinStreak = await this.winStreakTable.getWinStreakFromDate(player.id, date);
 
                 const embed = new EmbedBuilder()
                     .setTitle(`Statistiques pour le mois de ${month} ${year}`)
@@ -686,11 +685,11 @@ export class TriviaModel {
             return;
         }
 
-        let winStreak: WinStreak = await this.winstreakTable.getWinstreakFromDate(value.player.id, new Date());
+        let winStreak: WinStreak = await this.winStreakTable.getWinStreakFromDate(value.player.id, new Date());
 
         if (!winStreak) {
             try {
-                const added = await this.winstreakTable.addWinstreak(value.player.id);
+                const added = await this.winStreakTable.addWinStreak(value.player.id);
 
                 if (!added) {
                     await playerAnswer.interaction.editReply({
@@ -877,7 +876,7 @@ export class TriviaModel {
         }
 
         try {
-            const update = await this.winstreakTable.updateWinstreak(value.player.id, new Date(), winStreak);
+            const update = await this.winStreakTable.updateWinStreak(value.player.id, new Date(), winStreak);
 
             if (!update) {
                 await playerAnswer.interaction.editReply({
