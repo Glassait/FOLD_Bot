@@ -9,7 +9,7 @@ import { TimeEnum } from '../enums/time.enum';
  */
 type Constructor = new (...args: any[]) => any;
 
-type DependenceInjection = 'Statistic' | 'Trivia' | 'Axios' | 'WotApi' | 'Database';
+type DependenceInjection = 'Trivia' | 'Axios' | 'WotApi' | 'Database';
 
 /**
  * Decorator function to inject singleton instances based on the provided dependence type.
@@ -32,9 +32,6 @@ export function Injectable<GDependence extends DependenceInjection>(
     return function actual<GClass>(_target: GClass, _context: ClassFieldDecoratorContext<GClass, any>) {
         return function (this: GClass, field: any) {
             switch (dependence) {
-                case 'Statistic':
-                    field = require('../singleton/statistic.singleton').StatisticSingleton.instance;
-                    break;
                 case 'Trivia':
                     field = require('../singleton/trivia.singleton').TriviaSingleton.instance;
                     break;

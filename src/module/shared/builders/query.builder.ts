@@ -1,6 +1,6 @@
 import type { TableAbstract } from '../abstracts/table.abstract';
 import type { ColumnsInterface, ComputeInterface, ValuesInterface } from './interfaces/query.interface';
-import type { Condition } from './types/query.type';
+import type { Condition, OrderBy } from './types/query.type';
 
 /**
  * Represents a utility class for generating SQL queries.
@@ -24,7 +24,7 @@ class Computer {
      * const insertQuery = Computer.computeInsertInto('users', ['John', 23], ['name', 'age']);
      */
     public static computeInsertInto(tableName: string, values: any[], columns?: string[]): string {
-        return `INSERT INTO ${tableName} ${columns ? '(' + columns.join(', ') + ')' : ''} VALUES (${values.map((value: number | string): string => "'" + this.stringifyValue(value) + "'").join(', ')})`;
+        return `INSERT INTO ${tableName} ${columns ? '(' + columns.join(', ') + ')' : ''} VALUES (${values.map((value: any): string => this.stringifyValue(value, true)).join(', ')})`;
     }
 
     /**
@@ -107,19 +107,24 @@ class Computer {
      * Converts a value to a string representation.
      *
      * @param {any} value - The value to stringify.
+     * @param {boolean} [addQuote= false] - If the result has to be between quote (ex: 'test')
      *
      * @returns {string} - The string representation of the value.
      */
-    private static stringifyValue(value: any): string {
+    private static stringifyValue(value: any, addQuote: boolean = false): string {
         if (typeof value === 'string') {
+            return `${addQuote ? "'" : ''}${value}${addQuote ? "'" : ''}`;
+        }
+
+        if (value === null) {
             return value;
         }
 
         if (value instanceof Date) {
-            return value.toISOString().replace('T', ' ').replace('Z', '');
+            return `${addQuote ? "'" : ''}${value.toISOString().replace('T', ' ').replace('Z', '')}${addQuote ? "'" : ''}`;
         }
 
-        return JSON.stringify(value);
+        return `${addQuote ? "'" : ''}${JSON.stringify(value)}${addQuote ? "'" : ''}`;
     }
 }
 
@@ -138,17 +143,36 @@ class Conditions {
     protected _where: Condition;
 
     /**
+     * The order by condition
+     */
+    protected _orderBy: OrderBy[];
+
+    /**
+     * The max number of row to show
+     */
+    protected _limit: number;
+
+    /**
      * Build the condition
      */
     public buildConditions(): string {
         let conditions: string = '';
 
+        if (this._innerJoin) {
+            conditions += ` INNER JOIN ${this._innerJoin.tableName} ON ${this.reduceConditionsAndVerdes(this._innerJoin.condition)}`;
+        }
+
         if (this._where) {
             conditions += ' WHERE ' + this.reduceConditionsAndVerdes(this._where);
         }
 
-        if (this._innerJoin) {
-            conditions += ` INNER JOIN ${this._innerJoin.tableName} ON ${this.reduceConditionsAndVerdes(this._innerJoin.condition)}`;
+        if (this._orderBy) {
+            conditions +=
+                ' ORDER BY ' + this._orderBy.map((by: OrderBy): string => `${by.column} ${by.direction ? by.direction : 'ASC'}`).join(', ');
+        }
+
+        if (this._limit) {
+            conditions += ` LIMIT ${this._limit}`;
         }
 
         return conditions;
@@ -158,7 +182,7 @@ class Conditions {
      * Sets the WHERE conditions.
      *
      * @param {Condition['conditions']} conditions - The WHERE conditions.
-     * @param {Condition['verdes']} [verde] - The 'OR' or 'AND' operators.
+     * @param {Condition['verdes']} [verdes] - The 'OR' or 'AND' operators.
      *
      * @returns {this} - The instance of the class extending the {@link Conditions} class.
      *
@@ -167,15 +191,15 @@ class Conditions {
      * @example
      * new DeleteBuilder('tableName').where([["name LIKE 'John'", 'age = 23' ], ['AND']])
      */
-    public where(conditions: Condition['conditions'], verde?: Condition['verdes']): this {
-        if (verde && verde.length !== conditions.length - 1) {
+    public where(conditions: Condition['conditions'], verdes?: Condition['verdes']): this {
+        if (verdes && verdes.length !== conditions.length - 1) {
             throw new Error('Verde length different of condition length (minus one)');
         }
 
         this._where = { conditions: conditions };
 
-        if (verde) {
-            this._where.verdes = verde;
+        if (verdes) {
+            this._where.verdes = verdes;
         }
 
         return this;
@@ -186,28 +210,38 @@ class Conditions {
      *
      * @param {string} tableName - The name of the table to join
      * @param {Condition['conditions']} conditions - The conditions.
-     * @param {Condition['verdes']} [verde] - The 'OR' or 'AND' operators.
+     * @param {Condition['verdes']} [verdes] - The 'OR' or 'AND' operators.
      *
      * @returns {this} - The instance of the class extending the {@link Conditions} class.
      *
      * @throws {Error} - If the length of verde is not equal to the length of conditions minus one.
      */
-    public innerJoin(tableName: string, conditions: Condition['conditions'], verde?: Condition['verdes']): this {
-        if (verde && verde.length !== conditions.length - 1) {
-            throw new Error('Verde length different of condition length (minus one)');
-        }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    protected innerJoin(tableName: string, conditions: Condition['conditions'], verdes?: Condition['verdes']): this {
+        return this;
+    }
 
-        this._innerJoin = {
-            tableName: tableName,
-            condition: {
-                conditions: conditions,
-            },
-        };
+    /**
+     * Set the ORDER BY conditions
+     *
+     * @param {OrderBy[]} orders - The order by
+     *
+     * @returns {this} - The instance of the class extending the {@link Conditions} class.
+     */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    protected orderBy(orders: OrderBy[]): this {
+        return this;
+    }
 
-        if (verde) {
-            this._innerJoin.condition.verdes = verde;
-        }
-
+    /**
+     * Set the LIMIT conditions
+     *
+     * @param {number} limit - The number of row to show
+     *
+     * @returns {this} - The instance of the class extending the {@link Conditions} class.
+     */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    protected limit(limit: number): this {
         return this;
     }
 
@@ -388,6 +422,48 @@ export class SelectBuilder extends Conditions implements ComputeInterface, Colum
      */
     public columns(...columns: string[]): this {
         this._columns = columns;
+        return this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public override innerJoin(tableName: string, conditions: Condition['conditions'], verdes?: Condition['verdes']): this {
+        if (!(this instanceof SelectBuilder)) {
+            throw new Error('Inner Join is only applyca');
+        }
+
+        if (verdes && verdes.length !== conditions.length - 1) {
+            throw new Error('Verde length different of condition length (minus one)');
+        }
+
+        this._innerJoin = {
+            tableName: tableName,
+            condition: {
+                conditions: conditions,
+            },
+        };
+
+        if (verdes) {
+            this._innerJoin.condition.verdes = verdes;
+        }
+
+        return this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public override orderBy(orders: OrderBy[]): this {
+        this._orderBy = orders;
+        return this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public override limit(limit: number): this {
+        this._limit = Math.abs(limit);
         return this;
     }
 

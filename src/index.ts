@@ -1,7 +1,7 @@
 import { GatewayIntentBits } from 'discord.js';
 import { basename } from 'node:path';
 import { TriviaSingleton } from './module/shared/singleton/trivia.singleton';
-import { TanksTable } from './module/shared/tables/tanks.table';
+import { EnvUtil } from './module/shared/utils/env.util';
 import { Logger } from './module/shared/utils/logger';
 
 const logger: Logger = new Logger(basename(__filename));
@@ -50,10 +50,10 @@ process.on('uncaughtException', (err: Error): void => {
 });
 
 setTimeout(async (): Promise<void> => {
-    const table = new TanksTable();
+    const test = TriviaSingleton.instance;
 
-    const trivia = TriviaSingleton.instance;
-    await trivia.updateDatabase();
+    await EnvUtil.sleep(1000);
+    await test.fetchTankOfTheDay();
 
     throw new Error('END');
 });

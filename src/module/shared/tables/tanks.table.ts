@@ -1,5 +1,5 @@
 import { TableAbstract } from '../abstracts/table.abstract';
-import { InsertIntoBuilder, SelectBuilder, UpdateBuilder } from '../builders/query.builder';
+import { InsertIntoBuilder, SelectBuilder } from '../builders/query.builder';
 import { LoggerInjector } from '../decorators/injector.decorator';
 import type { Tank } from '../types/table.type';
 import type { Ammo } from '../types/wot-api.type';
@@ -11,7 +11,7 @@ export class TanksTable extends TableAbstract {
     }
 
     public async countAll(): Promise<number> {
-        return ((await this.select(new SelectBuilder(this).columns('COUNT(*)'))) as any)[0];
+        return ((await this.select(new SelectBuilder(this).columns('COUNT(*)'))) as any)[0]['COUNT(*)'];
     }
 
     public async getTankById(id: number): Promise<Tank | undefined> {
@@ -24,14 +24,5 @@ export class TanksTable extends TableAbstract {
 
     public async insertTank(name: string, image: string, ammo: Ammo[]): Promise<boolean> {
         return this.insert(new InsertIntoBuilder(this).columns('name', ' image', 'ammo').values(name, image, JSON.stringify(ammo)));
-    }
-
-    public async updateTank(tank: Tank): Promise<boolean> {
-        return this.update(
-            new UpdateBuilder(this)
-                .columns('name', 'image', 'ammo')
-                .values(tank.name, tank.image, JSON.stringify(tank.ammo))
-                .where([`name LIKE '${tank.name}'`])
-        );
     }
 }

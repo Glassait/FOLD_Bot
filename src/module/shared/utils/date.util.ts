@@ -3,6 +3,17 @@
  */
 export class DateUtil {
     /**
+     * Gets the previous month.
+     *
+     * @returns {Date} - The previous month.
+     */
+    public static getPreviousMonthAsDate(): Date {
+        const date = new Date();
+        date.setMonth(date.getMonth() - 1);
+        return date;
+    }
+
+    /**
      * Gets a formatted string representing the previous month.
      *
      * @returns {string} - A formatted string representing the previous month in the format "Month Year".
@@ -12,9 +23,7 @@ export class DateUtil {
      * console.log(previousMonth); // "January 2022"
      */
     public static getPreviousMonth(): string {
-        const month = new Date();
-        month.setMonth(month.getMonth() - 1);
-        return this.convertDateToMonthYearString(month);
+        return this.convertDateToMonthYearString(this.getPreviousMonthAsDate());
     }
 
     /**
@@ -121,5 +130,16 @@ export class DateUtil {
      */
     public static convertDateToDayMonthYearString(date: Date): string {
         return date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: '2-digit' });
+    }
+
+    /**
+     * Format the date to the following format YYYY-MM-DD
+     *
+     * @param {Date} date - The date to format
+     *
+     * @return {string} - The string representation to the date formated in YYYY-MM-DD
+     */
+    public static formatDateForSql(date: Date): string {
+        return `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}`;
     }
 }

@@ -26,3 +26,28 @@ export type Condition = {
      */
     verdes?: ('AND' | 'OR')[];
 };
+
+/**
+ * This type represent the couple column - direction to order a sql table with
+ *
+ * @example
+ * [
+ *     {
+ *         column: "name"
+ *     },
+ *     {
+ *         column: "date",
+ *         direction: 'DESC'
+ *     }
+ * ]
+ */
+export type OrderBy = {
+    /**
+     * The name of the column
+     */
+    column: string;
+    /**
+     * The direction to order. This is optional, if not give, the direction 'ASC' is used
+     */
+    direction?: 'ASC' | 'DESC';
+};

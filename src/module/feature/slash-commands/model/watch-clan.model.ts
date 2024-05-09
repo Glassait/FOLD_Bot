@@ -224,7 +224,7 @@ export class WatchClanModel {
             .setTitle('Ajout de joueur sur liste noire')
             .setDescription(`Le joueur \`${name}\` a été ajouté sur liste noire !`);
 
-        await interaction.editReply({ content: 'Je joueur a bien été ajouté à la liste noire !' });
+        await interaction.editReply({ content: 'Le joueur a bien été ajouté à la liste noire !' });
         await this._channel.send({
             embeds: [this.confirmationEmbed],
         });

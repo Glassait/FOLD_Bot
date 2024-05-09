@@ -41,6 +41,10 @@ export type TriviaData = {
  */
 export type Tank = {
     /**
+     * The id of the tank in the database
+     */
+    id: number;
+    /**
      * The name of the tank
      */
     name: string;
@@ -59,7 +63,7 @@ export type Tank = {
  */
 export type TriviaPlayer = {
     /**
-     * A generated id
+     * The generated id of the player
      */
     id: number;
     /**
@@ -73,7 +77,7 @@ export type TriviaPlayer = {
  */
 export type TriviaAnswer = {
     /**
-     * Generated id
+     * The generated id of the answer
      */
     id: number;
     /**
@@ -83,7 +87,7 @@ export type TriviaAnswer = {
     /**
      * The Trivia id to link with the trivia table
      */
-    trivia_id: number;
+    trivia_id: number | null;
     /**
      * The date of the answer
      */
@@ -95,9 +99,57 @@ export type TriviaAnswer = {
     /**
      * The time taken by the player to answer the question
      */
-    answer_time: number;
+    answer_time: number | null;
     /**
      * The elo at the end of the trivia
      */
     elo: number;
+};
+
+/**
+ * Represent formated type from the database
+ */
+export type TriviaQuestion = {
+    /**
+     * The generated id od the question
+     */
+    id: number;
+    /**
+     * The tank of the database
+     */
+    tank: Tank;
+    /**
+     * The ammo index, when not null mark the selected tank for the question
+     */
+    ammoIndex: number | null;
+};
+
+/**
+ * The raw data taken from the database
+ */
+export type TriviaRaw = {
+    /**
+     * The id of the trivia question
+     */
+    trivia_id: number;
+    /**
+     * The id of the tank in the database
+     */
+    tank_id: number;
+    /**
+     * The ammo index, when not null mark the selected tank for the question
+     */
+    ammo_index: number | null;
+    /**
+     * The name of the tank
+     */
+    name: string;
+    /**
+     * The image url of the tank
+     */
+    image: string;
+    /**
+     * The stringify JSON of the {@link Ammo}
+     */
+    ammo: string;
 };
