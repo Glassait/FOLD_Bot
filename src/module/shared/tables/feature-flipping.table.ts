@@ -30,6 +30,7 @@ export class FeatureFlippingTable extends TableAbstract {
      * @returns {Promise<boolean>} A promise that resolves to the activation status of the feature.
      */
     public async getFeature(name: FeatureFlippingName): Promise<boolean> {
-        return ((await this.select(new SelectBuilder(this).columns('activated').where([`name like '${name}'`]))) as any)[0].activated;
+        return !!((await this.select(new SelectBuilder(this).columns('is_activated').where([`name like '${name}'`]))) as any)[0]
+            .is_activated;
     }
 }

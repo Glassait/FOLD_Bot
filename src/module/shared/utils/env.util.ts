@@ -34,20 +34,29 @@ export class EnvUtil {
     /**
      * Creates an asynchronous thread that executes the given function after a specified delay.
      *
-     * @param {(...args: any[]) => Promise<any>} fun The function to execute asynchronously.
+     * @param {() => Promise<any>} fun The function to execute asynchronously.
      * @param {number} [delay=0] The delay in milliseconds before executing the function.
+     *
+     * @example
+     * // From a class
+     * class Greet {
+     *     greet()
+     * }
+     *
+     * const instance = Greet()
+     * EnvUtil.asyncThread(instance.greet.bind(instance))
      */
-    public static asyncThread(fun: (...args: any[]) => Promise<any>, delay: number = 0): void {
+    public static asyncThread(fun: () => Promise<any>, delay: number = 0): void {
         setTimeout(async (): Promise<void> => await fun(), delay);
     }
 
     /**
      * Creates a thread that executes the given function after a specified delay.
      *
-     * @param {(...args: any[]) => any} fun The function to execute.
+     * @param {() => any} fun The function to execute.
      * @param {number} [delay=0] The delay in milliseconds before executing the function.
      */
-    public static thread(fun: (...args: any[]) => any, delay: number = 0): void {
+    public static thread(fun: () => any, delay: number = 0): void {
         setTimeout((): void => fun(), delay);
     }
 }

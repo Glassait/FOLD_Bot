@@ -26,11 +26,11 @@ module.exports = {
         client.user?.setPresence({ activities: [{ type: status[0], name: status[1] }], status: 'online' });
 
         if (await featuresTable.getFeature('trivia')) {
-            EnvUtil.asyncThread(trivia.fetchTankOfTheDay);
+            EnvUtil.asyncThread(trivia.fetchTankOfTheDay.bind(trivia));
             EnvUtil.thread(async (): Promise<void> => {
                 await trivia.sendTriviaResultForYesterday(client);
+                await trivia.reduceEloOfInactifPlayer();
             });
-            await trivia.reduceEloOfInactifPlayer();
         }
 
         const today: Date = new Date();
@@ -58,6 +58,6 @@ module.exports = {
             });
         }
 
-        EnvUtil.asyncThread(trivia.updateDatabase);
+        EnvUtil.asyncThread(trivia.updateDatabase.bind(trivia));
     },
 } as BotEvent;

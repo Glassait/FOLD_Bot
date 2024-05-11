@@ -21,12 +21,12 @@ export class WatchClansTable extends TableAbstract {
      *
      * @throws {Error} - If id or name is missing in the clan data.
      */
-    public async addClan(clan: Omit<Clan, 'lastActivity' | 'imageUrl'>): Promise<boolean> {
+    public async addClan(clan: Omit<Clan, 'last_activity' | 'image_url'>): Promise<boolean> {
         if (!clan.id || !clan.name) {
             throw new Error(`Id and Name are required to add in database, given id ${clan.id} name ${clan.name}`);
         }
 
-        return await this.insert(new InsertIntoBuilder(this).columns('id', 'name').values(clan.id, clan.name));
+        return await this.insert(new InsertIntoBuilder(this).columns('id', 'name', 'last_activity').values(clan.id, clan.name, new Date()));
     }
 
     /**
@@ -39,10 +39,10 @@ export class WatchClansTable extends TableAbstract {
      * @throws {Error} - If any required property is missing in the clan data.
      */
     public async addClanFull(clan: Required<Clan>): Promise<boolean> {
-        if (!clan.id || !clan.name || !clan.imageUrl || !clan.lastActivity) {
+        if (!clan.id || !clan.name || !clan.image_url || !clan.last_activity) {
             throw new Error('All properties in CLAN are required to add in database, given :', { cause: clan });
         }
-        return await this.insert(new InsertIntoBuilder(this).values(clan.id, clan.name, clan.imageUrl, clan.lastActivity));
+        return await this.insert(new InsertIntoBuilder(this).values(clan.id, clan.name, clan.image_url, clan.last_activity));
     }
 
     /**
@@ -58,20 +58,20 @@ export class WatchClansTable extends TableAbstract {
         if (!clan.id) {
             throw new Error(`Id is required to update in database`);
         }
-        if (!clan.lastActivity && !clan.imageUrl) {
+        if (!clan.last_activity && !clan.image_url) {
             throw new Error('At least one of `lastActivity` or `imageUrl` is needed to run update query');
         }
 
         const columns: string[] = [];
         const values: string[] = [];
 
-        if (clan.imageUrl) {
-            columns.push('imageUrl');
-            values.push(clan.imageUrl);
+        if (clan.image_url) {
+            columns.push('image_url');
+            values.push(clan.image_url);
         }
-        if (clan.lastActivity) {
+        if (clan.last_activity) {
             columns.push('last_activity');
-            values.push(clan.lastActivity);
+            values.push(clan.last_activity);
         }
 
         return await this.update(

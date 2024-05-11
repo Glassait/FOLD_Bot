@@ -5,11 +5,11 @@ export type NewsWebsite = {
     /**
      * The live URL of the website.
      */
-    liveUrl: string;
+    live_url: string;
     /**
      * The last URL of the website.
      */
-    lastUrl: string;
+    last_url: string;
     /**
      * The name of the website.
      */

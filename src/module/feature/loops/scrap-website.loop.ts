@@ -22,7 +22,7 @@ module.exports = {
         }
 
         let req = require('../../shared/tables/news-websites.table');
-        const newsWebsite: NewsWebsitesTable = new req.NewsWebsiteTable();
+        const newsWebsite: NewsWebsitesTable = new req.NewsWebsitesTable();
         const site: NewsWebsite[] = await newsWebsite.getAll();
 
         if (site.length <= 0) {

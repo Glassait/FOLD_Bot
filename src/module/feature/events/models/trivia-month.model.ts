@@ -64,7 +64,7 @@ export class TriviaMonthModel {
         const players: TriviaPlayer[] = await this.playersTable.getAllPlayers();
 
         const promises: Promise<TriviaAnswer[]>[] = players.map(({ id }) =>
-            this.playersAnswersTable.getPeriodAnswerOfPlayer(id, this.month.getMonth(), this.month.getFullYear())
+            this.playersAnswersTable.getPeriodAnswerOfPlayer(id, this.month)
         );
         const winPromise: Promise<WinStreak>[] = players.map(({ id }) => this.winStreakTable.getWinStreakFromDate(id, this.month));
 

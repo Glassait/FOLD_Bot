@@ -29,8 +29,8 @@ export class SearchClanModel {
         this.logger.info('Starting fetching clan of leaving player');
 
         for (const playerId of await this.leavingPlayers.getAll()) {
-            const result: PlayerPersonalDataSuccess = await this.wotApi.fetchPlayerPersonalData(playerId);
-            const clanId = result.data[playerId].clan_id;
+            const result: PlayerPersonalDataSuccess = await this.wotApi.fetchPlayerPersonalData(playerId.id);
+            const clanId = result.data[playerId.id].clan_id;
             const clans: Clan[] = await this.watchClans.selectClan(String(clanId as number));
 
             if (clanId !== null && clanId !== 500312605 && clans.length === 0) {
@@ -42,7 +42,7 @@ export class SearchClanModel {
                     );
                 }
             } else {
-                await this.leavingPlayers.deletePlayer(playerId);
+                await this.leavingPlayers.deletePlayer(playerId.id);
             }
         }
 

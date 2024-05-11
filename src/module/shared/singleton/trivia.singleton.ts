@@ -104,6 +104,8 @@ export class TriviaSingleton {
         });
 
         this.logger.info(`${EmojiEnum.HAMMER} {} instance initialized`, TriviaSingleton.name);
+
+        this.fetchTankOfTheDay.bind(this);
     }
 
     //region SINGLETON
@@ -183,7 +185,7 @@ export class TriviaSingleton {
         for (const selected of tanks) {
             const index: number = tanks.indexOf(selected);
 
-            const triviaAnswers: (TriviaAnswer & TriviaPlayer)[] = await this.playerAnswerTable.getTopThreeForYesterday(selected.tank.id);
+            const triviaAnswers: (TriviaAnswer & TriviaPlayer)[] = await this.playerAnswerTable.getTopThreeForYesterday(tanks[index].id);
 
             const answerEmbed = new EmbedBuilder()
                 .setTitle(`Question n°${index + 1}`)
@@ -268,11 +270,11 @@ export class TriviaSingleton {
 
         for (const player of players) {
             const answer: TriviaAnswer = await this.playerAnswerTable.getLastAnswerOfPlayer(player.id);
+            const oldElo: number = answer?.elo ?? 0;
 
-            if (answer.trivia_id === null) {
+            if (answer?.trivia_id === null && oldElo > 0) {
                 hasInactifPlayer = true;
-                const oldElo: number = answer.elo;
-                const elo: number = Math.round(answer.elo * 0.982);
+                const elo: number = Math.round(oldElo * 0.982);
 
                 await this.playerAnswerTable.addAfkAnswer(player.id, DateUtil.getPreviousDayAsDate(), elo);
 
@@ -288,6 +290,7 @@ export class TriviaSingleton {
         if (hasInactifPlayer) {
             await this.channel.send({ embeds: [embedPlayer] });
         }
+        this.logger.debug('End removing elo of inactif player');
     }
 
     /**
@@ -299,7 +302,7 @@ export class TriviaSingleton {
         const allTanks: VehicleData[] = this.extractTankData(await this.wotApi.fetchTankopediaApi());
 
         for (const tankWot of Object.values(allTanks)) {
-            const tank = await this.tanksTable.getTankByName(tankWot.name);
+            const tank: Tank | null = await this.tanksTable.getTankByName(tankWot.name);
 
             if (tank) {
                 return;

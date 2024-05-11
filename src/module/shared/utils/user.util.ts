@@ -59,11 +59,11 @@ export class UserUtil {
      * @returns {TextChannel} - The Discord text channel.
      */
     public static async fetchChannelFromClient(client: Client, channel: Channel): Promise<TextChannel> {
-        const chan: TextChannel | undefined = <TextChannel>client.channels.cache.get(channel.id);
+        const chan: TextChannel | undefined = <TextChannel>client.channels.cache.get(channel.channel_id);
 
         if (!chan) {
-            const g: Guild = await client.guilds.fetch(channel.guild);
-            return <TextChannel>await g.channels.fetch(channel.id);
+            const g: Guild = await client.guilds.fetch(channel.guild_id);
+            return <TextChannel>await g.channels.fetch(channel.channel_id);
         }
 
         return chan;

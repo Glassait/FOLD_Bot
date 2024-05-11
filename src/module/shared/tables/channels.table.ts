@@ -12,7 +12,7 @@ export class ChannelsTable extends TableAbstract {
     /**
      * Represents the development channel.
      */
-    private readonly DEV_CHANNEL: Channel = { guild: '1218558386761891901', id: '1218558387361546412' };
+    private readonly DEV_CHANNEL: Channel = { guild_id: '1218558386761891901', channel_id: '1218558387361546412' };
 
     constructor() {
         super('channels');
@@ -58,6 +58,6 @@ export class ChannelsTable extends TableAbstract {
             return Promise.resolve(this.DEV_CHANNEL);
         }
 
-        return ((await this.select(new SelectBuilder(this).columns('*').where([`name LIKE '${name}'`]))) as any)[0];
+        return ((await this.select(new SelectBuilder(this).columns('*').where([`feature_name LIKE '${name}'`]))) as any)[0];
     }
 }

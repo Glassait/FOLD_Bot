@@ -1,6 +1,7 @@
 import { TableAbstract } from '../abstracts/table.abstract';
 import { DeleteBuilder, InsertIntoBuilder, SelectBuilder } from '../builders/query.builder';
 import { LoggerInjector } from '../decorators/injector.decorator';
+import type { LeavingPlayer } from '../types/table.type';
 
 /**
  * Represents a table for managing leaving players.
@@ -38,7 +39,7 @@ export class LeavingPlayersTable extends TableAbstract {
      *
      * @returns {Promise<number[]>} A Promise that resolves to an array of leaving player IDs.
      */
-    public async getAll(): Promise<number[]> {
+    public async getAll(): Promise<LeavingPlayer[]> {
         return await this.select(new SelectBuilder(this).columns('*'));
     }
 }

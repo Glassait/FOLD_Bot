@@ -20,7 +20,7 @@ export class WinStreakTable extends TableAbstract {
             new UpdateBuilder(this)
                 .columns('current', 'max')
                 .values(winStreak.current, winStreak.max)
-                .where([`player_id = ${playerId}`, `MONTH(month) = MONTH(${date})`], ['AND'])
+                .where([`player_id = ${playerId}`, `MONTH(date) = ${date.getMonth() + 1}`], ['AND'])
         );
     }
 
@@ -29,7 +29,10 @@ export class WinStreakTable extends TableAbstract {
             (await this.select(
                 new SelectBuilder(this)
                     .columns('current', 'max')
-                    .where([`player_id = ${playerId}`, `MONTH(date) = MONTH(${date})`, `YEAR(date) = YEAR(${date})`], ['AND', 'AND'])
+                    .where(
+                        [`player_id = ${playerId}`, `MONTH(date) = ${date.getMonth() + 1}`, `YEAR(date) = ${date.getFullYear()}`],
+                        ['AND', 'AND']
+                    )
             )) as any
         )[0];
     }

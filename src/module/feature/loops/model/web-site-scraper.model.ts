@@ -42,7 +42,7 @@ export class WebSiteScraper {
         this.logger.debug(`${EmojiEnum.MINE} Start scrapping {}`, website.name);
 
         this.axios
-            .get(website.liveUrl)
+            .get(website.live_url)
             .then((response: AxiosResponse<string, any>): void => {
                 this.logger.debug('Fetching newsletter for {} end successfully', website.name);
                 this.getLastNews(response.data, website)

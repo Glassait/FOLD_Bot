@@ -16,9 +16,9 @@ export type Clan = {
     /**
      * The optional URL of the clan's image.
      */
-    imageUrl?: string;
+    image_url?: string;
     /**
      * The last time a leaving activity was detected
      */
-    lastActivity?: string;
+    last_activity?: string;
 };

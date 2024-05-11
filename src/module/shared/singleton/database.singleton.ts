@@ -51,13 +51,11 @@ export class DatabaseSingleton {
      *
      * @param {string} sql - The SQL query to execute.
      *
-     * @returns {Promise<[QueryResult, any[]]>} - A Promise resolving to an array containing the query result and field metadata.
+     * @returns {Promise<[QueryResult, FieldPacket[]]>} - A Promise resolving to an array containing the query result and field metadata.
      */
     public async query(sql: string): Promise<[QueryResult, FieldPacket[]]> {
         try {
-            const conn = await this._pool.getConnection();
-            const [rows, fields] = await conn.query({ sql: sql });
-            this._pool.releaseConnection(conn);
+            const [rows, fields] = await this._pool.execute({ sql: sql });
             return [rows, fields];
         } catch (error) {
             throw new Error('Error executing SQL query', { cause: error });
@@ -81,6 +79,6 @@ export class DatabaseSingleton {
             enableKeepAlive: true,
             keepAliveInitialDelay: 0,
         });
-        this.logger.debug(`${EmojiEnum.HAMMER} Pool to the database created : {}`, this._pool);
+        this.logger.debug(`${EmojiEnum.HAMMER} Pool to the database created`);
     }
 }

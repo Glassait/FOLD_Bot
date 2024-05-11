@@ -14,15 +14,15 @@ export class CommandsTable extends TableAbstract {
     }
 
     /**
-     * Retrieves the Discord ID of a command by its name.
+     * Retrieves the Discord server ID of a command by its name.
      *
      * @param {CommandName} name - The name of the command.
      *
-     * @returns {Promise<string[]>} - A promise that resolves to an array of Discord IDs.
+     * @returns {Promise<string[]>} - A promise that resolves to an array of Discord servers IDs.
      */
     public async getCommand(name: CommandName): Promise<string[]> {
         return (
-            (await this.select(new SelectBuilder(this).columns('discord_id').where([`name LIKE '${name}'`]))) as any
-        )[0].discord_id.split(',');
+            (await this.select(new SelectBuilder(this).columns('servers_id').where([`name LIKE '${name}'`]))) as any
+        )[0].servers_id.split(',');
     }
 }

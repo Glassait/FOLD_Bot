@@ -116,7 +116,7 @@ class Computer {
             return `${addQuote ? "'" : ''}${value}${addQuote ? "'" : ''}`;
         }
 
-        if (value === null) {
+        if (value === null || typeof value === 'boolean') {
             return value;
         }
 
@@ -254,7 +254,13 @@ class Conditions {
      */
     private reduceConditionsAndVerdes(conditions: Condition): string {
         return conditions.conditions.reduce((where: string, condition: any, index: number): string => {
-            return where + condition + (index === conditions.conditions.length - 2 ? ` ${(conditions.verdes as string[])[index]} ` : '');
+            return (
+                where +
+                condition +
+                (conditions.conditions.length > 1 && index <= conditions.conditions.length - 2
+                    ? ` ${(conditions.verdes as string[])[index]} `
+                    : '')
+            );
         }, '');
     }
 }

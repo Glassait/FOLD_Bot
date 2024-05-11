@@ -54,7 +54,7 @@ export class BlacklistedPlayersTable extends TableAbstract {
      * @returns {Promise<BlacklistedPlayer[]>} A Promise that resolves to an array of blacklisted players.
      */
     public async getPlayer(id: number): Promise<BlacklistedPlayer[]> {
-        return await this.select(new SelectBuilder(this).where([`id = ${id}`]));
+        return await this.select(new SelectBuilder(this).columns('*').where([`id = ${id}`]));
     }
 
     /**
@@ -65,6 +65,8 @@ export class BlacklistedPlayersTable extends TableAbstract {
      * @returns {Promise<BlacklistedPlayer[]>} A Promise that resolves to an array of blacklisted players.
      */
     public async findPlayer(idOrName: string): Promise<BlacklistedPlayer[]> {
-        return await this.select(new SelectBuilder(this).where([`id LIKE '%${idOrName}%'`, `name LIKE '%${idOrName}%'`], ['OR']));
+        return await this.select(
+            new SelectBuilder(this).columns('*').where([`id LIKE '%${idOrName}%'`, `name LIKE '%${idOrName}%'`], ['OR'])
+        );
     }
 }

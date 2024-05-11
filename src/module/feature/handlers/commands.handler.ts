@@ -12,20 +12,20 @@ module.exports = async (): Promise<void> => {
     const logger: Logger = new Logger(basename(__filename));
     const slashCommandsDir: string = join(__dirname, '../slash-commands');
     const body: { [key: Snowflake]: RESTPostAPIChatInputApplicationCommandsJSONBody[] } = {};
-    const commands = new CommandsTable();
+    const commandsTable = new CommandsTable();
 
     for (const file of readdirSync(slashCommandsDir)) {
-        if (!file.endsWith('.ts')) return;
+        if (file.endsWith('.ts')) {
+            const command: SlashCommandModel = require(`${slashCommandsDir}/${file}`);
 
-        const command: SlashCommandModel = require(`${slashCommandsDir}/${file}`);
+            (await commandsTable.getCommand(command.name as CommandName)).forEach((serverId: string): void => {
+                const guild: RESTPostAPIChatInputApplicationCommandsJSONBody[] = body[serverId] ?? [];
+                guild.push(command.data.toJSON());
+                body[serverId] = guild;
+            });
 
-        (await commands.getCommand(command.name as CommandName)).forEach((serverId: string): void => {
-            const guild: RESTPostAPIChatInputApplicationCommandsJSONBody[] = body[serverId] ?? [];
-            guild.push(command.data.toJSON());
-            body[serverId] = guild;
-        });
-
-        logger.info(`${EmojiEnum.FLAME} Successfully loaded command {}`, command.name);
+            logger.info(`${EmojiEnum.FLAME} Successfully loaded command {}`, command.name);
+        }
     }
 
     const rest: REST = new REST({ version: '10' }).setToken(token);

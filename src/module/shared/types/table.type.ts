@@ -39,7 +39,7 @@ export type TriviaData = {
 /**
  * Represent the information store in the tanks table
  */
-export type Tank = {
+export type TankRaw = {
     /**
      * The id of the tank in the database
      */
@@ -52,6 +52,28 @@ export type Tank = {
      * The image url of the tank
      */
     image: string;
+    /**
+     * The stringify JSON of the tanks shell
+     */
+    ammo: string;
+};
+
+/**
+ * Represent the information store in the tanks table
+ */
+export type Tank = {
+    /**
+     * @see TankRaw#id
+     */
+    id: TankRaw['id'];
+    /**
+     * @see TankRaw#name
+     */
+    name: TankRaw['name'];
+    /**
+     * @see TankRaw#image
+     */
+    image: TankRaw['image'];
     /**
      * The shell definition of the tank
      */
@@ -111,7 +133,7 @@ export type TriviaAnswer = {
  */
 export type TriviaQuestion = {
     /**
-     * The generated id od the question
+     * The generated id of the question
      */
     id: number;
     /**
@@ -166,4 +188,14 @@ export type WinStreak = {
      * The maximum win streak count achieved.
      */
     max: number;
+};
+
+/**
+ * Represent the data store in the leaving players table
+ */
+export type LeavingPlayer = {
+    /**
+     * The id of the player
+     */
+    id: number;
 };

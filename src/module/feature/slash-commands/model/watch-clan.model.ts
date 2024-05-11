@@ -11,6 +11,7 @@ import type { WotApiModel } from '../../../shared/apis/wot-api.model';
 import { Injectable, LoggerInjector, TableInjectable } from '../../../shared/decorators/injector.decorator';
 import type { BlacklistedPlayersTable } from '../../../shared/tables/blacklisted-players.table';
 import type { ChannelsTable } from '../../../shared/tables/channels.table';
+import type { FeatureFlippingTable } from '../../../shared/tables/feature-flipping.table';
 import type { WatchClansTable } from '../../../shared/tables/watch-clans.table';
 import type { BlacklistedPlayer } from '../../../shared/types/blacklisted-player.type';
 import type { WargamingSuccessType } from '../../../shared/types/wargaming-api.type';
@@ -35,8 +36,8 @@ export class WatchClanModel {
     @TableInjectable('WatchClans') private readonly watchClans: WatchClansTable;
     @TableInjectable('BlacklistedPlayers') private readonly blacklistedPlayers: BlacklistedPlayersTable;
     @TableInjectable('Channels') private readonly channels: ChannelsTable;
+    @TableInjectable('FeatureFlipping') private readonly featureFlippingTable: FeatureFlippingTable;
     //endregion
-
     private _channel: TextChannel;
 
     get channel(): TextChannel {
@@ -64,6 +65,13 @@ export class WatchClanModel {
      * @param {string[]} optionsName - The list of options name.
      */
     public async addClanToWatch(interaction: ChatInputCommandInteraction, optionsName: string[]): Promise<void> {
+        if (!(await this.featureFlippingTable.getFeature('fold_recruitment'))) {
+            await interaction.editReply({
+                content: "L'observateur n'est pas activé pas l'administrateur <@313006042340524033>",
+            });
+            return;
+        }
+
         const id: number = interaction.options.get(optionsName[0])?.value as number;
         let name: string = interaction.options.get(optionsName[1])?.value as string;
         name = StringUtil.sanitize(name).toUpperCase();
@@ -94,7 +102,7 @@ export class WatchClanModel {
 
         this.confirmationEmbed
             .setTitle("Ajout de clan à l'observateur")
-            .setDescription(`Le clan \`${name}\` a été ajouté à la liste des clans à observer !`);
+            .setDescription(StringUtil.transformToCode('Le clan {} a été ajouté à la liste des clans à observer !', name));
 
         await this.channel.send({ embeds: [this.confirmationEmbed] });
     }
@@ -106,6 +114,13 @@ export class WatchClanModel {
      * @param {string[]} optionsName - The list of options name.
      */
     public async removeClanFromWatch(interaction: ChatInputCommandInteraction, optionsName: string[]): Promise<void> {
+        if (!(await this.featureFlippingTable.getFeature('fold_recruitment'))) {
+            await interaction.editReply({
+                content: "L'observateur n'est pas activé pas l'administrateur <@313006042340524033>",
+            });
+            return;
+        }
+
         let idOrName: string = interaction.options.get(optionsName[0])?.value as string;
         idOrName = StringUtil.sanitize(idOrName).toUpperCase();
 
@@ -139,7 +154,7 @@ export class WatchClanModel {
 
         this.confirmationEmbed
             .setTitle("Suppression de clan de l'observateur")
-            .setDescription(StringUtil.transformToCode('`Le clan {} a été supprimé de la liste des clans à observer !`', clan.name));
+            .setDescription(StringUtil.transformToCode('Le clan {} a été supprimé de la liste des clans à observer !', clan.name));
 
         await this.channel.send({ embeds: [this.confirmationEmbed] });
     }
@@ -150,9 +165,23 @@ export class WatchClanModel {
      * @param {ChatInputCommandInteraction} interaction - The interaction that triggered the command.
      */
     public async clanList(interaction: ChatInputCommandInteraction): Promise<void> {
+        if (!(await this.featureFlippingTable.getFeature('fold_recruitment'))) {
+            await interaction.editReply({
+                content: "L'observateur n'est pas activé pas l'administrateur <@313006042340524033>",
+            });
+            return;
+        }
+
         const listClanNames: string[] = (await this.watchClans.getAll())
             .map((clan: Clan) => clan.name)
             .sort((a: string, b: string): number => (a < b ? -1 : 1));
+
+        if (listClanNames.length === 0) {
+            await interaction.editReply({
+                content: 'Aucun clan est observé !',
+            });
+            return;
+        }
 
         const third: number = Math.round(listClanNames.length / 3);
 
@@ -179,6 +208,13 @@ export class WatchClanModel {
      * @param {string[]} optionsName - The list of options name.
      */
     public async blacklistPlayer(interaction: ChatInputCommandInteraction, optionsName: string[]): Promise<void> {
+        if (!(await this.featureFlippingTable.getFeature('fold_recruitment'))) {
+            await interaction.editReply({
+                content: "L'observateur n'est pas activé pas l'administrateur <@313006042340524033>",
+            });
+            return;
+        }
+
         let idAndName: string = interaction.options.get(optionsName[0])?.value as string;
         idAndName = StringUtil.sanitize(idAndName);
         let reason: string = interaction.options.get(optionsName[1])?.value as string;
@@ -237,9 +273,24 @@ export class WatchClanModel {
      * @param {string[]} optionsName - The list of options name.
      */
     public async removePlayerToBlacklist(interaction: ChatInputCommandInteraction, optionsName: string[]): Promise<void> {
+        if (!(await this.featureFlippingTable.getFeature('fold_recruitment'))) {
+            await interaction.editReply({
+                content: "L'observateur n'est pas activé pas l'administrateur <@313006042340524033>",
+            });
+            return;
+        }
+
         let idAndName: string = interaction.options.get(optionsName[0])?.value as string;
         idAndName = StringUtil.sanitize(idAndName);
         const [id, name] = idAndName.split('#');
+
+        if (!id || !name) {
+            await interaction.editReply({
+                content:
+                    "Merci de sélectionner un joueur dans la liste déroulante. Si vous ne trouvez pas le joueur rechercher cela veut dire qu'il n'est pas présent dans la liste noire",
+            });
+            return;
+        }
 
         const player: BlacklistedPlayer[] = await this.blacklistedPlayers.getPlayer(Number(id));
 
@@ -260,7 +311,7 @@ export class WatchClanModel {
         const removed: boolean = await this.blacklistedPlayers.removePlayer(player[0]);
 
         if (!removed) {
-            this.logger.debug('An error occur during deletion of player inside the database', idAndName);
+            this.logger.debug('An error occur during deletion of player {} inside the database', idAndName);
             await interaction.editReply({
                 content: `Une erreur est survenue lors de la suppression du joueur. Merci de réessayer plus tard ou de contacter <@313006042340524033>`,
             });
@@ -288,6 +339,11 @@ export class WatchClanModel {
         interaction: AutocompleteInteraction,
         interactionType: 'clan' | 'add-player' | 'remove-player'
     ): Promise<void> {
+        if (!(await this.featureFlippingTable.getFeature('fold_recruitment'))) {
+            await interaction.respond([]);
+            return;
+        }
+
         switch (interactionType) {
             case 'clan':
                 await this.autocompleteClan(interaction);

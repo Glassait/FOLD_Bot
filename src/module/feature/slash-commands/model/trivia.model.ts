@@ -69,7 +69,7 @@ export class TriviaModel {
             },
             {
                 name: 'Minuteur',
-                value: `Tu as \`30 secondes\` pour répondre à la question. À la fin du minuteur, le bot t'enverra ton résultat : bonne ou mauvaise réponse ainsi que les informations sur le char à trouver et sur le char que tu as sélectionné.\n\nLorsque tu répond à la question en moins de \`10 secondes\`, tu obtiens un bonus de \`25%\` sur les points obtenus en cas de bonne réponse. ${EmojiEnum.WARNING} **Le temps de réponse change si tu sélectionnes une autre réponse**`,
+                value: `Tu as \`30 secondes\` pour répondre à la question. À la fin du minuteur, le bot t'enverra ton résultat : bonne ou mauvaise réponse ainsi que les informations sur le char à trouver et sur le char que tu as sélectionné.\n\nLorsque tu répond à la question en moins de \`10 secondes\`, tu obtiens un bonus de \`25%\` sur les points obtenus en cas de bonne réponse. ${EmojiEnum.WARNING} **Le temps de réponse change si tu sélectionnes une autre réponse !**`,
             },
             {
                 name: 'Bouton',
@@ -77,7 +77,7 @@ export class TriviaModel {
             },
             {
                 name: 'Sommaire',
-                value: 'Tous les jours, au lancement du bot, un sommaire sera envoyé. Il contient le top 5 des joueurs pour chaque question en terme de vitesse de réponse, ainsi que la bonne réponse et des informations sur les autres chars.',
+                value: 'Tous les jours, au lancement du bot, un sommaire sera envoyé. Il contient le top 3 des joueurs pour chaque question en terme de vitesse de réponse, ainsi que la bonne réponse et des informations sur les autres chars.',
             },
             {
                 name: 'AFK',
@@ -93,7 +93,7 @@ export class TriviaModel {
      */
     private readonly embedExample: EmbedBuilder = new EmbedBuilder()
         .setTitle('Example de question')
-        .setDescription("Dans cette exemple, les boutons sont clickable mais aucune logique n'est implémenté !")
+        .setDescription("Dans cette exemple, les boutons sont clickable mais aucune logique n'est implémentée !")
         .setColor(Colors.Blurple)
         .setFields(
             {
@@ -108,7 +108,7 @@ export class TriviaModel {
             }
         );
     /**
-     *
+     * The row builder for the example
      */
     private readonly rowExample: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>()
         .addComponents(new ButtonBuilder().setCustomId('Object 140').setLabel('Object 140').setStyle(ButtonStyle.Primary))
@@ -143,6 +143,7 @@ export class TriviaModel {
             interaction: ChatInputCommandInteraction;
         }
     >;
+
     //endregion
 
     /**
@@ -227,12 +228,12 @@ export class TriviaModel {
         const ammo: Ammo = datum.tank.ammo[datum.ammoIndex];
 
         const target = new Date();
-        target.setTime(target.getTime() + this.maxQuestionDuration * TimeEnum.MINUTE);
+        target.setTime(target.getTime() + this.maxQuestionDuration);
 
         const startGameEmbed: EmbedBuilder = new EmbedBuilder()
             .setTitle('Devine le bon char')
             .setFooter({ text: 'Trivia Game' })
-            .setDescription(`Tu es entrain de répondre à la question n°\`${numberOfAnswer + 1 || 1}\` sur ${this.maxNumberOfQuestion}`)
+            .setDescription(`Tu es entrain de répondre à la question n°\`${numberOfAnswer + 1}\` sur ${this.maxNumberOfQuestion}`)
             .setColor(Colors.Blurple)
             .setFields(
                 {
@@ -288,14 +289,27 @@ export class TriviaModel {
             return;
         }
 
-        const periods: { year: number; month: number }[] = (await this.playerAnswerTable.getAllPeriodsOfPlayer(player.id)).reverse();
+        const periods: Date[] = (await this.playerAnswerTable.getAllPeriodsOfPlayer(player.id))
+            .map(({ month, year }) => {
+                const date = new Date();
+
+                date.setMonth(month - 1);
+                date.setFullYear(year);
+
+                return date;
+            })
+            .reverse();
 
         const select: StringSelectMenuBuilder = new StringSelectMenuBuilder()
             .setCustomId('trivia-statistics-select')
             .setPlaceholder('Choisissez un mois');
 
-        periods.forEach(({ month, year }) =>
-            select.addOptions(new StringSelectMenuOptionBuilder().setLabel(`${month} ${year}`).setValue(`${year}-${month}`))
+        periods.forEach((date: Date) =>
+            select.addOptions(
+                new StringSelectMenuOptionBuilder()
+                    .setLabel(`${date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}`)
+                    .setValue(`${date}`)
+            )
         );
 
         const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(select);
@@ -307,19 +321,18 @@ export class TriviaModel {
         message
             .createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: TimeEnum.HOUR })
             .on('collect', async (i: StringSelectMenuInteraction): Promise<void> => {
-                let [year, month]: any = i.values[0].split('-');
-                year = Number(year);
-                month = Number(month);
+                const date = new Date(i.values[0]);
 
-                const date = new Date();
-                date.setMonth(month);
-                date.setFullYear(year);
-
-                const stats: TriviaAnswer[] = await this.playerAnswerTable.getPeriodAnswerOfPlayer(player.id, month, year);
-                const winstreak: WinStreak = await this.winStreakTable.getWinStreakFromDate(player.id, date);
+                const stats: TriviaAnswer[] = await this.playerAnswerTable.getPeriodAnswerOfPlayer(player.id, date);
+                const winStreak: WinStreak = await this.winStreakTable.getWinStreakFromDate(player.id, date);
 
                 const embed = new EmbedBuilder()
-                    .setTitle(`Statistiques pour le mois de ${month} ${year}`)
+                    .setTitle(
+                        `Statistiques pour le mois de ${date.toLocaleDateString('fr-FR', {
+                            month: 'long',
+                            year: 'numeric',
+                        })}`
+                    )
                     .setColor(Colors.LuminousVividPink)
                     .setDescription('Voici les statistiques demandées')
                     .setFields(
@@ -331,7 +344,7 @@ export class TriviaModel {
                             }, 0)}\``,
                             inline: true,
                         },
-                        { name: 'Plus longue séquence correcte', value: `\`${winstreak.max}\`` },
+                        { name: 'Plus longue séquence correcte', value: `\`${winStreak.max}\`` },
                         {
                             name: 'Réponse la plus rapide',
                             value: `\`${Math.min(...stats.flatMap(({ answer_time }) => Number(answer_time))) / TimeEnum.SECONDE}\` sec`,
@@ -378,11 +391,16 @@ export class TriviaModel {
             return;
         }
 
-        const promises: Promise<TriviaAnswer & TriviaPlayer>[] = players.map(({ id }) =>
+        const promises: Promise<(TriviaAnswer & TriviaPlayer) | null>[] = players.map(({ id }) =>
             this.playerAnswerTable.getLastAnswerWithPlayerOfPlayer(id)
         );
-        const playerStats = (await Promise.all(promises))
-            .filter(({ date }): boolean => date.getMonth() === new Date().getMonth())
+        const playerStats = (await Promise.all(promises)).filter(
+            (value: (TriviaAnswer & TriviaPlayer) | null): boolean => value !== null
+        ) as Awaited<TriviaAnswer & TriviaPlayer>[];
+
+        const today = new Date();
+        playerStats
+            .filter(({ date }): boolean => date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear())
             .sort((a: TriviaAnswer & TriviaPlayer, b: TriviaAnswer & TriviaPlayer) => b.elo - a.elo);
 
         if (playerStats.length === 0) {
@@ -653,32 +671,19 @@ export class TriviaModel {
 
         const lastAnswer: TriviaAnswer = await this.playerAnswerTable.getLastAnswerOfPlayer(value.player.id);
 
-        const oldElo = lastAnswer.elo;
+        const oldElo = lastAnswer?.elo ?? 0;
         const elo = this.calculateElo(oldElo, playerAnswer?.responseTime, isGoodAnswer);
 
         try {
-            const added: boolean = await this.playerAnswerTable.addAnswer(
-                value.player.id,
-                datum.id,
-                new Date(),
-                isGoodAnswer,
-                playerAnswer.responseTime,
-                elo
-            );
-
-            if (!added) {
-                await playerAnswer.interaction.editReply({
-                    content: "Une erreur est survenue lors de l'enregistrement de ta réponse dans la base de données !",
-                });
-                this.logger.error(StringUtil.transformToCode(`Failed to add answer of player {} in database`, playerName));
-                return;
-            }
+            await this.playerAnswerTable.addAnswer(value.player.id, datum.id, new Date(), isGoodAnswer, playerAnswer.responseTime, elo);
 
             this.logger.info('Successfully add player {} answer in database', playerName);
         } catch (reason) {
-            await playerAnswer.interaction.editReply({
-                content: "Une erreur est survenue lors de l'enregistrement de ta réponse dans la base de données !",
-            });
+            if (playerAnswer?.interaction) {
+                await playerAnswer.interaction.editReply({
+                    content: "Une erreur est survenue lors de l'enregistrement de ta réponse dans la base de données !",
+                });
+            }
             this.logger.error(
                 StringUtil.transformToCode(`Failed to add answer of player {} in database, with error {}`, playerName, reason)
             );
@@ -766,7 +771,7 @@ export class TriviaModel {
         winStreak.current++;
         winStreak.max = Math.max(winStreak.current, winStreak.max);
 
-        await this.updateWinstreak(playerName, winStreak, playerAnswer);
+        await this.updateWinStreak(playerName, winStreak, playerAnswer);
 
         await playerAnswer?.interaction.editReply({
             content: '',
@@ -818,7 +823,7 @@ export class TriviaModel {
         }
 
         winStreak.current = 0;
-        await this.updateWinstreak(playerName, winStreak, playerAnswer);
+        await this.updateWinStreak(playerName, winStreak, playerAnswer);
 
         const tank = allTanks.find((tank: Tank): boolean => tank.name === playerAnswer?.response);
 
@@ -868,7 +873,7 @@ export class TriviaModel {
      * @param {WinStreak} winStreak - The player's current winstreak data.
      * @param {PlayerAnswer} playerAnswer - The interaction object of the player's answer.
      */
-    private async updateWinstreak(playerName: string, winStreak: WinStreak, playerAnswer: PlayerAnswer): Promise<void> {
+    private async updateWinStreak(playerName: string, winStreak: WinStreak, playerAnswer: PlayerAnswer): Promise<void> {
         const value = this.datum.get(playerName);
 
         if (!value) {
@@ -876,16 +881,7 @@ export class TriviaModel {
         }
 
         try {
-            const update = await this.winStreakTable.updateWinStreak(value.player.id, new Date(), winStreak);
-
-            if (!update) {
-                await playerAnswer.interaction.editReply({
-                    content: 'Une erreur est survenue lors de la mise à jour de tes statistiques dans la base de données !',
-                });
-                this.logger.error(StringUtil.transformToCode(`Failed to update winstreak for player {} in database`, playerName));
-                return;
-            }
-
+            await this.winStreakTable.updateWinStreak(value.player.id, new Date(), winStreak);
             this.logger.info('Successfully update winstreak for player {} in database', playerName);
         } catch (reason) {
             await playerAnswer.interaction.editReply({

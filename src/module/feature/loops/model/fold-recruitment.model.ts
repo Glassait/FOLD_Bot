@@ -120,9 +120,9 @@ export class FoldRecruitmentModel {
             .replace(FoldRecruitmentEnum.CLAN_ID, String(clan.id))
             .replace('today', new Date().toISOString().slice(0, 19));
 
-        if (!clan.imageUrl) {
+        if (!clan.image_url) {
             try {
-                clan.imageUrl = (await this.wotApiModel.fetchClanImage(clan.name)).data[0]?.emblems?.x64?.portal;
+                clan.image_url = (await this.wotApiModel.fetchClanImage(clan.name)).data[0]?.emblems?.x64?.portal;
                 await this.watchClans.updateClan(clan);
             } catch (error) {
                 this.logger.error('An error occurred while fetching the image of the clan', error);
@@ -164,7 +164,7 @@ export class FoldRecruitmentModel {
 
         if (extracted.length > 0) {
             this._noPlayerFound = false;
-            clan.lastActivity = extracted[0].created_at;
+            clan.last_activity = extracted[0].created_at;
             await this.watchClans.updateClan(clan);
         }
     }
@@ -181,7 +181,7 @@ export class FoldRecruitmentModel {
         const embedPlayer: EmbedBuilder = new EmbedBuilder()
             .setAuthor({
                 name: `${clan.name} ${EmojiEnum.REDIRECTION}`,
-                iconURL: clan.imageUrl,
+                iconURL: clan.image_url,
                 url: this.clanUrl.replace(FoldRecruitmentEnum.CLAN_ID, String(clan.id)),
             })
             .setTitle(blacklisted ? 'Joueur sur liste noire détecté' : 'Nouveau joueur pouvant être recruté')
@@ -244,7 +244,7 @@ export class FoldRecruitmentModel {
     } {
         const extracted: LeaveClanActivity[] = data.items.filter(
             (item: ClanActivity): boolean =>
-                item.subtype === WotClanActivity.LEAVE_CLAN && new Date(item.created_at) > new Date(clan?.lastActivity ?? '')
+                item.subtype === WotClanActivity.LEAVE_CLAN && new Date(item.created_at) > new Date(clan?.last_activity ?? '')
         ) as unknown as LeaveClanActivity[];
 
         const datum: Players[] = extracted.flatMap((activity: LeaveClanActivity) =>

@@ -19,7 +19,7 @@ export class TableAbstract {
     private readonly sqlReturn = {
         CREATE: 2,
         UPDATE: 34,
-        REMOVE: 34,
+        REMOVE: [34, 2],
     };
 
     /**
@@ -76,7 +76,7 @@ export class TableAbstract {
         const sql = builder.compute();
         this.validateQueryType(sql, 'DELETE');
         const rows = await this.query(sql);
-        return 'serverStatus' in rows && rows.serverStatus === this.sqlReturn.REMOVE;
+        return 'serverStatus' in rows && this.sqlReturn.REMOVE.includes(rows.serverStatus);
     }
 
     /**

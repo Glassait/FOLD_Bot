@@ -42,7 +42,7 @@ export class NewsScrapper {
         const updated: boolean = await this.newsWebsites.updateWebsite(newsWebsite.name, url);
 
         if (updated) {
-            newsWebsite.lastUrl = url;
+            newsWebsite.last_url = url;
         }
 
         if (await this.checkHrefContainBanWord(url)) {
@@ -59,7 +59,7 @@ export class NewsScrapper {
         const embed: EmbedBuilder = new EmbedBuilder().setTitle(title).setDescription(description).setURL(url).setColor(Colors.DarkGrey);
 
         if (image) {
-            embed.setImage(image.startsWith('http') ? image : newsWebsite.liveUrl + image);
+            embed.setImage(image.startsWith('http') ? image : newsWebsite.live_url + image);
         }
 
         await this.channel.send({ embeds: [embed] });

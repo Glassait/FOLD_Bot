@@ -107,22 +107,22 @@ export function TableInjectable(
             FeatureFlipping: require('../tables/feature-flipping.table').FeatureFlippingTable,
             Commands: require('../tables/commands.table').CommandsTable,
             // Fold Recruitment
-            WatchClans: require('../tables/watch-clans.table').WatchClanTable,
-            BlacklistedPlayers: require('../tables/blacklisted-players.table').BlacklistedPlayerTable,
-            LeavingPlayers: require('../tables/leaving-players.table').LeavingPlayerTable,
-            PotentialClans: require('../tables/potential-clans.table').PotentialClanTable,
+            WatchClans: require('../tables/watch-clans.table').WatchClansTable,
+            BlacklistedPlayers: require('../tables/blacklisted-players.table').BlacklistedPlayersTable,
+            LeavingPlayers: require('../tables/leaving-players.table').LeavingPlayersTable,
+            PotentialClans: require('../tables/potential-clans.table').PotentialClansTable,
             FoldRecruitment: require('../tables/fold-recruitment.table').FoldRecruitmentTable,
             // Newsletter
-            NewsWebsites: require('../tables/news-websites.table').NewsWebsiteTable,
+            NewsWebsites: require('../tables/news-websites.table').NewsWebsitesTable,
             BanWords: require('../tables/ban-words.table').BanWordsTable,
             WotApi: require('../tables/wot-api.table').WotApiTable,
             // Trivia game
-            TriviaData: require('../tables/trivia-data.table').TriviaTable,
+            TriviaData: require('../tables/trivia-data.table').TriviaDataTable,
             Tanks: require('../tables/tanks.table').TanksTable,
             Players: require('../tables/players.table').PlayersTable,
             PlayersAnswer: require('../tables/players-answers.table').PlayersAnswersTable,
             Trivia: require('../tables/trivia.table').TriviaTable,
-            WinStreak: require('../tables/win-streak.table').WinstreakTable,
+            WinStreak: require('../tables/win-streak.table').WinStreakTable,
         };
     }
 

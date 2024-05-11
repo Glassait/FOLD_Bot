@@ -50,7 +50,7 @@ export class TriviaTable extends TableAbstract {
             (await this.select(
                 new SelectBuilder(this)
                     .columns('COUNT(*) as count')
-                    .where([`MONTH(date) = ${date.getMonth()}`, `YEAR(date) = ${date.getFullYear()}`], ['AND'])
+                    .where([`MONTH(date) = ${date.getMonth() + 1}`, `YEAR(date) = ${date.getFullYear()}`], ['AND'])
             )) as any
         )[0].count;
     }

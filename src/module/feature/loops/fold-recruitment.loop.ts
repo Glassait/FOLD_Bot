@@ -21,7 +21,7 @@ module.exports = {
         }
 
         let req = require('../../shared/tables/watch-clans.table');
-        const watchClan: WatchClansTable = new req.WatchClanTable();
+        const watchClan: WatchClansTable = new req.WatchClansTable();
 
         req = require('../../shared/tables/fold-recruitment.table');
         const foldRecruitment: FoldRecruitmentTable = new req.FoldRecruitmentTable();
