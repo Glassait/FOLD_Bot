@@ -58,4 +58,4 @@ const newExample = new ExampleSingleton(); // ERROR - Constructor of class Examp
 
 The application used persistant logging write in markdown.
 
-The class that manage the log is a [singleton](./logger.singleton.ts), but you don't directly used the singleton. In executed file, you are using the [direct class](../classes/logger.ts) that used an instance of the singleton.
+The class that manage the log is a [singleton](./logger.singleton.ts), but you don't directly used the singleton. In executed file, you are using the [direct class](../utils/logger.ts) that used an instance of the singleton.

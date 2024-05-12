@@ -1,26 +1,32 @@
 import { type Client, Colors, EmbedBuilder, type TextChannel } from 'discord.js';
-import type { Logger } from '../../../shared/classes/logger';
-import { Injectable, LoggerInjector } from '../../../shared/decorators/injector.decorator';
+import { LoggerInjector } from '../../../shared/decorators/injector/logger-injector.decorator';
+import { Table } from '../../../shared/decorators/injector/table-injector.decorator';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
-import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
-import type { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
-import type {
-    MonthlyTriviaOverallStatistic,
-    MonthlyTriviaPlayerStatistic,
-    TriviaPlayerStatistic,
-} from '../../../shared/types/statistic.type';
+import type { ChannelsTable } from '../../../shared/tables/complexe-table/channels/channels.table';
+import type { TriviaAnswer } from '../../../shared/tables/complexe-table/players-answers/models/players-answers.type';
+import type { PlayersAnswersTable } from '../../../shared/tables/complexe-table/players-answers/players-answers.table';
+import type { TriviaPlayer } from '../../../shared/tables/complexe-table/players/models/players.type';
+import type { PlayersTable } from '../../../shared/tables/complexe-table/players/players.table';
+import type { TriviaTable } from '../../../shared/tables/complexe-table/trivia/trivia.table';
+import type { WinStreak } from '../../../shared/tables/complexe-table/win-streak/models/win-streak.type';
+import type { WinStreakTable } from '../../../shared/tables/complexe-table/win-streak/win-streak.table';
 import { DateUtil } from '../../../shared/utils/date.util';
+import type { Logger } from '../../../shared/utils/logger';
 import { MathUtil } from '../../../shared/utils/math.util';
 import { StringUtil } from '../../../shared/utils/string.util';
+import { UserUtil } from '../../../shared/utils/user.util';
 import { MEDAL } from '../../../shared/utils/variables.util';
 
 @LoggerInjector
 export class TriviaMonthModel {
     //region INJECTABLE
     private readonly logger: Logger;
-    @Injectable('Inventory') private readonly inventory: InventorySingleton;
-    @Injectable('Statistic') private readonly statistic: StatisticSingleton;
+    @Table('Channels') private readonly channels: ChannelsTable;
+    @Table('PlayersAnswer') private readonly playersAnswersTable: PlayersAnswersTable;
+    @Table('Players') private readonly playersTable: PlayersTable;
+    @Table('WinStreak') private readonly winStreakTable: WinStreakTable;
+    @Table('Trivia') private readonly triviaTable: TriviaTable;
     //endregion
 
     //region PRIVATE
@@ -31,16 +37,17 @@ export class TriviaMonthModel {
     /**
      * The previous month
      */
-    private month: string = DateUtil.getPreviousMonth();
+    private month: Date = DateUtil.getPreviousMonthAsDate();
     /**
      * Represents the list of player statistics.
      * Each entry is a tuple containing the player's name and their monthly statistics.
      *
      * The first element of the tuple is the player's name (string).
      *
-     * The second element of the tuple is the player's monthly statistics (MonthlyTriviaPlayerStatisticType).
+     * The second element of the tuple is the player's monthly answer (TriviaAnswer).
      */
-    private playerClassement: [string, MonthlyTriviaPlayerStatistic][];
+    private playerClassement: [string, TriviaAnswer[], WinStreak][];
+
     /**
      * The list of embed for the message
      */
@@ -55,27 +62,34 @@ export class TriviaMonthModel {
      */
     public async initialise(client: Client): Promise<void> {
         this.logger.info('First of the month, creation of the trivia month message');
-        this.channel = await this.inventory.getChannelForTrivia(client);
+        this.channel = await UserUtil.fetchChannelFromClient(client, await this.channels.getTrivia());
 
-        this.playerClassement = Object.entries(this.statistic.trivia.player)
-            .reduce((newArray: [string, MonthlyTriviaPlayerStatistic][], [name, statistics]: [string, TriviaPlayerStatistic]) => {
-                if (statistics[this.month]) {
-                    newArray.push([name, statistics[this.month]]);
-                }
+        const players: TriviaPlayer[] = await this.playersTable.getAllPlayers();
 
-                return newArray;
-            }, [])
-            .sort(
-                ([, aStatistics]: [string, MonthlyTriviaPlayerStatistic], [, bStatistics]: [string, MonthlyTriviaPlayerStatistic]) =>
-                    bStatistics.elo - aStatistics.elo
-            );
+        const promises: Promise<TriviaAnswer[]>[] = players.map(({ id }) =>
+            this.playersAnswersTable.getPeriodAnswerOfPlayer(id, this.month)
+        );
+        const winPromise: Promise<WinStreak>[] = players.map(({ id }) => this.winStreakTable.getWinStreakFromDate(id, this.month));
+
+        const winstreaks: Awaited<WinStreak>[] = await Promise.all(winPromise);
+
+        this.playerClassement = (await Promise.all(promises)).map((answers: TriviaAnswer[], index: number) => [
+            players[index].name,
+            answers,
+            winstreaks[index],
+        ]);
+
+        this.playerClassement.sort(
+            ([, aAnswers]: [string, TriviaAnswer[], WinStreak], [, bAnswer]: [string, TriviaAnswer[], WinStreak]) =>
+                bAnswer[bAnswer.length - 1].elo - aAnswers[aAnswers.length - 1].elo
+        );
     }
 
     /**
      * Sends the trivia month message to the designated channel.
      */
     public async createEmbedAndSendToChannel(): Promise<void> {
-        this.createEmbed();
+        await this.createEmbed();
 
         this.logger.debug(`${EmojiEnum.LETTER} Sending trivia month message`);
         await this.channel.send({ embeds: this.listEmbed });
@@ -84,7 +98,7 @@ export class TriviaMonthModel {
     /**
      * Creates multiple embeds for various statistics and information related to the trivia game.
      */
-    private createEmbed(): void {
+    private async createEmbed(): Promise<void> {
         this.logger.debug(`${EmojiEnum.HAMMER} Start building embed for trivia month`);
         this.embedIntroduction();
         this.embedScoreboard();
@@ -96,7 +110,7 @@ export class TriviaMonthModel {
             this.embedWinStreakPlayer();
         }
 
-        this.embedOverall();
+        await this.embedOverall();
     }
 
     /**
@@ -105,7 +119,7 @@ export class TriviaMonthModel {
     private embedIntroduction(): void {
         this.listEmbed.push(
             new EmbedBuilder()
-                .setTitle(`Résumé du mois de ${this.month}`)
+                .setTitle(StringUtil.transformToCode(`Résumé du mois de {}`, DateUtil.convertDateToMonthYearString(this.month)))
                 .setDescription('Le dernier mois a été chargé en apprentissage. Découvrons les statistiques du mois.')
                 .setImage('https://us-wotp.wgcdn.co/dcont/fb/image/wall_february_2018_1024x600.jpg')
                 .setColor(Colors.DarkGold)
@@ -145,8 +159,9 @@ export class TriviaMonthModel {
                         this.playerClassement
                             .slice(0, 3)
                             .reduce(
-                                (text: string, [name, statistics]: [string, MonthlyTriviaPlayerStatistic]) =>
-                                    text + StringUtil.transformToCode(`${MEDAL[index++]} ${name} avec {} points\n`, statistics.elo),
+                                (text: string, [name, answer]) =>
+                                    text +
+                                    StringUtil.transformToCode(`${MEDAL[index++]} ${name} avec {} points\n`, answer[answer.length - 1].elo),
                                 ''
                             ),
                 });
@@ -157,10 +172,11 @@ export class TriviaMonthModel {
                     value:
                         'Voila le reste du classement :\n\n' +
                         this.playerClassement
-                            .slice(3, -1)
+                            .slice(3)
                             .reduce(
-                                (text: string, [name, statistics]: [string, MonthlyTriviaPlayerStatistic]) =>
-                                    text + StringUtil.transformToCode(`${1 + ++index} : ${name} avec {} points\n`, statistics.elo),
+                                (text: string, [name, answer]) =>
+                                    text +
+                                    StringUtil.transformToCode(`${1 + index++} : ${name} avec {} points\n`, answer[answer.length - 1].elo),
                                 ''
                             ),
                 });
@@ -174,12 +190,11 @@ export class TriviaMonthModel {
      */
     private embedQuickPlayer(): void {
         this.playerClassement.sort(
-            ([, aStatistics]: [string, MonthlyTriviaPlayerStatistic], [, bStatistics]: [string, MonthlyTriviaPlayerStatistic]) =>
-                MathUtil.getMinFromArrayOfObject(Object.values(aStatistics.daily), 'answer_time') -
-                MathUtil.getMinFromArrayOfObject(Object.values(bStatistics.daily), 'answer_time')
+            ([, aAnswers]: [string, TriviaAnswer[], WinStreak], [, bAnswers]: [string, TriviaAnswer[], WinStreak]) =>
+                MathUtil.getMinFromArrayOfObject(aAnswers, 'answer_time') - MathUtil.getMinFromArrayOfObject(bAnswers, 'answer_time')
         );
 
-        const [name, statistics]: [string, MonthlyTriviaPlayerStatistic] = this.playerClassement[0];
+        const [name, answers] = this.playerClassement[0];
 
         this.listEmbed.push(
             new EmbedBuilder()
@@ -188,7 +203,7 @@ export class TriviaMonthModel {
                     StringUtil.transformToCode(
                         `Tel un EBR 75, {} détruit ces ennemies plus vite que l'éclair. Ainsi il a répondu le plus rapidement en {} secondes.`,
                         name,
-                        MathUtil.getMinFromArrayOfObject(Object.values(statistics.daily), 'answer_time') / TimeEnum.SECONDE
+                        MathUtil.getMinFromArrayOfObject(answers, 'answer_time') / TimeEnum.SECONDE
                     )
                 )
                 .setColor(Colors.DarkGold)
@@ -201,11 +216,10 @@ export class TriviaMonthModel {
      */
     private embedSlowPlayer(): void {
         this.playerClassement.sort(
-            ([, aStatistics]: [string, MonthlyTriviaPlayerStatistic], [, bStatistics]: [string, MonthlyTriviaPlayerStatistic]) =>
-                MathUtil.getMaxFromArrayOfObject(Object.values(bStatistics.daily), 'answer_time') -
-                MathUtil.getMaxFromArrayOfObject(Object.values(aStatistics.daily), 'answer_time')
+            ([, aAnswers]: [string, TriviaAnswer[], WinStreak], [, bAnswers]: [string, TriviaAnswer[], WinStreak]) =>
+                MathUtil.getMaxFromArrayOfObject(bAnswers, 'answer_time') - MathUtil.getMaxFromArrayOfObject(aAnswers, 'answer_time')
         );
-        const [name, statistics] = this.playerClassement[0];
+        const [name, answers] = this.playerClassement[0];
 
         this.listEmbed.push(
             new EmbedBuilder()
@@ -214,7 +228,7 @@ export class TriviaMonthModel {
                     StringUtil.transformToCode(
                         `{} est un véritable mur d'acier IRL, du coup il prend son temps pour répondre. Son temps le plus long est de {} secondes.`,
                         name,
-                        MathUtil.getMaxFromArrayOfObject(Object.values(statistics.daily), 'answer_time') / TimeEnum.SECONDE
+                        MathUtil.getMaxFromArrayOfObject(answers, 'answer_time') / TimeEnum.SECONDE
                     )
                 )
                 .setColor(Colors.DarkGold)
@@ -227,10 +241,9 @@ export class TriviaMonthModel {
      */
     private embedWinStreakPlayer(): void {
         this.playerClassement.sort(
-            ([, aStatistics]: [string, MonthlyTriviaPlayerStatistic], [, bStatistics]: [string, MonthlyTriviaPlayerStatistic]) =>
-                bStatistics.win_streak.max - aStatistics.win_streak.max
+            ([, , aWin]: [string, TriviaAnswer[], WinStreak], [, , bWin]: [string, TriviaAnswer[], WinStreak]) => bWin.max - aWin.max
         );
-        const [name, statistics]: [string, MonthlyTriviaPlayerStatistic] = this.playerClassement[0];
+        const [name, , win] = this.playerClassement[0];
 
         this.listEmbed.push(
             new EmbedBuilder()
@@ -240,7 +253,7 @@ export class TriviaMonthModel {
                         `{} est tel un Léopard, il rate jamais ça cible. {} a correctement répondu {} fois d'affilée.`,
                         name,
                         name,
-                        statistics.win_streak.max
+                        win.max
                     )
                 )
                 .setColor(Colors.DarkGold)
@@ -253,25 +266,15 @@ export class TriviaMonthModel {
     /**
      * Create the embed for overall statistics
      */
-    private embedOverall(): void {
-        const overallStatistic: MonthlyTriviaOverallStatistic = this.statistic.trivia.overall[this.month];
-
-        if (!overallStatistic) {
-            return;
-        }
+    private async embedOverall(): Promise<void> {
+        const numberOfGame: number = await this.triviaTable.getNumberOfGameFromDate(this.month);
 
         this.listEmbed.push(
             new EmbedBuilder()
                 .setTitle('Statistique générale')
                 .setDescription('Pour finir voici des statistiques inutiles.')
                 .setColor(Colors.DarkGold)
-                .setFields(
-                    { name: 'Nombre total de parties :', value: `\`${overallStatistic.number_of_game}\`` },
-                    {
-                        name: 'Nombre de jours sans participation :',
-                        value: `\`${overallStatistic.day_without_participation}\``,
-                    }
-                )
+                .setFields({ name: 'Nombre total de parties :', value: `\`${numberOfGame}\`` })
         );
     }
 }

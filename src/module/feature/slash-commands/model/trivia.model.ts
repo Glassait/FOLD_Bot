@@ -14,22 +14,26 @@ import {
     type StringSelectMenuInteraction,
     StringSelectMenuOptionBuilder,
 } from 'discord.js';
-import type { Logger } from '../../../shared/classes/logger';
-import { Injectable, LoggerInjector } from '../../../shared/decorators/injector.decorator';
+import type { Ammo } from '../../../shared/apis/wot-api/models/wot-api.type';
+import { LoggerInjector } from '../../../shared/decorators/injector/logger-injector.decorator';
+import { Singleton } from '../../../shared/decorators/injector/singleton-injector.decorator';
+import { Table } from '../../../shared/decorators/injector/table-injector.decorator';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
-import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
-import type { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
-import type { TriviaSingleton } from '../../../shared/singleton/trivia.singleton';
-import type {
-    DailyTrivia,
-    MonthlyTriviaPlayerStatistic,
-    TriviaPlayerStatistic,
-    TriviaStatistic,
-    WinStreak,
-} from '../../../shared/types/statistic.type';
-import type { TriviaSelected } from '../../../shared/types/trivia.type';
-import type { Ammo, VehicleData } from '../../../shared/types/wot-api.type';
+import type { TriviaSelected } from '../../../shared/singleton/trivia/models/trivia.type';
+import type { TriviaSingleton } from '../../../shared/singleton/trivia/trivia.singleton';
+import type { TriviaAnswer } from '../../../shared/tables/complexe-table/players-answers/models/players-answers.type';
+import type { PlayersAnswersTable } from '../../../shared/tables/complexe-table/players-answers/players-answers.table';
+import type { TriviaPlayer } from '../../../shared/tables/complexe-table/players/models/players.type';
+import type { PlayersTable } from '../../../shared/tables/complexe-table/players/players.table';
+import type { Tank } from '../../../shared/tables/complexe-table/tanks/models/tanks.type';
+import type { TriviaData } from '../../../shared/tables/complexe-table/trivia-data/models/trivia-data.type';
+import type { TriviaDataTable } from '../../../shared/tables/complexe-table/trivia-data/trivia-data.table';
+import type { WinStreak } from '../../../shared/tables/complexe-table/win-streak/models/win-streak.type';
+import type { WinStreakTable } from '../../../shared/tables/complexe-table/win-streak/win-streak.table';
+import { DateUtil } from '../../../shared/utils/date.util';
+import type { Logger } from '../../../shared/utils/logger';
+import { StringUtil } from '../../../shared/utils/string.util';
 import { TimeUtil } from '../../../shared/utils/time.util';
 import { MEDAL } from '../../../shared/utils/variables.util';
 import { ShellEnum, ShellType } from '../enums/shell.enum';
@@ -39,9 +43,11 @@ import type { PlayerAnswer } from '../types/trivia-game.type';
 export class TriviaModel {
     //region INJECTABLE
     private readonly logger: Logger;
-    @Injectable('Trivia') private readonly trivia: TriviaSingleton;
-    @Injectable('Statistic') private readonly statistic: StatisticSingleton;
-    @Injectable('Inventory') private readonly inventory: InventorySingleton;
+    @Singleton('Trivia') private readonly trivia: TriviaSingleton;
+    @Table('TriviaData') private readonly triviaTable: TriviaDataTable;
+    @Table('Players') private readonly playersTable: PlayersTable;
+    @Table('PlayersAnswer') private readonly playerAnswerTable: PlayersAnswersTable;
+    @Table('WinStreak') private readonly winStreakTable: WinStreakTable;
     //endregion
 
     //region PRIVATE READONLY FIELDS
@@ -50,7 +56,7 @@ export class TriviaModel {
      */
     private readonly embedRule: EmbedBuilder = new EmbedBuilder()
         .setColor(Colors.Orange)
-        .setTitle('Voici les règles concernant le jeu trivia')
+        .setTitle('Voici les règles concernant le jeu trivia V2.1')
         .setThumbnail(
             'https://img.poki.com/cdn-cgi/image/quality=78,width=600,height=600,fit=cover,f=auto/8fe1b52b0dce26510d0ebf4cbb484aaf.png'
         )
@@ -65,11 +71,11 @@ export class TriviaModel {
             },
             {
                 name: 'Obus',
-                value: `Affichant son \`type\` (AP, APCR, etc) et son \`dégât moyen (alpha)\`, l'obus peut être un obus \`standard\` ou un obus \`spécial\` (ou gold). **${EmojiEnum.WARNING} Le bot ne récupère actuellement que le premier canon des chars, alors sois attentif aux chars tels que l'IS-4, l'AMX M4 54, et autres !**`,
+                value: `Affichant son \`type\` (AP, APCR, etc) et son \`dégât moyen (alpha)\`, l'obus peut être un obus \`standard\` ou un obus \`spécial\` (dit gold). **${EmojiEnum.WARNING} Depuis la V2.1, le bot récupère le canon dit 'méta' des chars. Cependant, il n'utilise qu'un seul canon, donc faites attention au char comme le E-100 ou c'est le premier canon qui est sélectionné !**`,
             },
             {
                 name: 'Minuteur',
-                value: `Tu as \`1 minute\` pour répondre à la question. À la fin du minuteur, le bot t'enverra ton résultat : bonne ou mauvaise réponse ainsi que les informations sur le char à trouver et sur le char que tu as sélectionné.\n\nLorsque tu répond à la question en moins de \`10 secondes\`, tu obtiens un bonus de \`25%\` sur les points obtenus en cas de bonne réponse. ${EmojiEnum.WARNING} **Le temps de réponse change si la tu sélectionne une autre réponse**`,
+                value: `Tu as \`30 secondes\` pour répondre à la question. À la fin du minuteur, le bot t'enverra ton résultat : bonne ou mauvaise réponse ainsi que les informations sur le char à trouver et sur le char que tu as sélectionné.\n\nLorsque tu répond à la question en moins de \`10 secondes\`, tu obtiens un bonus de \`25%\` sur les points obtenus en cas de bonne réponse. ${EmojiEnum.WARNING} **Le temps de réponse change si tu sélectionnes une autre réponse !**`,
             },
             {
                 name: 'Bouton',
@@ -77,11 +83,15 @@ export class TriviaModel {
             },
             {
                 name: 'Sommaire',
-                value: 'Tous les jours, au lancement du bot, un sommaire sera envoyé. Il contient le top 5 des joueurs pour chaque question en terme de vitesse de réponse, ainsi que la bonne réponse et des informations sur les autres chars.',
+                value: 'Tous les jours, au lancement du bot, un sommaire sera envoyé. Il contient le top 3 des joueurs pour chaque question en terme de vitesse de réponse, ainsi que la bonne réponse et des informations sur les autres chars.',
             },
             {
                 name: 'AFK',
                 value: "En cas d'absence de jeu pendant une journée, une perte de `1.8% de vos points` sera appliquée.",
+            },
+            {
+                name: 'Valeur',
+                value: `${EmojiEnum.WARNING} Les valeurs indiquées dans les paragraphes précédent peuvent être modifiées sans avoir été mis à jour dans le texte. Une communication pourra être fais dans ce cas la !`,
             }
         );
     /**
@@ -89,7 +99,7 @@ export class TriviaModel {
      */
     private readonly embedExample: EmbedBuilder = new EmbedBuilder()
         .setTitle('Example de question')
-        .setDescription("Dans cette exemple, les boutons sont clickable mais aucune logique n'est implémenté !")
+        .setDescription("Dans cette exemple, les boutons sont clickable mais aucune logique n'est implémentée !")
         .setColor(Colors.Blurple)
         .setFields(
             {
@@ -104,7 +114,7 @@ export class TriviaModel {
             }
         );
     /**
-     *
+     * The row builder for the example
      */
     private readonly rowExample: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>()
         .addComponents(new ButtonBuilder().setCustomId('Object 140').setLabel('Object 140').setStyle(ButtonStyle.Primary))
@@ -115,39 +125,40 @@ export class TriviaModel {
 
     //region PRIVATE FIELDS
     /**
-     * The maximum duration of a trivia question
+     * @see TriviaData.max_duration_of_question
      * @unit minute
      */
-    private maxQuestionDuration: number;
+    private maxQuestionDuration: TriviaData['max_duration_of_question'];
     /**
-     * The maximum time to get extra point for the trivia game
+     * @see TriviaData.max_response_time_limit
      * @unit second
      */
-    private responseTimeLimit: number;
+    private responseTimeLimit: TriviaData['max_response_time_limit'];
     /**
-     * The information stored in the statistique about the trivia game
+     * @see TriviaData.max_number_of_question
      */
-    private triviaStatistic: TriviaStatistic;
+    private maxNumberOfQuestion: TriviaData['max_number_of_question'];
     /**
      * The map of all players with there metadata
      */
     private datum: Map<
         string,
         {
-            daily: DailyTrivia;
-            stats: MonthlyTriviaPlayerStatistic;
+            player: TriviaPlayer;
+            questionNumber: number;
             interaction: ChatInputCommandInteraction;
         }
     >;
+
     //endregion
 
     /**
      * Initialize the class
      */
-    public initialize(): void {
-        this.maxQuestionDuration = TimeEnum.MINUTE * this.inventory.trivia.max_duration_of_question;
-        this.responseTimeLimit = TimeEnum.SECONDE * this.inventory.trivia.max_response_time_limit;
-        this.triviaStatistic = this.statistic.trivia;
+    public async initialize(): Promise<void> {
+        this.maxQuestionDuration = TimeEnum.MINUTE * (await this.triviaTable.getMaxDurationOfQuestion());
+        this.responseTimeLimit = TimeEnum.SECONDE * (await this.triviaTable.getMaxResponseTimeLimit());
+        this.maxNumberOfQuestion = await this.triviaTable.getMaxNumberOfQuestion();
         this.datum = new Map();
     }
 
@@ -166,19 +177,36 @@ export class TriviaModel {
      * @param {ChatInputCommandInteraction} interaction - The chat interaction of the player
      */
     public async sendGame(interaction: ChatInputCommandInteraction): Promise<void> {
-        this.statistic.initializeTriviaMonth(interaction.user.username);
+        let player: TriviaPlayer = await this.playersTable.getPlayerByName(interaction.user.username);
 
-        if (
-            this.triviaStatistic.player[interaction.user.username][this.statistic.currentMonth].daily[this.statistic.currentDay]
-                ?.participation >= this.inventory.trivia.max_number_of_question
-        ) {
+        if (!player) {
+            try {
+                const added = await this.playersTable.addPlayer(interaction.user.username);
+
+                if (!added) {
+                    throw new Error('Return false');
+                }
+
+                this.logger.info('New player added to trivia database {}', interaction.user.username);
+                player = await this.playersTable.getPlayerByName(interaction.user.username);
+            } catch (reason) {
+                await interaction.editReply({
+                    content: 'Il y a un problème avec la base de données, merci de réessayer plus tard',
+                });
+                this.logger.error(`Failed to insert new player in database with error : ${reason}`);
+                return;
+            }
+        }
+
+        const numberOfAnswer: number = await this.playerAnswerTable.countAnswerOfPlayer(player.id);
+        if (numberOfAnswer >= this.maxNumberOfQuestion) {
             await interaction.editReply({
-                content: `Tu as atteint le nombre maximum de question par jour ! (actuellement ${this.inventory.trivia.max_number_of_question} par jour)\nReviens demain pour pouvoir rejouer !`,
+                content: `Tu as atteint le nombre maximum de question par jour ! (actuellement ${this.maxNumberOfQuestion} par jour)\nReviens demain pour pouvoir rejouer !`,
             });
             return;
         }
 
-        if (this.datum.get(interaction.user.username)) {
+        if (this.datum.get(player.name)) {
             await interaction.editReply({
                 content: `Tu as déjà une parti de trivia en cours ! Merci d'attendre que la partie précédente ce termine avant de lancer une nouvelle partie`,
             });
@@ -186,15 +214,14 @@ export class TriviaModel {
         }
 
         const value = {
-            daily:
-                this.triviaStatistic.player[interaction.user.username][this.statistic.currentMonth].daily[this.statistic.currentDay] || {},
-            stats: this.triviaStatistic.player[interaction.user.username][this.statistic.currentMonth],
+            player: player,
+            questionNumber: numberOfAnswer,
             interaction: interaction,
         };
 
-        this.datum.set(interaction.user.username, value);
+        this.datum.set(player.name, value);
 
-        const { allTanks, datum } = this.getData(interaction.user.username);
+        const { allTanks, selectedTanks } = this.getData(player.name);
 
         if (!allTanks || allTanks.length === 0) {
             await interaction.editReply({
@@ -204,19 +231,15 @@ export class TriviaModel {
             return;
         }
 
-        const ammo: Ammo = datum.tank.default_profile.ammo[datum.ammoIndex];
+        const ammo: Ammo = selectedTanks.tank.ammo[selectedTanks.ammoIndex];
 
         const target = new Date();
-        target.setTime(target.getTime() + this.inventory.trivia.max_duration_of_question * TimeEnum.MINUTE);
+        target.setTime(target.getTime() + this.maxQuestionDuration);
 
         const startGameEmbed: EmbedBuilder = new EmbedBuilder()
             .setTitle('Devine le bon char')
             .setFooter({ text: 'Trivia Game' })
-            .setDescription(
-                `Tu es entrain de répondre à la question n°\`${value.daily.participation + 1 || 1}\` sur ${
-                    this.inventory.trivia.max_number_of_question
-                }`
-            )
+            .setDescription(`Tu es entrain de répondre à la question n°\`${numberOfAnswer + 1}\` sur ${this.maxNumberOfQuestion}`)
             .setColor(Colors.Blurple)
             .setFields(
                 {
@@ -231,8 +254,10 @@ export class TriviaModel {
                 }
             );
 
-        const row: ActionRowBuilder<ButtonBuilder> = allTanks.reduce((rowBuilder: ActionRowBuilder<ButtonBuilder>, data: VehicleData) => {
-            rowBuilder.addComponents(new ButtonBuilder().setCustomId(`${data.name}`).setLabel(data.name).setStyle(ButtonStyle.Primary));
+        const row: ActionRowBuilder<ButtonBuilder> = allTanks.reduce((rowBuilder: ActionRowBuilder<ButtonBuilder>, data: Tank) => {
+            rowBuilder.addComponents(
+                new ButtonBuilder().setCustomId(`${data.name}#${data.id}`).setLabel(data.name).setStyle(ButtonStyle.Primary)
+            );
             return rowBuilder;
         }, new ActionRowBuilder<ButtonBuilder>());
 
@@ -251,9 +276,18 @@ export class TriviaModel {
      * @param {ChatInputCommandInteraction} interaction - The interaction object representing the user command.
      */
     public async sendStatistics(interaction: ChatInputCommandInteraction): Promise<void> {
-        const playerStats = this.triviaStatistic.player[interaction.user.username];
+        const player: TriviaPlayer = await this.playersTable.getPlayerByName(interaction.user.username);
 
-        if (!playerStats) {
+        if (!player) {
+            await interaction.editReply({
+                content: "Tu n'as pas encore joué à Trivia. Essaye après avoir répondu au moins une fois au jeu. (`/trivia game`)",
+            });
+            return;
+        }
+
+        const lastAnswer: TriviaAnswer = await this.playerAnswerTable.getLastAnswerOfPlayer(player.id);
+
+        if (!lastAnswer) {
             await interaction.editReply({
                 content:
                     "Tu n'as pas encore de statistiques pour le jeu Trivia. Essaye après avoir répondu au moins une fois au jeu. (`/trivia game`)",
@@ -261,13 +295,28 @@ export class TriviaModel {
             return;
         }
 
+        const periods: Date[] = (await this.playerAnswerTable.getAllPeriodsOfPlayer(player.id))
+            .map(({ month, year }) => {
+                const date = new Date();
+
+                date.setMonth(month - 1);
+                date.setFullYear(year);
+
+                return date;
+            })
+            .reverse();
+
         const select: StringSelectMenuBuilder = new StringSelectMenuBuilder()
             .setCustomId('trivia-statistics-select')
             .setPlaceholder('Choisissez un mois');
 
-        Object.keys(playerStats)
-            .reverse()
-            .forEach((month: string) => select.addOptions(new StringSelectMenuOptionBuilder().setLabel(month).setValue(month)));
+        periods.forEach((date: Date) =>
+            select.addOptions(
+                new StringSelectMenuOptionBuilder()
+                    .setLabel(`${date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}`)
+                    .setValue(`${date}`)
+            )
+        );
 
         const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(select);
         const message: Message<BooleanCache<CacheType>> = await interaction.editReply({
@@ -278,45 +327,43 @@ export class TriviaModel {
         message
             .createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: TimeEnum.HOUR })
             .on('collect', async (i: StringSelectMenuInteraction): Promise<void> => {
-                const stats = playerStats[i.values[0]];
+                const date = new Date(i.values[0]);
+
+                const stats: TriviaAnswer[] = await this.playerAnswerTable.getPeriodAnswerOfPlayer(player.id, date);
+                const winStreak: WinStreak = await this.winStreakTable.getWinStreakFromDate(player.id, date);
 
                 const embed = new EmbedBuilder()
-                    .setTitle(`Statistiques pour le mois de ${i.values[0]}`)
+                    .setTitle(
+                        `Statistiques pour le mois de ${date.toLocaleDateString('fr-FR', {
+                            month: 'long',
+                            year: 'numeric',
+                        })}`
+                    )
                     .setColor(Colors.LuminousVividPink)
                     .setDescription('Voici les statistiques demandées')
                     .setFields(
-                        { name: 'Elo', value: `\`${stats.elo}\``, inline: true },
+                        { name: 'Elo', value: `\`${stats[stats.length - 1].elo}\``, inline: true },
                         {
                             name: 'Nombre de bonnes réponses',
-                            value: `\`${Object.values(stats.daily).reduce((number: number, currentValue: DailyTrivia) => {
-                                number += currentValue.right_answer;
-                                return number;
+                            value: `\`${stats.reduce((number: number, { right_answer }) => {
+                                return number + (right_answer ? 1 : 0);
                             }, 0)}\``,
                             inline: true,
                         },
-                        { name: 'Plus longue séquence correcte', value: `\`${stats.win_streak.max}\`` },
+                        { name: 'Plus longue séquence correcte', value: `\`${winStreak.max}\`` },
                         {
                             name: 'Réponse la plus rapide',
-                            value: `\`${
-                                Math.min(...Object.values(stats.daily).flatMap((daily: DailyTrivia) => daily.answer_time)) /
-                                TimeEnum.SECONDE
-                            }\` sec`,
+                            value: `\`${Math.min(...stats.filter(({ answer_time }) => answer_time !== null).flatMap(({ answer_time }) => answer_time as number)) / TimeEnum.SECONDE}\` sec`,
                             inline: true,
                         },
                         {
                             name: 'Réponse la plus longue',
-                            value: `\`${
-                                Math.max(...Object.values(stats.daily).flatMap((daily: DailyTrivia) => daily.answer_time)) /
-                                TimeEnum.SECONDE
-                            }\` sec`,
+                            value: `\`${Math.max(...stats.filter(({ answer_time }) => answer_time !== null).flatMap(({ answer_time }) => answer_time as number)) / TimeEnum.SECONDE}\` sec`,
                             inline: true,
                         },
                         {
                             name: 'Nombre de participation',
-                            value: `\`${Object.values(stats.daily).reduce((number: number, currentValue: DailyTrivia) => {
-                                number += currentValue.participation;
-                                return number;
-                            }, 0)}\``,
+                            value: `\`${stats.filter(({ trivia_id }) => trivia_id !== null).length}\``,
                         }
                     );
 
@@ -330,28 +377,36 @@ export class TriviaModel {
      * Sends the scoreboard for the current month's trivia game.
      *
      * @param {ChatInputCommandInteraction} interaction - The interaction object representing the user's command interaction.
+     *
+     * Update here with database
      */
     public async sendScoreboard(interaction: ChatInputCommandInteraction): Promise<void> {
         const username = interaction.user.username;
         const embedScoreboard = new EmbedBuilder()
             .setTitle('Scoreboard')
-            .setDescription(`Voici le scoreboard du mois de \`${this.statistic.currentMonth}\` pour le jeu trivia`)
+            .setDescription(`Voici le scoreboard du mois de \`${DateUtil.getCurrentMonth()}\` pour le jeu trivia`)
             .setFooter({ text: 'Trivia game' })
             .setColor(Colors.Fuchsia);
 
-        if (Object.values(this.triviaStatistic.player).length === 0) {
+        const players: TriviaPlayer[] = await this.playersTable.getAllPlayers();
+
+        if (players.length === 0) {
             await interaction.editReply({
                 content: "Aucun joueur n'a pour l'instant joué au jeu",
             });
             return;
         }
 
-        const playerStats = Object.entries(this.triviaStatistic.player)
-            .filter((player: [string, TriviaPlayerStatistic]) => player[1][this.statistic.currentMonth])
-            .sort(
-                (a: [string, TriviaPlayerStatistic], b: [string, TriviaPlayerStatistic]) =>
-                    b[1][this.statistic.currentMonth].elo - a[1][this.statistic.currentMonth].elo
-            );
+        const promises: Promise<(TriviaAnswer & TriviaPlayer) | null>[] = players.map(({ id }) =>
+            this.playerAnswerTable.getLastAnswerWithPlayerOfPlayer(id)
+        );
+
+        let playerStats = (await Promise.all(promises)).filter(
+            (value: (TriviaAnswer & TriviaPlayer) | null): boolean => value !== null
+        ) as Awaited<TriviaAnswer & TriviaPlayer>[];
+
+        const today = new Date();
+        playerStats = playerStats.filter(({ date }) => date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear());
 
         if (playerStats.length === 0) {
             await interaction.editReply({
@@ -360,14 +415,14 @@ export class TriviaModel {
             return;
         }
 
+        playerStats.sort((a: TriviaAnswer & TriviaPlayer, b: TriviaAnswer & TriviaPlayer) => b.elo - a.elo);
+
         embedScoreboard.addFields({
             name: 'Joueur - Elo',
             value: playerStats
                 .map(
-                    (player: [string, TriviaPlayerStatistic], index: number): string =>
-                        `${username === player[0] ? '`--> ' : ''}${index < 3 ? MEDAL[index] : index + 1}. ${player[0]} - ${
-                            player[1][this.statistic.currentMonth].elo
-                        }${username === player[0] ? ' <--`' : ''}`
+                    (player: TriviaAnswer & TriviaPlayer, index: number): string =>
+                        `${username === player.name ? '`--> ' : ''}${index < 3 ? MEDAL[index] : index + 1}. ${player.name} - ${player.elo}${username === player.name ? ' <--`' : ''}`
                 )
                 .join('\n'),
             inline: true,
@@ -388,12 +443,12 @@ export class TriviaModel {
      * @example
      * const { allTanks, datum } = this.getData(interaction.user.username);
      */
-    private getData(username: string): { allTanks: VehicleData[]; datum: TriviaSelected } {
+    private getData(username: string): { allTanks: Tank[]; selectedTanks: TriviaSelected } {
         const value = this.datum.get(username);
 
         return {
-            allTanks: this.trivia.allTanks[value?.daily.participation ?? 0],
-            datum: this.trivia.datum[value?.daily.participation ?? 0],
+            allTanks: this.trivia.allTanks[value?.questionNumber ?? 0],
+            selectedTanks: this.trivia.selectedTanks[value?.questionNumber ?? 0],
         };
     }
 
@@ -433,8 +488,8 @@ export class TriviaModel {
 
                         await playerAnswer.interaction?.editReply({
                             content: hasAlreadyAnswer
-                                ? `Ta réponse a été mise à jour en \`${interaction.customId}\``
-                                : `Ta réponse \`${interaction.customId}\` a été enregistrée !`,
+                                ? `Ta réponse a été mise à jour en \`${interaction.customId.split('#')[0]}\``
+                                : `Ta réponse \`${interaction.customId.split('#')[0]}\` a été enregistrée !`,
                         });
 
                         changedAnswer = true;
@@ -483,19 +538,19 @@ export class TriviaModel {
      */
     private async sendAnswerToPlayer(playerAnswer: PlayerAnswer, username: string): Promise<void> {
         const { interaction } = this.datum.get(username) || {};
-        const { allTanks, datum } = this.getData(username);
+        const { allTanks, selectedTanks } = this.getData(username);
 
         const isGoodAnswer = this.isGoodAnswer(playerAnswer, username);
 
-        const answerEmbed: EmbedBuilder = this.createAnswerEmbed(true, datum.tank, isGoodAnswer);
+        const answerEmbed: EmbedBuilder = this.createAnswerEmbed(true, selectedTanks.tank, isGoodAnswer);
 
         const otherAnswer: EmbedBuilder[] = [];
 
-        const ammo: Ammo = datum.tank.default_profile.ammo[datum.ammoIndex];
+        const ammo: Ammo = selectedTanks.tank.ammo[selectedTanks.ammoIndex];
 
-        allTanks.forEach((vehicle: VehicleData): void => {
-            const vehicleAmmo: Ammo = vehicle.default_profile.ammo[datum.ammoIndex];
-            if (vehicle.name !== datum.tank.name && this.checkVehicleAmmoDetail(vehicleAmmo, ammo)) {
+        allTanks.forEach((vehicle: Tank): void => {
+            const vehicleAmmo: Ammo = vehicle.ammo[selectedTanks.ammoIndex];
+            if (vehicle.name !== selectedTanks.tank.name && this.checkVehicleAmmoDetail(vehicleAmmo, ammo)) {
                 this.logger.debug('Another tank has the same shell {}', vehicle.name);
                 otherAnswer.push(this.createAnswerEmbed(false, vehicle, isGoodAnswer));
             }
@@ -511,7 +566,7 @@ export class TriviaModel {
      * Create the answer embed to send to the player.
      *
      * @param {boolean} main - If this is the main answer or not
-     * @param {VehicleData} vehicle - The data of the tank
+     * @param {Tank} vehicle - The data of the tank
      * @param {boolean} isGoodAnswer - Is the player found the right answer or not
      *
      * @return {EmbedBuilder} - The response embed build by the bot to send to the player
@@ -520,33 +575,27 @@ export class TriviaModel {
      * const embed = this.createAnswerEmbed(true, {...}, true);
      * console.log(embed) // Embed{ title: "Réponse principale", color: Colors.Red, etc. }
      */
-    private createAnswerEmbed(main: boolean, vehicle: VehicleData, isGoodAnswer: boolean): EmbedBuilder {
+    private createAnswerEmbed(main: boolean, vehicle: Tank, isGoodAnswer: boolean): EmbedBuilder {
         return new EmbedBuilder()
             .setTitle(main ? 'Réponse principale' : 'Autre bonne réponse')
             .setColor(isGoodAnswer ? Colors.Green : Colors.Red)
-            .setImage(vehicle.images.big_icon)
+            .setImage(vehicle.image)
             .setDescription(main ? `Le char à deviner était : \`${vehicle.name}\`` : `Le char suivant \`${vehicle.name}\` à le mème obus !`)
             .setFooter({ text: 'Trivia Game' })
             .setFields(
                 {
                     name: 'Obus normal',
-                    value: `\`${ShellEnum[vehicle.default_profile.ammo[0].type as keyof typeof ShellEnum]} ${
-                        vehicle.default_profile.ammo[0].damage[1]
-                    }\``,
+                    value: `\`${ShellEnum[vehicle.ammo[0].type as keyof typeof ShellEnum]} ${vehicle.ammo[0].damage[1]}\``,
                     inline: true,
                 },
                 {
                     name: 'Obus spécial (ou gold)',
-                    value: `\`${ShellEnum[vehicle.default_profile.ammo[1].type as keyof typeof ShellEnum]} ${
-                        vehicle.default_profile.ammo[1].damage[1]
-                    }\``,
+                    value: `\`${ShellEnum[vehicle.ammo[1].type as keyof typeof ShellEnum]} ${vehicle.ammo[1].damage[1]}\``,
                     inline: true,
                 },
                 {
                     name: 'Obus explosif',
-                    value: `\`${ShellEnum[vehicle.default_profile.ammo[2].type as keyof typeof ShellEnum]} ${
-                        vehicle.default_profile.ammo[2].damage[1]
-                    }\``,
+                    value: `\`${ShellEnum[vehicle.ammo[2].type as keyof typeof ShellEnum]} ${vehicle.ammo[2].damage[1]}\``,
                     inline: true,
                 }
             );
@@ -573,29 +622,28 @@ export class TriviaModel {
      * @return {boolean} - True if the player answer is the good answer, false otherwise
      */
     private isGoodAnswer(playerAnswer: PlayerAnswer, username: string): boolean {
-        const { datum } = this.getData(username);
-        return playerAnswer?.response === datum.tank.name || this.isAnotherTanks(playerAnswer, username);
+        const { selectedTanks } = this.getData(username);
+        const tankId = Number(playerAnswer?.response.split('#')[1]);
+        return tankId === selectedTanks.tank.id || this.isAnotherTanks(tankId, username);
     }
 
     /**
      * Check if another tanks is the good answer.
      *
-     * @param {PlayerAnswer} playerResponse - The player answer
+     * @param {number} tankId - The id of the tank
      * @param {string} username - The player username
      *
      * @return {boolean} - True if another tanks is the good answer, false otherwise
      */
-    private isAnotherTanks(playerResponse: PlayerAnswer, username: string): boolean {
-        const { allTanks, datum } = this.getData(username);
-        const vehicle: VehicleData | undefined = allTanks.find(
-            (vehicle: VehicleData): boolean => vehicle.name === playerResponse?.response
-        );
+    private isAnotherTanks(tankId: number, username: string): boolean {
+        const { allTanks, selectedTanks } = this.getData(username);
+        const vehicle: Tank | undefined = allTanks.find((vehicle: Tank): boolean => vehicle.id === tankId);
 
         if (!vehicle) {
             return false;
         }
 
-        return this.checkVehicleAmmoDetail(vehicle.default_profile.ammo[datum.ammoIndex], datum.tank.default_profile.ammo[datum.ammoIndex]);
+        return this.checkVehicleAmmoDetail(vehicle.ammo[selectedTanks.ammoIndex], selectedTanks.tank.ammo[selectedTanks.ammoIndex]);
     }
 
     /**
@@ -626,25 +674,68 @@ export class TriviaModel {
             return;
         }
 
-        const { allTanks, datum } = this.getData(playerName);
+        const { allTanks, selectedTanks } = this.getData(playerName);
 
-        value.daily.participation++;
-        value.daily.answer.push(isGoodAnswer ? datum.tank.name : playerAnswer?.response);
-        value.daily.answer_time.push(playerAnswer?.responseTime);
-        value.daily.answer_date.push(new Date());
+        const lastAnswer: TriviaAnswer = await this.playerAnswerTable.getLastAnswerOfPlayer(value.player.id);
 
-        const oldElo = value.stats.elo;
-        value.stats.elo = this.calculateElo(oldElo, playerAnswer?.responseTime, isGoodAnswer);
+        const oldElo = lastAnswer?.elo ?? 0;
+        const elo = this.calculateElo(oldElo, playerAnswer?.responseTime, isGoodAnswer);
 
-        const winStreak = value.stats.win_streak;
+        try {
+            await this.playerAnswerTable.addAnswer(
+                value.player.id,
+                selectedTanks.id,
+                new Date(),
+                isGoodAnswer,
+                playerAnswer?.responseTime,
+                elo
+            );
 
-        if (isGoodAnswer) {
-            await this.handleGoodAnswer(winStreak, playerAnswer, oldElo, playerName);
-        } else {
-            await this.handleWrongAnswer(winStreak, playerAnswer, oldElo, playerName, allTanks, datum);
+            this.logger.info('Successfully add player {} answer in database', playerName);
+        } catch (reason) {
+            if (playerAnswer?.interaction) {
+                await playerAnswer.interaction.editReply({
+                    content: "Une erreur est survenue lors de l'enregistrement de ta réponse dans la base de données !",
+                });
+            }
+            this.logger.error(
+                StringUtil.transformToCode(`Failed to add answer of player {} in database, with error {}`, playerName, reason)
+            );
+            return;
         }
 
-        this.statistic.trivia = this.triviaStatistic;
+        let winStreak: WinStreak = await this.winStreakTable.getWinStreakFromDate(value.player.id, new Date());
+
+        if (!winStreak) {
+            try {
+                const added = await this.winStreakTable.addWinStreak(value.player.id);
+
+                if (!added) {
+                    await playerAnswer.interaction.editReply({
+                        content: 'Une erreur est survenue lors de la création de tes statistiques dans la base de données !',
+                    });
+                    this.logger.error(StringUtil.transformToCode(`Failed to create winstreak for player {} in database`, playerName));
+                    return;
+                }
+
+                this.logger.info('Successfully create winstreak for player {} in database', playerName);
+                winStreak = { max: 0, current: 0 };
+            } catch (reason) {
+                await playerAnswer.interaction.editReply({
+                    content: 'Une erreur est survenue lors de la création de tes statistiques dans la base de données !',
+                });
+                this.logger.error(
+                    StringUtil.transformToCode(`Failed to create winstreak for player {} in database, with error {}`, playerName, reason)
+                );
+                return;
+            }
+        }
+
+        if (isGoodAnswer) {
+            await this.handleGoodAnswer(winStreak, playerAnswer, oldElo, elo, playerName);
+        } else {
+            await this.handleWrongAnswer(winStreak, playerAnswer, oldElo, elo, playerName, allTanks, selectedTanks);
+        }
     }
 
     /**
@@ -675,18 +766,26 @@ export class TriviaModel {
      * @param {{ current: number; max: number }} winStreak - The player win streak
      * @param {PlayerAnswer} playerAnswer - The player answer
      * @param {number} oldElo - The player elo before the answer
+     * @param {number} newElo - The player elo after the answer
      * @param {string} playerName - The player username
      */
-    private async handleGoodAnswer(winStreak: WinStreak, playerAnswer: PlayerAnswer, oldElo: number, playerName: string): Promise<void> {
+    private async handleGoodAnswer(
+        winStreak: WinStreak,
+        playerAnswer: PlayerAnswer,
+        oldElo: number,
+        newElo: number,
+        playerName: string
+    ): Promise<void> {
         const value = this.datum.get(playerName);
 
         if (!value) {
             return;
         }
 
-        value.daily.right_answer++;
         winStreak.current++;
         winStreak.max = Math.max(winStreak.current, winStreak.max);
+
+        await this.updateWinStreak(playerName, winStreak, playerAnswer);
 
         await playerAnswer?.interaction.editReply({
             content: '',
@@ -698,7 +797,7 @@ export class TriviaModel {
                     .setFooter({ text: 'Trivia Game' })
                     .setFields({
                         name: 'Elo',
-                        value: `Ton nouvelle elo est : \`${value.stats.elo}\` (modification de \`${value.stats.elo - oldElo}\`)`,
+                        value: `Ton nouvelle elo est : \`${newElo}\` (modification de \`${newElo - oldElo}\`)`,
                     }),
             ],
         });
@@ -711,16 +810,18 @@ export class TriviaModel {
      * @param {{ current: number; max: number }} winStreak - The player win streak
      * @param {PlayerAnswer} playerAnswer - The player answer
      * @param {number} oldElo - The player elo before the answer
+     * @param {number} newElo - The player elo after the answer
      * @param {string} playerName - The player username
-     * @param {VehicleData[]} allTanks - All the tanks available for the question
+     * @param {Tank[]} allTanks - All the tanks available for the question
      * @param {TriviaSelected} datum - The tank selected for the question
      */
     private async handleWrongAnswer(
         winStreak: WinStreak,
         playerAnswer: PlayerAnswer,
         oldElo: number,
+        newElo: number,
         playerName: string,
-        allTanks: VehicleData[],
+        allTanks: Tank[],
         datum: TriviaSelected
     ): Promise<void> {
         this.logger.debug('Player {} failed to find the right answer', playerName);
@@ -736,13 +837,15 @@ export class TriviaModel {
         }
 
         winStreak.current = 0;
-        const tank = allTanks.find((tank: VehicleData): boolean => tank.name === playerAnswer?.response);
+        await this.updateWinStreak(playerName, winStreak, playerAnswer);
+
+        const tank = allTanks.find((tank: Tank): boolean => tank.name === playerAnswer?.response);
 
         if (!tank) {
             return;
         }
 
-        const ammo = tank.default_profile.ammo[datum.ammoIndex];
+        const ammo = tank.ammo[datum.ammoIndex];
         await playerAnswer?.interaction.editReply({
             content: '',
             embeds: [
@@ -751,7 +854,7 @@ export class TriviaModel {
                     .setDescription("Tu n'a malheureusement pas trouvée la bonne réponse")
                     .setColor(Colors.Red)
                     .setFooter({ text: 'Trivia Game' })
-                    .setImage(tank.images.big_icon)
+                    .setImage(tank.image)
                     .setFields(
                         {
                             name: 'Char sélectionné',
@@ -770,10 +873,38 @@ export class TriviaModel {
                         },
                         {
                             name: 'Elo',
-                            value: `Ton nouvelle elo est : \`${value.stats.elo}\` (modification de \`${value.stats.elo - oldElo}\`)`,
+                            value: `Ton nouvelle elo est : \`${newElo}\` (modification de \`${newElo - oldElo}\`)`,
                         }
                     ),
             ],
         });
+    }
+
+    /**
+     * Updates the winstreak for a player in the database.
+     *
+     * @param {string} playerName - The name of the player.
+     * @param {WinStreak} winStreak - The player's current winstreak data.
+     * @param {PlayerAnswer} playerAnswer - The interaction object of the player's answer.
+     */
+    private async updateWinStreak(playerName: string, winStreak: WinStreak, playerAnswer: PlayerAnswer): Promise<void> {
+        const value = this.datum.get(playerName);
+
+        if (!value) {
+            return;
+        }
+
+        try {
+            await this.winStreakTable.updateWinStreak(value.player.id, new Date(), winStreak);
+            this.logger.info('Successfully update winstreak for player {} in database', playerName);
+        } catch (reason) {
+            await playerAnswer.interaction.editReply({
+                content: 'Une erreur est survenue lors de la mise à jour de tes statistiques dans la base de données !',
+            });
+            this.logger.error(
+                StringUtil.transformToCode(`Failed to update winstreak for player {} in database, with error {}`, playerName, reason)
+            );
+            return;
+        }
     }
 }

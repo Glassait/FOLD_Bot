@@ -1,15 +1,21 @@
 import type { AxiosInstance } from 'axios';
 import { type Client, Colors, EmbedBuilder, type TextChannel } from 'discord.js';
-import { WotApiModel } from '../../../shared/apis/wot-api.model';
-import type { Logger } from '../../../shared/classes/logger';
-import { Injectable, LoggerInjector } from '../../../shared/decorators/injector.decorator';
+import { WotApiModel } from '../../../shared/apis/wot-api/wot-api.model';
+import { LoggerInjector } from '../../../shared/decorators/injector/logger-injector.decorator';
+import { Singleton } from '../../../shared/decorators/injector/singleton-injector.decorator';
+import { Table } from '../../../shared/decorators/injector/table-injector.decorator';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
-import type { FeatureSingleton } from '../../../shared/singleton/feature.singleton';
-import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
-import type { StatisticSingleton } from '../../../shared/singleton/statistic.singleton';
-import type { Clan, PlayerBlacklistedDetail } from '../../../shared/types/feature.type';
+import type { BlacklistedPlayersTable } from '../../../shared/tables/complexe-table/blacklisted-players/blacklisted-players.table';
+import type { BlacklistedPlayer } from '../../../shared/tables/complexe-table/blacklisted-players/model/blacklisted-players.type';
+import type { ChannelsTable } from '../../../shared/tables/complexe-table/channels/channels.table';
+import type { FoldRecruitmentTable } from '../../../shared/tables/complexe-table/fold-recruitment/fold-recruitment.table';
+import type { LeavingPlayersTable } from '../../../shared/tables/complexe-table/leaving-players/leaving-players.table';
+import type { Clan } from '../../../shared/tables/complexe-table/watch-clans/models/watch-clans.type';
+import type { WatchClansTable } from '../../../shared/tables/complexe-table/watch-clans/watch-clans.table';
+import type { Logger } from '../../../shared/utils/logger';
 import { StringUtil } from '../../../shared/utils/string.util';
+import { UserUtil } from '../../../shared/utils/user.util';
 import { FoldRecruitmentEnum, WotClanActivity } from '../enums/fold-recruitment.enum';
 import type { ClanActivity, FoldRecruitmentData, LeaveClanActivity, Players } from '../types/fold-recruitment.type';
 
@@ -26,11 +32,13 @@ export class FoldRecruitmentModel {
 
     //region INJECTABLE
     private readonly logger: Logger;
-    @Injectable('Axios', TimeEnum.SECONDE * 30) private readonly axios: AxiosInstance;
-    @Injectable('Inventory') private readonly inventory: InventorySingleton;
-    @Injectable('Statistic') private readonly statistic: StatisticSingleton;
-    @Injectable('Feature') private readonly feature: FeatureSingleton;
     private readonly wotApiModel: WotApiModel = new WotApiModel();
+    @Singleton('Axios', TimeEnum.SECONDE * 30) private readonly axios: AxiosInstance;
+    @Table('WatchClans') private readonly watchClans: WatchClansTable;
+    @Table('BlacklistedPlayers') private readonly blacklistedPlayers: BlacklistedPlayersTable;
+    @Table('LeavingPlayers') private readonly leavingPlayers: LeavingPlayersTable;
+    @Table('Channels') private readonly channels: ChannelsTable;
+    @Table('FoldRecruitment') private readonly foldRecruitment: FoldRecruitmentTable;
     //endregion
 
     //region PRIVATE FIELDS
@@ -95,28 +103,29 @@ export class FoldRecruitmentModel {
      * @param {Client} client - The Discord client instance.
      */
     public async initialise(client: Client): Promise<void> {
-        this.channel = await this.inventory.getChannelForFoldRecruitment(client);
+        this.channel = await UserUtil.fetchChannelFromClient(client, await this.channels.getFoldRecruitment());
 
-        this.url = this.inventory.foldRecruitment.newsfeed_url;
-        this.clanUrl = this.inventory.foldRecruitment.clan_url;
-        this.tomato = this.inventory.foldRecruitment.tomato_url;
-        this.wargaming = this.inventory.foldRecruitment.wargaming_url;
-        this.wotLife = this.inventory.foldRecruitment.wot_life_url;
+        this.url = await this.foldRecruitment.getUrl('newsfeed');
+        this.clanUrl = await this.foldRecruitment.getUrl('clan');
+        this.tomato = await this.foldRecruitment.getUrl('tomato');
+        this.wargaming = await this.foldRecruitment.getUrl('wargaming');
+        this.wotLife = await this.foldRecruitment.getUrl('wot_life');
     }
 
     /**
      * Fetches the activity of a clan and sends a message to the designated channel.
      *
-     * @param {string} clanId - The unique identifier of the clan.
-     * @param {Clan} clan - The clan for which the activity is to be fetched.
+     * @param {Clan} clan - The clan for which the activity have to be fetched.
      */
-    public async fetchClanActivity(clanId: string, clan: Clan): Promise<void> {
-        const url: string = this.url.replace(FoldRecruitmentEnum.CLAN_ID, clanId).replace('today', new Date().toISOString().slice(0, 19));
+    public async fetchClanActivity(clan: Clan): Promise<void> {
+        const url: string = this.url
+            .replace(FoldRecruitmentEnum.CLAN_ID, String(clan.id))
+            .replace('today', new Date().toISOString().slice(0, 19));
 
-        if (!clan.imageUrl) {
+        if (!clan.image_url) {
             try {
-                clan.imageUrl = (await this.wotApiModel.fetchClanImage(clan.name)).data[0]?.emblems?.x64?.portal;
-                this.feature.updateClan(clanId, clan);
+                clan.image_url = (await this.wotApiModel.fetchClanImage(clan.name)).data[0]?.emblems?.x64?.portal;
+                await this.watchClans.updateClan(clan);
             } catch (error) {
                 this.logger.error('An error occurred while fetching the image of the clan', error);
             }
@@ -124,7 +133,7 @@ export class FoldRecruitmentModel {
 
         try {
             this.logger.debug('Fetching activity of the clan with url: {}', url);
-            return await this.manageClanActivities(clanId, clan, (await this.axios.get(url)).data);
+            return await this.manageClanActivities(clan, (await this.axios.get(url)).data);
         } catch (error) {
             this.logger.error('An error occurred while fetching the activity of the clan', error);
         }
@@ -142,25 +151,23 @@ export class FoldRecruitmentModel {
      * Manages clan activities by processing the Fold recruitment data.
      * Updates clan information and sends notifications for players leaving the clan.
      *
-     * @param {string} clanId - The ID of the clan.
      * @param {Clan} clan - The clan object.
      * @param {FoldRecruitmentData} data - The Fold recruitment data.
      */
-    private async manageClanActivities(clanId: string, clan: Clan, data: FoldRecruitmentData): Promise<void> {
-        const { datum, extracted } = this.extractPlayerFromFeed(data, clanId);
+    private async manageClanActivities(clan: Clan, data: FoldRecruitmentData): Promise<void> {
+        const { datum, extracted } = this.extractPlayerFromFeed(data, clan);
 
         this.logger.debug('{} players leaves the clan', datum.length);
 
         for (const player of datum) {
-            await this.buildAndSendEmbedForPlayer(player, clanId, clan);
-            this.feature.addLeavingPlayer(player.id);
+            await this.buildAndSendEmbedForPlayer(player, clan);
+            await this.leavingPlayers.addPlayer(player.id);
         }
 
         if (extracted.length > 0) {
             this._noPlayerFound = false;
             clan.last_activity = extracted[0].created_at;
-            this.feature.updateClan(clanId, clan);
-            this.statistic.updateClanStatistics(clanId, datum.length);
+            await this.watchClans.updateClan(clan);
         }
     }
 
@@ -168,17 +175,16 @@ export class FoldRecruitmentModel {
      * Builds and sends an embed message for a player who has left a clan and can be recruited.
      *
      * @param {Players} player - The player who has left the clan.
-     * @param {string} clanId - The unique identifier of the clan.
      * @param {Clan} clan - The clan from which the player has left.
      */
-    private async buildAndSendEmbedForPlayer(player: Players, clanId: string, clan: Clan): Promise<void> {
-        const blacklisted: PlayerBlacklistedDetail | undefined = this.feature.playerBlacklisted[player.id];
+    private async buildAndSendEmbedForPlayer(player: Players, clan: Clan): Promise<void> {
+        const blacklisted: BlacklistedPlayer | undefined = (await this.blacklistedPlayers.getPlayer(player.id)).shift();
 
         const embedPlayer: EmbedBuilder = new EmbedBuilder()
             .setAuthor({
                 name: `${clan.name} ${EmojiEnum.REDIRECTION}`,
-                iconURL: clan.imageUrl,
-                url: this.clanUrl.replace(FoldRecruitmentEnum.CLAN_ID, clanId),
+                iconURL: clan.image_url,
+                url: this.clanUrl.replace(FoldRecruitmentEnum.CLAN_ID, String(clan.id)),
             })
             .setTitle(blacklisted ? 'Joueur sur liste noire détecté' : 'Nouveau joueur pouvant être recruté')
             .setDescription(
@@ -227,21 +233,20 @@ export class FoldRecruitmentModel {
      * Extracts players and leave clan activities from the given clan activity feed data.
      *
      * @param {FoldRecruitmentData} data - The clan activity feed data.
-     * @param {string} clanId - The unique identifier of the clan.
+     * @param {Clan} clan - The clan to extract player from feed
      *
      * @returns {{ datum: Players[]; extracted: LeaveClanActivity[] }} - An object containing extracted players and leave clan activities.
      */
     private extractPlayerFromFeed(
         data: FoldRecruitmentData,
-        clanId: string
+        clan: Clan
     ): {
         datum: Players[];
         extracted: LeaveClanActivity[];
     } {
         const extracted: LeaveClanActivity[] = data.items.filter(
             (item: ClanActivity): boolean =>
-                item.subtype === WotClanActivity.LEAVE_CLAN &&
-                new Date(item.created_at) > new Date(this.feature.watchClans[clanId].last_activity ?? '')
+                item.subtype === WotClanActivity.LEAVE_CLAN && new Date(item.created_at) > new Date(clan?.last_activity ?? '')
         ) as unknown as LeaveClanActivity[];
 
         const datum: Players[] = extracted.flatMap((activity: LeaveClanActivity) =>

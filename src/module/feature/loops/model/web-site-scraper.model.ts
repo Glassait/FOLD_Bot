@@ -1,12 +1,15 @@
 import type { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 import { type CheerioAPI, load } from 'cheerio';
 import type { Client, TextChannel } from 'discord.js';
-import type { Logger } from '../../../shared/classes/logger';
-import { Injectable, LoggerInjector } from '../../../shared/decorators/injector.decorator';
+import { LoggerInjector } from '../../../shared/decorators/injector/logger-injector.decorator';
+import { Singleton } from '../../../shared/decorators/injector/singleton-injector.decorator';
+import { Table } from '../../../shared/decorators/injector/table-injector.decorator';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
-import type { InventorySingleton } from '../../../shared/singleton/inventory.singleton';
-import type { WebSiteState } from '../../../shared/types/inventory.type';
+import type { ChannelsTable } from '../../../shared/tables/complexe-table/channels/channels.table';
+import type { NewsWebsite } from '../../../shared/tables/complexe-table/news-websites/models/news-websites.type';
+import type { Logger } from '../../../shared/utils/logger';
+import { UserUtil } from '../../../shared/utils/user.util';
 import { WebsiteNameEnum } from '../enums/website-name.enum';
 import type { WotExpress } from './news-scrapped/wot-express.model';
 
@@ -14,8 +17,8 @@ import type { WotExpress } from './news-scrapped/wot-express.model';
 export class WebSiteScraper {
     //region INJECTABLE
     private readonly logger: Logger;
-    @Injectable('Axios', TimeEnum.SECONDE * 10) private readonly axios: AxiosInstance;
-    @Injectable('Inventory') private readonly inventory: InventorySingleton;
+    @Singleton('Axios', TimeEnum.SECONDE * 10) private readonly axios: AxiosInstance;
+    @Table('Channels') private readonly channels: ChannelsTable;
     //endregion
 
     /**
@@ -29,33 +32,32 @@ export class WebSiteScraper {
      * @param {Client} client - The Discord client instance
      */
     public async initialise(client: Client): Promise<void> {
-        this.channel = await this.inventory.getNewsLetterChannel(client);
+        this.channel = await UserUtil.fetchChannelFromClient(client, await this.channels.getNewsWebsite());
     }
 
     /**
      * Launch the scrapping of the newsletter at the specific index
      *
-     * @param {index} index - The index of the website in the inventory
+     * @param {NewsWebsite} website - The news website to scrap
      */
-    public async scrapWebsiteAtIndex(index: number): Promise<void> {
-        const newsLetter: WebSiteState = this.inventory.getNewsLetterAtIndex(index);
-        this.logger.debug(`${EmojiEnum.MINE} Start scrapping {}`, newsLetter.name);
+    public async scrapWebsite(website: NewsWebsite): Promise<void> {
+        this.logger.debug(`${EmojiEnum.MINE} Start scrapping {}`, website.name);
 
         this.axios
-            .get(newsLetter.liveUrl)
+            .get(website.live_url)
             .then((response: AxiosResponse<string, any>): void => {
-                this.logger.debug('Fetching newsletter for {} end successfully', newsLetter.name);
-                this.getLastNews(response.data, newsLetter)
+                this.logger.debug('Fetching newsletter for {} end successfully', website.name);
+                this.getLastNews(response.data, website)
                     .then((): void => {
-                        this.logger.debug('Scraping newsletter {} end successfully', newsLetter.name);
+                        this.logger.debug('Scraping newsletter {} end successfully', website.name);
                     })
                     .catch(reason => {
-                        this.logger.error(`Scrapping newsletter for \`${newsLetter.name}\` failed: ${reason}`);
+                        this.logger.error(`Scrapping newsletter for \`${website.name}\` failed: ${reason}`);
                     });
             })
             .catch((error: AxiosError): void => {
                 this.logger.error(
-                    `Fetching newsletter for \`${newsLetter.name}\` failed with error \`${error.status}\` and message \`${error.message}\``,
+                    `Fetching newsletter for \`${website.name}\` failed with error \`${error.status}\` and message \`${error.message}\``,
                     error
                 );
             });
@@ -65,22 +67,22 @@ export class WebSiteScraper {
      * Use the Cheerios API to scrap the html
      *
      * @param {string} html - The html of the website
-     * @param {WebSiteState} webSiteState - The website scrapped
+     * @param {NewsWebsite} newsWebsite - The website scrapped
      */
-    public async getLastNews(html: string, webSiteState: WebSiteState): Promise<void> {
+    public async getLastNews(html: string, newsWebsite: NewsWebsite): Promise<void> {
         const $: CheerioAPI = load(html);
 
-        if (webSiteState.name === WebsiteNameEnum.WOT_EXPRESS) {
+        if (newsWebsite.name === WebsiteNameEnum.WOT_EXPRESS) {
             const req = require('./news-scrapped/wot-express.model');
 
             const wotExpress: WotExpress = new req.WotExpress($, this.channel);
-            await wotExpress.scrap(webSiteState);
-        } else if (webSiteState.name === WebsiteNameEnum.THE_ARMORED_PATROL) {
+            await wotExpress.scrap(newsWebsite);
+        } else if (newsWebsite.name === WebsiteNameEnum.THE_ARMORED_PATROL) {
             const req = require('./news-scrapped/the-armored-patrol.model');
 
             const theArmoredPatrol = new req.TheArmoredPatrol($, this.channel);
-            await theArmoredPatrol.scrap(webSiteState);
+            await theArmoredPatrol.scrap(newsWebsite);
         }
-        this.logger.debug(`${EmojiEnum.MINE} End scrapping for {}`, webSiteState.name);
+        this.logger.debug(`${EmojiEnum.MINE} End scrapping for {}`, newsWebsite.name);
     }
 }

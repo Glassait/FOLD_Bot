@@ -1,7 +1,7 @@
 import { Client, GatewayIntentBits } from 'discord.js';
 import { basename } from 'node:path';
 import { token } from './module/core/config.json';
-import { Logger } from './module/shared/classes/logger';
+import { Logger } from './module/shared/utils/logger';
 
 const logger: Logger = new Logger(basename(__filename));
 

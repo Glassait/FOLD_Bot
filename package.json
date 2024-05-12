@@ -4,7 +4,7 @@
 	"description": "A bot for the FOLD_ discord server and WoT clan",
 	"main": "src/index.ts",
 	"engines": {
-		"node": ">= 18.16.0"
+		"node": ">= 18.18.0"
 	},
 	"scripts": {
 		"start": "ts-node .",
@@ -29,26 +29,43 @@
 		"url": "https://github.com/Glassait/FOLD_Bot/issues"
 	},
 	"homepage": "https://github.com/Glassait/FOLD_Bot#readme",
+	"madge": {
+		"detectiveOptions": {
+			"fontSize": "12px",
+			"layout": "sfdp",
+			"graphVizOptions": {
+				"G": {
+					"rankdir": "LR",
+					"beautify": true
+				}
+			},
+			"es6": {
+				"mixedImports": true,
+				"skipTypeImports": true
+			}
+		}
+	},
 	"dependencies": {
-		"@napi-rs/canvas": "^0.1.51",
+		"@napi-rs/canvas": "^0.1.52",
 		"axios": "1.6.8",
 		"cheerio": "1.0.0-rc.12",
-		"discord.js": "^14.12.1",
+		"discord.js": "^14.14.1",
+		"mysql2": "^3.9.7",
 		"ts-node": "10.9.2"
 	},
 	"devDependencies": {
 		"@eslint/eslintrc": "^3.0.2",
-		"@eslint/js": "^9.0.0",
-		"@types/node": "20.12.7",
+		"@eslint/js": "^9.1.1",
+		"@types/node": "^20.12.7",
 		"@typescript-eslint/eslint-plugin": "^6.21.0",
 		"eslint": "^8.57.0",
-		"eslint-config-standard-with-typescript": "^43.0.1",
+		"eslint-config-love": "^43.1.0",
 		"eslint-plugin-import": "^2.29.1",
 		"eslint-plugin-n": "^16.6.2",
 		"eslint-plugin-promise": "^6.1.1",
 		"globals": "^15.0.0",
 		"prettier": "3.2.5",
 		"typescript": "^5.4.5",
-		"typescript-eslint": "^7.6.0"
+		"typescript-eslint": "^7.7.1"
 	}
 }

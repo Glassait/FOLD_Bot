@@ -2,9 +2,9 @@ import type { Client } from 'discord.js';
 import { readdirSync } from 'fs';
 import { basename } from 'node:path';
 import { join } from 'path';
-import { Logger } from '../../shared/classes/logger';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
 import { TimeEnum } from '../../shared/enums/time.enum';
+import { Logger } from '../../shared/utils/logger';
 import type { BotLoop } from '../loops/types/bot-loop.type';
 
 module.exports = async (client: Client): Promise<void> => {
