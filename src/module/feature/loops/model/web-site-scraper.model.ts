@@ -1,11 +1,13 @@
 import type { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 import { type CheerioAPI, load } from 'cheerio';
 import type { Client, TextChannel } from 'discord.js';
-import { Injectable, LoggerInjector, TableInjectable } from '../../../shared/decorators/injector.decorator';
+import { LoggerInjector } from '../../../shared/decorators/injector/logger-injector.decorator';
+import { Singleton } from '../../../shared/decorators/injector/singleton-injector.decorator';
+import { Table } from '../../../shared/decorators/injector/table-injector.decorator';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
-import type { ChannelsTable } from '../../../shared/tables/channels.table';
-import type { NewsWebsite } from '../../../shared/types/news_website.type';
+import type { ChannelsTable } from '../../../shared/tables/complexe-table/channels/channels.table';
+import type { NewsWebsite } from '../../../shared/tables/complexe-table/news-websites/models/news-websites.type';
 import type { Logger } from '../../../shared/utils/logger';
 import { UserUtil } from '../../../shared/utils/user.util';
 import { WebsiteNameEnum } from '../enums/website-name.enum';
@@ -15,8 +17,8 @@ import type { WotExpress } from './news-scrapped/wot-express.model';
 export class WebSiteScraper {
     //region INJECTABLE
     private readonly logger: Logger;
-    @Injectable('Axios', TimeEnum.SECONDE * 10) private readonly axios: AxiosInstance;
-    @TableInjectable('Channels') private readonly channels: ChannelsTable;
+    @Singleton('Axios', TimeEnum.SECONDE * 10) private readonly axios: AxiosInstance;
+    @Table('Channels') private readonly channels: ChannelsTable;
     //endregion
 
     /**

@@ -12,10 +12,12 @@ export class LoggerSingleton {
      * The directory where the logs are stored
      */
     private dir: string = './src/logs/';
+
     /**
      * The path to the log file
      */
     private path: string = `${this.dir}${new Date().toLocaleString('fr-FR').replace(/\//g, '-').replace(/ /g, '_').replace(/:/g, '-')}.md`;
+
     /**
      * The actual log text
      */

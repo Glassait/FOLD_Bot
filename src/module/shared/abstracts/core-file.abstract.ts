@@ -4,13 +4,19 @@ import type { Logger } from '../utils/logger';
 /**
  * Represents a core file handler.
  *
+ * * I keep this class because I think I code it well
+ *
  * @template DType - The type of data stored in the file.
+ *
+ * @deprecated
+ * @ignore
  */
 export class CoreFileAbstract<DType extends object> {
     /**
      * Logger instance, initialized in the child constructor
      */
     protected logger: Logger;
+
     /**
      * The data stored in the file
      */

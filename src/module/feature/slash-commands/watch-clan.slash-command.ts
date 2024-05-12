@@ -101,8 +101,7 @@ module.exports = new SlashCommandModel(
                 .addStringOption((builder: SlashCommandStringOption) =>
                     builder
                         .setName(MAPPING.BLACKLIST_PLAYER.optionsName[1])
-                        .setDescription('La raison de la mise en liste noire')
-                        .setRequired(true)
+                        .setDescription('La raison de la mise en liste noire, si vide remplis avec une raison par défaut')
                 ),
             new SlashCommandSubcommandBuilder()
                 .setName(MAPPING.UNBLACKLIST_PLAYER.name)

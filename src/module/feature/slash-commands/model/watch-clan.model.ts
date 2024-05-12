@@ -7,22 +7,38 @@ import {
     EmbedBuilder,
     type TextChannel,
 } from 'discord.js';
-import type { WotApiModel } from '../../../shared/apis/wot-api.model';
-import { Injectable, LoggerInjector, TableInjectable } from '../../../shared/decorators/injector.decorator';
-import type { BlacklistedPlayersTable } from '../../../shared/tables/blacklisted-players.table';
-import type { ChannelsTable } from '../../../shared/tables/channels.table';
-import type { FeatureFlippingTable } from '../../../shared/tables/feature-flipping.table';
-import type { WatchClansTable } from '../../../shared/tables/watch-clans.table';
-import type { BlacklistedPlayer } from '../../../shared/types/blacklisted-player.type';
-import type { WargamingSuccessType } from '../../../shared/types/wargaming-api.type';
-import type { Clan } from '../../../shared/types/watch-clan.type';
-import type { PlayerData } from '../../../shared/types/wot-api.type';
+import type { WargamingSuccessType } from '../../../shared/apis/wot-api/models/wargaming-api.type';
+import type { PlayerData } from '../../../shared/apis/wot-api/models/wot-api.type';
+import type { WotApiModel } from '../../../shared/apis/wot-api/wot-api.model';
+import { LoggerInjector } from '../../../shared/decorators/injector/logger-injector.decorator';
+import { Singleton } from '../../../shared/decorators/injector/singleton-injector.decorator';
+import { Table } from '../../../shared/decorators/injector/table-injector.decorator';
+import type { BlacklistedPlayersTable } from '../../../shared/tables/complexe-table/blacklisted-players/blacklisted-players.table';
+import type { BlacklistedPlayer } from '../../../shared/tables/complexe-table/blacklisted-players/model/blacklisted-players.type';
+import type { ChannelsTable } from '../../../shared/tables/complexe-table/channels/channels.table';
+import type { FeatureFlippingTable } from '../../../shared/tables/complexe-table/feature-flipping/feature-flipping.table';
+import type { Clan } from '../../../shared/tables/complexe-table/watch-clans/models/watch-clans.type';
+import type { WatchClansTable } from '../../../shared/tables/complexe-table/watch-clans/watch-clans.table';
 import type { Logger } from '../../../shared/utils/logger';
 import { StringUtil } from '../../../shared/utils/string.util';
 import { UserUtil } from '../../../shared/utils/user.util';
 
 @LoggerInjector
 export class WatchClanModel {
+    //region INJECTABLE
+    private readonly logger: Logger;
+    @Singleton('WotApi') private readonly wotApi: WotApiModel;
+    @Table('WatchClans') private readonly watchClans: WatchClansTable;
+    @Table('BlacklistedPlayers') private readonly blacklistedPlayers: BlacklistedPlayersTable;
+    @Table('Channels') private readonly channels: ChannelsTable;
+    @Table('FeatureFlipping') private readonly featureFlippingTable: FeatureFlippingTable;
+    //endregion
+
+    /**
+     * The default reason to be used when a player is not suitable for the clan without any specific reason provided.
+     */
+    private readonly defaultReason = 'Ce joueur ne convient pas au clan (aucune de raison fourni)';
+
     //region PRIVATE
     /**
      * Embed send to the recruitment chanel to confirm that the clan has been deleted or added
@@ -30,19 +46,13 @@ export class WatchClanModel {
     private confirmationEmbed: EmbedBuilder = new EmbedBuilder().setColor(Colors.Green);
     //endregion
 
-    //region INJECTABLE
-    private readonly logger: Logger;
-    @Injectable('WotApi') private readonly wotApi: WotApiModel;
-    @TableInjectable('WatchClans') private readonly watchClans: WatchClansTable;
-    @TableInjectable('BlacklistedPlayers') private readonly blacklistedPlayers: BlacklistedPlayersTable;
-    @TableInjectable('Channels') private readonly channels: ChannelsTable;
-    @TableInjectable('FeatureFlipping') private readonly featureFlippingTable: FeatureFlippingTable;
-    //endregion
+    //region GETTER-SETTER
     private _channel: TextChannel;
 
     get channel(): TextChannel {
         return this._channel;
     }
+    //endregion
 
     /**
      * Fetches and sets the channel for fold recruitment from the client.
@@ -220,7 +230,6 @@ export class WatchClanModel {
         let reason: string = interaction.options.get(optionsName[1])?.value as string;
         reason = StringUtil.escape(reason);
 
-        // TODO check value return by autocomplete
         let [id, name] = idAndName.split('#');
 
         if (!id || !name) {
@@ -245,7 +254,11 @@ export class WatchClanModel {
             return;
         }
 
-        const added: boolean = await this.blacklistedPlayers.addPlayer({ id: Number(id), name: name, reason: reason });
+        const added: boolean = await this.blacklistedPlayers.addPlayer({
+            id: Number(id),
+            name: name,
+            reason: reason ?? this.defaultReason,
+        });
 
         if (!added) {
             this.logger.debug('An error occur when adding player to blacklist');

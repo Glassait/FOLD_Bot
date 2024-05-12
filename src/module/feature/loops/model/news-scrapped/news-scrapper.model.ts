@@ -1,10 +1,11 @@
 import type { CheerioAPI } from 'cheerio';
 import { Colors, EmbedBuilder, type TextChannel } from 'discord.js';
-import { LoggerInjector, TableInjectable } from '../../../../shared/decorators/injector.decorator';
+import { LoggerInjector } from '../../../../shared/decorators/injector/logger-injector.decorator';
+import { Table } from '../../../../shared/decorators/injector/table-injector.decorator';
 import { EmojiEnum } from '../../../../shared/enums/emoji.enum';
-import type { BanWordsTable } from '../../../../shared/tables/ban-words.table';
-import type { NewsWebsitesTable } from '../../../../shared/tables/news-websites.table';
-import type { NewsWebsite } from '../../../../shared/types/news_website.type';
+import type { NewsWebsite } from '../../../../shared/tables/complexe-table/news-websites/models/news-websites.type';
+import type { NewsWebsitesTable } from '../../../../shared/tables/complexe-table/news-websites/news-websites.table';
+import type { BanWordsTable } from '../../../../shared/tables/simple-table/ban-words.table';
 import type { Logger } from '../../../../shared/utils/logger';
 
 /**
@@ -14,8 +15,8 @@ import type { Logger } from '../../../../shared/utils/logger';
 export class NewsScrapper {
     //region INJECTABLE
     private readonly logger: Logger;
-    @TableInjectable('NewsWebsites') private readonly newsWebsites: NewsWebsitesTable;
-    @TableInjectable('BanWords') private readonly banWords: BanWordsTable;
+    @Table('NewsWebsites') private readonly newsWebsites: NewsWebsitesTable;
+    @Table('BanWords') private readonly banWords: BanWordsTable;
     //endregion
 
     /**

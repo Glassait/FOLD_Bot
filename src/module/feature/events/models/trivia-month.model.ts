@@ -1,13 +1,16 @@
 import { type Client, Colors, EmbedBuilder, type TextChannel } from 'discord.js';
-import { LoggerInjector, TableInjectable } from '../../../shared/decorators/injector.decorator';
+import { LoggerInjector } from '../../../shared/decorators/injector/logger-injector.decorator';
+import { Table } from '../../../shared/decorators/injector/table-injector.decorator';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
-import type { ChannelsTable } from '../../../shared/tables/channels.table';
-import type { PlayersAnswersTable } from '../../../shared/tables/players-answers.table';
-import type { PlayersTable } from '../../../shared/tables/players.table';
-import type { TriviaTable } from '../../../shared/tables/trivia.table';
-import type { WinStreakTable } from '../../../shared/tables/win-streak.table';
-import type { TriviaAnswer, TriviaPlayer, WinStreak } from '../../../shared/types/table.type';
+import type { ChannelsTable } from '../../../shared/tables/complexe-table/channels/channels.table';
+import type { TriviaAnswer } from '../../../shared/tables/complexe-table/players-answers/models/players-answers.type';
+import type { PlayersAnswersTable } from '../../../shared/tables/complexe-table/players-answers/players-answers.table';
+import type { TriviaPlayer } from '../../../shared/tables/complexe-table/players/models/players.type';
+import type { PlayersTable } from '../../../shared/tables/complexe-table/players/players.table';
+import type { TriviaTable } from '../../../shared/tables/complexe-table/trivia/trivia.table';
+import type { WinStreak } from '../../../shared/tables/complexe-table/win-streak/models/win-streak.type';
+import type { WinStreakTable } from '../../../shared/tables/complexe-table/win-streak/win-streak.table';
 import { DateUtil } from '../../../shared/utils/date.util';
 import type { Logger } from '../../../shared/utils/logger';
 import { MathUtil } from '../../../shared/utils/math.util';
@@ -19,11 +22,11 @@ import { MEDAL } from '../../../shared/utils/variables.util';
 export class TriviaMonthModel {
     //region INJECTABLE
     private readonly logger: Logger;
-    @TableInjectable('Channels') private readonly channels: ChannelsTable;
-    @TableInjectable('PlayersAnswer') private readonly playersAnswersTable: PlayersAnswersTable;
-    @TableInjectable('Players') private readonly playersTable: PlayersTable;
-    @TableInjectable('WinStreak') private readonly winStreakTable: WinStreakTable;
-    @TableInjectable('Trivia') private readonly triviaTable: TriviaTable;
+    @Table('Channels') private readonly channels: ChannelsTable;
+    @Table('PlayersAnswer') private readonly playersAnswersTable: PlayersAnswersTable;
+    @Table('Players') private readonly playersTable: PlayersTable;
+    @Table('WinStreak') private readonly winStreakTable: WinStreakTable;
+    @Table('Trivia') private readonly triviaTable: TriviaTable;
     //endregion
 
     //region PRIVATE
@@ -116,7 +119,7 @@ export class TriviaMonthModel {
     private embedIntroduction(): void {
         this.listEmbed.push(
             new EmbedBuilder()
-                .setTitle(`Résumé du mois de ${this.month}`)
+                .setTitle(StringUtil.transformToCode(`Résumé du mois de {}`, DateUtil.convertDateToMonthYearString(this.month)))
                 .setDescription('Le dernier mois a été chargé en apprentissage. Découvrons les statistiques du mois.')
                 .setImage('https://us-wotp.wgcdn.co/dcont/fb/image/wall_february_2018_1024x600.jpg')
                 .setColor(Colors.DarkGold)
@@ -169,11 +172,11 @@ export class TriviaMonthModel {
                     value:
                         'Voila le reste du classement :\n\n' +
                         this.playerClassement
-                            .slice(3, -1)
+                            .slice(3)
                             .reduce(
                                 (text: string, [name, answer]) =>
                                     text +
-                                    StringUtil.transformToCode(`${1 + ++index} : ${name} avec {} points\n`, answer[answer.length - 1].elo),
+                                    StringUtil.transformToCode(`${1 + index++} : ${name} avec {} points\n`, answer[answer.length - 1].elo),
                                 ''
                             ),
                 });

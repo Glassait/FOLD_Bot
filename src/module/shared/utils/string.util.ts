@@ -31,16 +31,41 @@ export class StringUtil {
     }
 
     /**
-     * Sanitizes a string by removing leading and trailing whitespace, as well as single and double quotes.
+     * Sanitizes a string by removing quotation marks (`"` and `'`).
      *
-     * @param {string} text - The text to sanitize.
+     * @param {string} text The string to be sanitized.
      *
-     * @returns {string} - The sanitized text.
+     * @returns {string} The sanitized string with quotation marks (`"` and `'`) removed.
+     *
+     * @description
+     * This function removes quotation marks (`"` and `'`) from a string. This can be useful for security purposes to prevent potential XSS (Cross-Site Scripting) attacks. However, it's important to note that this method provides a basic level of sanitization and might not be sufficient for all scenarios.
+     *
+     * @warning This method only removes quotation marks and does not address all potential XSS vulnerabilities.
+     *
+     * @example
+     * const userInput = '"This string contains <script>alert("XSS!")</script>"';
+     * const sanitizedString = sanitize(userInput);
+     * console.log(sanitizedString); // Output: This string contains  alert("XSS!")
      */
     public static sanitize(text: string): string {
         return text.trim().replace(/["']/g, '');
     }
 
+    /**
+     * Escapes special characters in a string to be safely used within other contexts.
+     *
+     * @param {string} text The string to be escaped.
+     *
+     * @returns {string} The escaped string with quotation marks (`"` and `'`) replaced with their escaped versions (`\"` and `\'`).
+     *
+     * @description
+     * This function escapes quotation marks (`"` and `'`) within a string to prevent them from being interpreted literally when the string is used in other contexts, such as within HTML attributes or JavaScript code strings.
+     *
+     * @example
+     * const unescapedString = 'This string contains "double quotes"';
+     * const escapedString = escape(unescapedString);
+     * console.log(escapedString); // Output: This string contains \"double quotes\"
+     */
     public static escape(text: string): string {
         return text.trim().replace(/"/g, '\\"').replace(/'/g, "\\'");
     }

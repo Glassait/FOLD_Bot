@@ -1,9 +1,9 @@
 import type { Client } from 'discord.js';
 import { basename } from 'node:path';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
-import { FeatureFlippingTable } from '../../shared/tables/feature-flipping.table';
-import type { FoldRecruitmentTable } from '../../shared/tables/fold-recruitment.table';
-import type { WatchClansTable } from '../../shared/tables/watch-clans.table';
+import { FeatureFlippingTable } from '../../shared/tables/complexe-table/feature-flipping/feature-flipping.table';
+import type { FoldRecruitmentTable } from '../../shared/tables/complexe-table/fold-recruitment/fold-recruitment.table';
+import type { WatchClansTable } from '../../shared/tables/complexe-table/watch-clans/watch-clans.table';
 import { Logger } from '../../shared/utils/logger';
 import { TimeUtil } from '../../shared/utils/time.util';
 import type { FoldRecruitmentModel } from './model/fold-recruitment.model';
@@ -20,10 +20,10 @@ module.exports = {
             return;
         }
 
-        let req = require('../../shared/tables/watch-clans.table');
+        let req = require('../../shared/tables/complexe-table/watch-clans/watch-clans.table');
         const watchClan: WatchClansTable = new req.WatchClansTable();
 
-        req = require('../../shared/tables/fold-recruitment.table');
+        req = require('../../shared/tables/complexe-table/fold-recruitment/fold-recruitment.table');
         const foldRecruitment: FoldRecruitmentTable = new req.FoldRecruitmentTable();
 
         req = require('./model/fold-recruitment.model');

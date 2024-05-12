@@ -1,6 +1,9 @@
 import type { QueryResult } from 'mysql2/promise';
-import { DeleteBuilder, type InsertIntoBuilder, SelectBuilder, UpdateBuilder } from '../builders/query.builder';
-import { Injectable } from '../decorators/injector.decorator';
+import type { DeleteBuilder } from '../builders/query/delete.builder';
+import type { InsertIntoBuilder } from '../builders/query/insert-into.builder';
+import type { SelectBuilder } from '../builders/query/select.builder';
+import type { UpdateBuilder } from '../builders/query/update.builder';
+import { Singleton } from '../decorators/injector/singleton-injector.decorator';
 import type { DatabaseSingleton } from '../singleton/database.singleton';
 import type { Logger } from '../utils/logger';
 
@@ -9,7 +12,7 @@ import type { Logger } from '../utils/logger';
  */
 export class TableAbstract {
     //region INJECTABLE
-    @Injectable('Database') protected readonly database: DatabaseSingleton;
+    @Singleton('Database') protected readonly database: DatabaseSingleton;
     private readonly logger: Logger;
     //endregion
 

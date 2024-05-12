@@ -1,6 +1,6 @@
 import { type ChatInputCommandInteraction, type Client, Colors, EmbedBuilder, PermissionsBitField, type TextChannel } from 'discord.js';
-import { PotentialClansTable } from '../../shared/tables/potential-clans.table';
-import type { PotentialClan } from '../../shared/types/potential-clan.type';
+import { PotentialClansTable } from '../../shared/tables/complexe-table/potential-clans/potential-clans.table';
+import type { PotentialClan } from '../../shared/tables/complexe-table/potential-clans/models/potential-clan.type';
 import { UserUtil } from '../../shared/utils/user.util';
 import { SlashCommandModel } from './model/slash-command.model';
 
@@ -19,7 +19,7 @@ module.exports = new SlashCommandModel(
             return;
         }
 
-        const req = require('../../shared/tables/channels.table');
+        const req = require('../../shared/tables/complexe-table/channels/channels.table');
         const channels = new req.ChannelsTable();
 
         const channel: TextChannel = await UserUtil.fetchChannelFromClient(client as Client, await channels.getFoldRecruitment());

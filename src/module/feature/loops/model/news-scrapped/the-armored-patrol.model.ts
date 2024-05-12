@@ -1,5 +1,5 @@
 import { TimeEnum } from '../../../../shared/enums/time.enum';
-import type { NewsWebsite } from '../../../../shared/types/news_website.type';
+import type { NewsWebsite } from '../../../../shared/tables/complexe-table/news-websites/models/news-websites.type';
 import { EnvUtil } from '../../../../shared/utils/env.util';
 import { NewsScrapper } from './news-scrapper.model';
 

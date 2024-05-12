@@ -14,17 +14,23 @@ import {
     type StringSelectMenuInteraction,
     StringSelectMenuOptionBuilder,
 } from 'discord.js';
-import { Injectable, LoggerInjector, TableInjectable } from '../../../shared/decorators/injector.decorator';
+import type { Ammo } from '../../../shared/apis/wot-api/models/wot-api.type';
+import { LoggerInjector } from '../../../shared/decorators/injector/logger-injector.decorator';
+import { Singleton } from '../../../shared/decorators/injector/singleton-injector.decorator';
+import { Table } from '../../../shared/decorators/injector/table-injector.decorator';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
-import type { TriviaSingleton } from '../../../shared/singleton/trivia.singleton';
-import type { PlayersAnswersTable } from '../../../shared/tables/players-answers.table';
-import type { PlayersTable } from '../../../shared/tables/players.table';
-import type { TriviaDataTable } from '../../../shared/tables/trivia-data.table';
-import type { WinStreakTable } from '../../../shared/tables/win-streak.table';
-import type { Tank, TriviaAnswer, TriviaData, TriviaPlayer, WinStreak } from '../../../shared/types/table.type';
-import type { TriviaSelected } from '../../../shared/types/trivia.type';
-import type { Ammo } from '../../../shared/types/wot-api.type';
+import type { TriviaSelected } from '../../../shared/singleton/trivia/models/trivia.type';
+import type { TriviaSingleton } from '../../../shared/singleton/trivia/trivia.singleton';
+import type { TriviaAnswer } from '../../../shared/tables/complexe-table/players-answers/models/players-answers.type';
+import type { PlayersAnswersTable } from '../../../shared/tables/complexe-table/players-answers/players-answers.table';
+import type { TriviaPlayer } from '../../../shared/tables/complexe-table/players/models/players.type';
+import type { PlayersTable } from '../../../shared/tables/complexe-table/players/players.table';
+import type { Tank } from '../../../shared/tables/complexe-table/tanks/models/tanks.type';
+import type { TriviaData } from '../../../shared/tables/complexe-table/trivia-data/models/trivia-data.type';
+import type { TriviaDataTable } from '../../../shared/tables/complexe-table/trivia-data/trivia-data.table';
+import type { WinStreak } from '../../../shared/tables/complexe-table/win-streak/models/win-streak.type';
+import type { WinStreakTable } from '../../../shared/tables/complexe-table/win-streak/win-streak.table';
 import { DateUtil } from '../../../shared/utils/date.util';
 import type { Logger } from '../../../shared/utils/logger';
 import { StringUtil } from '../../../shared/utils/string.util';
@@ -37,11 +43,11 @@ import type { PlayerAnswer } from '../types/trivia-game.type';
 export class TriviaModel {
     //region INJECTABLE
     private readonly logger: Logger;
-    @Injectable('Trivia') private readonly trivia: TriviaSingleton;
-    @TableInjectable('TriviaData') private readonly triviaTable: TriviaDataTable;
-    @TableInjectable('Players') private readonly playersTable: PlayersTable;
-    @TableInjectable('PlayersAnswer') private readonly playerAnswerTable: PlayersAnswersTable;
-    @TableInjectable('WinStreak') private readonly winStreakTable: WinStreakTable;
+    @Singleton('Trivia') private readonly trivia: TriviaSingleton;
+    @Table('TriviaData') private readonly triviaTable: TriviaDataTable;
+    @Table('Players') private readonly playersTable: PlayersTable;
+    @Table('PlayersAnswer') private readonly playerAnswerTable: PlayersAnswersTable;
+    @Table('WinStreak') private readonly winStreakTable: WinStreakTable;
     //endregion
 
     //region PRIVATE READONLY FIELDS
@@ -215,7 +221,7 @@ export class TriviaModel {
 
         this.datum.set(player.name, value);
 
-        const { allTanks, datum } = this.getData(player.name);
+        const { allTanks, selectedTanks } = this.getData(player.name);
 
         if (!allTanks || allTanks.length === 0) {
             await interaction.editReply({
@@ -225,7 +231,7 @@ export class TriviaModel {
             return;
         }
 
-        const ammo: Ammo = datum.tank.ammo[datum.ammoIndex];
+        const ammo: Ammo = selectedTanks.tank.ammo[selectedTanks.ammoIndex];
 
         const target = new Date();
         target.setTime(target.getTime() + this.maxQuestionDuration);
@@ -347,12 +353,12 @@ export class TriviaModel {
                         { name: 'Plus longue séquence correcte', value: `\`${winStreak.max}\`` },
                         {
                             name: 'Réponse la plus rapide',
-                            value: `\`${Math.min(...stats.flatMap(({ answer_time }) => Number(answer_time))) / TimeEnum.SECONDE}\` sec`,
+                            value: `\`${Math.min(...stats.filter(({ answer_time }) => answer_time !== null).flatMap(({ answer_time }) => answer_time as number)) / TimeEnum.SECONDE}\` sec`,
                             inline: true,
                         },
                         {
                             name: 'Réponse la plus longue',
-                            value: `\`${Math.max(...stats.flatMap(({ answer_time }) => Number(answer_time))) / TimeEnum.SECONDE}\` sec`,
+                            value: `\`${Math.max(...stats.filter(({ answer_time }) => answer_time !== null).flatMap(({ answer_time }) => answer_time as number)) / TimeEnum.SECONDE}\` sec`,
                             inline: true,
                         },
                         {
@@ -394,14 +400,13 @@ export class TriviaModel {
         const promises: Promise<(TriviaAnswer & TriviaPlayer) | null>[] = players.map(({ id }) =>
             this.playerAnswerTable.getLastAnswerWithPlayerOfPlayer(id)
         );
-        const playerStats = (await Promise.all(promises)).filter(
+
+        let playerStats = (await Promise.all(promises)).filter(
             (value: (TriviaAnswer & TriviaPlayer) | null): boolean => value !== null
         ) as Awaited<TriviaAnswer & TriviaPlayer>[];
 
         const today = new Date();
-        playerStats
-            .filter(({ date }): boolean => date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear())
-            .sort((a: TriviaAnswer & TriviaPlayer, b: TriviaAnswer & TriviaPlayer) => b.elo - a.elo);
+        playerStats = playerStats.filter(({ date }) => date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear());
 
         if (playerStats.length === 0) {
             await interaction.editReply({
@@ -409,6 +414,8 @@ export class TriviaModel {
             });
             return;
         }
+
+        playerStats.sort((a: TriviaAnswer & TriviaPlayer, b: TriviaAnswer & TriviaPlayer) => b.elo - a.elo);
 
         embedScoreboard.addFields({
             name: 'Joueur - Elo',
@@ -436,12 +443,12 @@ export class TriviaModel {
      * @example
      * const { allTanks, datum } = this.getData(interaction.user.username);
      */
-    private getData(username: string): { allTanks: Tank[]; datum: TriviaSelected } {
+    private getData(username: string): { allTanks: Tank[]; selectedTanks: TriviaSelected } {
         const value = this.datum.get(username);
 
         return {
             allTanks: this.trivia.allTanks[value?.questionNumber ?? 0],
-            datum: this.trivia.datum[value?.questionNumber ?? 0],
+            selectedTanks: this.trivia.selectedTanks[value?.questionNumber ?? 0],
         };
     }
 
@@ -531,19 +538,19 @@ export class TriviaModel {
      */
     private async sendAnswerToPlayer(playerAnswer: PlayerAnswer, username: string): Promise<void> {
         const { interaction } = this.datum.get(username) || {};
-        const { allTanks, datum } = this.getData(username);
+        const { allTanks, selectedTanks } = this.getData(username);
 
         const isGoodAnswer = this.isGoodAnswer(playerAnswer, username);
 
-        const answerEmbed: EmbedBuilder = this.createAnswerEmbed(true, datum.tank, isGoodAnswer);
+        const answerEmbed: EmbedBuilder = this.createAnswerEmbed(true, selectedTanks.tank, isGoodAnswer);
 
         const otherAnswer: EmbedBuilder[] = [];
 
-        const ammo: Ammo = datum.tank.ammo[datum.ammoIndex];
+        const ammo: Ammo = selectedTanks.tank.ammo[selectedTanks.ammoIndex];
 
         allTanks.forEach((vehicle: Tank): void => {
-            const vehicleAmmo: Ammo = vehicle.ammo[datum.ammoIndex];
-            if (vehicle.name !== datum.tank.name && this.checkVehicleAmmoDetail(vehicleAmmo, ammo)) {
+            const vehicleAmmo: Ammo = vehicle.ammo[selectedTanks.ammoIndex];
+            if (vehicle.name !== selectedTanks.tank.name && this.checkVehicleAmmoDetail(vehicleAmmo, ammo)) {
                 this.logger.debug('Another tank has the same shell {}', vehicle.name);
                 otherAnswer.push(this.createAnswerEmbed(false, vehicle, isGoodAnswer));
             }
@@ -615,9 +622,9 @@ export class TriviaModel {
      * @return {boolean} - True if the player answer is the good answer, false otherwise
      */
     private isGoodAnswer(playerAnswer: PlayerAnswer, username: string): boolean {
-        const { datum } = this.getData(username);
+        const { selectedTanks } = this.getData(username);
         const tankId = Number(playerAnswer?.response.split('#')[1]);
-        return tankId === datum.tank.id || this.isAnotherTanks(tankId, username);
+        return tankId === selectedTanks.tank.id || this.isAnotherTanks(tankId, username);
     }
 
     /**
@@ -629,14 +636,14 @@ export class TriviaModel {
      * @return {boolean} - True if another tanks is the good answer, false otherwise
      */
     private isAnotherTanks(tankId: number, username: string): boolean {
-        const { allTanks, datum } = this.getData(username);
+        const { allTanks, selectedTanks } = this.getData(username);
         const vehicle: Tank | undefined = allTanks.find((vehicle: Tank): boolean => vehicle.id === tankId);
 
         if (!vehicle) {
             return false;
         }
 
-        return this.checkVehicleAmmoDetail(vehicle.ammo[datum.ammoIndex], datum.tank.ammo[datum.ammoIndex]);
+        return this.checkVehicleAmmoDetail(vehicle.ammo[selectedTanks.ammoIndex], selectedTanks.tank.ammo[selectedTanks.ammoIndex]);
     }
 
     /**
@@ -667,7 +674,7 @@ export class TriviaModel {
             return;
         }
 
-        const { allTanks, datum } = this.getData(playerName);
+        const { allTanks, selectedTanks } = this.getData(playerName);
 
         const lastAnswer: TriviaAnswer = await this.playerAnswerTable.getLastAnswerOfPlayer(value.player.id);
 
@@ -675,7 +682,14 @@ export class TriviaModel {
         const elo = this.calculateElo(oldElo, playerAnswer?.responseTime, isGoodAnswer);
 
         try {
-            await this.playerAnswerTable.addAnswer(value.player.id, datum.id, new Date(), isGoodAnswer, playerAnswer.responseTime, elo);
+            await this.playerAnswerTable.addAnswer(
+                value.player.id,
+                selectedTanks.id,
+                new Date(),
+                isGoodAnswer,
+                playerAnswer?.responseTime,
+                elo
+            );
 
             this.logger.info('Successfully add player {} answer in database', playerName);
         } catch (reason) {
@@ -720,7 +734,7 @@ export class TriviaModel {
         if (isGoodAnswer) {
             await this.handleGoodAnswer(winStreak, playerAnswer, oldElo, elo, playerName);
         } else {
-            await this.handleWrongAnswer(winStreak, playerAnswer, oldElo, elo, playerName, allTanks, datum);
+            await this.handleWrongAnswer(winStreak, playerAnswer, oldElo, elo, playerName, allTanks, selectedTanks);
         }
     }
 

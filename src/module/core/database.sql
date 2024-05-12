@@ -52,27 +52,6 @@ CREATE OR REPLACE TABLE player (
     name varchar(255) NOT NULL COMMENT 'The name of the player'
 ) COMMENT 'This table manage the trivia player';
 
-CREATE OR REPLACE TABLE player_answer (
-    id           int(11) UNSIGNED AUTO_INCREMENT COMMENT 'The generated id'
-        PRIMARY KEY,
-    player_id    int(3) UNSIGNED  NOT NULL COMMENT 'The id of the player in the Player table',
-    trivia_id    int(11) UNSIGNED NOT NULL COMMENT 'The id of the corresponding question in the trivia table',
-    date         datetime         NOT NULL COMMENT 'The date of the Trivia at format yyyy-MM-dd HH:mm:ss',
-    right_answer tinyint(1)       NOT NULL COMMENT 'If the answer was a good answer or not',
-    answer_time  int(6) UNSIGNED  NULL COMMENT 'The time in millis taken to answer',
-    elo          int(6) UNSIGNED  NOT NULL COMMENT 'The elo of the player after each answer',
-    CONSTRAINT player_answer_player_id_fk
-        FOREIGN KEY ( player_id ) REFERENCES player ( id )
-            ON UPDATE CASCADE ON DELETE CASCADE
-) COMMENT 'This table manage the player answer of the trivia game';
-
-
-
-CREATE OR REPLACE TABLE potential_clans (
-    id  int(11) UNSIGNED AUTO_INCREMENT COMMENT 'The generated id' PRIMARY KEY,
-    url text NOT NULL COMMENT 'The url of the clan found'
-) COMMENT 'This table manage all clans fold from leaving player';
-
 CREATE OR REPLACE TABLE tanks (
     id    int(3) UNSIGNED AUTO_INCREMENT COMMENT 'The generated id' PRIMARY KEY,
     name  varchar(255)                 NOT NULL COMMENT 'The name of the tank',
@@ -81,15 +60,39 @@ CREATE OR REPLACE TABLE tanks (
 ) COMMENT 'This table manage all the tanks of the trivia game';
 
 CREATE OR REPLACE TABLE trivia (
-    id         int(11) UNSIGNED AUTO_INCREMENT COMMENT 'The generated id' PRIMARY KEY,
-    trivia_id  int(11) UNSIGNED NOT NULL COMMENT 'The id of the trivia',
+    id         int(11) UNSIGNED AUTO_INCREMENT COMMENT 'The id of the question'
+        PRIMARY KEY,
     tank_id    int(3) UNSIGNED  NOT NULL COMMENT 'The tank id taken from the Tank Table',
-    date       date             NOT NULL COMMENT 'The date of the Trivia at format YYYY-MM-DD',
+    date       datetime         NOT NULL COMMENT 'The date of the Trivia at format YYYY-MM-DD',
     ammo_index tinyint UNSIGNED NULL COMMENT 'The index of the question about the ammo',
     CONSTRAINT trivia_tanks_id_fk
         FOREIGN KEY ( tank_id ) REFERENCES tanks ( id )
             ON UPDATE CASCADE
 ) COMMENT 'This table manage the question used during the trivia game';
+
+CREATE OR REPLACE TABLE player_answer (
+    id           int(11) UNSIGNED AUTO_INCREMENT COMMENT 'The generated id'
+        PRIMARY KEY,
+    player_id    int(3) UNSIGNED  NOT NULL COMMENT 'The id of the player in the Player table',
+    trivia_id    int(11) UNSIGNED NULL COMMENT 'The id of the corresponding question in the trivia table',
+    date         datetime         NOT NULL COMMENT 'The date of the Trivia at format yyyy-MM-dd HH:mm:ss',
+    right_answer tinyint(1)       NOT NULL COMMENT 'If the answer was a good answer or not',
+    answer_time  int(6) UNSIGNED  NULL COMMENT 'The time in millis taken to answer',
+    elo          int(6) UNSIGNED  NOT NULL COMMENT 'The elo of the player after each answer',
+    CONSTRAINT player_answer_player_id_fk
+        FOREIGN KEY ( player_id ) REFERENCES player ( id )
+            ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT player_answer_trivia_id_fk
+        FOREIGN KEY ( trivia_id ) REFERENCES trivia ( id )
+) COMMENT 'This table manage the player answer of the trivia game';
+
+CREATE OR REPLACE INDEX player_answer_trivia_id_index
+    ON player_answer ( trivia_id );
+
+CREATE OR REPLACE TABLE potential_clans (
+    id  int(11) UNSIGNED AUTO_INCREMENT COMMENT 'The generated id' PRIMARY KEY,
+    url text NOT NULL COMMENT 'The url of the clan found'
+) COMMENT 'This table manage all clans fold from leaving player';
 
 CREATE OR REPLACE TABLE trivia_data (
     max_number_of_question     int                          NOT NULL COMMENT 'The max number of question that can be ask per day',

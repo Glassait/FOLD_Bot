@@ -1,16 +1,18 @@
 import type { AxiosInstance } from 'axios';
 import { type Client, Colors, EmbedBuilder, type TextChannel } from 'discord.js';
-import { WotApiModel } from '../../../shared/apis/wot-api.model';
-import { Injectable, LoggerInjector, TableInjectable } from '../../../shared/decorators/injector.decorator';
+import { WotApiModel } from '../../../shared/apis/wot-api/wot-api.model';
+import { LoggerInjector } from '../../../shared/decorators/injector/logger-injector.decorator';
+import { Singleton } from '../../../shared/decorators/injector/singleton-injector.decorator';
+import { Table } from '../../../shared/decorators/injector/table-injector.decorator';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 import { TimeEnum } from '../../../shared/enums/time.enum';
-import type { BlacklistedPlayersTable } from '../../../shared/tables/blacklisted-players.table';
-import type { ChannelsTable } from '../../../shared/tables/channels.table';
-import type { FoldRecruitmentTable } from '../../../shared/tables/fold-recruitment.table';
-import type { LeavingPlayersTable } from '../../../shared/tables/leaving-players.table';
-import type { WatchClansTable } from '../../../shared/tables/watch-clans.table';
-import type { BlacklistedPlayer } from '../../../shared/types/blacklisted-player.type';
-import type { Clan } from '../../../shared/types/watch-clan.type';
+import type { BlacklistedPlayersTable } from '../../../shared/tables/complexe-table/blacklisted-players/blacklisted-players.table';
+import type { BlacklistedPlayer } from '../../../shared/tables/complexe-table/blacklisted-players/model/blacklisted-players.type';
+import type { ChannelsTable } from '../../../shared/tables/complexe-table/channels/channels.table';
+import type { FoldRecruitmentTable } from '../../../shared/tables/complexe-table/fold-recruitment/fold-recruitment.table';
+import type { LeavingPlayersTable } from '../../../shared/tables/complexe-table/leaving-players/leaving-players.table';
+import type { Clan } from '../../../shared/tables/complexe-table/watch-clans/models/watch-clans.type';
+import type { WatchClansTable } from '../../../shared/tables/complexe-table/watch-clans/watch-clans.table';
 import type { Logger } from '../../../shared/utils/logger';
 import { StringUtil } from '../../../shared/utils/string.util';
 import { UserUtil } from '../../../shared/utils/user.util';
@@ -31,12 +33,12 @@ export class FoldRecruitmentModel {
     //region INJECTABLE
     private readonly logger: Logger;
     private readonly wotApiModel: WotApiModel = new WotApiModel();
-    @Injectable('Axios', TimeEnum.SECONDE * 30) private readonly axios: AxiosInstance;
-    @TableInjectable('WatchClans') private readonly watchClans: WatchClansTable;
-    @TableInjectable('BlacklistedPlayers') private readonly blacklistedPlayers: BlacklistedPlayersTable;
-    @TableInjectable('LeavingPlayers') private readonly leavingPlayers: LeavingPlayersTable;
-    @TableInjectable('Channels') private readonly channels: ChannelsTable;
-    @TableInjectable('FoldRecruitment') private readonly foldRecruitment: FoldRecruitmentTable;
+    @Singleton('Axios', TimeEnum.SECONDE * 30) private readonly axios: AxiosInstance;
+    @Table('WatchClans') private readonly watchClans: WatchClansTable;
+    @Table('BlacklistedPlayers') private readonly blacklistedPlayers: BlacklistedPlayersTable;
+    @Table('LeavingPlayers') private readonly leavingPlayers: LeavingPlayersTable;
+    @Table('Channels') private readonly channels: ChannelsTable;
+    @Table('FoldRecruitment') private readonly foldRecruitment: FoldRecruitmentTable;
     //endregion
 
     //region PRIVATE FIELDS

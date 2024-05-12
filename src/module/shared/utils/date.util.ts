@@ -58,13 +58,22 @@ export class DateUtil {
     }
 
     /**
-     * Format the date to the following format YYYY-MM-DD
+     * Calculates the difference between two dates in days, rounded to the nearest whole number.
      *
-     * @param {Date} date - The date to format
+     * @param {Date} date1 - The first date.
+     * @param {Date} date2 - The second date.
      *
-     * @return {string} - The string representation to the date formated in YYYY-MM-DD
+     * @returns {number} The difference between the two dates in days (rounded).
+     *
+     * @example
+     * const today = new Date();
+     * const yesterday = new Date();
+     * yesterday.setDate(today.getDate() - 1);
+
+     * const daysDifference = getDiffOfDay(today, yesterday);
+     * console.log(daysDifference); // Output: 1
      */
-    public static formatDateForSql(date: Date): string {
-        return `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}`;
+    public static diffOfDay(date1: Date, date2: Date): number {
+        return Math.round((date1.getTime() - date2.getTime()) / (1000 * 3600 * 24));
     }
 }

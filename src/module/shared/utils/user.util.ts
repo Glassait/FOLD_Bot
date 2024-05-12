@@ -1,5 +1,5 @@
 import type { ChatInputCommandInteraction, Client, CommandInteractionOption, Guild, GuildMember, TextChannel } from 'discord.js';
-import type { Channel } from '../types/channel.type';
+import type { Channel } from '../tables/complexe-table/channels/models/channels.type';
 
 /**
  * Utility class for user-related operations.

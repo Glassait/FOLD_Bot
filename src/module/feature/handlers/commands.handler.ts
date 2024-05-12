@@ -4,7 +4,8 @@ import { basename } from 'node:path';
 import { join } from 'path';
 import { client_id, token } from '../../core/config.json';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
-import { type CommandName, CommandsTable } from '../../shared/tables/commands.table';
+import { CommandsTable } from '../../shared/tables/complexe-table/commands/commands.table';
+import type { CommandName } from '../../shared/tables/complexe-table/commands/models/commands.type';
 import { Logger } from '../../shared/utils/logger';
 import type { SlashCommandModel } from '../slash-commands/model/slash-command.model';
 

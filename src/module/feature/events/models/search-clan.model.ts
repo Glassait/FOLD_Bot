@@ -1,12 +1,14 @@
-import type { WotApiModel } from '../../../shared/apis/wot-api.model';
-import { Injectable, LoggerInjector, TableInjectable } from '../../../shared/decorators/injector.decorator';
-import type { FoldRecruitmentTable } from '../../../shared/tables/fold-recruitment.table';
-import type { LeavingPlayersTable } from '../../../shared/tables/leaving-players.table';
-import type { PotentialClansTable } from '../../../shared/tables/potential-clans.table';
-import type { WatchClansTable } from '../../../shared/tables/watch-clans.table';
-import type { PotentialClan } from '../../../shared/types/potential-clan.type';
-import type { Clan } from '../../../shared/types/watch-clan.type';
-import type { PlayerPersonalDataSuccess } from '../../../shared/types/wot-api.type';
+import type { PlayerPersonalDataSuccess } from '../../../shared/apis/wot-api/models/wot-api.type';
+import type { WotApiModel } from '../../../shared/apis/wot-api/wot-api.model';
+import { LoggerInjector } from '../../../shared/decorators/injector/logger-injector.decorator';
+import { Singleton } from '../../../shared/decorators/injector/singleton-injector.decorator';
+import { Table } from '../../../shared/decorators/injector/table-injector.decorator';
+import type { FoldRecruitmentTable } from '../../../shared/tables/complexe-table/fold-recruitment/fold-recruitment.table';
+import type { LeavingPlayersTable } from '../../../shared/tables/complexe-table/leaving-players/leaving-players.table';
+import type { PotentialClan } from '../../../shared/tables/complexe-table/potential-clans/models/potential-clan.type';
+import type { PotentialClansTable } from '../../../shared/tables/complexe-table/potential-clans/potential-clans.table';
+import type { Clan } from '../../../shared/tables/complexe-table/watch-clans/models/watch-clans.type';
+import type { WatchClansTable } from '../../../shared/tables/complexe-table/watch-clans/watch-clans.table';
 import type { Logger } from '../../../shared/utils/logger';
 import { FoldRecruitmentEnum } from '../../loops/enums/fold-recruitment.enum';
 
@@ -14,11 +16,11 @@ import { FoldRecruitmentEnum } from '../../loops/enums/fold-recruitment.enum';
 export class SearchClanModel {
     //region INJECTABLE
     private readonly logger: Logger;
-    @Injectable('WotApi') private readonly wotApi: WotApiModel;
-    @TableInjectable('WatchClans') private readonly watchClans: WatchClansTable;
-    @TableInjectable('LeavingPlayers') private readonly leavingPlayers: LeavingPlayersTable;
-    @TableInjectable('PotentialClans') private readonly potentialClans: PotentialClansTable;
-    @TableInjectable('FoldRecruitment') private readonly foldRecruitment: FoldRecruitmentTable;
+    @Singleton('WotApi') private readonly wotApi: WotApiModel;
+    @Table('WatchClans') private readonly watchClans: WatchClansTable;
+    @Table('LeavingPlayers') private readonly leavingPlayers: LeavingPlayersTable;
+    @Table('PotentialClans') private readonly potentialClans: PotentialClansTable;
+    @Table('FoldRecruitment') private readonly foldRecruitment: FoldRecruitmentTable;
     //endregion
 
     /**

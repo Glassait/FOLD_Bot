@@ -1,8 +1,8 @@
 import { type Client, Events } from 'discord.js';
 import { basename } from 'node:path';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
-import { TriviaSingleton } from '../../shared/singleton/trivia.singleton';
-import { FeatureFlippingTable } from '../../shared/tables/feature-flipping.table';
+import { TriviaSingleton } from '../../shared/singleton/trivia/trivia.singleton';
+import { FeatureFlippingTable } from '../../shared/tables/complexe-table/feature-flipping/feature-flipping.table';
 import { EnvUtil } from '../../shared/utils/env.util';
 import { Logger } from '../../shared/utils/logger';
 import { SentenceUtil } from '../../shared/utils/sentence.util';
@@ -26,7 +26,7 @@ module.exports = {
         client.user?.setPresence({ activities: [{ type: status[0], name: status[1] }], status: 'online' });
 
         if (await featuresTable.getFeature('trivia')) {
-            EnvUtil.asyncThread(trivia.fetchTankOfTheDay.bind(trivia));
+            EnvUtil.asyncThread(trivia.createQuestionOfTheDay.bind(trivia));
             EnvUtil.thread(async (): Promise<void> => {
                 await trivia.sendTriviaResultForYesterday(client);
                 await trivia.reduceEloOfInactifPlayer();
@@ -58,6 +58,6 @@ module.exports = {
             });
         }
 
-        EnvUtil.asyncThread(trivia.updateDatabase.bind(trivia));
+        EnvUtil.asyncThread(trivia.updateTanksTableFromWotApi.bind(trivia));
     },
 } as BotEvent;
