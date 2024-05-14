@@ -1,9 +1,16 @@
 import { Client, GatewayIntentBits } from 'discord.js';
 import { basename } from 'node:path';
 import { token } from './module/core/config.json';
+import { EnvUtil } from './module/shared/utils/env.util';
 import { Logger } from './module/shared/utils/logger';
 
 const logger: Logger = new Logger(basename(__filename));
+
+if (EnvUtil.isDev()) {
+    logger.warn(
+        '=======================================================\n\t\t\tBot launch on DEV. This mode is not for production.\n=======================================================`'
+    );
+}
 
 logger.info('🤖 Bot is starting...');
 

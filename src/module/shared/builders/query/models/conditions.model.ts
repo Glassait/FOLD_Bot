@@ -1,4 +1,4 @@
-import type { Condition, OrderBy } from './computer.model';
+import type { Condition, OrderBy } from './computer.type';
 
 /**
  * Builder that help to build conditional query like where of inner join.

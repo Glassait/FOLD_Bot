@@ -1,6 +1,6 @@
 import { TableAbstract } from '../../../abstracts/table.abstract';
 import { InsertIntoBuilder } from '../../../builders/query/insert-into.builder';
-import type { Condition } from '../../../builders/query/models/computer.model';
+import type { Condition } from '../../../builders/query/models/computer.type';
 import { SelectBuilder } from '../../../builders/query/select.builder';
 import { LoggerInjector } from '../../../decorators/injector/logger-injector.decorator';
 import type { DeepNonNullables } from '../../../types/commons.type';
