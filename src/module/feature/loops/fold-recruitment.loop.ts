@@ -31,6 +31,11 @@ module.exports = {
         await recruitmentModel.initialise(client);
 
         await TimeUtil.forLoopTimeSleep(await foldRecruitment.getSchedule(), `${EmojiEnum.LOOP} Recruitment`, async (): Promise<void> => {
+            if (!(await featuresFlipping.getFeature('fold_recruitment'))) {
+                logger.info('Fold recruitment has been disabled during execution of loop');
+                return;
+            }
+
             recruitmentModel.noPlayerFound = true;
 
             for (const clan of await watchClan.getAll()) {

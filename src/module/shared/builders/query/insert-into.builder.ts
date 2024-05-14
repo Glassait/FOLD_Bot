@@ -1,5 +1,5 @@
 import type { TableAbstract } from '../../abstracts/table.abstract';
-import { Computer } from './models/query.builder';
+import { Computer } from './models/computer.model';
 import type { ColumnsInterface, ComputeInterface, ValuesInterface } from './models/query.interface';
 
 /**
@@ -15,6 +15,11 @@ export class InsertIntoBuilder implements ComputeInterface, ColumnsInterface, Va
      * The values to insert in the columns when inserting new line
      */
     private _values: any[];
+
+    /**
+     * Define if the `INSERT INTO` have `IGNORE` clause
+     */
+    private _ignore: boolean = false;
 
     constructor(private table: TableAbstract) {}
 
@@ -45,6 +50,15 @@ export class InsertIntoBuilder implements ComputeInterface, ColumnsInterface, Va
     }
 
     /**
+     * Transform the `INSERT INTO` query in `INSERT IGNORE INTO` query
+     */
+    public ignore(): this {
+        this._ignore = true;
+
+        return this;
+    }
+
+    /**
      * Generates the INSERT INTO query.
      *
      * @throws {Error} If values are not provided or if the number of columns does not match the number of values.
@@ -67,6 +81,6 @@ export class InsertIntoBuilder implements ComputeInterface, ColumnsInterface, Va
             );
         }
 
-        return Computer.computeInsertInto(this.table.tableName, this._values, this._columns);
+        return Computer.computeInsertInto(this.table.tableName, this._values, this._columns, this._ignore);
     }
 }

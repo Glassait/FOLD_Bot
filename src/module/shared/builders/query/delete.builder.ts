@@ -1,6 +1,6 @@
 import type { TableAbstract } from '../../abstracts/table.abstract';
+import { Computer } from './models/computer.model';
 import { Conditions } from './models/conditions.model';
-import { Computer } from './models/query.builder';
 import type { ComputeInterface } from './models/query.interface';
 
 /**
