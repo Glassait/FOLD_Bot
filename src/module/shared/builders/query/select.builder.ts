@@ -1,8 +1,8 @@
 import type { TableAbstract } from '../../abstracts/table.abstract';
+import { Computer } from './models/computer.model';
+import type { Condition, OrderBy } from './models/computer.type';
 import { Conditions } from './models/conditions.model';
-import { Computer } from './models/query.builder';
 import type { ColumnsInterface, ComputeInterface } from './models/query.interface';
-import type { Condition, OrderBy } from './models/computer.model';
 
 /**
  * Represents a SELECT query builder.

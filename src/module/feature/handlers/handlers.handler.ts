@@ -10,7 +10,9 @@ module.exports = async (client: Client): Promise<void> => {
         if (!(!handler.endsWith('.ts') || handler.startsWith('handlers'))) {
             require(`${handlersDir}/${handler}`)(client);
 
-            await EnvUtil.sleep(TimeEnum.SECONDE * 10);
+            if (!EnvUtil.isDev()) {
+                await EnvUtil.sleep(TimeEnum.SECONDE * 10);
+            }
         }
     }
 };

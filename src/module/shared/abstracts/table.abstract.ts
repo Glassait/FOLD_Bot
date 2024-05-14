@@ -45,7 +45,7 @@ export class TableAbstract {
      */
     protected async insert(builder: InsertIntoBuilder): Promise<boolean> {
         const sql = builder.compute();
-        this.validateQueryType(sql, 'INSERT INTO');
+        this.validateQueryType(sql, /INSERT( IGNORE)? INTO/);
         const rows = await this.query(sql);
         return 'serverStatus' in rows && rows.serverStatus === this.sqlReturn.CREATE;
     }
@@ -115,13 +115,16 @@ export class TableAbstract {
      * Validates the type of SQL query.
      *
      * @param {string} sql - The SQL query to validate.
-     * @param {string} expectedType - The expected type of SQL query (e.g., INSERT INTO, UPDATE, DELETE, SELECT).
+     * @param {RegExp | string} expectedType - The expected type of SQL query (e.g., INSERT INTO, UPDATE, DELETE, SELECT).
      *
      * @throws {Error} - If the SQL query does not match the expected type.
      */
-    private validateQueryType(sql: string, expectedType: string): void {
-        if (!sql.startsWith(expectedType)) {
-            throw new Error(`SQL query is not a ${expectedType} statement.`);
+    private validateQueryType(sql: string, expectedType: RegExp | string): void {
+        if (
+            (typeof expectedType === 'string' && !sql.startsWith(expectedType)) ||
+            (expectedType instanceof RegExp && !expectedType.test(sql))
+        ) {
+            throw new Error(`SQL query is not a ${expectedType.toString()} statement. Given ${sql}`);
         }
     }
 }
