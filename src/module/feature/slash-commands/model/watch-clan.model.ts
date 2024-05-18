@@ -226,12 +226,29 @@ export class WatchClanModel {
         }
 
         const idAndName: string = interaction.options.get(optionsName[0])?.value as string;
+
+        if (idAndName === 'ERROR') {
+            await interaction.editReply({
+                content: 'Le pseudo passé contient une ou plusieurs erreurs !',
+            });
+            return;
+        }
+
         const reason: string = interaction.options.get(optionsName[1])?.value as string;
 
         let [id, name] = idAndName.split('#');
 
         if (!id || !name) {
-            const searchResult: WargamingSuccessType<PlayerData[]> = await this.wotApi.fetchPlayerData(idAndName);
+            let searchResult: WargamingSuccessType<PlayerData[]>;
+
+            try {
+                searchResult = await this.wotApi.fetchPlayerData(idAndName);
+            } catch (e) {
+                await interaction.editReply({
+                    content: 'Le pseudo passé contient une ou plusieurs erreurs !',
+                });
+                return;
+            }
 
             if (!searchResult) {
                 await interaction.editReply({ content: "The player pass doesn't exist" });
@@ -408,16 +425,25 @@ export class WatchClanModel {
             return;
         }
 
-        const searchResult: WargamingSuccessType<PlayerData[]> = await this.wotApi.fetchPlayerData(focusedOption.value);
+        try {
+            const searchResult: WargamingSuccessType<PlayerData[]> = await this.wotApi.fetchPlayerData(focusedOption.value);
 
-        await interaction.respond(
-            searchResult.data
-                .map((player: { nickname: string; account_id: number }): { name: string; value: string } => ({
-                    name: `${player.nickname} | ${player.account_id}`,
-                    value: `${player.account_id}#${player.nickname}`,
-                }))
-                .slice(0, 24)
-        );
+            await interaction.respond(
+                searchResult.data
+                    .map((player: { nickname: string; account_id: number }): { name: string; value: string } => ({
+                        name: `${player.nickname} | ${player.account_id}`,
+                        value: `${player.account_id}#${player.nickname}`,
+                    }))
+                    .slice(0, 24)
+            );
+        } catch (e) {
+            await interaction.respond([
+                {
+                    name: 'Une erreur est survenue avec le pseudo renseigné',
+                    value: 'ERROR',
+                },
+            ]);
+        }
     }
 
     /**

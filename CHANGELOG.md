@@ -28,15 +28,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Changed the format of data storage from JSON to SQL database
-- Now the trivia game use the meta canon of tanks like IS-4 anf BC 25 T
+-   Changed the format of data storage from JSON to SQL database
+-   Now the trivia game use the meta canon of tanks like IS-4 anf BC 25 T
 
 ### Fixed
 
-- Now when changing month, the reduced elo of inactif player is set to the correct month
-- The quickest answer now display the right value (before displaying 0)
+-   Now when changing month, the reduced elo of inactif player is set to the correct month
+-   The quickest answer now display the right value (before displaying 0)
+-   Blacklisted slash-command have now better error managent when Wargaming API send error
 
-## [3.0.0] - Mai 12, 2024  <span data-view-component="true" class="label latest">Latest</span>
+## [3.0.0] - Mai 12, 2024 <span data-view-component="true" class="label latest">Latest</span>
 
 ### Added
 
@@ -492,7 +493,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[3.1.0]: https://github.com/Glassait/FOLD_Bot/compare/v3.0.0-2...v3.1.0-3
+[3.1.0]: https://github.com/Glassait/FOLD_Bot/compare/v3.0.0-2...v3.1.0-4
 [3.0.0]: https://github.com/Glassait/FOLD_Bot/compare/v2.3.0-6...v3.0.0-2
 [2.3.0]: https://github.com/Glassait/FOLD_Bot/compare/v2.2.10-6...v2.3.0-5
 [2.2.10]: https://github.com/Glassait/FOLD_Bot/compare/v2.2.9-8...v2.2.10-6
