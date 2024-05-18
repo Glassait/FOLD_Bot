@@ -48,6 +48,10 @@ export class StringUtil {
      * console.log(sanitizedString); // Output: This string contains  alert("XSS!")
      */
     public static sanitize(text: string): string {
+        if (!text) {
+            return text;
+        }
+
         return text.trim().replace(/["']/g, '');
     }
 
@@ -67,6 +71,10 @@ export class StringUtil {
      * console.log(escapedString); // Output: This string contains \"double quotes\"
      */
     public static escape(text: string): string {
+        if (!text) {
+            return text;
+        }
+
         return text.trim().replace(/"/g, '\\"').replace(/'/g, "\\'");
     }
 }

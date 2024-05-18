@@ -225,10 +225,8 @@ export class WatchClanModel {
             return;
         }
 
-        let idAndName: string = interaction.options.get(optionsName[0])?.value as string;
-        idAndName = StringUtil.sanitize(idAndName);
-        let reason: string = interaction.options.get(optionsName[1])?.value as string;
-        reason = StringUtil.escape(reason);
+        const idAndName: string = interaction.options.get(optionsName[0])?.value as string;
+        const reason: string = interaction.options.get(optionsName[1])?.value as string;
 
         let [id, name] = idAndName.split('#');
 
