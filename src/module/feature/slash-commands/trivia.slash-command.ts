@@ -1,6 +1,5 @@
 import { type ChatInputCommandInteraction, SlashCommandSubcommandBuilder } from 'discord.js';
 import { FeatureFlippingTable } from '../../shared/tables/complexe-table/feature-flipping/feature-flipping.table';
-import { TriviaDataTable } from '../../shared/tables/complexe-table/trivia-data/trivia-data.table';
 import { DateUtil } from '../../shared/utils/date.util';
 import { SlashCommandModel } from './model/slash-command.model';
 import { TriviaModel } from './model/trivia.model';
@@ -21,12 +20,6 @@ const MAPPING = {
 };
 const trivia = new TriviaModel();
 trivia.initialize().then();
-let maxNumberOfQuestion = 0;
-
-setTimeout(async () => {
-    const triviaTable = new TriviaDataTable();
-    maxNumberOfQuestion = await triviaTable.getMaxNumberOfQuestion();
-});
 
 module.exports = new SlashCommandModel(
     'trivia',
@@ -56,7 +49,7 @@ module.exports = new SlashCommandModel(
         option: [
             new SlashCommandSubcommandBuilder()
                 .setName(MAPPING.GAME.name)
-                .setDescription(`Jouer au jeu trivia et apprenez les alpha des tier 10 (maximum ${maxNumberOfQuestion} par jour)`),
+                .setDescription(`Jouer au jeu trivia et apprenez les alpha des tier 10`),
             new SlashCommandSubcommandBuilder()
                 .setName(MAPPING.STATISTICS.name)
                 .setDescription('Visualiser-vos statistiques sur le jeu trivia'),
