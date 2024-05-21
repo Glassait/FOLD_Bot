@@ -839,7 +839,7 @@ export class TriviaModel {
         winStreak.current = 0;
         await this.updateWinStreak(playerName, winStreak, playerAnswer);
 
-        const tank = allTanks.find((tank: Tank): boolean => tank.name === playerAnswer?.response);
+        const tank = allTanks.find((tank: Tank): boolean => tank.name === playerAnswer?.response.split('#')[0]);
 
         if (!tank) {
             return;
