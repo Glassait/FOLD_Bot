@@ -42,6 +42,7 @@ module.exports = {
 
         CronUtil.createCron(
             await cronsTable.getCron('newsletter'),
+            'newsletter',
             async (): Promise<void> => {
                 await webSiteScraper.scrapWebsite(site[index]);
                 index = index >= site.length - 1 ? 0 : ++index;

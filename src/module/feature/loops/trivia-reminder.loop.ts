@@ -27,7 +27,7 @@ module.exports = {
 
         const channel: TextChannel = await UserUtil.fetchChannelFromClient(client, await channelsTable.getTrivia());
 
-        CronUtil.createCron(await cronsTable.getCron('trivia'), async (): Promise<void> => {
+        CronUtil.createCron(await cronsTable.getCron('trivia'), 'trivia', async (): Promise<void> => {
             await channel.send({
                 embeds: [
                     new EmbedBuilder()

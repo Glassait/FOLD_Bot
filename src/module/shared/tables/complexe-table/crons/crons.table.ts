@@ -4,7 +4,7 @@ import { LoggerInjector } from '../../../decorators/injector/logger-injector.dec
 import type { CronName } from './models/crons.type';
 
 /**
- * Decorator to inject logging functionality.
+ * Represent the cron table
  */
 @LoggerInjector
 export class CronsTable extends TableAbstract {

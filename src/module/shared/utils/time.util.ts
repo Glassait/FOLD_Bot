@@ -1,11 +1,6 @@
-import { basename } from 'node:path';
 import { TimeEnum } from '../enums/time.enum';
-import { EnvUtil } from './env.util';
-import { Logger } from './logger';
 
 export class TimeUtil {
-    private static readonly logger: Logger = new Logger(basename(__filename));
-
     /**
      * Convert a JavaScript Date object to Unix timestamp (seconds since epoch).
      *
@@ -19,40 +14,5 @@ export class TimeUtil {
      */
     public static convertToUnix(date: Date): number {
         return Math.floor(date.getTime() / TimeEnum.SECONDE);
-    }
-
-    /**
-     * Execute a callback function at scheduled intervals based on a given array of time schedules.
-     *
-     * @param {string[]} scheduler - An array of time schedules in the format 'HH:mm'.
-     * @param {string} loopName - A descriptive name for the loop.
-     * @param {() => Promise<void>} callback - The callback function to be executed at each scheduled interval.
-     *
-     * @returns {Promise<void>} - A Promise that resolves when all scheduled intervals are completed.
-     *
-     * @example
-     * const scheduler = ['12:00', '15:30', '18:45'];
-     * const loopName = 'MyLoop';
-     * const callback = async () => {
-     *   // Your asynchronous logic here
-     *   console.log(`${loopName} loop executed.`);
-     * };
-     * await TimeUtil.forLoopTimeSleep(scheduler, loopName, callback);
-     */
-    public static async forLoopTimeSleep(scheduler: string[], loopName: string, callback: () => Promise<void>): Promise<void> {
-        for (const schedule of scheduler) {
-            const startDate: Date = new Date();
-            const targetDate: Date = new Date();
-            const date: string[] = schedule.split(':');
-            targetDate.setHours(Number(date[0]), Number(date[1]) || 0, 0, 0);
-            this.logger.info(`${loopName} loop start at {}`, String(targetDate));
-            const time: number = targetDate.getTime() - startDate.getTime();
-
-            if (time > 0) {
-                await EnvUtil.sleep(time);
-
-                await callback();
-            }
-        }
     }
 }
