@@ -22,13 +22,4 @@ export class FoldRecruitmentTable extends TableAbstract {
     public async getUrl(url: FoldRecruitmentUrl): Promise<string> {
         return ((await this.select(new SelectBuilder(this).columns(`${url}_url`))) as any)[0][`${url}_url`];
     }
-
-    /**
-     * Retrieves the schedule stored in the Fold Recruitment table.
-     *
-     * @returns {Promise<string[]>} - The schedule stored in the Fold Recruitment table.
-     */
-    public async getSchedule(): Promise<string[]> {
-        return JSON.parse(((await this.select(new SelectBuilder(this).columns('schedule'))) as any)[0].schedule);
-    }
 }

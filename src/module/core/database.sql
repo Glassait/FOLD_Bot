@@ -27,12 +27,11 @@ CREATE OR REPLACE TABLE feature_flipping (
 ) COMMENT 'Table following the feature flipping of each feature of the bot';
 
 CREATE OR REPLACE TABLE fold_recruitment (
-    newsfeed_url  text                         NOT NULL COMMENT 'The url of wargaming to get the news of the clan',
-    clan_url      text                         NOT NULL COMMENT 'The wargaming url to the clan page',
-    tomato_url    text                         NOT NULL COMMENT 'The tomato.gg url for the player',
-    wargaming_url text                         NOT NULL COMMENT 'The wargaming url for the player',
-    wot_life_url  text                         NOT NULL COMMENT 'The wot life url for the player',
-    schedule      longtext COLLATE utf8mb4_bin NOT NULL COMMENT 'The time when the fold recruitment run'
+    newsfeed_url  text NOT NULL COMMENT 'The url of wargaming to get the news of the clan',
+    clan_url      text NOT NULL COMMENT 'The wargaming url to the clan page',
+    tomato_url    text NOT NULL COMMENT 'The tomato.gg url for the player',
+    wargaming_url text NOT NULL COMMENT 'The wargaming url for the player',
+    wot_life_url  text NOT NULL COMMENT 'The wot life url for the player'
 ) COMMENT 'This table manage the fold recruitment';
 
 CREATE OR REPLACE TABLE leaving_players (
@@ -126,3 +125,9 @@ CREATE OR REPLACE TABLE wot_api (
     url  text NOT NULL COMMENT 'The url of the wot api'
 ) COMMENT 'This table store the different wargaming url used by the bot';
 
+CREATE OR REPLACE TABLE crons (
+    id   int AUTO_INCREMENT COMMENT 'The generated id'
+        PRIMARY KEY,
+    name text     NOT NULL COMMENT 'The name of the feature who used the cron',
+    cron char(20) NOT NULL COMMENT 'The cron'
+) COMMENT 'This table store all the cron used by the bot';
