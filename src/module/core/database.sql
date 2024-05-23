@@ -130,5 +130,5 @@ CREATE OR REPLACE TABLE crons (
     id   int AUTO_INCREMENT COMMENT 'The generated id'
         PRIMARY KEY,
     name text     NOT NULL COMMENT 'The name of the feature who used the cron',
-    cron char(12) NOT NULL COMMENT 'The cron'
+    cron char(20) NOT NULL COMMENT 'The cron'
 ) COMMENT 'This table store all the cron used by the bot';

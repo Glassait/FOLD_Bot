@@ -1,9 +1,13 @@
 import { CronJob } from 'cron';
+import { basename } from 'node:path';
+import { Logger } from './logger';
 
 /**
  * Utility class for creating and managing cron jobs.
  */
 export class CronUtil {
+    private static logger: Logger = new Logger(basename(__filename));
+
     /**
      * Creates a new cron job with the specified cron schedule and callback function.
      *
@@ -18,6 +22,9 @@ export class CronUtil {
             start: true,
             timeZone: 'system',
             runOnInit: runOnInit,
+            onComplete: (): void => {
+                this.logger.info('The cron {} finish executing', cron);
+            },
         });
     }
 }

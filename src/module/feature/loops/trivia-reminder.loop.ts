@@ -1,9 +1,10 @@
 import { type Client, Colors, EmbedBuilder, type TextChannel } from 'discord.js';
 import { basename } from 'node:path';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
+import type { CronsTable } from '../../shared/tables/complexe-table/crons/crons.table';
 import { FeatureFlippingTable } from '../../shared/tables/complexe-table/feature-flipping/feature-flipping.table';
+import { CronUtil } from '../../shared/utils/cron.util';
 import { Logger } from '../../shared/utils/logger';
-import { TimeUtil } from '../../shared/utils/time.util';
 import { UserUtil } from '../../shared/utils/user.util';
 import type { BotLoop } from './types/bot-loop.type';
 
@@ -18,12 +19,15 @@ module.exports = {
             return;
         }
 
-        const req = require('../../shared/tables/complexe-table/channels/channels.table');
-        const channels = new req.ChannelsTable();
+        let req = require('../../shared/tables/complexe-table/channels/channels.table');
+        const channelsTable = new req.ChannelsTable();
 
-        const channel: TextChannel = await UserUtil.fetchChannelFromClient(client, await channels.getTrivia());
+        req = require('../../shared/tables/complexe-table/crons/crons.table');
+        const cronsTable: CronsTable = new req.CronsTable();
 
-        await TimeUtil.forLoopTimeSleep(['20:00'], `${EmojiEnum.LOOP} Trivia reminder`, async (): Promise<void> => {
+        const channel: TextChannel = await UserUtil.fetchChannelFromClient(client, await channelsTable.getTrivia());
+
+        CronUtil.createCron(await cronsTable.getCron('trivia'), async (): Promise<void> => {
             await channel.send({
                 embeds: [
                     new EmbedBuilder()
