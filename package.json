@@ -49,6 +49,7 @@
 		"@napi-rs/canvas": "^0.1.52",
 		"axios": "1.6.8",
 		"cheerio": "1.0.0-rc.12",
+		"cron": "^3.1.7",
 		"discord.js": "^14.15.2",
 		"mysql2": "^3.9.7",
 		"ts-node": "10.9.2"

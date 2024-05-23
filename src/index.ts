@@ -8,7 +8,7 @@ const logger: Logger = new Logger(basename(__filename));
 
 if (EnvUtil.isDev()) {
     logger.warn(
-        '=======================================================\n\t\t\tBot launch on DEV. This mode is not for production.\n=======================================================`'
+        '\n=======================================================\n\tBot launch on DEV. This mode is not for production.\n=======================================================`'
     );
 }
 
