@@ -4,9 +4,9 @@ import { LoggerInjector } from '../../../shared/decorators/injector/logger-injec
 import { Singleton } from '../../../shared/decorators/injector/singleton-injector.decorator';
 import { Table } from '../../../shared/decorators/injector/table-injector.decorator';
 import type { LeavingPlayersTable } from '../../../shared/tables/complexe-table/leaving-players/leaving-players.table';
-import type { PotentialClansTable } from '../../../shared/tables/complexe-table/potential-clans/potential-clans.table';
 import type { Clan } from '../../../shared/tables/complexe-table/watch-clans/models/watch-clans.type';
 import type { WatchClansTable } from '../../../shared/tables/complexe-table/watch-clans/watch-clans.table';
+import type { PotentialClansTable } from '../../../shared/tables/simple-table/potential-clans.table';
 import type { Logger } from '../../../shared/utils/logger';
 
 @LoggerInjector

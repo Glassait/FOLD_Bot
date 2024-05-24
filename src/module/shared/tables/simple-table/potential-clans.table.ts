@@ -1,8 +1,8 @@
-import { TableAbstract } from '../../../abstracts/table.abstract';
-import { DeleteBuilder } from '../../../builders/query/delete.builder';
-import { InsertIntoBuilder } from '../../../builders/query/insert-into.builder';
-import { SelectBuilder } from '../../../builders/query/select.builder';
-import { LoggerInjector } from '../../../decorators/injector/logger-injector.decorator';
+import { TableAbstract } from '../../abstracts/table.abstract';
+import { DeleteBuilder } from '../../builders/query/delete.builder';
+import { InsertIntoBuilder } from '../../builders/query/insert-into.builder';
+import { SelectBuilder } from '../../builders/query/select.builder';
+import { LoggerInjector } from '../../decorators/injector/logger-injector.decorator';
 
 /**
  * Represents a PotentialClanTable class for managing potential clans.

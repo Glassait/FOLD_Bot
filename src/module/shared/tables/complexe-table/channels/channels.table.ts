@@ -53,7 +53,7 @@ export class ChannelsTable extends TableAbstract {
      *
      * @returns {Promise<Channel>} - A promise that resolves to the channel.
      */
-    public async getChannel(name: string): Promise<Channel> {
+    private async getChannel(name: string): Promise<Channel> {
         if (EnvUtil.isDev()) {
             return Promise.resolve(this.DEV_CHANNEL);
         }

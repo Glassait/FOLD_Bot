@@ -16,15 +16,11 @@ In the folder you will find all the slash command of the bot.
 
     ```typescript
     import { ChatInputCommandInteraction } from 'discord.js';
-    import { SlashCommandModel } from './model/slash-command.model';
+    import { SlashCommandModel } from './models/slash-command.model';
 
-    export const command: SlashCommandModel = new SlashCommandModel(
-        'name',
-        'description',
-        async (interaction: ChatInputCommandInteraction): Promise<void> => {
-            // The code execute by the commande
-        }
-    );
+    module.exports = new SlashCommandModel('name', 'description', async (interaction: ChatInputCommandInteraction): Promise<void> => {
+        // The code execute by the commande
+    });
     ```
 
 3. Fill the name (IMPORTANT the name need to be the same has the file without the `.slash-command.ts`), description and execute part
@@ -46,7 +42,7 @@ import { SlashCommandMentionableOption } from '@discordjs/builders';
 import { ChatInputCommandInteraction } from 'discord.js';
 import { SlashCommandModel } from './model/slash-command.model';
 
-export const command: SlashCommandModel = new SlashCommandModel(
+module.exports = new SlashCommandModel(
     'ban',
     'Ban user',
     async (interaction: ChatInputCommandInteraction): Promise<void> => {
@@ -72,7 +68,7 @@ Example: Only people who can move user and higher can use this command.
 import { ChatInputCommandInteraction, PermissionsBitField } from 'discord.js';
 import { SlashCommandModel } from './model/slash-command.model';
 
-export const command: SlashCommandModel = new SlashCommandModel(
+module.exports = new SlashCommandModel(
     'move',
     'Move the user',
     async (interaction: ChatInputCommandInteraction): Promise<void> => {

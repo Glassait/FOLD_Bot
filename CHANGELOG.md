@@ -26,6 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.1.0] <span data-view-component="true" class="label pre-release">Pre-release</span>
 
+### Added
+
+-   Maintenance slash-command to annonce the maintenance of the bot
+
 ### Changed
 
 -   Changed the format of data storage from JSON to SQL database
@@ -498,7 +502,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[3.1.0]: https://github.com/Glassait/FOLD_Bot/compare/v3.0.0-2...v3.1.0-7
+[3.1.0]: https://github.com/Glassait/FOLD_Bot/compare/v3.0.0-2...v3.1.0-8
 [3.0.0]: https://github.com/Glassait/FOLD_Bot/compare/v2.3.0-6...v3.0.0-2
 [2.3.0]: https://github.com/Glassait/FOLD_Bot/compare/v2.2.10-6...v2.3.0-5
 [2.2.10]: https://github.com/Glassait/FOLD_Bot/compare/v2.2.9-8...v2.2.10-6
