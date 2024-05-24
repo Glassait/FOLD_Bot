@@ -3,7 +3,6 @@ import { DeleteBuilder } from '../../../builders/query/delete.builder';
 import { InsertIntoBuilder } from '../../../builders/query/insert-into.builder';
 import { SelectBuilder } from '../../../builders/query/select.builder';
 import { LoggerInjector } from '../../../decorators/injector/logger-injector.decorator';
-import type { PotentialClan } from './models/potential-clan.type';
 
 /**
  * Represents a PotentialClanTable class for managing potential clans.
@@ -17,32 +16,32 @@ export class PotentialClansTable extends TableAbstract {
     /**
      * Adds a clan to the table.
      *
-     * @param {string} url - The URL of the clan.
+     * @param {number} id - The ID of the clan.
      *
      * @returns {Promise<boolean>} A promise that resolves to true if the clan is successfully added, false otherwise.
      */
-    public async addClan(url: string): Promise<boolean> {
-        return await this.insert(new InsertIntoBuilder(this).columns('url').values(url));
+    public async addClan(id: number): Promise<boolean> {
+        return await this.insert(new InsertIntoBuilder(this).columns('id').values(id));
     }
 
     /**
-     * Retrieves a clan by clanId.
+     * Checks if a clan exists by its ID.
      *
-     * @param {number} clanId - The ID of the clan to retrieve.
+     * @param {number} clanId - The ID of the clan to check.
      *
-     * @returns {Promise<PotentialClan[]>} A promise that resolves to an array of PotentialClan objects.
+     * @returns {Promise<boolean>} - A promise that resolves to a boolean indicating whether the clan exists.
      */
-    public async getClan(clanId: number): Promise<PotentialClan[]> {
-        return await this.select(new SelectBuilder(this).columns('url').where([`url LIKE '%${clanId}%'`]));
+    public async clanExist(clanId: number): Promise<boolean> {
+        return !!((await this.select(new SelectBuilder(this).columns('COUNT(1) as  count').where([`id = ${clanId}`]))) as any)[0].count;
     }
 
     /**
      * Retrieves all clans.
      *
-     * @returns {Promise<PotentialClan[]>} A promise that resolves to an array of PotentialClan objects.
+     * @returns {Promise<number[]>} A promise that resolves to an array of PotentialClan objects.
      */
-    public async getAll(): Promise<PotentialClan[]> {
-        return await this.select(new SelectBuilder(this).columns('url'));
+    public async getAll(): Promise<number[]> {
+        return (await this.select<{ id: number }[]>(new SelectBuilder(this).columns('*'))).map(({ id }): number => id);
     }
 
     /**

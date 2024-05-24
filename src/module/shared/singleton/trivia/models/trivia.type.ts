@@ -1,4 +1,4 @@
+import type { TriviaQuestion } from '../../../tables/complexe-table/trivia/models/trivia.type';
 import type { DeepNonNullables } from '../../../types/commons.type';
-import type { TriviaQuestion } from '../../../types/table.type';
 
 export type TriviaSelected = DeepNonNullables<TriviaQuestion>;

@@ -7,7 +7,7 @@ import type { NewsWebsite } from '../../shared/tables/complexe-table/news-websit
 import { type NewsWebsitesTable } from '../../shared/tables/complexe-table/news-websites/news-websites.table';
 import { CronUtil } from '../../shared/utils/cron.util';
 import { Logger } from '../../shared/utils/logger';
-import type { WebSiteScraper } from './model/web-site-scraper.model';
+import type { WebSiteScraper } from './models/web-site-scraper.model';
 import type { BotLoop } from './types/bot-loop.type';
 
 module.exports = {

@@ -89,8 +89,8 @@ CREATE OR REPLACE INDEX player_answer_trivia_id_index
     ON player_answer ( trivia_id );
 
 CREATE OR REPLACE TABLE potential_clans (
-    id  int(11) UNSIGNED AUTO_INCREMENT COMMENT 'The generated id' PRIMARY KEY,
-    url text NOT NULL COMMENT 'The url of the clan found'
+    id int(11) UNSIGNED NOT NULL COMMENT 'The id of the clan'
+        PRIMARY KEY
 ) COMMENT 'This table manage all clans fold from leaving player';
 
 CREATE OR REPLACE TABLE trivia_data (

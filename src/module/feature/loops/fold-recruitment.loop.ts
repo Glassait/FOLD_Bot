@@ -6,7 +6,7 @@ import { FeatureFlippingTable } from '../../shared/tables/complexe-table/feature
 import type { WatchClansTable } from '../../shared/tables/complexe-table/watch-clans/watch-clans.table';
 import { CronUtil } from '../../shared/utils/cron.util';
 import { Logger } from '../../shared/utils/logger';
-import type { FoldRecruitmentModel } from './model/fold-recruitment.model';
+import type { FoldRecruitmentModel } from './models/fold-recruitment.model';
 import type { BotLoop } from './types/bot-loop.type';
 
 module.exports = {

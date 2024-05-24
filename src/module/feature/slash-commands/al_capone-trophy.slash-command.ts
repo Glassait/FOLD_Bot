@@ -9,7 +9,7 @@ import {
     type TextChannel,
 } from 'discord.js';
 import { UserUtil } from '../../shared/utils/user.util';
-import { SlashCommandModel } from './model/slash-command.model';
+import { SlashCommandModel } from './models/slash-command.model';
 
 module.exports = new SlashCommandModel(
     'al_capone-trophy',

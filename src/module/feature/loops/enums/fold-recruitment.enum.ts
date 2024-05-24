@@ -14,6 +14,10 @@ export enum FoldRecruitmentEnum {
      * Represents the clan ID property.
      */
     CLAN_ID = 'CLAN_ID',
+    /**
+     * Represents the clan TAG property.
+     */
+    CLAN_NAME = 'CLAN_NAME',
 }
 
 /**

@@ -6,5 +6,5 @@ export type FeatureFlippingName =
     | 'trivia_month'
     | 'fold_recruitment'
     | 'scrap_website'
-    | 'search_clan'
+    | 'detected_clan'
     | (string & Record<string, never>);

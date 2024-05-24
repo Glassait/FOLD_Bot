@@ -7,7 +7,7 @@ import { EmojiEnum } from '../../shared/enums/emoji.enum';
 import { CommandsTable } from '../../shared/tables/complexe-table/commands/commands.table';
 import type { CommandName } from '../../shared/tables/complexe-table/commands/models/commands.type';
 import { Logger } from '../../shared/utils/logger';
-import type { SlashCommandModel } from '../slash-commands/model/slash-command.model';
+import type { SlashCommandModel } from '../slash-commands/models/slash-command.model';
 
 module.exports = async (): Promise<void> => {
     const logger: Logger = new Logger(basename(__filename));

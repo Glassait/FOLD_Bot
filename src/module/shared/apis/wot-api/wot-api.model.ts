@@ -11,6 +11,8 @@ import type { Logger } from '../../utils/logger';
 import type { WargamingErrorType, WargamingSuccessType } from './models/wargaming-api.type';
 import { WotApiConstants } from './models/wot-api.enum';
 import type {
+    ClanDetailsDto,
+    ClanDetailsSuccess,
     ClansDto,
     ClansSuccess,
     PlayerDataSuccess,
@@ -117,6 +119,30 @@ export class WotApiModel {
         this.logger.debug(`${EmojiEnum.SOLDIER} Fetching player data with url {}`, url);
 
         return await this.getDataFromUrl<PlayerDataSuccess, PlayerDto>(url);
+    }
+
+    /**
+     * Fetches the details of a specific clan by its ID.
+     *
+     * @param {number} clanId - The ID of the clan to fetch details for.
+     *
+     * @returns {Promise<ClanDetailsSuccess>} - A promise that resolves to the details of the clan.
+     *
+     * @throws {Error} - If there is an issue fetching the clan details.
+     *
+     * @example
+     * const clanDetails = await fetchClanDetails(12345);
+     * console.log(clanDetails); // { "12345": { tag: "TAG" } }
+     */
+    public async fetchClanDetails(clanId: number): Promise<ClanDetailsSuccess> {
+        const url: string =
+            this.WOT_API +
+            (await this.wotApi.getUrl('clan_details'))
+                .replace(WotApiConstants.APPLICATION_ID, application_id_wot)
+                .replace(FoldRecruitmentEnum.CLAN_ID, String(clanId));
+        this.logger.debug(`${EmojiEnum.SOLDIER} Fetching clan details with url {}`, url);
+
+        return await this.getDataFromUrl<ClanDetailsSuccess, ClanDetailsDto>(url);
     }
 
     /**

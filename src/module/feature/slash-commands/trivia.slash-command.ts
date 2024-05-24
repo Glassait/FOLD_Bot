@@ -1,8 +1,8 @@
 import { type ChatInputCommandInteraction, SlashCommandSubcommandBuilder } from 'discord.js';
 import { FeatureFlippingTable } from '../../shared/tables/complexe-table/feature-flipping/feature-flipping.table';
 import { DateUtil } from '../../shared/utils/date.util';
-import { SlashCommandModel } from './model/slash-command.model';
-import { TriviaModel } from './model/trivia.model';
+import { SlashCommandModel } from './models/slash-command.model';
+import { TriviaModel } from './models/trivia.model';
 
 const MAPPING = {
     STATISTICS: {

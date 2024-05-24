@@ -6,7 +6,6 @@ import { FeatureFlippingTable } from '../../shared/tables/complexe-table/feature
 import { EnvUtil } from '../../shared/utils/env.util';
 import { Logger } from '../../shared/utils/logger';
 import { SentenceUtil } from '../../shared/utils/sentence.util';
-import type { SearchClanModel } from './models/search-clan.model';
 import type { TriviaMonthModel } from './models/trivia-month.model';
 import type { BotEvent } from './types/bot-event.type';
 
@@ -46,15 +45,6 @@ module.exports = {
 
                 await triviaMonth.initialise(client);
                 await triviaMonth.createEmbedAndSendToChannel();
-            });
-        }
-
-        if (await featuresTable.getFeature('search_clan')) {
-            EnvUtil.thread(async (): Promise<void> => {
-                const red = require('./models/search-clan.model');
-                const searchClanModel: SearchClanModel = new red.SearchClanModel();
-
-                await searchClanModel.searchClan();
             });
         }
 

@@ -7,8 +7,8 @@ import {
     type SlashCommandIntegerOption,
     SlashCommandSubcommandBuilder,
 } from 'discord.js';
-import { SlashCommandModel } from './model/slash-command.model';
-import { WatchClanModel } from './model/watch-clan.model';
+import { SlashCommandModel } from './models/slash-command.model';
+import { WatchClanModel } from './models/watch-clan.model';
 
 const MAPPING = {
     ADD: {
