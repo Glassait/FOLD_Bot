@@ -7,8 +7,9 @@ import { Logger } from './module/shared/utils/logger';
 const logger: Logger = new Logger(basename(__filename));
 
 if (EnvUtil.isDev()) {
-    logger.warn(
-        '\n=======================================================\n    Bot launch on DEV. This mode is not for production.\n=======================================================`'
+    // eslint-disable-next-line
+    console.warn(
+        '===========================================================\n    Bot launch on DEV. This mode is not for production.\n===========================================================`'
     );
 }
 

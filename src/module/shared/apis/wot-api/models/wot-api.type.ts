@@ -118,7 +118,6 @@ export type ClansSuccess = WargamingSuccessType<ClansData[]>;
  * };
  */
 export type ClansDto = ClansError | ClansSuccess;
-
 //endregion
 
 //region PLAYER_PERSONAL_DTO
@@ -146,4 +145,20 @@ export type PlayerDataSuccess = WargamingSuccessType<PlayersData>;
 export type PlayerDataError = WargamingErrorType;
 
 export type PlayerDto = PlayerDataError | PlayerDataSuccess;
+//endregion
+
+//region CLAN DETAILS
+export type ClanDetail = {
+    tag: string;
+};
+
+export type ClanDetails = {
+    [clanId: string]: ClanDetail;
+};
+
+export type ClanDetailsSuccess = WargamingSuccessType<ClanDetails>;
+
+export type ClanDetailsError = WargamingErrorType;
+
+export type ClanDetailsDto = ClanDetailsError | ClanDetailsSuccess;
 //endregion
