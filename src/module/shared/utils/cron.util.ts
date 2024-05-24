@@ -22,7 +22,7 @@ export class CronUtil {
         CronJob.from({
             cronTime: cron,
             onTick: async (): Promise<void> => {
-                this.logger.info(`${EmojiEnum.LOOP} - {} loop start at {}`, name, new Date().toDateString());
+                this.logger.info(`${EmojiEnum.LOOP} {} loop start at {}`, name, new Date().toISOString());
                 await callback();
             },
             start: true,
