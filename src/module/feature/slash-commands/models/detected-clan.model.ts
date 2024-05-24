@@ -12,6 +12,9 @@ import type { Logger } from '../../../shared/utils/logger';
 import { UserUtil } from '../../../shared/utils/user.util';
 import { FoldRecruitmentEnum } from '../../loops/enums/fold-recruitment.enum';
 
+/**
+ * DetectedClanModel class responsible for managing and processing detected clans.
+ */
 @LoggerInjector
 export class DetectedClanModel {
     //region INJECTION
@@ -23,22 +26,50 @@ export class DetectedClanModel {
     @Singleton('WotApi') private readonly wotApiModel: WotApiModel;
     //endregion
 
+    /**
+     * List of clan IDs to be processed.
+     */
     private clans: number[];
+
+    /**
+     * Text channel for sending messages.
+     */
     private channel: TextChannel;
+
+    /**
+     * URL for accessing Wargaming clan data.
+     */
     private wargamingUrl: string;
+
+    /**
+     * URL for accessing Wot Life clan data.
+     */
     private wotLifeUrl: string;
 
+    /**
+     * Initializes the model with necessary data.
+     *
+     * @param {Client} client - The client instance to use.
+     */
     public async initialize(client: Client): Promise<void> {
         this.channel = await UserUtil.fetchChannelFromClient(client, await this.channelsTable.getFoldRecruitment());
         this.wargamingUrl = await this.foldRecruitmentTable.getUrl('clan');
         this.wotLifeUrl = await this.wotApiTable.getUrl('wot_life_clan');
     }
 
+    /**
+     * Checks if there are any clans to process.
+     *
+     * @returns {Promise<boolean>} - A promise that resolves to a boolean indicating if there are clans to process.
+     */
     public async haveClanToProcess(): Promise<boolean> {
         this.clans = await this.potentialClanTable.getAll();
         return !!this.clans.length;
     }
 
+    /**
+     * Processes the detected clans and sends details to the channel.
+     */
     public async processClans(): Promise<void> {
         this.logger.debug('Start processing clans');
         let embed = this.buildEmbed();
@@ -66,7 +97,12 @@ export class DetectedClanModel {
         this.logger.debug('End processing clans');
     }
 
-    private buildEmbed() {
+    /**
+     * Builds an embed for displaying clan information.
+     *
+     * @returns {EmbedBuilder} - The embed builder instance.
+     */
+    private buildEmbed(): EmbedBuilder {
         return new EmbedBuilder().setTitle('Liste des clans détectés').setColor(Colors.DarkGold);
     }
 }

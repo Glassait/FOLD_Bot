@@ -93,7 +93,6 @@ CREATE OR REPLACE TABLE potential_clans (
         PRIMARY KEY
 ) COMMENT 'This table manage all clans fold from leaving player';
 
-
 CREATE OR REPLACE TABLE trivia_data (
     max_number_of_question     int                          NOT NULL COMMENT 'The max number of question that can be ask per day',
     max_number_of_unique_tanks int                          NOT NULL COMMENT 'The max number of tanks before a tank can be redraw',
