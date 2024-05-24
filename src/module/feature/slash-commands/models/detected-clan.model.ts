@@ -6,8 +6,8 @@ import { Table } from '../../../shared/decorators/injector/table-injector.decora
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 import type { ChannelsTable } from '../../../shared/tables/complexe-table/channels/channels.table';
 import type { FoldRecruitmentTable } from '../../../shared/tables/complexe-table/fold-recruitment/fold-recruitment.table';
-import type { PotentialClansTable } from '../../../shared/tables/complexe-table/potential-clans/potential-clans.table';
 import type { WotApiTable } from '../../../shared/tables/complexe-table/wot-api/wot-api.table';
+import type { PotentialClansTable } from '../../../shared/tables/simple-table/potential-clans.table';
 import type { Logger } from '../../../shared/utils/logger';
 import { UserUtil } from '../../../shared/utils/user.util';
 import { FoldRecruitmentEnum } from '../../loops/enums/fold-recruitment.enum';
