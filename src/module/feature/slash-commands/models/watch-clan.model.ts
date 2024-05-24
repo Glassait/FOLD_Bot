@@ -14,7 +14,7 @@ import { LoggerInjector } from '../../../shared/decorators/injector/logger-injec
 import { Singleton } from '../../../shared/decorators/injector/singleton-injector.decorator';
 import { Table } from '../../../shared/decorators/injector/table-injector.decorator';
 import type { BlacklistedPlayersTable } from '../../../shared/tables/complexe-table/blacklisted-players/blacklisted-players.table';
-import type { BlacklistedPlayer } from '../../../shared/tables/complexe-table/blacklisted-players/model/blacklisted-players.type';
+import type { BlacklistedPlayer } from '../../../shared/tables/complexe-table/blacklisted-players/models/blacklisted-players.type';
 import type { ChannelsTable } from '../../../shared/tables/complexe-table/channels/channels.table';
 import type { FeatureFlippingTable } from '../../../shared/tables/complexe-table/feature-flipping/feature-flipping.table';
 import type { Clan } from '../../../shared/tables/complexe-table/watch-clans/models/watch-clans.type';

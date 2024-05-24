@@ -4,7 +4,7 @@ import { InsertIntoBuilder } from '../../../builders/query/insert-into.builder';
 import { SelectBuilder } from '../../../builders/query/select.builder';
 import { LoggerInjector } from '../../../decorators/injector/logger-injector.decorator';
 import { StringUtil } from '../../../utils/string.util';
-import type { BlacklistedPlayer } from './model/blacklisted-players.type';
+import type { BlacklistedPlayer } from './models/blacklisted-players.type';
 
 /**
  * Represents a table for managing blacklisted players.

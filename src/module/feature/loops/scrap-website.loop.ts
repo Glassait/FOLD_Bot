@@ -30,7 +30,7 @@ module.exports = {
             return;
         }
 
-        req = require('./model/web-site-scraper.model');
+        req = require('./models/web-site-scraper.model');
         const webSiteScraper: WebSiteScraper = new req.WebSiteScraper();
         await webSiteScraper.initialise(client);
 
@@ -44,7 +44,7 @@ module.exports = {
             await cronsTable.getCron('newsletter'),
             'newsletter',
             async (): Promise<void> => {
-                await webSiteScraper.scrapWebsite(site[index]);
+                webSiteScraper.scrapWebsite(site[index]).then();
                 index = index >= site.length - 1 ? 0 : ++index;
             },
             true

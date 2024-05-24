@@ -26,7 +26,7 @@ module.exports = {
         req = require('../../shared/tables/complexe-table/crons/crons.table');
         const cronsTable: CronsTable = new req.CronsTable();
 
-        req = require('./model/fold-recruitment.model');
+        req = require('./models/fold-recruitment.model');
         const recruitmentModel: FoldRecruitmentModel = new req.FoldRecruitmentModel();
         await recruitmentModel.initialise(client);
 
