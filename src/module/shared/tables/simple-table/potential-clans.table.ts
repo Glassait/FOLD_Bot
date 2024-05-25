@@ -41,7 +41,7 @@ export class PotentialClansTable extends TableAbstract {
      * @returns {Promise<number[]>} A promise that resolves to an array of PotentialClan objects.
      */
     public async getAll(): Promise<number[]> {
-        return (await this.select<{ id: number }[]>(new SelectBuilder(this).columns('*'))).map(({ id }): number => id);
+        return (await this.select<{ id: number }>(new SelectBuilder(this).columns('*'))).map(({ id }): number => id);
     }
 
     /**

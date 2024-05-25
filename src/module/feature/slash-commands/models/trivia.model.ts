@@ -191,7 +191,8 @@ export class TriviaModel {
                 player = await this.playersTable.getPlayerByName(interaction.user.username);
             } catch (reason) {
                 await interaction.editReply({
-                    content: 'Il y a un problème avec la base de données, merci de réessayer plus tard',
+                    content:
+                        'Il y a un problème avec la base de données, merci de réessayer plus tard. Si le problème persist merci de contacter <@313006042340524033>',
                 });
                 this.logger.error(`Failed to insert new player in database with error : ${reason}`);
                 return;
@@ -228,6 +229,7 @@ export class TriviaModel {
                 content:
                     'Le jeu ne semble pas encore initialisé, merci de réessayer dans quelque minutes. Si le problème persist merci de contacter <@313006042340524033>',
             });
+            this.datum.delete(player.name);
             return;
         }
 
@@ -687,8 +689,8 @@ export class TriviaModel {
                 selectedTanks.id,
                 new Date(),
                 isGoodAnswer,
-                playerAnswer?.responseTime,
-                elo
+                elo,
+                playerAnswer?.responseTime
             );
 
             this.logger.info('Successfully add player {} answer in database', playerName);
