@@ -1,7 +1,7 @@
 import { type Client, Events } from 'discord.js';
 import { basename } from 'node:path';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
-import { TriviaSingleton } from '../../shared/singleton/trivia/trivia.singleton';
+import type { TriviaSingleton } from '../../shared/singleton/trivia/trivia.singleton';
 import { FeatureFlippingTable } from '../../shared/tables/complexe-table/feature-flipping/feature-flipping.table';
 import { EnvUtil } from '../../shared/utils/env.util';
 import { Logger } from '../../shared/utils/logger';
@@ -15,22 +15,12 @@ module.exports = {
     async execute(client: Client): Promise<void> {
         const logger: Logger = new Logger(basename(__filename));
         const featuresTable: FeatureFlippingTable = new FeatureFlippingTable();
-        const trivia: TriviaSingleton = TriviaSingleton.instance;
-
         logger.info(`${EmojiEnum.MUSCLE} Logged in as {}`, client.user?.tag as string);
 
         const status = SentenceUtil.getRandomStatus();
         logger.debug('Status of the bot set to {} and {}', status[0], status[1]);
 
         client.user?.setPresence({ activities: [{ type: status[0], name: status[1] }], status: 'online' });
-
-        if (await featuresTable.getFeature('trivia')) {
-            EnvUtil.asyncThread(trivia.createQuestionOfTheDay.bind(trivia));
-            EnvUtil.thread(async (): Promise<void> => {
-                await trivia.sendTriviaResultForYesterday(client);
-                await trivia.reduceEloOfInactifPlayer();
-            });
-        }
 
         const today: Date = new Date();
 
@@ -48,6 +38,7 @@ module.exports = {
             });
         }
 
+        const trivia: TriviaSingleton = require('../../shared/singleton/trivia/trivia.singleton').TriviaSingleton.instance;
         EnvUtil.asyncThread(trivia.updateTanksTableFromWotApi.bind(trivia));
     },
 } as BotEvent;

@@ -168,6 +168,17 @@ export class TriviaSingleton {
         await this.createQuestionOfTheDay();
     }
 
+    public async canReduceElo() {
+        const today = new Date();
+        const reduceDate = await this.triviaDataTable.getLastReduceDate();
+
+        return (
+            today.getFullYear() !== reduceDate.getFullYear() ||
+            today.getMonth() !== reduceDate.getMonth() ||
+            today.getDate() !== reduceDate.getDate()
+        );
+    }
+
     /**
      * Sends the results of yesterday's trivia to the configured channel.
      *
@@ -267,19 +278,22 @@ export class TriviaSingleton {
 
         for (const player of players) {
             const lastAnswer: TriviaAnswer = await this.playerAnswerTable.getLastAnswerOfPlayer(player.id);
-            const oldElo: number = lastAnswer?.elo ?? 0;
-            const daysInactive = DateUtil.diffOfDay(today, new Date(lastAnswer.date));
 
-            if ((!lastAnswer?.trivia_id && oldElo > 0) || daysInactive > 1) {
-                const newElo: number = Math.round(oldElo * 0.982);
-                inactivePlayers.push({
-                    playerName: player.name,
-                    eloChange: oldElo - newElo,
-                });
+            if (lastAnswer) {
+                const oldElo: number = lastAnswer?.elo ?? 0;
+                const daysInactive = DateUtil.diffOfDay(today, new Date(lastAnswer.date));
 
-                await this.playerAnswerTable.addAfkAnswer(player.id, yesterday, newElo);
+                if ((!lastAnswer?.trivia_id && oldElo > 0) || daysInactive > 1) {
+                    const newElo: number = Math.round(oldElo * 0.982);
+                    inactivePlayers.push({
+                        playerName: player.name,
+                        eloChange: oldElo - newElo,
+                    });
 
-                this.logger.debug('Inactif player spotted : {}, old elo : {}, new elo : {}', player.name, oldElo, newElo);
+                    await this.playerAnswerTable.addAfkAnswer(player.id, yesterday, newElo);
+
+                    this.logger.debug('Inactif player spotted : {}, old elo : {}, new elo : {}', player.name, oldElo, newElo);
+                }
             }
         }
 
@@ -299,6 +313,7 @@ export class TriviaSingleton {
 
             await this.channel.send({ embeds: [inactiveEmbed] });
         }
+        await this.triviaDataTable.updateLastReduceDate(new Date());
         this.logger.debug('Finished reducing Elo of inactive players');
     }
 

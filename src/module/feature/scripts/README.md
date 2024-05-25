@@ -1,86 +1,30 @@
-![GitHub repo file count (file extension)](https://img.shields.io/github/directory-file-count/Glassait/FOLD_Bot/src%2Fmodule%2Ffeature%2Fslash-commands?type=file&extension=ts&style=flat-square&label=Slash%20Command)
+![GitHub repo file count (file extension)](https://img.shields.io/github/directory-file-count/Glassait/FOLD_Bot/src%2Fmodule%2Ffeature%2Fscripts?type=file&extension=ts&style=flat-square&label=Scripts)
 
-# Slash Command
+# Scripts
 
-In the folder you will find all the slash command of the bot.
+In the folder you will find all the scripts of the bot.
 
-<p id="createNewSlashCommand"></p>
+A script is basically a code that you need to run only one time when the bot start.
 
-## Create new slash command
+## Create new script
 
 1. Create new typescript file in the folder with the patter
     ```text
-    name.slash-command.ts
+    name.script.ts
     ```
 2. Use the following template
 
     ```typescript
-    import { ChatInputCommandInteraction } from 'discord.js';
-    import { SlashCommandModel } from './models/slash-command.model';
+    import { ScriptModel } from './models/script.model';
 
-    module.exports = new SlashCommandModel('name', 'description', async (interaction: ChatInputCommandInteraction): Promise<void> => {
-        // The code execute by the commande
+    // The client param is optionnal, and can be remove if not need
+    module.exports = new ScriptModel('name', async (client: Client) => {
+        // Code to execute
     });
     ```
 
-3. Fill the name (IMPORTANT the name need to be the same has the file without the `.slash-command.ts`), description and execute part
-4. In the inventory.json add the new slash-command name and the array of guildID
-5. Congrats the new slash-command will be available, the registering of the command is automatic in the handler `commands.handler.ts`
-
-## ⚙️ Options & Permission
-
-You can add option and/or permission to the slash command
-
-### Options
-
-The forth arg in the `SlashCommand` constructor is dédicated to options, it takes array of `OptionType`.
-
-Example: The option allow the user to pass people of the discord server.
-
-```typescript
-import { SlashCommandMentionableOption } from '@discordjs/builders';
-import { ChatInputCommandInteraction } from 'discord.js';
-import { SlashCommandModel } from './model/slash-command.model';
-
-module.exports = new SlashCommandModel(
-    'ban',
-    'Ban user',
-    async (interaction: ChatInputCommandInteraction): Promise<void> => {
-        // The code execute by the commande
-    },
-    {
-        option: [new SlashCommandMentionableOption().setName('target').setDescription("L'utilisateur à déconnecter").setRequired(true)],
-    }
-);
-```
-
-Actually the `OptionType` have only 2 options `StringOption` and `MentionableOption`, you are free to add more, don't forget to update the `OptionMap` to manage it.
-
-Mode documentation on [discord.js](https://discordjs.guide/slash-commands/advanced-creation.html#adding-options)
-
-### Permission
-
-The last arg in the `SlashCommand` constructor is dédicated to permission. You just have to use the `PermissionsBitField.Flags` class form discord.js.
-
-Example: Only people who can move user and higher can use this command.
-
-```typescript
-import { ChatInputCommandInteraction, PermissionsBitField } from 'discord.js';
-import { SlashCommandModel } from './model/slash-command.model';
-
-module.exports = new SlashCommandModel(
-    'move',
-    'Move the user',
-    async (interaction: ChatInputCommandInteraction): Promise<void> => {
-        // The code execute by the commande
-    },
-    {
-        permission: PermissionsBitField.Flags.MoveMembers,
-    }
-);
-```
-
-More documentation on [discord.js](https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags)
+3. Fill the name and arrow function part
+4. Congrats the new script will be available, the registering of the command is automatic in the handler `script.handler.ts`
 
 ## Log
 
