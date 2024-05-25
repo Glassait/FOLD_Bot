@@ -168,7 +168,12 @@ export class TriviaSingleton {
         await this.createQuestionOfTheDay();
     }
 
-    public async canReduceElo() {
+    /**
+     * Determines if the Elo can be reduced by checking the last date of reduce in the database.
+     *
+     * @returns {Promise<boolean>} - True if the Elo can be reduced, false otherwise.
+     */
+    public async canReduceElo(): Promise<boolean> {
         const today = new Date();
         const reduceDate = await this.triviaDataTable.getLastReduceDate();
 

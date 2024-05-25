@@ -9,9 +9,11 @@ A script is basically a code that you need to run only one time when the bot sta
 ## Create new script
 
 1. Create new typescript file in the folder with the patter
+
     ```text
     name.script.ts
     ```
+   
 2. Use the following template
 
     ```typescript
