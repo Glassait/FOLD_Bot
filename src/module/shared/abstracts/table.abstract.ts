@@ -93,10 +93,10 @@ export class TableAbstract {
      *
      * @template T - The type return by the query select
      */
-    protected async select<T>(builder: SelectBuilder): Promise<T> {
+    protected async select<T>(builder: SelectBuilder): Promise<T[]> {
         const sql = builder.compute();
         this.validateQueryType(sql, 'SELECT');
-        return (await this.query(sql)) as T;
+        return (await this.query(sql)) as T[];
     }
 
     /**

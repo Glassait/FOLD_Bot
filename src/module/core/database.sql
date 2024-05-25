@@ -94,11 +94,12 @@ CREATE OR REPLACE TABLE potential_clans (
 ) COMMENT 'This table manage all clans fold from leaving player';
 
 CREATE OR REPLACE TABLE trivia_data (
-    max_number_of_question     int                          NOT NULL COMMENT 'The max number of question that can be ask per day',
-    max_number_of_unique_tanks int                          NOT NULL COMMENT 'The max number of tanks before a tank can be redraw',
-    max_response_time_limit    int                          NOT NULL COMMENT 'The max time to get extra points for good anwser',
-    max_duration_of_question   decimal(2, 1)                NOT NULL COMMENT 'The max duration of the question',
-    last_tank_page             longtext COLLATE utf8mb4_bin NOT NULL COMMENT 'The list of tanks draw, if a tanks is in the list it can''t be redraw'
+    max_number_of_question     int                              NOT NULL COMMENT 'The max number of question that can be ask per day',
+    max_number_of_unique_tanks int                              NOT NULL COMMENT 'The max number of tanks before a tank can be redraw',
+    max_response_time_limit    int                              NOT NULL COMMENT 'The max time to get extra points for good anwser',
+    max_duration_of_question   decimal(2, 1)                    NOT NULL COMMENT 'The max duration of the question',
+    last_tank_page             longtext COLLATE utf8mb4_bin     NOT NULL COMMENT 'The list of tanks draw, if a tanks is in the list it can''t be redraw',
+    last_date_reduction        date DEFAULT CURRENT_TIMESTAMP() NOT NULL COMMENT 'The last date when the bot reduce the elo of player'
 ) COMMENT 'This table store the data for the trivia game';
 
 CREATE OR REPLACE TABLE watch_clans (

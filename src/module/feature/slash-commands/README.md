@@ -1,4 +1,4 @@
-![GitHub repo file count (file extension)](https://img.shields.io/github/directory-file-count/Glassait/freePuntosBot/src%2Fmodule%2Ffeature%2Fslash-commands?type=file&extension=ts&style=flat-square&label=Slash%20Command)
+![GitHub repo file count (file extension)](https://img.shields.io/github/directory-file-count/Glassait/FOLD_Bot/src%2Fmodule%2Ffeature%2Fslash-commands?type=file&extension=ts&style=flat-square&label=Slash%20Command)
 
 # Slash Command
 
@@ -23,8 +23,8 @@ In the folder you will find all the slash command of the bot.
     });
     ```
 
-3. Fill the name (IMPORTANT the name need to be the same has the file without the `.slash-command.ts`), description and execute part
-4. In the inventory.json add the new slash-command name and the array of guildID
+3. Fill the name (IMPORTANT the name need to be the same has the file without the `.slash-command.ts`), description and arrow function part
+4. In the commands table in the database add the new slash-command name and the array of guildID like this `id,id,...`
 5. Congrats the new slash-command will be available, the registering of the command is automatic in the handler `commands.handler.ts`
 
 ## ⚙️ Options & Permission
