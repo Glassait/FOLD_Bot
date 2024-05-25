@@ -1,7 +1,6 @@
 import { TableAbstract } from '../../../abstracts/table.abstract';
 import { SelectBuilder } from '../../../builders/query/select.builder';
 import { LoggerInjector } from '../../../decorators/injector/logger-injector.decorator';
-import type { FoldRecruitmentUrl } from './models/fold-recruitment.type';
 
 /**
  * Represents a table for storing information related to Fold Recruitment.
@@ -13,13 +12,16 @@ export class FoldRecruitmentTable extends TableAbstract {
     }
 
     /**
-     * Retrieves the URL associated with a specific type of Fold Recruitment.
-     *
-     * @param {FoldRecruitmentUrl} url - The type of Fold Recruitment URL.
-     *
-     * @returns {Promise<string>} - The URL associated with the specified type of Fold Recruitment.
+     * Get the minimal wn8 for the fold recruitment
      */
-    public async getUrl(url: FoldRecruitmentUrl): Promise<string> {
-        return ((await this.select(new SelectBuilder(this).columns(`${url}_url`))) as any)[0][`${url}_url`];
+    public async getMinWn8(): Promise<number> {
+        return (await this.select<{ wn8_min: number }>(new SelectBuilder(this).columns('wn8_min')))[0].wn8_min;
+    }
+
+    /**
+     * Get the minimal amount of battles for the fold recruitment
+     */
+    public async getMinBattles(): Promise<number> {
+        return (await this.select<{ battles_min: number }>(new SelectBuilder(this).columns('battles_min')))[0].battles_min;
     }
 }

@@ -1,5 +1,5 @@
 import { TableAbstract } from '../../../abstracts/table.abstract';
-import type { Ammo } from '../../../apis/wot-api/models/wot-api.type';
+import type { Ammo } from '../../../apis/wot/models/wot-api.type';
 import { InsertIntoBuilder } from '../../../builders/query/insert-into.builder';
 import { SelectBuilder } from '../../../builders/query/select.builder';
 import { LoggerInjector } from '../../../decorators/injector/logger-injector.decorator';

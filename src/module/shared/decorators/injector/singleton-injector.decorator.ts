@@ -44,11 +44,6 @@ export function Singleton<GSingleton extends SingletonDependence>(
                         httpsAgent: new AgentHttps({ keepAlive: true, timeout: timeout }),
                     });
                     break;
-                case 'WotApi': {
-                    const req = require('../../apis/wot-api/wot-api.model');
-                    field = new req.WotApiModel();
-                    break;
-                }
                 case 'Database':
                     field = require('../../singleton/database.singleton').DatabaseSingleton.instance;
                     break;

@@ -27,11 +27,8 @@ CREATE OR REPLACE TABLE feature_flipping (
 ) COMMENT 'Table following the feature flipping of each feature of the bot';
 
 CREATE OR REPLACE TABLE fold_recruitment (
-    newsfeed_url  text NOT NULL COMMENT 'The url of wargaming to get the news of the clan',
-    clan_url      text NOT NULL COMMENT 'The wargaming url to the clan page',
-    tomato_url    text NOT NULL COMMENT 'The tomato.gg url for the player',
-    wargaming_url text NOT NULL COMMENT 'The wargaming url for the player',
-    wot_life_url  text NOT NULL COMMENT 'The wot life url for the player'
+    wn8_min     int(6) DEFAULT 1000 NOT NULL COMMENT 'The minimal wn8 needed for the recruitment',
+    battles_min int    DEFAULT 5000 NOT NULL COMMENT 'The minimal amount of battle needed for the recruitment'
 ) COMMENT 'This table manage the fold recruitment';
 
 CREATE OR REPLACE TABLE leaving_players (

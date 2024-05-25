@@ -1,7 +1,9 @@
+import { LoggerInjector } from '../../decorators/injector/logger-injector.decorator';
 import { StringUtil } from '../../utils/string.util';
 import { ApiBase } from '../api.base';
 import type { TomatoError, TomatoOverall, TomatoSuccess } from './models/tomato-api.type';
 
+@LoggerInjector
 export class TomatoApi extends ApiBase {
     constructor() {
         super('https://api.tomato.gg/');

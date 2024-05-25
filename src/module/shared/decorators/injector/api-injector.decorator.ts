@@ -31,7 +31,10 @@ export function Api<GApi extends ApiDependence>(
                     field = new (require('../../apis/tomato/tomato.api').TomatoApi)();
                     break;
                 case 'Wot':
-                    field = new (require('../../apis/wot-api/wot-api.model').WotApiModel)();
+                    field = new (require('../../apis/wot/wot.api').WotApi)();
+                    break;
+                case 'Wargaming':
+                    field = new (require('../../apis/wargaming/wargaming.api').WargamingApi)();
                     break;
                 default:
                     throw new Error(`Unsupported dependence type: ${dependence}`);

@@ -1,7 +1,7 @@
-import type { PlayerPersonalDataSuccess } from '../../../shared/apis/wot-api/models/wot-api.type';
-import type { WotApiModel } from '../../../shared/apis/wot-api/wot-api.model';
+import type { PlayerPersonalDataSuccess } from '../../../shared/apis/wot/models/wot-api.type';
+import type { WotApi } from '../../../shared/apis/wot/wot.api';
+import { Api } from '../../../shared/decorators/injector/api-injector.decorator';
 import { LoggerInjector } from '../../../shared/decorators/injector/logger-injector.decorator';
-import { Singleton } from '../../../shared/decorators/injector/singleton-injector.decorator';
 import { Table } from '../../../shared/decorators/injector/table-injector.decorator';
 import type { LeavingPlayersTable } from '../../../shared/tables/complexe-table/leaving-players/leaving-players.table';
 import type { Clan } from '../../../shared/tables/complexe-table/watch-clans/models/watch-clans.type';
@@ -13,7 +13,7 @@ import type { Logger } from '../../../shared/utils/logger';
 export class DetectedClanModel {
     //region INJECTABLE
     private readonly logger: Logger;
-    @Singleton('WotApi') private readonly wotApi: WotApiModel;
+    @Api('Wot') private readonly wotApi: WotApi;
     @Table('WatchClans') private readonly watchClans: WatchClansTable;
     @Table('LeavingPlayers') private readonly leavingPlayers: LeavingPlayersTable;
     @Table('PotentialClans') private readonly potentialClans: PotentialClansTable;

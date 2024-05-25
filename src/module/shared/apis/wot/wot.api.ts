@@ -1,7 +1,6 @@
 import { application_id_wot } from '../../../core/config.json';
 import { LoggerInjector } from '../../decorators/injector/logger-injector.decorator';
 import { ApiBase } from '../api.base';
-import type { WargamingErrorType, WargamingSuccessType } from './models/wargaming-api.type';
 import type {
     ClanDetailsDto,
     ClanDetailsSuccess,
@@ -14,9 +13,10 @@ import type {
     TankopediaVehicle,
     TankopediaVehiclesSuccess,
 } from './models/wot-api.type';
+import type { WargamingErrorType, WargamingSuccessType } from './models/wot-base-api.type';
 
 @LoggerInjector
-export class WotApiModel extends ApiBase {
+export class WotApi extends ApiBase {
     /**
      * The maximum number of try when fetching vehicle's data
      * @default 5

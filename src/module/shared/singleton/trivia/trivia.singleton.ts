@@ -1,8 +1,8 @@
 import { type Client, Colors, EmbedBuilder, type TextChannel } from 'discord.js';
 import { basename } from 'node:path';
 import { ShellEnum, ShellType } from '../../../feature/slash-commands/enums/shell.enum';
-import type { TankopediaVehiclesSuccess, VehicleData } from '../../apis/wot-api/models/wot-api.type';
-import type { WotApiModel } from '../../apis/wot-api/wot-api.model';
+import type { TankopediaVehiclesSuccess, VehicleData } from '../../apis/wot/models/wot-api.type';
+import type { WotApi } from '../../apis/wot/wot.api';
 import { EmojiEnum } from '../../enums/emoji.enum';
 import { TimeEnum } from '../../enums/time.enum';
 import { ChannelsTable } from '../../tables/complexe-table/channels/channels.table';
@@ -32,7 +32,7 @@ import type { TriviaSelected } from './models/trivia.type';
 export class TriviaSingleton {
     //region INJECTION
     private readonly logger: Logger;
-    private readonly wotApi: WotApiModel;
+    private readonly wotApi: WotApi;
     private readonly channels: ChannelsTable;
     private readonly triviaDataTable: TriviaDataTable;
     private readonly tanksTable: TanksTable;
@@ -89,7 +89,7 @@ export class TriviaSingleton {
     //endregion
 
     private constructor() {
-        this.wotApi = new (require('../../apis/wot-api/wot-api.model').WotApiModel)();
+        this.wotApi = new (require('../../apis/wot/wot.api').WotApi)();
         this.logger = new Logger(basename(__filename));
         this.channels = new ChannelsTable();
         this.triviaDataTable = new TriviaDataTable();

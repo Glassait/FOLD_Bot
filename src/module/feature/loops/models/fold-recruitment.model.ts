@@ -1,11 +1,13 @@
-import type { AxiosInstance } from 'axios';
 import { type Client, Colors, EmbedBuilder, type TextChannel } from 'discord.js';
-import { WotApiModel } from '../../../shared/apis/wot-api/wot-api.model';
+import type { TomatoOverall, TomatoSuccess } from '../../../shared/apis/tomato/models/tomato-api.type';
+import type { TomatoApi } from '../../../shared/apis/tomato/tomato.api';
+import type { ClanActivity, LeaveClanActivity, Players, WargamingNewsfeed } from '../../../shared/apis/wargaming/models/wargaming.type';
+import type { WargamingApi } from '../../../shared/apis/wargaming/wargaming.api';
+import { WotApi } from '../../../shared/apis/wot/wot.api';
+import { Api } from '../../../shared/decorators/injector/api-injector.decorator';
 import { LoggerInjector } from '../../../shared/decorators/injector/logger-injector.decorator';
-import { Singleton } from '../../../shared/decorators/injector/singleton-injector.decorator';
 import { Table } from '../../../shared/decorators/injector/table-injector.decorator';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
-import { TimeEnum } from '../../../shared/enums/time.enum';
 import type { BlacklistedPlayersTable } from '../../../shared/tables/complexe-table/blacklisted-players/blacklisted-players.table';
 import type { BlacklistedPlayer } from '../../../shared/tables/complexe-table/blacklisted-players/models/blacklisted-players.type';
 import type { ChannelsTable } from '../../../shared/tables/complexe-table/channels/channels.table';
@@ -15,9 +17,9 @@ import type { Clan } from '../../../shared/tables/complexe-table/watch-clans/mod
 import type { WatchClansTable } from '../../../shared/tables/complexe-table/watch-clans/watch-clans.table';
 import type { Logger } from '../../../shared/utils/logger';
 import { StringUtil } from '../../../shared/utils/string.util';
+import { UrlUtil } from '../../../shared/utils/url.util';
 import { UserUtil } from '../../../shared/utils/user.util';
-import { FoldRecruitmentEnum, WotClanActivity } from '../enums/fold-recruitment.enum';
-import type { ClanActivity, FoldRecruitmentData, LeaveClanActivity, Players } from '../types/fold-recruitment.type';
+import { WotClanActivity } from '../enums/fold-recruitment.enum';
 
 @LoggerInjector
 export class FoldRecruitmentModel {
@@ -27,18 +29,26 @@ export class FoldRecruitmentModel {
      */
     private readonly embedNoPlayerFound: EmbedBuilder = new EmbedBuilder()
         .setColor(Colors.DarkRed)
-        .setTitle("Aucun joueur n'a quitté son clan depuis le dernier scan !");
+        .setTitle("Aucun joueur n'a quitté son clan deputise le dernier scan !");
+
+    /**
+     * Embed for the message indicating that no player was found.
+     */
+    private readonly embedNoPlayerMeetCriteria: EmbedBuilder = new EmbedBuilder()
+        .setColor(Colors.DarkRed)
+        .setTitle("Le recrutement n'a trouvé aucun joueur satisfaisant les conditions requises.");
     //endregion
 
     //region INJECTABLE
     private readonly logger: Logger;
-    private readonly wotApiModel: WotApiModel = new WotApiModel();
-    @Singleton('Axios', TimeEnum.SECONDE * 30) private readonly axios: AxiosInstance;
     @Table('WatchClans') private readonly watchClans: WatchClansTable;
     @Table('BlacklistedPlayers') private readonly blacklistedPlayers: BlacklistedPlayersTable;
     @Table('LeavingPlayers') private readonly leavingPlayers: LeavingPlayersTable;
     @Table('Channels') private readonly channels: ChannelsTable;
-    @Table('FoldRecruitment') private readonly foldRecruitment: FoldRecruitmentTable;
+    @Table('FoldRecruitment') private readonly foldRecruitmentTable: FoldRecruitmentTable;
+    @Api('Wargaming') private readonly wargamingApi: WargamingApi;
+    @Api('Tomato') private readonly tomatoApi: TomatoApi;
+    @Api('Wot') private readonly wotApi: WotApi;
     //endregion
 
     //region PRIVATE FIELDS
@@ -46,43 +56,26 @@ export class FoldRecruitmentModel {
      * The channel to send the leaving player inside
      */
     private channel: TextChannel;
-    /**
-     * The base url for the wargaming feed of elements
-     *
-     * @replace CLAN_ID
-     */
-    private url: string;
-    /**
-     * The base url for the wot clan
-     *
-     * @replace CLAN_ID
-     */
-    private clanUrl: string;
-    /**
-     * The base url of tomatoGG for player's statistics
-     *
-     * @replace PLAYER_ID
-     * @replace PLAYER_NAME
-     */
-    private tomato: string;
-    /**
-     * The base url of Wargaming for player's statistics
-     *
-     * @replace PLAYER_ID
-     * @replace PLAYER_NAME
-     */
-    private wargaming: string;
-    /**
-     * The base url of Wot Life for player's statistics
-     *
-     * @replace PLAYER_ID
-     * @replace PLAYER_NAME
-     */
-    private wotLife: string;
+
     /**
      * Indicates whether any player was found during the fold recruitment.
      */
     private _noPlayerFound: boolean;
+
+    /**
+     * Indicates whether any player meet the criteria during the fold recruitment.
+     */
+    private _noPlayerMeetCriteria: boolean;
+
+    /**
+     * The minimal wn8 for the fold recruitment
+     */
+    private minWn8: number;
+
+    /**
+     * The minimal amount of battles for the fold recruitment
+     */
+    private minBattles: number;
     //endregion
 
     //region GETTER
@@ -92,6 +85,14 @@ export class FoldRecruitmentModel {
 
     set noPlayerFound(bool: boolean) {
         this._noPlayerFound = bool;
+    }
+
+    get noPlayerMeetCriteria(): boolean {
+        return this._noPlayerMeetCriteria;
+    }
+
+    set noPlayerMeetCriteria(bool: boolean) {
+        this._noPlayerMeetCriteria = bool;
     }
     //endregion
 
@@ -105,11 +106,8 @@ export class FoldRecruitmentModel {
     public async initialise(client: Client): Promise<void> {
         this.channel = await UserUtil.fetchChannelFromClient(client, await this.channels.getFoldRecruitment());
 
-        this.url = await this.foldRecruitment.getUrl('newsfeed');
-        this.clanUrl = await this.foldRecruitment.getUrl('clan');
-        this.tomato = await this.foldRecruitment.getUrl('tomato');
-        this.wargaming = await this.foldRecruitment.getUrl('wargaming');
-        this.wotLife = await this.foldRecruitment.getUrl('wot_life');
+        this.minWn8 = await this.foldRecruitmentTable.getMinWn8();
+        this.minBattles = await this.foldRecruitmentTable.getMinBattles();
     }
 
     /**
@@ -118,13 +116,9 @@ export class FoldRecruitmentModel {
      * @param {Clan} clan - The clan for which the activity have to be fetched.
      */
     public async fetchClanActivity(clan: Clan): Promise<void> {
-        const url: string = this.url
-            .replace(FoldRecruitmentEnum.CLAN_ID, String(clan.id))
-            .replace('today', new Date().toISOString().slice(0, 19));
-
         if (!clan.image_url) {
             try {
-                clan.image_url = (await this.wotApiModel.clansList(clan.name)).data[0]?.emblems?.x64?.portal;
+                clan.image_url = (await this.wotApi.clansList(clan.name)).data[0]?.emblems?.x64?.portal;
                 await this.watchClans.updateClan(clan);
             } catch (error) {
                 this.logger.error('An error occurred while fetching the image of the clan', error);
@@ -132,8 +126,7 @@ export class FoldRecruitmentModel {
         }
 
         try {
-            this.logger.debug('Fetching activity of the clan with url: {}', url);
-            return await this.manageClanActivities(clan, (await this.axios.get(url)).data);
+            return await this.manageClanActivities(clan, await this.wargamingApi.clansNewsfeed(clan.id));
         } catch (error) {
             this.logger.error('An error occurred while fetching the activity of the clan', error);
         }
@@ -148,13 +141,21 @@ export class FoldRecruitmentModel {
     }
 
     /**
+     * Sends a message to the fold recruitment channel indicating that no player meets the criteria.
+     */
+    public async sendMessageNoPlayerMeetCriteria() {
+        this.logger.info('No player meet the clan criteria during the fold recruitment !');
+        await this.channel.send({ embeds: [this.embedNoPlayerMeetCriteria] });
+    }
+
+    /**
      * Manages clan activities by processing the Fold recruitment data.
      * Updates clan information and sends notifications for players leaving the clan.
      *
      * @param {Clan} clan - The clan object.
-     * @param {FoldRecruitmentData} data - The Fold recruitment data.
+     * @param {WargamingNewsfeed} data - The Fold recruitment data.
      */
-    private async manageClanActivities(clan: Clan, data: FoldRecruitmentData): Promise<void> {
+    private async manageClanActivities(clan: Clan, data: WargamingNewsfeed): Promise<void> {
         const { datum, extracted } = this.extractPlayerFromFeed(data, clan);
 
         this.logger.debug('{} players leaves the clan', datum.length);
@@ -178,13 +179,20 @@ export class FoldRecruitmentModel {
      * @param {Clan} clan - The clan from which the player has left.
      */
     private async buildAndSendEmbedForPlayer(player: Players, clan: Clan): Promise<void> {
+        const tomatoOverall: TomatoSuccess<TomatoOverall> = await this.tomatoApi.playerOverall(player.id);
+
+        if (tomatoOverall.data.overallWN8 < this.minWn8 || tomatoOverall.data.battles < this.minBattles) {
+            return;
+        }
+
+        this._noPlayerMeetCriteria = false;
         const blacklisted: BlacklistedPlayer | undefined = (await this.blacklistedPlayers.getPlayer(player.id)).shift();
 
         const embedPlayer: EmbedBuilder = new EmbedBuilder()
             .setAuthor({
                 name: `${clan.name} ${EmojiEnum.REDIRECTION}`,
                 iconURL: clan.image_url,
-                url: this.clanUrl.replace(FoldRecruitmentEnum.CLAN_ID, String(clan.id)),
+                url: UrlUtil.getWargamingClanUrl(clan.id),
             })
             .setTitle(blacklisted ? 'Joueur sur liste noire détecté' : 'Nouveau joueur pouvant être recruté')
             .setDescription(
@@ -204,23 +212,17 @@ export class FoldRecruitmentModel {
             .setFields(
                 {
                     name: 'Wargaming',
-                    value: `[Redirection ${EmojiEnum.REDIRECTION}](${this.wargaming
-                        .replace(FoldRecruitmentEnum.PLAYER_NAME, player.name)
-                        .replace(FoldRecruitmentEnum.PLAYER_ID, String(player.id))})`,
+                    value: `[Redirection ${EmojiEnum.REDIRECTION}](${UrlUtil.getWargamingPlayerUrl(player.name, player.id)})`,
                     inline: true,
                 },
                 {
                     name: 'TomatoGG',
-                    value: `[Redirection ${EmojiEnum.REDIRECTION}](${this.tomato
-                        .replace(FoldRecruitmentEnum.PLAYER_NAME, player.name)
-                        .replace(FoldRecruitmentEnum.PLAYER_ID, String(player.id))})`,
+                    value: `[Redirection ${EmojiEnum.REDIRECTION}](${UrlUtil.getTomatoPlayerUrl(player.name, player.id)})`,
                     inline: true,
                 },
                 {
                     name: 'Wot Life',
-                    value: `[Redirection ${EmojiEnum.REDIRECTION}](${this.wotLife
-                        .replace(FoldRecruitmentEnum.PLAYER_NAME, player.name)
-                        .replace(FoldRecruitmentEnum.PLAYER_ID, String(player.id))})`,
+                    value: `[Redirection ${EmojiEnum.REDIRECTION}](${UrlUtil.getWotLifePlayerUrl(player.name, player.id)})`,
                     inline: true,
                 }
             )
@@ -232,13 +234,13 @@ export class FoldRecruitmentModel {
     /**
      * Extracts players and leave clan activities from the given clan activity feed data.
      *
-     * @param {FoldRecruitmentData} data - The clan activity feed data.
+     * @param {WargamingNewsfeed} data - The clan activity feed data.
      * @param {Clan} clan - The clan to extract player from feed
      *
      * @returns {{ datum: Players[]; extracted: LeaveClanActivity[] }} - An object containing extracted players and leave clan activities.
      */
     private extractPlayerFromFeed(
-        data: FoldRecruitmentData,
+        data: WargamingNewsfeed,
         clan: Clan
     ): {
         datum: Players[];
