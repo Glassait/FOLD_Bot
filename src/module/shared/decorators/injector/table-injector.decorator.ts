@@ -1,4 +1,4 @@
-import type { Constructor } from './models/constructor.type';
+import type { Constructor } from './models/injector.type';
 
 let tableMap: {
     // Commons
@@ -14,7 +14,6 @@ let tableMap: {
     // Newsletter
     NewsWebsites: Constructor;
     BanWords: Constructor;
-    WotApi: Constructor;
     // Trivia game
     TriviaData: Constructor;
     Tanks: Constructor;
@@ -56,7 +55,6 @@ export function Table(
             // Newsletter
             NewsWebsites: require('../../tables/complexe-table/news-websites/news-websites.table').NewsWebsitesTable,
             BanWords: require('../../tables/simple-table/ban-words.table').BanWordsTable,
-            WotApi: require('../../tables/complexe-table/wot-api/wot-api.table').WotApiTable,
             // Trivia game
             TriviaData: require('../../tables/complexe-table/trivia-data/trivia-data.table').TriviaDataTable,
             Tanks: require('../../tables/complexe-table/tanks/tanks.table').TanksTable,

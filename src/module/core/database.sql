@@ -120,12 +120,6 @@ CREATE OR REPLACE TABLE win_streak (
             ON UPDATE CASCADE ON DELETE CASCADE
 ) COMMENT 'This table store the month win streak of trivia game player';
 
-CREATE OR REPLACE TABLE wot_api (
-    id   int(3) UNSIGNED AUTO_INCREMENT COMMENT 'The generated id' PRIMARY KEY,
-    name text NOT NULL COMMENT 'The name of the wot api',
-    url  text NOT NULL COMMENT 'The url of the wot api'
-) COMMENT 'This table store the different wargaming url used by the bot';
-
 CREATE OR REPLACE TABLE crons (
     id   int AUTO_INCREMENT COMMENT 'The generated id'
         PRIMARY KEY,

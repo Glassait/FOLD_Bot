@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Agent as AgentHttp } from 'node:http';
 import { Agent as AgentHttps } from 'node:https';
 import { TimeEnum } from '../../enums/time.enum';
-import type { SingletonDependence } from './models/singleton-injector.type';
+import type { SingletonDependence } from './models/injector.type';
 
 /**
  * Decorator function that injects singleton instances based on the provided dependence type.
@@ -21,10 +21,7 @@ import type { SingletonDependence } from './models/singleton-injector.type';
  * import { TriviaSingleton } from '../../singleton/trivia.singleton';
  *
  * class MyComponent {
- *   \@Singleton('Trivia')
- *   triviaService: TriviaSingleton;
- *
- *   // ...
+ *   \@Singleton('Trivia') private readonly triviaSingleton: TriviaSingleton;
  * }
  */
 export function Singleton<GSingleton extends SingletonDependence>(

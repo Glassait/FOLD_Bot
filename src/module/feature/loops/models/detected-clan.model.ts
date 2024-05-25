@@ -27,7 +27,7 @@ export class DetectedClanModel {
         this.logger.info('Starting fetching clan of leaving player');
 
         for (const playerId of await this.leavingPlayers.getAll()) {
-            const result: PlayerPersonalDataSuccess = await this.wotApi.fetchPlayerPersonalData(playerId.id);
+            const result: PlayerPersonalDataSuccess = await this.wotApi.accountInfo(playerId.id);
             const clanId = result.data[playerId.id].clan_id;
             const clans: Clan[] = await this.watchClans.selectClan(String(clanId));
 

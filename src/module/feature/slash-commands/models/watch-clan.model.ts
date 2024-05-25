@@ -242,7 +242,7 @@ export class WatchClanModel {
             let searchResult: WargamingSuccessType<PlayerData[]>;
 
             try {
-                searchResult = await this.wotApi.fetchPlayerData(idAndName);
+                searchResult = await this.wotApi.accountList(idAndName);
             } catch (e) {
                 await interaction.editReply({
                     content: 'Le pseudo passé contient une ou plusieurs erreurs !',
@@ -426,7 +426,7 @@ export class WatchClanModel {
         }
 
         try {
-            const searchResult: WargamingSuccessType<PlayerData[]> = await this.wotApi.fetchPlayerData(focusedOption.value);
+            const searchResult: WargamingSuccessType<PlayerData[]> = await this.wotApi.accountList(focusedOption.value);
 
             await interaction.respond(
                 searchResult.data

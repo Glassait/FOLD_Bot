@@ -328,7 +328,7 @@ export class TriviaSingleton {
     public async updateTanksTableFromWotApi(): Promise<void> {
         this.logger.info('Start updating the tanks database');
 
-        const vehicles: VehicleData[] = this.extractTankData(await this.wotApi.fetchTankopediaApi());
+        const vehicles: VehicleData[] = this.extractTankData(await this.wotApi.tankopediaVehicles());
 
         for (const vehicle of Object.values(vehicles)) {
             const tank: Tank | null = await this.tanksTable.getTankByName(vehicle.name);

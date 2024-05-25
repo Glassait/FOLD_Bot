@@ -1,5 +1,5 @@
 import { ContextAbstract } from '../../abstracts/context.abstract';
-import type { Constructor } from './models/constructor.type';
+import type { Constructor } from './models/injector.type';
 
 /**
  * Decorator function that injects a logger instance into a class.

@@ -124,7 +124,7 @@ export class FoldRecruitmentModel {
 
         if (!clan.image_url) {
             try {
-                clan.image_url = (await this.wotApiModel.fetchClanImage(clan.name)).data[0]?.emblems?.x64?.portal;
+                clan.image_url = (await this.wotApiModel.clansList(clan.name)).data[0]?.emblems?.x64?.portal;
                 await this.watchClans.updateClan(clan);
             } catch (error) {
                 this.logger.error('An error occurred while fetching the image of the clan', error);
