@@ -112,7 +112,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
--   Rework the trivia game, everything explain here [#138](https://github.com/Glassait/freePuntosBot/issues/138)
+-   Rework the trivia game, everything explain here [#138](https://github.com/Glassait/FOLD_Bot/issues/138)
 -   Blank the base content of feature.json
 -   Put url for fold-recruitment in inventory
 -   Transform list of clan for recruitment in object with clan id in properties

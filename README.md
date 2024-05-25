@@ -1,9 +1,9 @@
-![GitHub issues by-label](https://img.shields.io/github/issues/Glassait/freePuntosBot/enhancement?logo=github&color=green&style=for-the-badge)
-![GitHub issues by-label](https://img.shields.io/github/issues/Glassait/freePuntosBot/bug?logo=github&color=red&style=for-the-badge)
-![GitHub closed issues](https://img.shields.io/github/issues-closed/Glassait/freePuntosBot?logo=github&color=open&style=for-the-badge&link=https%3A%2F%2Fgithub.com%2FGlassait%2FfreePuntosBot%2Fissues)
-![GitHub package.json version (branch)](https://img.shields.io/github/package-json/v/Glassait/freePuntosBot/main?style=for-the-badge)
-![GitHub commit activity (branch)](https://img.shields.io/github/commit-activity/m/Glassait/freePuntosBot?logo=github&style=for-the-badge)
-![GitHub contributors](https://img.shields.io/github/contributors/Glassait/freePuntosBot?logo=github&style=for-the-badge&color=purple)
+![GitHub issues by-label](https://img.shields.io/github/issues/Glassait/FOLD_Bot/enhancement?logo=github&color=green&style=for-the-badge)
+![GitHub issues by-label](https://img.shields.io/github/issues/Glassait/FOLD_Bot/bug?logo=github&color=red&style=for-the-badge)
+![GitHub closed issues](https://img.shields.io/github/issues-closed/Glassait/FOLD_Bot?logo=github&color=open&style=for-the-badge&link=https%3A%2F%2Fgithub.com%2FGlassait%2FFOLD_Bot%2Fissues)
+![GitHub package.json version (branch)](https://img.shields.io/github/package-json/v/Glassait/FOLD_Bot/main?style=for-the-badge)
+![GitHub commit activity (branch)](https://img.shields.io/github/commit-activity/m/Glassait/FOLD_Bot?logo=github&style=for-the-badge)
+![GitHub contributors](https://img.shields.io/github/contributors/Glassait/FOLD_Bot?logo=github&style=for-the-badge&color=purple)
 
 <header style="display: flex; align-items: center; flex-direction: column">
    <img src="logo.png" alt="free puntos logo" width="300" height="auto">
@@ -11,7 +11,7 @@
    # FOLD Bot
    
    <div>
-   <a href="https://github.com/Glassait/freePuntosBot/issues">Report bug</a> · <a href="https://github.com/Glassait/freePuntosBot/issues">Request feature</a>
+   <a href="https://github.com/Glassait/FOLD_Bot/issues">Report bug</a> · <a href="https://github.com/Glassait/FOLD_Bot/issues">Request feature</a>
    </div>
 </header>
 
@@ -42,7 +42,7 @@ This project need node v18.16.0 or higher
 
 1. Clone the repo
     ```sh
-    git clone https://github.com/Glassait/freePuntosBot
+    git clone https://github.com/Glassait/FOLD_Bot
     ```
 2. Install NPM packages
     ```sh
@@ -60,7 +60,7 @@ The technical documentation can be found [here](./src/README.md)
 
 ## Roadmap
 
-See the [open issues](https://github.com/Glassait/freePuntosBot/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement) for a
+See the [open issues](https://github.com/Glassait/FOLD_Bot/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement) for a
 full list of proposed features (and known issues).
 
 ## Contributing
