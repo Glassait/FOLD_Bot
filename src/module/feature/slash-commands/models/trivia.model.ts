@@ -14,7 +14,7 @@ import {
     type StringSelectMenuInteraction,
     StringSelectMenuOptionBuilder,
 } from 'discord.js';
-import type { Ammo } from '../../../shared/apis/wot-api/models/wot-api.type';
+import type { Ammo } from '../../../shared/apis/wot/models/wot-api.type';
 import { LoggerInjector } from '../../../shared/decorators/injector/logger-injector.decorator';
 import { Singleton } from '../../../shared/decorators/injector/singleton-injector.decorator';
 import { Table } from '../../../shared/decorators/injector/table-injector.decorator';

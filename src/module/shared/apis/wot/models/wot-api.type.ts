@@ -1,5 +1,5 @@
 //region TANKOPEDIA
-import type { WargamingErrorType, WargamingSuccessType } from './wargaming-api.type';
+import type { WargamingErrorType, WargamingSuccessType } from './wot-base-api.type';
 
 /**
  * Represents an error specific to the Tankopedia Vehicles API response.

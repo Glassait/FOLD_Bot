@@ -7,11 +7,11 @@ import {
     EmbedBuilder,
     type TextChannel,
 } from 'discord.js';
-import type { WargamingSuccessType } from '../../../shared/apis/wot-api/models/wargaming-api.type';
-import type { PlayerData } from '../../../shared/apis/wot-api/models/wot-api.type';
-import type { WotApiModel } from '../../../shared/apis/wot-api/wot-api.model';
+import type { PlayerData } from '../../../shared/apis/wot/models/wot-api.type';
+import type { WargamingSuccessType } from '../../../shared/apis/wot/models/wot-base-api.type';
+import type { WotApi } from '../../../shared/apis/wot/wot.api';
+import { Api } from '../../../shared/decorators/injector/api-injector.decorator';
 import { LoggerInjector } from '../../../shared/decorators/injector/logger-injector.decorator';
-import { Singleton } from '../../../shared/decorators/injector/singleton-injector.decorator';
 import { Table } from '../../../shared/decorators/injector/table-injector.decorator';
 import type { BlacklistedPlayersTable } from '../../../shared/tables/complexe-table/blacklisted-players/blacklisted-players.table';
 import type { BlacklistedPlayer } from '../../../shared/tables/complexe-table/blacklisted-players/models/blacklisted-players.type';
@@ -27,7 +27,7 @@ import { UserUtil } from '../../../shared/utils/user.util';
 export class WatchClanModel {
     //region INJECTABLE
     private readonly logger: Logger;
-    @Singleton('WotApi') private readonly wotApi: WotApiModel;
+    @Api('Wot') private readonly wotApi: WotApi;
     @Table('WatchClans') private readonly watchClans: WatchClansTable;
     @Table('BlacklistedPlayers') private readonly blacklistedPlayers: BlacklistedPlayersTable;
     @Table('Channels') private readonly channels: ChannelsTable;
@@ -242,7 +242,7 @@ export class WatchClanModel {
             let searchResult: WargamingSuccessType<PlayerData[]>;
 
             try {
-                searchResult = await this.wotApi.fetchPlayerData(idAndName);
+                searchResult = await this.wotApi.accountList(idAndName);
             } catch (e) {
                 await interaction.editReply({
                     content: 'Le pseudo passé contient une ou plusieurs erreurs !',
@@ -426,7 +426,7 @@ export class WatchClanModel {
         }
 
         try {
-            const searchResult: WargamingSuccessType<PlayerData[]> = await this.wotApi.fetchPlayerData(focusedOption.value);
+            const searchResult: WargamingSuccessType<PlayerData[]> = await this.wotApi.accountList(focusedOption.value);
 
             await interaction.respond(
                 searchResult.data

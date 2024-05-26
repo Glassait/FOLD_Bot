@@ -1,4 +1,4 @@
-import type { Ammo } from '../../../../apis/wot-api/models/wot-api.type';
+import type { Ammo } from '../../../../apis/wot/models/wot-api.type';
 
 /**
  * Represent the information store in the tanks table

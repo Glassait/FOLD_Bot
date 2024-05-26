@@ -27,11 +27,11 @@ CREATE OR REPLACE TABLE feature_flipping (
 ) COMMENT 'Table following the feature flipping of each feature of the bot';
 
 CREATE OR REPLACE TABLE fold_recruitment (
-    newsfeed_url  text NOT NULL COMMENT 'The url of wargaming to get the news of the clan',
-    clan_url      text NOT NULL COMMENT 'The wargaming url to the clan page',
-    tomato_url    text NOT NULL COMMENT 'The tomato.gg url for the player',
-    wargaming_url text NOT NULL COMMENT 'The wargaming url for the player',
-    wot_life_url  text NOT NULL COMMENT 'The wot life url for the player'
+    wn8_min             int(6) DEFAULT 1000 NOT NULL COMMENT 'The minimal wn8 needed for the recruitment',
+    battles_min         int    DEFAULT 5000 NOT NULL COMMENT 'The minimal amount of battle needed for the recruitment',
+    random_min_28       int    DEFAULT 30   NOT NULL COMMENT 'The minimal required number of random battles on the last 28 days',
+    fort_sorties_min_28 int    DEFAULT 20   NOT NULL COMMENT 'The minimal required number of fort sorties battles on the last 28 days',
+    fort_battles_min_28 int    DEFAULT 10   NOT NULL COMMENT 'The minimal required number of fort battles battles on the last 28 days'
 ) COMMENT 'This table manage the fold recruitment';
 
 CREATE OR REPLACE TABLE leaving_players (
@@ -94,12 +94,12 @@ CREATE OR REPLACE TABLE potential_clans (
 ) COMMENT 'This table manage all clans fold from leaving player';
 
 CREATE OR REPLACE TABLE trivia_data (
-    max_number_of_question     int                              NOT NULL COMMENT 'The max number of question that can be ask per day',
-    max_number_of_unique_tanks int                              NOT NULL COMMENT 'The max number of tanks before a tank can be redraw',
-    max_response_time_limit    int                              NOT NULL COMMENT 'The max time to get extra points for good anwser',
-    max_duration_of_question   decimal(2, 1)                    NOT NULL COMMENT 'The max duration of the question',
-    last_tank_page             longtext COLLATE utf8mb4_bin     NOT NULL COMMENT 'The list of tanks draw, if a tanks is in the list it can''t be redraw',
-    last_date_reduction        date DEFAULT CURRENT_TIMESTAMP() NOT NULL COMMENT 'The last date when the bot reduce the elo of player'
+    max_number_of_question     int           DEFAULT 4                   NOT NULL COMMENT 'The max number of question that can be ask per day',
+    max_number_of_unique_tanks int           DEFAULT 30                  NOT NULL COMMENT 'The max number of tanks before a tank can be redraw',
+    max_response_time_limit    int           DEFAULT 10                  NOT NULL COMMENT 'The max time to get extra points for good anwser',
+    max_duration_of_question   decimal(2, 1) DEFAULT 0.5                 NOT NULL COMMENT 'The max duration of the question',
+    last_tank_page             longtext COLLATE utf8mb4_bin              NOT NULL COMMENT 'The list of tanks draw, if a tanks is in the list it can''t be redraw',
+    last_date_reduction        date          DEFAULT CURRENT_TIMESTAMP() NOT NULL COMMENT 'The last date when the bot reduce the elo of player'
 ) COMMENT 'This table store the data for the trivia game';
 
 CREATE OR REPLACE TABLE watch_clans (
@@ -119,12 +119,6 @@ CREATE OR REPLACE TABLE win_streak (
         FOREIGN KEY ( player_id ) REFERENCES player ( id )
             ON UPDATE CASCADE ON DELETE CASCADE
 ) COMMENT 'This table store the month win streak of trivia game player';
-
-CREATE OR REPLACE TABLE wot_api (
-    id   int(3) UNSIGNED AUTO_INCREMENT COMMENT 'The generated id' PRIMARY KEY,
-    name text NOT NULL COMMENT 'The name of the wot api',
-    url  text NOT NULL COMMENT 'The url of the wot api'
-) COMMENT 'This table store the different wargaming url used by the bot';
 
 CREATE OR REPLACE TABLE crons (
     id   int AUTO_INCREMENT COMMENT 'The generated id'

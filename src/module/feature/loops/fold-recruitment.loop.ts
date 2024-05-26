@@ -36,7 +36,9 @@ module.exports = {
                 return;
             }
 
+            recruitmentModel.clearDatum();
             recruitmentModel.noPlayerFound = true;
+            recruitmentModel.noPlayerMeetCriteria = true;
 
             for (const clan of await watchClansTable.getAll()) {
                 logger.debug(`${EmojiEnum.MALE} Start recruitment for {}`, clan.name);
@@ -46,6 +48,10 @@ module.exports = {
 
             if (recruitmentModel.noPlayerFound) {
                 await recruitmentModel.sendMessageNoPlayerFound();
+            } else if (recruitmentModel.noPlayerMeetCriteria) {
+                await recruitmentModel.sendMessageNoPlayerMeetCriteria();
+            } else {
+                await recruitmentModel.checkPlayerActivity();
             }
         });
     },

@@ -31,10 +31,11 @@ module.exports = new SlashCommandModel(
 
         switch (interaction.options.getSubcommand()) {
             case 'start': {
-                const minute: number = interaction.options.get('duration')?.value as number;
+                const howLong: number = interaction.options.get('how-long')?.value as number;
+                const duration: number = interaction.options.get('duration')?.value as number;
                 const date = new Date();
-                date.setMinutes(date.getMinutes() + minute);
-                const message = `Le bot passe en maintenance : <t:${TimeUtil.convertToUnix(date)}:R>`;
+                date.setMinutes(date.getMinutes() + howLong);
+                const message = `Le bot passe en maintenance : <t:${TimeUtil.convertToUnix(date)}:R> pour ${duration} minute(s)`;
 
                 messages.foldRecruitment = await channels.foldRecruitment.send({
                     content: message,
@@ -49,7 +50,7 @@ module.exports = new SlashCommandModel(
                 const messageFold = await channels.foldRecruitment.send({ content: 'Fin de la maintenance du bot' });
                 const messageTrivia = await channels.trivia.send({ content: 'Fin de la maintenance du bot' });
 
-                setTimeout(async () => {
+                setTimeout(async (): Promise<void> => {
                     if (messages.foldRecruitment) {
                         await messages.foldRecruitment.delete();
                     }
@@ -78,7 +79,10 @@ module.exports = new SlashCommandModel(
                 .setName('start')
                 .setDescription('Annonce la maintenance du bot')
                 .addIntegerOption((builder: SlashCommandIntegerOption) =>
-                    builder.setName('duration').setDescription('Le temps avant la maintenance du bot').setRequired(true)
+                    builder.setName('how-long').setDescription('Le temps avant la maintenance du bot (en minute)').setRequired(true)
+                )
+                .addIntegerOption((builder: SlashCommandIntegerOption) =>
+                    builder.setName('duration').setDescription('Le temps que va durer la maintenance du bot (en minute)').setRequired(true)
                 ),
             new SlashCommandSubcommandBuilder().setName('end').setDescription('Annonce la fin de la maintenance du bot'),
         ],

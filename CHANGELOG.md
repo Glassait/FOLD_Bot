@@ -24,7 +24,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.1.0] <span data-view-component="true" class="label pre-release">Pre-release</span>
+## [3.1.1] <span data-view-component="true" class="label pre-release">Pre-release</span>
+
+### Changed
+
+-   Multiple modification on fold recruitment :
+    -   Now the bot call the tomato api to check the overall wn8 and battle. If criteria are not meet the message is not send
+    -   After all message send, the bot check the recent activity for each player wo meet the criteria and update the message with warning when activity is low
+-   Maintenance slash-command now takes 2 options : first when the maintenance will start, 2 the duration of the maintenance
+
+### Fixed
+
+-   Real fix of counting game for trivia when player play after midnight
+
+## [3.1.0] - Mai 26, 2024 <span data-view-component="true" class="label latest">Latest</span>
 
 ### Added
 
@@ -50,7 +63,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   The quickest answer now display the right value (before displaying 0)
 -   Blacklisted slash-command have now better error managent when Wargaming API send error
 
-## [3.0.0] - Mai 12, 2024 <span data-view-component="true" class="label latest">Latest</span>
+## [3.0.0] - Mai 12, 2024
 
 ### Added
 
@@ -506,6 +519,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+[3.1.1]: https://github.com/Glassait/FOLD_Bot/compare/v3.1.0-10...v3.1.1-0
 [3.1.0]: https://github.com/Glassait/FOLD_Bot/compare/v3.0.0-2...v3.1.0-10
 [3.0.0]: https://github.com/Glassait/FOLD_Bot/compare/v2.3.0-6...v3.0.0-2
 [2.3.0]: https://github.com/Glassait/FOLD_Bot/compare/v2.2.10-6...v2.3.0-5
