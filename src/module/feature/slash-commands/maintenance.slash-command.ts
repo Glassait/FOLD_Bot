@@ -50,7 +50,7 @@ module.exports = new SlashCommandModel(
                 const messageFold = await channels.foldRecruitment.send({ content: 'Fin de la maintenance du bot' });
                 const messageTrivia = await channels.trivia.send({ content: 'Fin de la maintenance du bot' });
 
-                setTimeout(async () => {
+                setTimeout(async (): Promise<void> => {
                     if (messages.foldRecruitment) {
                         await messages.foldRecruitment.delete();
                     }

@@ -1,7 +1,13 @@
-import { type Client, Colors, EmbedBuilder, type TextChannel } from 'discord.js';
+import { type Client, Colors, EmbedBuilder, type Message, type TextChannel } from 'discord.js';
 import type { TomatoOverall, TomatoSuccess } from '../../../shared/apis/tomato/models/tomato-api.type';
 import type { TomatoApi } from '../../../shared/apis/tomato/tomato.api';
-import type { ClanActivity, LeaveClanActivity, Players, WargamingNewsfeed } from '../../../shared/apis/wargaming/models/wargaming.type';
+import type {
+    ClanActivity,
+    LeaveClanActivity,
+    Players,
+    WargamingAccounts,
+    WargamingNewsfeed,
+} from '../../../shared/apis/wargaming/models/wargaming.type';
 import type { WargamingApi } from '../../../shared/apis/wargaming/wargaming.api';
 import { WotApi } from '../../../shared/apis/wot/wot.api';
 import { Api } from '../../../shared/decorators/injector/api-injector.decorator';
@@ -37,6 +43,20 @@ export class FoldRecruitmentModel {
     private readonly embedNoPlayerMeetCriteria: EmbedBuilder = new EmbedBuilder()
         .setColor(Colors.DarkRed)
         .setTitle("Le recrutement n'a trouvé aucun joueur satisfaisant les conditions requises.");
+
+    /**
+     * A map storing data where each key is the id of the player and each value is an object containing the recruitment message and the player name.
+     */
+    private readonly datum: Map<number, { message: Message<true>; playerName: string }> = new Map();
+
+    /**
+     * Map the types of battles with the corresponding title of embed field
+     */
+    private readonly mapText = {
+        random: 'Batailles aléatoires',
+        fort_battles: 'Incursions',
+        fort_sorties: 'Escarmouches',
+    };
     //endregion
 
     //region INJECTABLE
@@ -76,6 +96,7 @@ export class FoldRecruitmentModel {
      * The minimal amount of battles for the fold recruitment
      */
     private minBattles: number;
+
     //endregion
 
     //region GETTER
@@ -149,6 +170,36 @@ export class FoldRecruitmentModel {
     }
 
     /**
+     * Clears the data stored in the `datum` property.
+     *
+     * This method removes all elements from the `datum` collection, leaving it empty.
+     */
+    public clearDatum(): void {
+        this.datum.clear();
+    }
+
+    /**
+     * Check the player activity on the 3 types of battles : random, fort_sorties, fort_battles
+     */
+    public async checkPlayerActivity(): Promise<void> {
+        for (const [playerId, data] of this.datum) {
+            this.logger.debug('Checking recent activity of {}', data.playerName);
+            const warningEmbed = new EmbedBuilder()
+                .setTitle(`${EmojiEnum.WARNING} Attention : activité récente faible ${EmojiEnum.WARNING}`)
+                .setColor(Colors.Yellow);
+
+            const hasNotActivityRandom = await this.checkRecentActivity(warningEmbed, playerId, data.playerName, 'random');
+            const hasNotActivityFortSorties = await this.checkRecentActivity(warningEmbed, playerId, data.playerName, 'fort_sorties');
+            const hasNotActivityFortBattles = await this.checkRecentActivity(warningEmbed, playerId, data.playerName, 'fort_battles');
+
+            if (hasNotActivityFortBattles || hasNotActivityFortSorties || hasNotActivityRandom) {
+                const messageEmbed = new EmbedBuilder(data.message.embeds[0].data).setColor(Colors.Yellow);
+                await data.message.edit({ embeds: [messageEmbed, warningEmbed] });
+            }
+        }
+    }
+
+    /**
      * Manages clan activities by processing the Fold recruitment data.
      * Updates clan information and sends notifications for players leaving the clan.
      *
@@ -182,6 +233,7 @@ export class FoldRecruitmentModel {
         const tomatoOverall: TomatoSuccess<TomatoOverall> = await this.tomatoApi.playerOverall(player.id);
 
         if (tomatoOverall.data.overallWN8 < this.minWn8 || tomatoOverall.data.battles < this.minBattles) {
+            this.logger.info("The following player {} doesn't meet critéria", player.name);
             return;
         }
 
@@ -228,7 +280,8 @@ export class FoldRecruitmentModel {
             )
             .setColor(blacklisted ? Colors.Red : Colors.Blurple);
 
-        await this.channel.send({ embeds: [embedPlayer] });
+        const message: Message<true> = await this.channel.send({ embeds: [embedPlayer] });
+        this.datum.set(player.id, { message: message, playerName: player.name });
     }
 
     /**
@@ -261,5 +314,42 @@ export class FoldRecruitmentModel {
         );
 
         return { datum: datum, extracted: extracted };
+    }
+
+    /**
+     * Check the recent activity of a player in a specific type of battles.
+     *
+     * @param {EmbedBuilder} embed - The embed to update with a warning message if needed.
+     * @param {number} playerId - The ID of the player.
+     * @param {string} playerName - The name of the player.
+     * @param {'random' | 'fort_battles' | 'fort_sorties'} type - The type of battles to check.
+     *
+     * @returns {Promise<boolean>} - Returns true if the player's activity is low, otherwise false.
+     */
+    public async checkRecentActivity(
+        embed: EmbedBuilder,
+        playerId: number,
+        playerName: string,
+        type: 'random' | 'fort_battles' | 'fort_sorties'
+    ): Promise<boolean> {
+        const accounts: WargamingAccounts = await this.wargamingApi.accounts(playerId, playerName, type, 28);
+        const limit = await this.foldRecruitmentTable.getLimitByType(type);
+
+        const battlesCount: number | null = accounts.accounts[0].table_fields.battles_count;
+        if (battlesCount !== null && battlesCount >= limit) {
+            return false;
+        }
+
+        embed.addFields({
+            name: this.mapText[type],
+            value: StringUtil.transformToCode(
+                'Le joueur a fait moins de {} en {} au cours des 28 derniers jours (actuellement {})',
+                limit,
+                this.mapText[type].toLowerCase(),
+                battlesCount ?? 0
+            ),
+        });
+        this.logger.info('The following player {} have low recent activity in {} (detected {})', playerName, type, battlesCount);
+        return true;
     }
 }

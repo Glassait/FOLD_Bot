@@ -36,6 +36,7 @@ module.exports = {
                 return;
             }
 
+            recruitmentModel.clearDatum();
             recruitmentModel.noPlayerFound = true;
             recruitmentModel.noPlayerMeetCriteria = true;
 
@@ -49,6 +50,8 @@ module.exports = {
                 await recruitmentModel.sendMessageNoPlayerFound();
             } else if (recruitmentModel.noPlayerMeetCriteria) {
                 await recruitmentModel.sendMessageNoPlayerMeetCriteria();
+            } else {
+                await recruitmentModel.checkPlayerActivity();
             }
         });
     },
