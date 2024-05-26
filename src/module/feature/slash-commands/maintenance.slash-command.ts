@@ -1,7 +1,6 @@
 import {
     ChatInputCommandInteraction,
     type Client,
-    type Message,
     PermissionsBitField,
     type SlashCommandIntegerOption,
     SlashCommandSubcommandBuilder,
@@ -14,7 +13,6 @@ import { SlashCommandModel } from './models/slash-command.model';
 
 const channelTable = new ChannelsTable();
 const channels: { foldRecruitment?: TextChannel; trivia?: TextChannel } = {};
-const messages: { foldRecruitment?: Message<true>; trivia?: Message<true> } = {};
 
 module.exports = new SlashCommandModel(
     'maintenance',
@@ -37,31 +35,18 @@ module.exports = new SlashCommandModel(
                 date.setMinutes(date.getMinutes() + howLong);
                 const message = `Le bot passe en maintenance : <t:${TimeUtil.convertToUnix(date)}:R> pour ${duration} minute(s)`;
 
-                messages.foldRecruitment = await channels.foldRecruitment.send({
+                await channels.foldRecruitment.send({
                     content: message,
                 });
-                messages.trivia = await channels.trivia.send({
+                await channels.trivia.send({
                     content: message,
                 });
                 await interaction.deleteReply();
                 break;
             }
             case 'end': {
-                const messageFold = await channels.foldRecruitment.send({ content: 'Fin de la maintenance du bot' });
-                const messageTrivia = await channels.trivia.send({ content: 'Fin de la maintenance du bot' });
-
-                setTimeout(async (): Promise<void> => {
-                    if (messages.foldRecruitment) {
-                        await messages.foldRecruitment.delete();
-                    }
-
-                    if (messages.trivia) {
-                        await messages.trivia.delete();
-                    }
-
-                    await messageFold.delete();
-                    await messageTrivia.delete();
-                }, 5000);
+                await channels.foldRecruitment.send({ content: 'Fin de la maintenance du bot' });
+                await channels.trivia.send({ content: 'Fin de la maintenance du bot' });
 
                 await interaction.deleteReply();
                 break;
