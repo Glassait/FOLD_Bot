@@ -1,6 +1,6 @@
-import { TableAbstract } from '../../../abstracts/table.abstract';
-import { SelectBuilder } from '../../../builders/query/select.builder';
-import { LoggerInjector } from '../../../decorators/injector/logger-injector.decorator';
+import { TableAbstract } from '../../abstracts/table.abstract';
+import { SelectBuilder } from '../../builders/query/select.builder';
+import { LoggerInjector } from '../../decorators/injector/logger-injector.decorator';
 
 /**
  * Represents a table for storing information related to Fold Recruitment.

@@ -27,8 +27,11 @@ CREATE OR REPLACE TABLE feature_flipping (
 ) COMMENT 'Table following the feature flipping of each feature of the bot';
 
 CREATE OR REPLACE TABLE fold_recruitment (
-    wn8_min     int(6) DEFAULT 1000 NOT NULL COMMENT 'The minimal wn8 needed for the recruitment',
-    battles_min int    DEFAULT 5000 NOT NULL COMMENT 'The minimal amount of battle needed for the recruitment'
+    wn8_min             int(6) DEFAULT 1000 NOT NULL COMMENT 'The minimal wn8 needed for the recruitment',
+    battles_min         int    DEFAULT 5000 NOT NULL COMMENT 'The minimal amount of battle needed for the recruitment',
+    random_min_28       int    DEFAULT 30   NOT NULL COMMENT 'The minimal required number of random battles on the last 28 days',
+    fort_sorties_min_28 int    DEFAULT 20   NOT NULL COMMENT 'The minimal required number of fort sorties battles on the last 28 days',
+    fort_battles_min_28 int    DEFAULT 10   NOT NULL COMMENT 'The minimal required number of fort battles battles on the last 28 days'
 ) COMMENT 'This table manage the fold recruitment';
 
 CREATE OR REPLACE TABLE leaving_players (

@@ -17,10 +17,10 @@ import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 import type { BlacklistedPlayersTable } from '../../../shared/tables/complexe-table/blacklisted-players/blacklisted-players.table';
 import type { BlacklistedPlayer } from '../../../shared/tables/complexe-table/blacklisted-players/models/blacklisted-players.type';
 import type { ChannelsTable } from '../../../shared/tables/complexe-table/channels/channels.table';
-import type { FoldRecruitmentTable } from '../../../shared/tables/complexe-table/fold-recruitment/fold-recruitment.table';
 import type { LeavingPlayersTable } from '../../../shared/tables/complexe-table/leaving-players/leaving-players.table';
 import type { Clan } from '../../../shared/tables/complexe-table/watch-clans/models/watch-clans.type';
 import type { WatchClansTable } from '../../../shared/tables/complexe-table/watch-clans/watch-clans.table';
+import type { FoldRecruitmentTable } from '../../../shared/tables/simple-table/fold-recruitment.table';
 import type { Logger } from '../../../shared/utils/logger';
 import { StringUtil } from '../../../shared/utils/string.util';
 import { UrlUtil } from '../../../shared/utils/url.util';
@@ -184,17 +184,26 @@ export class FoldRecruitmentModel {
     public async checkPlayerActivity(): Promise<void> {
         for (const [playerId, data] of this.datum) {
             this.logger.debug('Checking recent activity of {}', data.playerName);
-            const warningEmbed = new EmbedBuilder()
-                .setTitle(`${EmojiEnum.WARNING} Attention : activité récente faible ${EmojiEnum.WARNING}`)
-                .setColor(Colors.Yellow);
+            const messageEmbed = new EmbedBuilder(data.message.embeds[0].data).setColor(Colors.Yellow);
 
-            const hasNotActivityRandom = await this.checkRecentActivity(warningEmbed, playerId, data.playerName, 'random');
-            const hasNotActivityFortSorties = await this.checkRecentActivity(warningEmbed, playerId, data.playerName, 'fort_sorties');
-            const hasNotActivityFortBattles = await this.checkRecentActivity(warningEmbed, playerId, data.playerName, 'fort_battles');
+            const [isUnderActivityRandom, has0Random] = await this.checkRecentActivity(messageEmbed, playerId, data.playerName, 'random');
+            const [isUnderActivityFortSorties, has0FortSorties] = await this.checkRecentActivity(
+                messageEmbed,
+                playerId,
+                data.playerName,
+                'fort_sorties'
+            );
+            const [isUnderActivityFortBattles, has0FortBattles] = await this.checkRecentActivity(
+                messageEmbed,
+                playerId,
+                data.playerName,
+                'fort_battles'
+            );
 
-            if (hasNotActivityFortBattles || hasNotActivityFortSorties || hasNotActivityRandom) {
-                const messageEmbed = new EmbedBuilder(data.message.embeds[0].data).setColor(Colors.Yellow);
-                await data.message.edit({ embeds: [messageEmbed, warningEmbed] });
+            if (has0Random && has0FortSorties && has0FortBattles) {
+                await data.message.delete();
+            } else if (isUnderActivityFortBattles || isUnderActivityFortSorties || isUnderActivityRandom) {
+                await data.message.edit({ embeds: [messageEmbed] });
             }
         }
     }
@@ -324,20 +333,20 @@ export class FoldRecruitmentModel {
      * @param {string} playerName - The name of the player.
      * @param {'random' | 'fort_battles' | 'fort_sorties'} type - The type of battles to check.
      *
-     * @returns {Promise<boolean>} - Returns true if the player's activity is low, otherwise false.
+     * @returns {Promise<[boolean, boolean]>} - Returns the couple [isUnderLimite, has0Battle]
      */
     public async checkRecentActivity(
         embed: EmbedBuilder,
         playerId: number,
         playerName: string,
         type: 'random' | 'fort_battles' | 'fort_sorties'
-    ): Promise<boolean> {
+    ): Promise<[boolean, boolean]> {
         const accounts: WargamingAccounts = await this.wargamingApi.accounts(playerId, playerName, type, 28);
         const limit = await this.foldRecruitmentTable.getLimitByType(type);
 
         const battlesCount: number | null = accounts.accounts[0].table_fields.battles_count;
         if (battlesCount !== null && battlesCount >= limit) {
-            return false;
+            return [false, false];
         }
 
         embed.addFields({
@@ -350,6 +359,6 @@ export class FoldRecruitmentModel {
             ),
         });
         this.logger.info('The following player {} have low recent activity in {} (detected {})', playerName, type, battlesCount);
-        return true;
+        return [true, battlesCount === null];
     }
 }

@@ -51,7 +51,7 @@ export function Table(
                 .BlacklistedPlayersTable,
             LeavingPlayers: require('../../tables/complexe-table/leaving-players/leaving-players.table').LeavingPlayersTable,
             PotentialClans: require('../../tables/simple-table/potential-clans.table').PotentialClansTable,
-            FoldRecruitment: require('../../tables/complexe-table/fold-recruitment/fold-recruitment.table').FoldRecruitmentTable,
+            FoldRecruitment: require('../../tables/simple-table/fold-recruitment.table').FoldRecruitmentTable,
             // Newsletter
             NewsWebsites: require('../../tables/complexe-table/news-websites/news-websites.table').NewsWebsitesTable,
             BanWords: require('../../tables/simple-table/ban-words.table').BanWordsTable,
