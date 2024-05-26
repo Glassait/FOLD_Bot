@@ -262,7 +262,7 @@ export class WatchClanModel {
         const player: BlacklistedPlayer[] = await this.blacklistedPlayers.getPlayer(Number(id));
 
         if (player.length > 0) {
-            this.logger.debug('Player {} already blacklisted !', player);
+            this.logger.debug('Player {} already blacklisted !', player[0].name);
             await interaction.editReply({
                 content: `Le joueur \`${name}\` est déjà dans la liste noire !`,
             });
@@ -431,7 +431,7 @@ export class WatchClanModel {
             await interaction.respond(
                 searchResult.data
                     .map((player: { nickname: string; account_id: number }): { name: string; value: string } => ({
-                        name: `${player.nickname} | ${player.account_id}`,
+                        name: `${player.nickname}`,
                         value: `${player.account_id}#${player.nickname}`,
                     }))
                     .slice(0, 24)

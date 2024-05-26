@@ -184,13 +184,9 @@ export class PlayersAnswersTable extends TableAbstract {
             `player_id = '${playerId}'`,
             `YEAR(date) = ${today.getFullYear()}`,
             `MONTH(date) = ${today.getMonth() + 1}`,
-            `(DAY(date) = ${today.getDate()} OR DAY(date) = ${DateUtil.getPreviousDayAsDate().getDate()})`,
+            `${today.getHours() > 20 ? '' : '('}DAY(date) = ${today.getDate()}${today.getHours() > 20 ? '' : ' OR DAY(date) = ' + DateUtil.getPreviousDayAsDate().getDate() + ')'}`,
         ];
         const verdes: Condition['verdes'] = ['AND', 'AND', 'AND'];
-
-        if (today.getHours() > 9) {
-            conditions[conditions.length - 1] = conditions[conditions.length - 1].split('OR')[0];
-        }
 
         return (await this.select<{ count: number }>(new SelectBuilder(this).columns('COUNT(*) as count').where(conditions, verdes)))[0]
             .count;
