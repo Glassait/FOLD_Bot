@@ -147,7 +147,7 @@ export class WatchClanModel {
             return;
         }
 
-        const clan: Clan = clans.shift() as Clan;
+        const clan: Clan = clans.shift()!;
         const removed: boolean = await this.watchClans.removeClan(String(clan.id));
 
         if (!removed) {
@@ -383,7 +383,7 @@ export class WatchClanModel {
                 await this.autocompleteRemovePlayer(interaction);
                 break;
             default:
-                throw new Error(`Invalid interactionType: ${interactionType}`);
+                throw new Error(`Invalid interactionType: ${interactionType as string}`);
         }
     }
 

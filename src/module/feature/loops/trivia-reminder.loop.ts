@@ -1,12 +1,13 @@
 import { type Client, Colors, EmbedBuilder, type TextChannel } from 'discord.js';
 import { basename } from 'node:path';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
-import type { CronsTable } from '../../shared/tables/complexe-table/crons/crons.table';
+import { CronsTable } from '../../shared/tables/complexe-table/crons/crons.table';
 import { FeatureFlippingTable } from '../../shared/tables/complexe-table/feature-flipping/feature-flipping.table';
 import { CronUtil } from '../../shared/utils/cron.util';
 import { Logger } from '../../shared/utils/logger';
 import { UserUtil } from '../../shared/utils/user.util';
 import type { BotLoop } from './types/bot-loop.type';
+import { ChannelsTable } from '../../shared/tables/complexe-table/channels/channels.table';
 
 module.exports = {
     name: 'Fold Recruitment',
@@ -19,15 +20,9 @@ module.exports = {
             return;
         }
 
-        let req = require('../../shared/tables/complexe-table/channels/channels.table');
-        const channelsTable = new req.ChannelsTable();
+        const channel: TextChannel = await UserUtil.fetchChannelFromClient(client, await new ChannelsTable().getTrivia());
 
-        req = require('../../shared/tables/complexe-table/crons/crons.table');
-        const cronsTable: CronsTable = new req.CronsTable();
-
-        const channel: TextChannel = await UserUtil.fetchChannelFromClient(client, await channelsTable.getTrivia());
-
-        CronUtil.createCron(await cronsTable.getCron('trivia'), 'trivia', async (): Promise<void> => {
+        CronUtil.createCron(await new CronsTable().getCron('trivia'), 'trivia', async (): Promise<void> => {
             await channel.send({
                 embeds: [
                     new EmbedBuilder()

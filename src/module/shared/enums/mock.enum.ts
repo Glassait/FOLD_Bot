@@ -1,6 +1,6 @@
 /**
  * Defined the status of the env
  */
-export enum MockEnum {
-    DEV = 'DEV',
-}
+export const MockEnum = {
+    DEV: 'DEV',
+} as const;

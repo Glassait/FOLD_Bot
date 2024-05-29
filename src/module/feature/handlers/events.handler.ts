@@ -17,10 +17,8 @@ module.exports = (client: Client): void => {
         const event: BotEvent = require(`${eventsDir}/${file}`) as BotEvent;
 
         event.once
-            ? // eslint-disable-next-line
-              client.once(event.name.toString(), (...args: any[]) => event.execute(client, ...args))
-            : // eslint-disable-next-line
-              client.on(event.name.toString(), (...args: any[]) => event.execute(client, ...args));
+            ? client.once(event.name.toString(), (...args: unknown[]) => event.execute(client, ...args))
+            : client.on(event.name.toString(), (...args: unknown[]) => event.execute(client, ...args));
 
         ++numberOfEvents;
         logger.info(`${EmojiEnum.STAR} Successfully loaded event {} as {} listener !`, event.name, event.once ? 'temporary' : 'permanent');

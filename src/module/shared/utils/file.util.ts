@@ -29,10 +29,7 @@ export class FileUtil {
 
         writeFile(path, data, err => {
             if (err) {
-                throw new Error(
-                    `${EmojiEnum.RED_CROSS} Failed to write into the following ${path.split('/').pop() as string} with error:`,
-                    err
-                );
+                throw new Error(`${EmojiEnum.RED_CROSS} Failed to write into the following ${path.split('/').pop()!} with error:`, err);
             }
         });
     }
@@ -51,10 +48,7 @@ export class FileUtil {
 
         mkdir(path, constants.R_OK, err => {
             if (err) {
-                throw new Error(
-                    `${EmojiEnum.RED_CROSS} Failed to create the following folder ${path.split('/').pop() as string} with error:`,
-                    err
-                );
+                throw new Error(`${EmojiEnum.RED_CROSS} Failed to create the following folder ${path.split('/').pop()!} with error:`, err);
             }
         });
     }

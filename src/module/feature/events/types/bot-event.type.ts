@@ -3,7 +3,7 @@ import type { Events } from 'discord.js';
 /**
  * Represents a bot event to be handled.
  */
-export interface BotEvent {
+export type BotEvent = {
     /**
      * The name of the event.
      */
@@ -15,8 +15,7 @@ export interface BotEvent {
     /**
      * The function to execute when the event occurs.
      *
-     * @param {...any} args - Arguments passed to the event handler.
+     * @param {...unknown} args - Arguments passed to the event handler.
      */
-    // eslint-disable-next-line
-    execute: (...args: any[]) => void | Promise<void>;
-}
+    execute: (...args: unknown[]) => void | Promise<void>;
+};

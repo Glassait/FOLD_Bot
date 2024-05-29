@@ -3,6 +3,7 @@ import pluginJs from '@eslint/js';
 import globals from 'globals';
 
 export default tseslint.config(
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
     pluginJs.configs.recommended,
     ...tseslint.configs.recommendedTypeChecked,
     ...tseslint.configs.stylisticTypeChecked,
@@ -12,7 +13,7 @@ export default tseslint.config(
             parser: tseslint.parser,
             sourceType: 'module',
             ecmaVersion: 2022,
-            parserOptions: { project: ['./tsconfig.json'] },
+            parserOptions: { project: './tsconfig.json' },
         },
         plugins: {
             '@typescript-eslint': tseslint.plugin,
@@ -22,6 +23,9 @@ export default tseslint.config(
             '@typescript-eslint/no-unsafe-call': ['off'],
             '@typescript-eslint/no-var-requires': ['off'],
             '@typescript-eslint/no-inferrable-types': ['off'],
+            '@typescript-eslint/consistent-type-definitions': ['off', 'type'],
+            '@typescript-eslint/no-explicit-any': ['error', { ignoreRestArgs: true, fixToUnknown: true }],
+            '@typescript-eslint/no-misused-promises': ['error', { checksVoidReturn: false }],
         },
     }
 );

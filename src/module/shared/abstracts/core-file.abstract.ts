@@ -88,8 +88,8 @@ export class CoreFileAbstract<DType extends object> {
      *
      * @template T - The type of data being verified and updated.
      */
-    protected verifyData<T>(initialValue: any, updatedData: T): T {
-        const data: any = initialValue;
+    protected verifyData<T extends Record<string, unknown>>(initialValue: T, updatedData: T): T {
+        const data = { ...initialValue };
 
         Object.keys(initialValue).forEach((key: string): void => {
             data[key as keyof T] = updatedData[key as keyof T] ?? initialValue[key as keyof T];

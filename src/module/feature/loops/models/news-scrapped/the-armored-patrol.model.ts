@@ -9,16 +9,26 @@ import { Element, SelectorType } from 'cheerio';
  */
 export class TheArmoredPatrol extends NewsScrapper {
     /**
+     * The default index used when the url is not found
+     */
+    private defaultIndex: number = 6;
+
+    /**
      * Scrapes news from The Armored Patrol website.
      *
      * @param {NewsWebsite} webSiteState - The website to scrap and get the news.
      */
     public async scrap(webSiteState: NewsWebsite): Promise<void> {
         const containers: Element[] = this.$(webSiteState.selector as SelectorType).get();
-        const index: number = containers.findIndex(
+        let index: number = containers.findIndex(
             (container: Element): boolean =>
-                (((container.children[1] as Element).children[1] as Element).children[0] as Element).attribs.href == webSiteState.last_url
+                (container.children[1] as { children: { children: Element[] }[] }).children[1].children[0].attribs.href ==
+                webSiteState.last_url
         );
+
+        if (index === -1) {
+            index = this.defaultIndex;
+        }
 
         if (!webSiteState.last_url) {
             await this.armoredPatrol(containers, 0, webSiteState);
@@ -42,8 +52,7 @@ export class TheArmoredPatrol extends NewsScrapper {
 
         await this.sendNews(
             link.attribs.href,
-            // eslint-disable-next-line
-            (link.children[0] as any).data,
+            (link.children[0] as { data: string }).data,
             `Nouvelle rumeur venant de ${webSiteState.name}`,
             webSiteState,
             this.$(`article#${containers[index].attribs.id} img`).attr('src')

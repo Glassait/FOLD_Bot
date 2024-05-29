@@ -19,7 +19,10 @@ const MAPPING = {
     },
 };
 const trivia = new TriviaModel();
-trivia.initialize().then();
+trivia
+    .initialize()
+    .then()
+    .catch(reason => console.error('Failed to initialize trivia command', reason));
 
 module.exports = new SlashCommandModel(
     'trivia',

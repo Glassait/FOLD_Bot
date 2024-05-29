@@ -10,6 +10,7 @@ export class ScriptModel {
      */
     constructor(
         private _name: string,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         private _script: (...args: any) => Promise<void>
     ) {}
 
@@ -23,6 +24,7 @@ export class ScriptModel {
     /**
      * Gets the script function.
      */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public get script(): (...args: any) => Promise<void> {
         return this._script;
     }

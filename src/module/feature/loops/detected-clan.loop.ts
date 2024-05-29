@@ -1,4 +1,3 @@
-import type { Client } from 'discord.js';
 import { basename } from 'node:path';
 import { CronsTable } from '../../shared/tables/complexe-table/crons/crons.table';
 import { FeatureFlippingTable } from '../../shared/tables/complexe-table/feature-flipping/feature-flipping.table';
@@ -9,8 +8,7 @@ import type { BotLoop } from './types/bot-loop.type';
 
 module.exports = {
     name: 'detected-clan',
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    execute: async (_client: Client): Promise<void> => {
+    execute: async (): Promise<void> => {
         const logger: Logger = new Logger(basename(__filename));
         const featureFlippingTable: FeatureFlippingTable = new FeatureFlippingTable();
 

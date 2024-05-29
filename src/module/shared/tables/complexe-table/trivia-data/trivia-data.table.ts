@@ -73,7 +73,7 @@ export class TriviaDataTable extends TableAbstract {
     public async getLastTankPage(): Promise<TriviaData['last_tank_page']> {
         return JSON.parse(
             (await this.select<{ last_tank_page: string }>(new SelectBuilder(this).columns('last_tank_page')))[0].last_tank_page
-        );
+        ) as TriviaData['last_tank_page'];
     }
 
     /**

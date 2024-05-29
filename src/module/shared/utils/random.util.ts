@@ -40,7 +40,7 @@ export class RandomUtil {
         }
 
         const range: number = max - min + 1;
-        const uniqueNumbers: Set<number> = new Set(forbidden);
+        const uniqueNumbers: Set<number> = new Set<number>(forbidden);
         const result: number[] = [];
 
         if (!allowRepeat && range < length) {
@@ -50,7 +50,7 @@ export class RandomUtil {
         while (result.length < length) {
             const randomNumber: number = this.getRandomNumber(max, min);
 
-            if (allowRepeat || !uniqueNumbers.has(randomNumber)) {
+            if (allowRepeat ?? !uniqueNumbers.has(randomNumber)) {
                 result.push(randomNumber);
                 uniqueNumbers.add(randomNumber);
             }

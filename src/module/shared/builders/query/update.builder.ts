@@ -15,7 +15,7 @@ export class UpdateBuilder extends Conditions implements ComputeInterface, Colum
     /**
      * The value to put in the columns in the table
      */
-    private _values: string[];
+    private _values: unknown[];
 
     constructor(private table: TableAbstract) {
         super();
@@ -42,7 +42,7 @@ export class UpdateBuilder extends Conditions implements ComputeInterface, Colum
      *
      * @inheritdoc
      */
-    public values(...values: any[]): this {
+    public values(...values: unknown[]): this {
         this._values = values;
         return this;
     }

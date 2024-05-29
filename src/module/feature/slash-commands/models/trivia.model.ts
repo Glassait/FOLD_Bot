@@ -194,7 +194,7 @@ export class TriviaModel {
                     content:
                         'Il y a un problème avec la base de données, merci de réessayer plus tard. Si le problème persist merci de contacter <@313006042340524033>',
                 });
-                this.logger.error(`Failed to insert new player in database with error : ${reason}`);
+                this.logger.error(`Failed to insert new player in database with error :`, reason);
                 return;
             }
         }
@@ -269,7 +269,7 @@ export class TriviaModel {
         });
         this.logger.debug('Trivia game message send to {}', interaction.user.username);
 
-        await this.collectAnswer(gameMessage, interaction.user.username);
+        this.collectAnswer(gameMessage, interaction.user.username);
     }
 
     /**
@@ -316,7 +316,7 @@ export class TriviaModel {
             select.addOptions(
                 new StringSelectMenuOptionBuilder()
                     .setLabel(`${date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}`)
-                    .setValue(`${date}`)
+                    .setValue(`${date.toISOString()}`)
             )
         );
 
@@ -328,6 +328,7 @@ export class TriviaModel {
 
         message
             .createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: TimeEnum.HOUR })
+
             .on('collect', async (i: StringSelectMenuInteraction): Promise<void> => {
                 const date = new Date(i.values[0]);
 
@@ -355,12 +356,12 @@ export class TriviaModel {
                         { name: 'Plus longue séquence correcte', value: `\`${winStreak.max}\`` },
                         {
                             name: 'Réponse la plus rapide',
-                            value: `\`${Math.min(...stats.filter(({ answer_time }) => answer_time !== null).flatMap(({ answer_time }) => answer_time as number)) / TimeEnum.SECONDE}\` sec`,
+                            value: `\`${Math.min(...stats.filter(({ answer_time }): boolean => answer_time !== null).flatMap(({ answer_time }): number => answer_time!)) / TimeEnum.SECONDE}\` sec`,
                             inline: true,
                         },
                         {
                             name: 'Réponse la plus longue',
-                            value: `\`${Math.max(...stats.filter(({ answer_time }) => answer_time !== null).flatMap(({ answer_time }) => answer_time as number)) / TimeEnum.SECONDE}\` sec`,
+                            value: `\`${Math.max(...stats.filter(({ answer_time }): boolean => answer_time !== null).flatMap(({ answer_time }): number => answer_time!)) / TimeEnum.SECONDE}\` sec`,
                             inline: true,
                         },
                         {
@@ -460,7 +461,7 @@ export class TriviaModel {
      * @param {Message<BooleanCache<CacheType>>} gameMessage - The message send to the channel via interaction reply
      * @param {string} username - The username of the player
      */
-    private async collectAnswer(gameMessage: Message<BooleanCache<CacheType>>, username: string): Promise<void> {
+    private collectAnswer(gameMessage: Message<BooleanCache<CacheType>>, username: string): void {
         this.logger.debug('Start collecting answer of {}', username);
         const timer = Date.now();
         let playerAnswer: PlayerAnswer;
@@ -503,7 +504,7 @@ export class TriviaModel {
 
                     this.logCollect(hasAlreadyAnswer, changedAnswer, interaction);
                 } catch (error) {
-                    this.logger.error(`Error during collecting player answer : ${error}`, error);
+                    this.logger.error(`Error during collecting player answer`, error);
                 }
             })
             .on('end', async (): Promise<void> => {
@@ -539,7 +540,7 @@ export class TriviaModel {
      * @param {string} username - The player name
      */
     private async sendAnswerToPlayer(playerAnswer: PlayerAnswer, username: string): Promise<void> {
-        const { interaction } = this.datum.get(username) || {};
+        const { interaction } = this.datum.get(username) ?? {};
         const { allTanks, selectedTanks } = this.getData(username);
 
         const isGoodAnswer = this.isGoodAnswer(playerAnswer, username);

@@ -36,11 +36,11 @@ export class TriviaTable extends TableAbstract {
 
     public async getNumberOfGameFromDate(date: Date): Promise<number> {
         return (
-            (await this.select(
+            await this.select<{ count: number }>(
                 new SelectBuilder(this)
                     .columns('COUNT(*) as count')
                     .where([`MONTH(date) = ${date.getMonth() + 1}`, `YEAR(date) = ${date.getFullYear()}`], ['AND'])
-            )) as any
+            )
         )[0].count;
     }
 }

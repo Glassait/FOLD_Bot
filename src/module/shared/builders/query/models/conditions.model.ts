@@ -125,7 +125,7 @@ export class Conditions {
      * @returns {string} The reduced WHERE conditions string.
      */
     private reduceConditionsAndVerdes(conditions: Condition): string {
-        return conditions.conditions.reduce((where: string, condition: any, index: number): string => {
+        return conditions.conditions.reduce((where: string, condition: string, index: number): string => {
             return (
                 where +
                 condition +

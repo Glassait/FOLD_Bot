@@ -46,7 +46,7 @@ export class EnvUtil {
      * const instance = Greet()
      * EnvUtil.asyncThread(instance.greet.bind(instance))
      */
-    public static asyncThread(fun: () => Promise<any>, delay: number = 0): void {
+    public static asyncThread(fun: () => Promise<void>, delay: number = 0): void {
         setTimeout(async (): Promise<void> => await fun(), delay);
     }
 
@@ -56,7 +56,7 @@ export class EnvUtil {
      * @param {() => any} fun The function to execute.
      * @param {number} [delay=0] The delay in milliseconds before executing the function.
      */
-    public static thread(fun: () => any, delay: number = 0): void {
+    public static thread(fun: () => void, delay: number = 0): void {
         setTimeout((): void => fun(), delay);
     }
 }

@@ -1,6 +1,7 @@
 import { type ChatInputCommandInteraction, type Client, PermissionsBitField } from 'discord.js';
 import { FeatureFlippingTable } from '../../shared/tables/complexe-table/feature-flipping/feature-flipping.table';
 import { SlashCommandModel } from './models/slash-command.model';
+import { DetectedClanModel } from './models/detected-clan.model';
 
 module.exports = new SlashCommandModel(
     'detected-clan',
@@ -17,15 +18,14 @@ module.exports = new SlashCommandModel(
             return;
         }
 
-        const req = require('./models/detected-clan.model');
-        const detectedClanModel = new req.DetectedClanModel();
+        const detectedClanModel: DetectedClanModel = new DetectedClanModel();
 
         if (!(await detectedClanModel.haveClanToProcess())) {
             await interaction.editReply({ content: 'Aucun clan potentiel est présent dans la liste' });
             return;
         }
 
-        await detectedClanModel.initialize(client);
+        await detectedClanModel.initialize(client!);
         await interaction.deleteReply();
         await detectedClanModel.processClans();
     },

@@ -58,6 +58,6 @@ export class ChannelsTable extends TableAbstract {
             return Promise.resolve(this.DEV_CHANNEL);
         }
 
-        return ((await this.select(new SelectBuilder(this).columns('*').where([`feature_name LIKE '${name}'`]))) as any)[0];
+        return (await this.select<Channel>(new SelectBuilder(this).columns('*').where([`feature_name LIKE '${name}'`])))[0];
     }
 }

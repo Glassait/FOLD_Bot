@@ -2,7 +2,7 @@ import { type Client, Colors, EmbedBuilder, type TextChannel } from 'discord.js'
 import { basename } from 'node:path';
 import { ShellEnum, ShellType } from '../../../feature/slash-commands/enums/shell.enum';
 import type { TankopediaVehiclesSuccess, VehicleData } from '../../apis/wot/models/wot-api.type';
-import type { WotApi } from '../../apis/wot/wot.api';
+import { WotApi } from '../../apis/wot/wot.api';
 import { EmojiEnum } from '../../enums/emoji.enum';
 import { TimeEnum } from '../../enums/time.enum';
 import { ChannelsTable } from '../../tables/complexe-table/channels/channels.table';
@@ -89,7 +89,7 @@ export class TriviaSingleton {
     //endregion
 
     private constructor() {
-        this.wotApi = new (require('../../apis/wot/wot.api').WotApi)();
+        this.wotApi = new WotApi();
         this.logger = new Logger(basename(__filename));
         this.channels = new ChannelsTable();
         this.triviaDataTable = new TriviaDataTable();

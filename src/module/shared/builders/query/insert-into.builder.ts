@@ -14,7 +14,7 @@ export class InsertIntoBuilder implements ComputeInterface, ColumnsInterface, Va
     /**
      * The values to insert in the columns when inserting new line
      */
-    private _values: any[];
+    private _values: unknown[];
 
     /**
      * Define if the `INSERT INTO` have `IGNORE` clause

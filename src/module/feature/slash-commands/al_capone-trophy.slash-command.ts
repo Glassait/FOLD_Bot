@@ -1,5 +1,5 @@
 import { SlashCommandMentionableOption } from '@discordjs/builders';
-import { Canvas, Image, type SKRSContext2D } from '@napi-rs/canvas';
+import { Canvas, Image, loadImage, type SKRSContext2D } from '@napi-rs/canvas';
 import {
     AttachmentBuilder,
     ChannelType,
@@ -15,8 +15,6 @@ module.exports = new SlashCommandModel(
     'al_capone-trophy',
     'Décerne le Al_capone trophée à un joueur',
     async (interaction: ChatInputCommandInteraction): Promise<void> => {
-        const Canvas = require('@napi-rs/canvas');
-
         const targetUser: GuildMember | undefined = await UserUtil.getGuildMemberFromInteraction(interaction, 'target', true);
 
         if (!targetUser) {
@@ -29,17 +27,17 @@ module.exports = new SlashCommandModel(
             return;
         }
 
-        const canvas: Canvas = Canvas.createCanvas(612, 612);
+        const canvas: Canvas = new Canvas(612, 612);
         const context: SKRSContext2D = canvas.getContext('2d');
 
-        const background: Image = await Canvas.loadImage('src/assets/img/trophy.jpg');
+        const background: Image = await loadImage('src/assets/img/trophy.jpg');
         context.drawImage(background, 0, 0, canvas.width, canvas.height);
 
         context.beginPath();
         context.arc(307, 198, 75, 0, Math.PI * 2, true);
         context.closePath();
         context.clip();
-        const avatar = await Canvas.loadImage(targetUser.displayAvatarURL({ extension: 'jpg' }));
+        const avatar = await loadImage(targetUser.displayAvatarURL({ extension: 'jpg' }));
         context.drawImage(avatar, 231, 120, 150, 150);
 
         const attachment = new AttachmentBuilder(await canvas.encode('jpeg'), { name: 'Al_capone-trophée.jpg' });

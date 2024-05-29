@@ -3,6 +3,8 @@ import { Agent as AgentHttp } from 'node:http';
 import { Agent as AgentHttps } from 'node:https';
 import { TimeEnum } from '../../enums/time.enum';
 import type { SingletonDependence } from './models/injector.type';
+import { TriviaSingleton } from '../../singleton/trivia/trivia.singleton';
+import { DatabaseSingleton } from '../../singleton/database.singleton';
 
 /**
  * Decorator function that injects singleton instances based on the provided dependence type.
@@ -30,11 +32,11 @@ export function Singleton<GSingleton extends SingletonDependence>(
     // eslint-disable-next-line @typescript-eslint/ban-types
 ): Function {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    return function actual<GClass>(_target: GClass, _context: ClassFieldDecoratorContext<GClass, any>) {
-        return function (this: GClass, field: any) {
+    return function actual<GClass>(_target: GClass, _context: ClassFieldDecoratorContext<GClass>) {
+        return function (this: GClass, field: unknown) {
             switch (dependence) {
                 case 'Trivia':
-                    field = require('../../singleton/trivia/trivia.singleton').TriviaSingleton.instance;
+                    field = TriviaSingleton.instance;
                     break;
                 case 'Axios':
                     field = axios.create({
@@ -45,7 +47,7 @@ export function Singleton<GSingleton extends SingletonDependence>(
                     });
                     break;
                 case 'Database':
-                    field = require('../../singleton/database.singleton').DatabaseSingleton.instance;
+                    field = DatabaseSingleton.instance;
                     break;
                 default:
                     throw new Error(`Unsupported dependence type: ${dependence}`);

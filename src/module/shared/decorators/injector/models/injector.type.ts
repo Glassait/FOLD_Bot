@@ -1,7 +1,8 @@
 /**
  * Base type to define a class
  */
-export type Constructor = new (...args: any[]) => any;
+// eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
+export type Constructor<T> = new (...args: any[]) => T;
 
 /**
  * All the singleton that can be injected with the decorator

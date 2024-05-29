@@ -1,4 +1,5 @@
 import type { TriviaQuestion, TriviaRaw } from './trivia.type';
+import { Ammo } from '../../../../apis/wot/models/wot-api.type';
 
 export class TriviaMapper {
     public static transformArrayTriviaRawInArrayTriviaQuestion(raws: TriviaRaw[]): TriviaQuestion[] {
@@ -14,7 +15,7 @@ export class TriviaMapper {
             ammoIndex: raw.ammo_index,
             tank: {
                 id: raw.tank_id,
-                ammo: JSON.parse(raw.ammo),
+                ammo: JSON.parse(raw.ammo) as Ammo[],
                 image: raw.image,
                 name: raw.name,
             },

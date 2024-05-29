@@ -21,10 +21,10 @@ module.exports = new SlashCommandModel(
         await interaction.deferReply({ ephemeral: true });
 
         if (!channels.foldRecruitment) {
-            channels.foldRecruitment = await UserUtil.fetchChannelFromClient(client as Client, await channelTable.getFoldRecruitment());
+            channels.foldRecruitment = await UserUtil.fetchChannelFromClient(client!, await channelTable.getFoldRecruitment());
         }
         if (!channels.trivia) {
-            channels.trivia = await UserUtil.fetchChannelFromClient(client as Client, await channelTable.getTrivia());
+            channels.trivia = await UserUtil.fetchChannelFromClient(client!, await channelTable.getTrivia());
         }
 
         switch (interaction.options.getSubcommand()) {

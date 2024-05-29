@@ -11,7 +11,8 @@ import type { NewsWebsite } from '../../../shared/tables/complexe-table/news-web
 import type { Logger } from '../../../shared/utils/logger';
 import { UserUtil } from '../../../shared/utils/user.util';
 import { WebsiteNameEnum } from '../enums/website-name.enum';
-import type { WotExpress } from './news-scrapped/wot-express.model';
+import { WotExpress } from './news-scrapped/wot-express.model';
+import { TheArmoredPatrol } from './news-scrapped/the-armored-patrol.model';
 
 @LoggerInjector
 export class WebSiteScraper {
@@ -40,12 +41,12 @@ export class WebSiteScraper {
      *
      * @param {NewsWebsite} website - The news website to scrap
      */
-    public async scrapWebsite(website: NewsWebsite): Promise<void> {
+    public scrapWebsite(website: NewsWebsite): void {
         this.logger.debug(`${EmojiEnum.MINE} Start scrapping {}`, website.name);
 
         this.axios
             .get(website.live_url)
-            .then((response: AxiosResponse<string, any>): void => {
+            .then((response: AxiosResponse<string>): void => {
                 this.logger.debug('Fetching newsletter for {} end successfully', website.name);
                 this.getLastNews(response.data, website)
                     .then((): void => {
@@ -73,15 +74,9 @@ export class WebSiteScraper {
         const $: CheerioAPI = load(html);
 
         if (newsWebsite.name === WebsiteNameEnum.WOT_EXPRESS) {
-            const req = require('./news-scrapped/wot-express.model');
-
-            const wotExpress: WotExpress = new req.WotExpress($, this.channel);
-            await wotExpress.scrap(newsWebsite);
+            await new WotExpress($, this.channel).scrap(newsWebsite);
         } else if (newsWebsite.name === WebsiteNameEnum.THE_ARMORED_PATROL) {
-            const req = require('./news-scrapped/the-armored-patrol.model');
-
-            const theArmoredPatrol = new req.TheArmoredPatrol($, this.channel);
-            await theArmoredPatrol.scrap(newsWebsite);
+            await new TheArmoredPatrol($, this.channel).scrap(newsWebsite);
         }
         this.logger.debug(`${EmojiEnum.MINE} End scrapping for {}`, newsWebsite.name);
     }

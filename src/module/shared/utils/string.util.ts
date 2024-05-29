@@ -23,7 +23,7 @@ export class StringUtil {
      * console.log(StringUtil.transformToCode(text)); // ERROR: Mismatch between the number of placeholders and the number of code snippets provided.
      */
     public static transformToCode(text: string, ...args: any[]): string {
-        if ((text.match(/{}/g) || []).length !== args.length) {
+        if ((text.match(/{}/g) ?? []).length !== args.length) {
             throw new Error('Mismatch between the number of placeholders and the number of code snippets provided.');
         }
 

@@ -58,7 +58,7 @@ export class DatabaseSingleton {
             const [rows, fields] = await this._pool.execute({ sql: sql });
             return [rows, fields];
         } catch (error) {
-            throw new Error(`Error executing SQL query, error : ${error}`, { cause: error });
+            throw new Error(`Error executing SQL query`, { cause: error });
         }
     }
 

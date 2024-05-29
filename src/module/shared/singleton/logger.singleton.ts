@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync } from 'fs';
 import type { ContextAbstract } from '../abstracts/context.abstract';
 import { EmojiEnum } from '../enums/emoji.enum';
+import { FileUtil } from '../utils/file.util';
 
 /**
  * Class used to manage the persistence of the log
@@ -106,7 +107,7 @@ export class LoggerSingleton {
             mkdirSync(this.dir);
         }
 
-        require('../utils/file.util').FileUtil.writeFile(this.path, this.log);
+        FileUtil.writeFile(this.path, this.log);
     }
 
     /**
@@ -123,6 +124,6 @@ export class LoggerSingleton {
             second: '2-digit',
             hourCycle: 'h24',
         })}][${level}][${context}] ${msg.replace(/application_id=[0-9a-z]{32}/, 'application_id=*********')}  \n`;
-        require('../utils/file.util').FileUtil.writeFile(this.path, this.log);
+        FileUtil.writeFile(this.path, this.log);
     }
 }
