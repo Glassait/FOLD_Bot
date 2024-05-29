@@ -15,6 +15,12 @@
 			"options": {
 				"useTabs": true
 			}
+		},
+		{
+			"files": "*.YML",
+			"options": {
+				"tabWidth": 2
+			}
 		}
 	]
 }

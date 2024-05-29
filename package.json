@@ -11,7 +11,7 @@
 		"start:mock": "ts-node . -- DEV",
 		"build": "tsc --build",
 		"clean": "tsc --build --clean",
-		"lint": "eslint .",
+		"lint": "eslint src",
 		"prepare": "husky"
 	},
 	"repository": {

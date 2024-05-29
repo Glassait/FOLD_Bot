@@ -4,8 +4,8 @@ on:
       - main
 name: Update package version
 jobs:
-  release:
-    name: Update version
+  config:
+    name: Configure action
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -21,18 +21,47 @@ jobs:
         run: |
           git config user.name '${{ secrets.MAINTAINER_NAME }}'
           git config user.email '${{ secrets.MAINTAINER_EMAIL }}'
-      - name: Patch version
-        if: ${{ contains(github.event.head_commit.message, 'patch') }}
-        run: npm version prepatch
-      - name: Minor version
-        if: ${{ contains(github.event.head_commit.message, 'minor') }}
-        run: npm version preminor
-      - name: Major version
-        if: ${{ contains(github.event.head_commit.message, 'major') }}
-        run: npm version premajor
+  release:
+    name: Update version with release (1.0.0-x)
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.event.head_commit.message, 'release') }}
+    needs:
+      - config
+    steps:
       - name: Prerelease version
-        if: ${{ contains(github.event.head_commit.message, 'release') }}
         run: npm version prerelease
       - name: Push version
-        run: |
-          git push --tags https://${{ secrets.TOKEN }}@github.com/${{ github.repository }} main
+        run: git push --tags https://${{ secrets.TOKEN }}@github.com/${{ github.repository }} main
+  patch:
+    name: Update version with patch (1.0.x-0)
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.event.head_commit.message, 'patch') }}
+    needs:
+      - config
+    steps:
+      - name: Patch version
+        run: npm version prepatch
+      - name: Push version
+        run: git push --tags https://${{ secrets.TOKEN }}@github.com/${{ github.repository }} main
+  minor:
+    name: Update version with minor (1.x.0-0)
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.event.head_commit.message, 'minor') }}
+    needs:
+      - config
+    steps:
+      - name: Minor version
+        run: npm version preminor
+      - name: Push version
+        run: git push --tags https://${{ secrets.TOKEN }}@github.com/${{ github.repository }} main
+  major:
+    name: Update version with major (x.0.0-0)
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.event.head_commit.message, 'major') }}
+    needs:
+      - config
+    steps:
+      - name: Major version
+        run: npm version premajor
+      - name: Push version
+        run: git push --tags https://${{ secrets.TOKEN }}@github.com/${{ github.repository }} main
