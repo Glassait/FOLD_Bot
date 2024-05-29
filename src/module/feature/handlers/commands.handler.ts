@@ -12,12 +12,12 @@ import type { SlashCommandModel } from '../slash-commands/models/slash-command.m
 module.exports = async (): Promise<void> => {
     const logger: Logger = new Logger(basename(__filename));
     const slashCommandsDir: string = join(__dirname, '../slash-commands');
-    const body: { [key: Snowflake]: RESTPostAPIChatInputApplicationCommandsJSONBody[] } = {};
+    const body: Record<Snowflake, RESTPostAPIChatInputApplicationCommandsJSONBody[]> = {};
     const commandsTable = new CommandsTable();
 
     for (const file of readdirSync(slashCommandsDir)) {
         if (file.endsWith('.ts')) {
-            const command: SlashCommandModel = require(`${slashCommandsDir}/${file}`);
+            const command: SlashCommandModel = require(`${slashCommandsDir}/${file}`) as SlashCommandModel;
 
             (await commandsTable.getCommand(command.name as CommandName)).forEach((serverId: string): void => {
                 const guild: RESTPostAPIChatInputApplicationCommandsJSONBody[] = body[serverId] ?? [];
@@ -37,7 +37,7 @@ module.exports = async (): Promise<void> => {
 
             logger.info('Successfully reloaded application {} slash-commands for guild {}', String(command.length), serverId);
         } catch (error) {
-            logger.error(`${error}`, error);
+            logger.error(`An error occur during registering slash-command`, error);
         }
     }
 };

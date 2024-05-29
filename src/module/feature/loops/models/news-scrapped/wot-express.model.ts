@@ -18,7 +18,7 @@ export class WotExpress extends NewsScrapper {
      * @param {NewsWebsite} newsWebsite - The website to scrap and get the news.
      */
     public async scrap(newsWebsite: NewsWebsite): Promise<void> {
-        const links: any[] = this.$(newsWebsite.selector).get();
+        const links: any[] = this.$(newsWebsite.selector);
         let index: number = links.findIndex((link: any): boolean => link.attribs.href == newsWebsite.last_url);
 
         if (index === -1) {

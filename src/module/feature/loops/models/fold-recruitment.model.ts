@@ -47,7 +47,10 @@ export class FoldRecruitmentModel {
     /**
      * A map storing data where each key is the id of the player and each value is an object containing the recruitment message and the player name.
      */
-    private readonly datum: Map<number, { message: Message<true>; playerName: string }> = new Map();
+    private readonly datum: Map<number, { message: Message<true>; playerName: string }> = new Map<
+        number,
+        { message: Message<true>; playerName: string }
+    >();
 
     /**
      * Map the types of battles with the corresponding title of embed field

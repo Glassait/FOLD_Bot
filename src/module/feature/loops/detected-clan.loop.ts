@@ -1,6 +1,6 @@
 import type { Client } from 'discord.js';
 import { basename } from 'node:path';
-import type { CronsTable } from '../../shared/tables/complexe-table/crons/crons.table';
+import { CronsTable } from '../../shared/tables/complexe-table/crons/crons.table';
 import { FeatureFlippingTable } from '../../shared/tables/complexe-table/feature-flipping/feature-flipping.table';
 import { CronUtil } from '../../shared/utils/cron.util';
 import { Logger } from '../../shared/utils/logger';
@@ -19,11 +19,8 @@ module.exports = {
             return;
         }
 
-        let req = require('../../shared/tables/complexe-table/crons/crons.table');
-        const cronsTable: CronsTable = new req.CronsTable();
-
-        req = require('./models/detected-clan.model');
-        const detectedClanModel: DetectedClanModel = new req.DetectedClanModel();
+        const cronsTable: CronsTable = new CronsTable();
+        const detectedClanModel: DetectedClanModel = new DetectedClanModel();
 
         CronUtil.createCron(await cronsTable.getCron('detected-clan'), 'detected-clan', async (): Promise<void> => {
             await detectedClanModel.searchClanFromLeavingPlayer();

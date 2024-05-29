@@ -17,5 +17,6 @@ export interface BotEvent {
      *
      * @param {...any} args - Arguments passed to the event handler.
      */
-    execute: (...args: any[]) => Promise<void>;
+    // eslint-disable-next-line
+    execute: (...args: any[]) => void | Promise<void>;
 }

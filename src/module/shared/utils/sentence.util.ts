@@ -36,7 +36,7 @@ export class SentenceUtil {
      * const randomStatus = SentenceUtil.getRandomStatus();
      * console.log(`Activity Type: ${randomStatus[0]}, Status: ${randomStatus[1]}`);
      */
-    public static getRandomStatus(): any {
+    public static getRandomStatus(): [ActivityType, string] {
         return this.status[RandomUtil.getRandomNumber(this.status.length - 1)];
     }
 }

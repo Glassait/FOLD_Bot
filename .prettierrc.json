@@ -7,7 +7,6 @@
 	"bracketSpacing": true,
 	"bracketSameLine": false,
 	"arrowParens": "avoid",
-	"htmlWhitespaceSensitivity": "strict",
 	"embeddedLanguageFormatting": "auto",
 	"printWidth": 140,
 	"overrides": [

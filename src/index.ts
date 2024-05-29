@@ -27,13 +27,16 @@ const client: Client = new Client({
 // Register handlers
 require('./module/feature/handlers/handlers.handler.ts')(client);
 
-client.login(token).then((value: string): void => {
-    if (value) {
-        logger.info('The bot is ready to kick some ass');
-    } else {
-        logger.error('Failed to connect');
-    }
-});
+client
+    .login(token)
+    .then((value: string): void => {
+        if (value) {
+            logger.info('The bot is ready to kick some ass');
+        } else {
+            logger.error('Failed to connect, error');
+        }
+    })
+    .catch(reason => logger.error('Failed to connect, error {}', reason));
 
 /**
  * Code to tracked API Errors
@@ -49,5 +52,5 @@ process.on('unhandledRejection', error => {
  * @param {Error} err - The uncaught exception error object.
  */
 process.on('uncaughtException', (err: Error): void => {
-    logger.error(`${err}`, err);
+    logger.error(`${err.name}`, err);
 });
