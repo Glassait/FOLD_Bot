@@ -47,9 +47,9 @@ export class FoldRecruitmentModel {
     /**
      * A map storing data where each key is the id of the player and each value is an object containing the recruitment message and the player name.
      */
-    private readonly datum: Map<number, { message: Message<true>; playerName: string }> = new Map<
+    private readonly datum: Map<number, { message: Message<true>; playerName: string; isBlacklisted: boolean }> = new Map<
         number,
-        { message: Message<true>; playerName: string }
+        { message: Message<true>; playerName: string; isBlacklisted: boolean }
     >();
 
     /**
@@ -186,6 +186,10 @@ export class FoldRecruitmentModel {
      */
     public async checkPlayerActivity(): Promise<void> {
         for (const [playerId, data] of this.datum) {
+            if (data.isBlacklisted) {
+                continue;
+            }
+
             this.logger.debug('Checking recent activity of {}', data.playerName);
             const messageEmbed = new EmbedBuilder(data.message.embeds[0].data).setColor(Colors.Yellow);
 
@@ -209,6 +213,43 @@ export class FoldRecruitmentModel {
                 await data.message.edit({ embeds: [messageEmbed] });
             }
         }
+    }
+
+    /**
+     * Check the recent activity of a player in a specific type of battles.
+     *
+     * @param {EmbedBuilder} embed - The embed to update with a warning message if needed.
+     * @param {number} playerId - The ID of the player.
+     * @param {string} playerName - The name of the player.
+     * @param {'random' | 'fort_battles' | 'fort_sorties'} type - The type of battles to check.
+     *
+     * @returns {Promise<[boolean, boolean]>} - Returns the couple [isUnderLimite, has0Battle]
+     */
+    public async checkRecentActivity(
+        embed: EmbedBuilder,
+        playerId: number,
+        playerName: string,
+        type: 'random' | 'fort_battles' | 'fort_sorties'
+    ): Promise<[boolean, boolean]> {
+        const accounts: WargamingAccounts = await this.wargamingApi.accounts(playerId, playerName, type, 28);
+        const limit = await this.foldRecruitmentTable.getLimitByType(type);
+
+        const battlesCount: number | null = accounts.accounts[0].table_fields.battles_count;
+        if (battlesCount !== null && battlesCount >= limit) {
+            return [false, false];
+        }
+
+        embed.addFields({
+            name: this.mapText[type],
+            value: StringUtil.transformToCode(
+                'Le joueur a fait moins de {} en {} au cours des 28 derniers jours (actuellement {})',
+                limit,
+                this.mapText[type].toLowerCase(),
+                battlesCount ?? 0
+            ),
+        });
+        this.logger.info('The following player {} have low recent activity in {} (detected {})', playerName, type, battlesCount);
+        return [true, battlesCount === null];
     }
 
     /**
@@ -242,11 +283,15 @@ export class FoldRecruitmentModel {
      * @param {Clan} clan - The clan from which the player has left.
      */
     private async buildAndSendEmbedForPlayer(player: Players, clan: Clan): Promise<void> {
-        const tomatoOverall: TomatoSuccess<TomatoOverall> = await this.tomatoApi.playerOverall(player.id);
+        try {
+            const tomatoOverall: TomatoSuccess<TomatoOverall> | undefined = await this.tomatoApi.playerOverall(player.id);
 
-        if (tomatoOverall.data.overallWN8 < this.minWn8 || tomatoOverall.data.battles < this.minBattles) {
-            this.logger.info("The following player {} doesn't meet critéria", player.name);
-            return;
+            if (tomatoOverall.data.overallWN8 < this.minWn8 || tomatoOverall.data.battles < this.minBattles) {
+                this.logger.info("The following player {} doesn't meet critéria", player.name);
+                return;
+            }
+        } catch (reason) {
+            this.logger.warn('', reason);
         }
 
         this._noPlayerMeetCriteria = false;
@@ -293,7 +338,7 @@ export class FoldRecruitmentModel {
             .setColor(blacklisted ? Colors.Red : Colors.Blurple);
 
         const message: Message<true> = await this.channel.send({ embeds: [embedPlayer] });
-        this.datum.set(player.id, { message: message, playerName: player.name });
+        this.datum.set(player.id, { message: message, playerName: player.name, isBlacklisted: !!blacklisted });
     }
 
     /**
@@ -326,42 +371,5 @@ export class FoldRecruitmentModel {
         );
 
         return { datum: datum, extracted: extracted };
-    }
-
-    /**
-     * Check the recent activity of a player in a specific type of battles.
-     *
-     * @param {EmbedBuilder} embed - The embed to update with a warning message if needed.
-     * @param {number} playerId - The ID of the player.
-     * @param {string} playerName - The name of the player.
-     * @param {'random' | 'fort_battles' | 'fort_sorties'} type - The type of battles to check.
-     *
-     * @returns {Promise<[boolean, boolean]>} - Returns the couple [isUnderLimite, has0Battle]
-     */
-    public async checkRecentActivity(
-        embed: EmbedBuilder,
-        playerId: number,
-        playerName: string,
-        type: 'random' | 'fort_battles' | 'fort_sorties'
-    ): Promise<[boolean, boolean]> {
-        const accounts: WargamingAccounts = await this.wargamingApi.accounts(playerId, playerName, type, 28);
-        const limit = await this.foldRecruitmentTable.getLimitByType(type);
-
-        const battlesCount: number | null = accounts.accounts[0].table_fields.battles_count;
-        if (battlesCount !== null && battlesCount >= limit) {
-            return [false, false];
-        }
-
-        embed.addFields({
-            name: this.mapText[type],
-            value: StringUtil.transformToCode(
-                'Le joueur a fait moins de {} en {} au cours des 28 derniers jours (actuellement {})',
-                limit,
-                this.mapText[type].toLowerCase(),
-                battlesCount ?? 0
-            ),
-        });
-        this.logger.info('The following player {} have low recent activity in {} (detected {})', playerName, type, battlesCount);
-        return [true, battlesCount === null];
     }
 }

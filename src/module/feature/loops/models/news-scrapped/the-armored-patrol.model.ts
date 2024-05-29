@@ -22,7 +22,7 @@ export class TheArmoredPatrol extends NewsScrapper {
         const containers: Element[] = this.$(webSiteState.selector as SelectorType).get();
         let index: number = containers.findIndex(
             (container: Element): boolean =>
-                (container.children[1] as { children: { children: Element[] }[] }).children[1].children[0].attribs.href ==
+                (container.children[1] as { children: { children: Element[] }[] }).children[1].children[0].attribs.href ===
                 webSiteState.last_url
         );
 

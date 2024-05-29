@@ -12,7 +12,9 @@ module.exports = (client: Client): void => {
     let numberOfEvents: number = 0;
 
     readdirSync(eventsDir).forEach((file: string): void => {
-        if (!file.endsWith('.ts')) return;
+        if (!file.endsWith('.ts')) {
+            return;
+        }
 
         const event: BotEvent = require(`${eventsDir}/${file}`) as BotEvent;
 

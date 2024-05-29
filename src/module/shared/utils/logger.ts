@@ -75,8 +75,8 @@ export class Logger {
             return error.stack ?? error.message;
         } else if (typeof error === 'string') {
             return error;
-        } else {
-            return JSON.stringify(error);
         }
+
+        return JSON.stringify(error);
     }
 }

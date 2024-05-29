@@ -12,12 +12,14 @@ module.exports = (client: Client): void => {
     const scriptsDir: string = join(__dirname, '../scripts');
 
     for (const file of readdirSync(scriptsDir)) {
-        if (file.endsWith('.ts')) {
-            const script: ScriptModel = require(`${scriptsDir}/${file}`) as ScriptModel;
-            EnvUtil.asyncThread(async (): Promise<void> => {
-                await script.script(client);
-            });
-            logger.info(`${EmojiEnum.FLAME} Successfully launch script : {}`, script.name);
+        if (!file.endsWith('.ts')) {
+            continue;
         }
+
+        const script: ScriptModel = require(`${scriptsDir}/${file}`) as ScriptModel;
+        EnvUtil.asyncThread(async (): Promise<void> => {
+            await script.script(client);
+        });
+        logger.info(`${EmojiEnum.FLAME} Successfully launch script : {}`, script.name);
     }
 };

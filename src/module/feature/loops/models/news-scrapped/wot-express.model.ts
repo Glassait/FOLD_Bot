@@ -20,7 +20,7 @@ export class WotExpress extends NewsScrapper {
      */
     public async scrap(newsWebsite: NewsWebsite): Promise<void> {
         const links: Element[] = this.$(newsWebsite.selector as SelectorType).get();
-        let index: number = links.findIndex((link: Element): boolean => link.attribs.href == newsWebsite.last_url);
+        let index: number = links.findIndex((link: Element): boolean => link.attribs.href === newsWebsite.last_url);
 
         if (index === -1) {
             index = this.defaultIndex;

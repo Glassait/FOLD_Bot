@@ -15,7 +15,9 @@ module.exports = (client: Client): void => {
 
     setTimeout((): void => {
         readdirSync(loopsDir).forEach((file: string): void => {
-            if (!file.endsWith('.ts')) return;
+            if (!file.endsWith('.ts')) {
+                return;
+            }
 
             const loop: BotLoop = require(`${loopsDir}/${file}`) as BotLoop;
             EnvUtil.asyncThread(async (): Promise<void> => {

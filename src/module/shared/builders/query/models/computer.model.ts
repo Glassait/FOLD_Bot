@@ -95,9 +95,7 @@ export class Computer {
      * @returns {string} The reduced UPDATE values string.
      */
     private static reduceUpdate(values: unknown[], columns: string[]): string {
-        return values.reduce((set: string, value: unknown, index: number): string => {
-            return set + columns[index] + " = '" + this.stringifyValue(value) + (index === values.length - 1 ? "'" : "', ");
-        }, '');
+        return values.reduce((set: string, value: unknown, index: number): string => set + columns[index] + " = '" + this.stringifyValue(value) + (index === values.length - 1 ? "'" : "', "), '');
     }
 
     /**

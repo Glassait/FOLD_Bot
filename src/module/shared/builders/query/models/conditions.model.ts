@@ -125,14 +125,12 @@ export class Conditions {
      * @returns {string} The reduced WHERE conditions string.
      */
     private reduceConditionsAndVerdes(conditions: Condition): string {
-        return conditions.conditions.reduce((where: string, condition: string, index: number): string => {
-            return (
+        return conditions.conditions.reduce(
+            (where: string, condition: string, index: number): string =>
                 where +
                 condition +
-                (conditions.conditions.length > 1 && index <= conditions.conditions.length - 2
-                    ? ` ${(conditions.verdes as string[])[index]} `
-                    : '')
-            );
-        }, '');
+                (conditions.conditions.length > 1 && index <= conditions.conditions.length - 2 ? ` ${conditions.verdes![index]} ` : ''),
+            ''
+        );
     }
 }

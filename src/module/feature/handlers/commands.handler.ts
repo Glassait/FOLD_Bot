@@ -16,17 +16,19 @@ module.exports = async (): Promise<void> => {
     const commandsTable = new CommandsTable();
 
     for (const file of readdirSync(slashCommandsDir)) {
-        if (file.endsWith('.ts')) {
-            const command: SlashCommandModel = require(`${slashCommandsDir}/${file}`) as SlashCommandModel;
-
-            (await commandsTable.getCommand(command.name as CommandName)).forEach((serverId: string): void => {
-                const guild: RESTPostAPIChatInputApplicationCommandsJSONBody[] = body[serverId] ?? [];
-                guild.push(command.data.toJSON());
-                body[serverId] = guild;
-            });
-
-            logger.info(`${EmojiEnum.FLAME} Successfully loaded command {}`, command.name);
+        if (!file.endsWith('.ts')) {
+            continue;
         }
+
+        const command: SlashCommandModel = require(`${slashCommandsDir}/${file}`) as SlashCommandModel;
+
+        (await commandsTable.getCommand(command.name as CommandName)).forEach((serverId: string): void => {
+            const guild: RESTPostAPIChatInputApplicationCommandsJSONBody[] = body[serverId] ?? [];
+            guild.push(command.data.toJSON());
+            body[serverId] = guild;
+        });
+
+        logger.info(`${EmojiEnum.FLAME} Successfully loaded command {}`, command.name);
     }
 
     const rest: REST = new REST({ version: '10' }).setToken(token);

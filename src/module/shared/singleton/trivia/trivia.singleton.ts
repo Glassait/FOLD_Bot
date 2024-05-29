@@ -284,21 +284,23 @@ export class TriviaSingleton {
         for (const player of players) {
             const lastAnswer: TriviaAnswer = await this.playerAnswerTable.getLastAnswerOfPlayer(player.id);
 
-            if (lastAnswer) {
-                const oldElo: number = lastAnswer?.elo ?? 0;
-                const daysInactive = DateUtil.diffOfDay(today, new Date(lastAnswer.date));
+            if (!lastAnswer) {
+                continue;
+            }
 
-                if ((!lastAnswer?.trivia_id && oldElo > 0) || daysInactive > 1) {
-                    const newElo: number = Math.round(oldElo * 0.982);
-                    inactivePlayers.push({
-                        playerName: player.name,
-                        eloChange: oldElo - newElo,
-                    });
+            const oldElo: number = lastAnswer?.elo ?? 0;
+            const daysInactive = DateUtil.diffOfDay(today, new Date(lastAnswer.date));
 
-                    await this.playerAnswerTable.addAfkAnswer(player.id, yesterday, newElo);
+            if ((!lastAnswer?.trivia_id && oldElo > 0) || daysInactive > 1) {
+                const newElo: number = Math.round(oldElo * 0.982);
+                inactivePlayers.push({
+                    playerName: player.name,
+                    eloChange: oldElo - newElo,
+                });
 
-                    this.logger.debug('Inactif player spotted : {}, old elo : {}, new elo : {}', player.name, oldElo, newElo);
-                }
+                await this.playerAnswerTable.addAfkAnswer(player.id, yesterday, newElo);
+
+                this.logger.debug('Inactif player spotted : {}, old elo : {}, new elo : {}', player.name, oldElo, newElo);
             }
         }
 
@@ -333,13 +335,15 @@ export class TriviaSingleton {
         for (const vehicle of Object.values(vehicles)) {
             const tank: Tank | null = await this.tanksTable.getTankByName(vehicle.name);
 
-            if (!tank) {
-                try {
-                    await this.tanksTable.insertTank(vehicle.name, vehicle.images.big_icon, vehicle.default_profile.ammo);
-                    this.logger.debug('Successfully insert tank {} in database', vehicle.name);
-                } catch (reason) {
-                    this.logger.warn(`Failed to insert tank {} in database with reason {}`, vehicle.name, reason);
-                }
+            if (tank) {
+                continue;
+            }
+
+            try {
+                await this.tanksTable.insertTank(vehicle.name, vehicle.images.big_icon, vehicle.default_profile.ammo);
+                this.logger.debug('Successfully insert tank {} in database', vehicle.name);
+            } catch (reason) {
+                this.logger.warn(`Failed to insert tank {} in database with reason {}`, vehicle.name, reason);
             }
         }
     }
@@ -367,7 +371,7 @@ export class TriviaSingleton {
      * @returns {number[]} - Array of tank pages to fetch.
      */
     private async createTankPages(): Promise<number[]> {
-        const tankPages: number[] = RandomUtil.getArrayWithRandomNumber(4, this.totalNumberOfTanks, 1, false, this.lastTankPage);
+        const tankPages: number[] = RandomUtil.getArrayWithRandomNumber(false, this.lastTankPage, 4, this.totalNumberOfTanks, 1);
 
         this.lastTankPage = [...this.lastTankPage.slice(this.lastTankPage.length >= this.maxNumberOfUniqueTanks ? 4 : 0), ...tankPages];
 
