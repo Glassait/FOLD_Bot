@@ -5,7 +5,7 @@ import { CronsTable } from '../../shared/tables/complexe-table/crons/crons.table
 import { FeatureFlippingTable } from '../../shared/tables/complexe-table/feature-flipping/feature-flipping.table';
 import type { NewsWebsite } from '../../shared/tables/complexe-table/news-websites/models/news-websites.type';
 import { NewsWebsitesTable } from '../../shared/tables/complexe-table/news-websites/news-websites.table';
-import { CronUtil } from '../../shared/utils/cron.util';
+import { createCron } from '../../shared/utils/cron.util';
 import { Logger } from '../../shared/utils/logger';
 import { WebSiteScraper } from './models/web-site-scraper.model';
 import type { BotLoop } from './types/bot-loop.type';
@@ -34,7 +34,7 @@ module.exports = {
         logger.info(`${EmojiEnum.LOOP} Web scraping initialized`);
         let index: number = 0;
 
-        CronUtil.createCron(
+        createCron(
             await new CronsTable().getCron('newsletter'),
             'newsletter',
             (): void => {

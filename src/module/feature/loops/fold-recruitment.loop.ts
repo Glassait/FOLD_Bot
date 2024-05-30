@@ -4,7 +4,7 @@ import { EmojiEnum } from '../../shared/enums/emoji.enum';
 import { CronsTable } from '../../shared/tables/complexe-table/crons/crons.table';
 import { FeatureFlippingTable } from '../../shared/tables/complexe-table/feature-flipping/feature-flipping.table';
 import { WatchClansTable } from '../../shared/tables/complexe-table/watch-clans/watch-clans.table';
-import { CronUtil } from '../../shared/utils/cron.util';
+import { createCron } from '../../shared/utils/cron.util';
 import { Logger } from '../../shared/utils/logger';
 import { FoldRecruitmentModel } from './models/fold-recruitment.model';
 import type { BotLoop } from './types/bot-loop.type';
@@ -26,7 +26,7 @@ module.exports = {
 
         await recruitmentModel.initialise(client);
 
-        CronUtil.createCron(await cronsTable.getCron('fold-recruitment'), 'fold-recruitment', async (): Promise<void> => {
+        createCron(await cronsTable.getCron('fold-recruitment'), 'fold-recruitment', async (): Promise<void> => {
             if (!(await featureFlippingTable.getFeature('fold_recruitment'))) {
                 logger.info('Fold recruitment has been disabled during execution of loop');
                 return;
@@ -42,9 +42,9 @@ module.exports = {
                 logger.debug(`${EmojiEnum.MALE} End recruitment for {}`, clan.name);
             }
 
-            if (recruitmentModel.noPlayerFound) {
+            if (recruitmentModel.noPlayerFound as boolean) {
                 await recruitmentModel.sendMessageNoPlayerFound();
-            } else if (recruitmentModel.noPlayerMeetCriteria) {
+            } else if (recruitmentModel.noPlayerMeetCriteria as boolean) {
                 await recruitmentModel.sendMessageNoPlayerMeetCriteria();
             } else {
                 await recruitmentModel.checkPlayerActivity();

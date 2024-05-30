@@ -1,6 +1,6 @@
 import { TimeEnum } from '../../../../shared/enums/time.enum';
 import type { NewsWebsite } from '../../../../shared/tables/complexe-table/news-websites/models/news-websites.type';
-import { EnvUtil } from '../../../../shared/utils/env.util';
+import { sleep } from '../../../../shared/utils/env.util';
 import { NewsScrapper } from './news-scrapper.model';
 import { Element, SelectorType } from 'cheerio';
 
@@ -31,7 +31,7 @@ export class WotExpress extends NewsScrapper {
         } else if (index > 0) {
             for (let i = index - 1; i >= 1; i--) {
                 await this.wotExpress(links, i, newsWebsite);
-                await EnvUtil.sleep(TimeEnum.MINUTE);
+                await sleep(TimeEnum.MINUTE);
             }
         }
     }
@@ -44,7 +44,7 @@ export class WotExpress extends NewsScrapper {
      * @param {NewsWebsite} newsWebsite - The website to scrap and get the news.
      */
     private async wotExpress(links: Element[], index: number, newsWebsite: NewsWebsite): Promise<void> {
-        const isEu: boolean = (links[index].children[2] as Element)?.attribs.class?.includes('eu');
+        const isEu: boolean = (links[index].children[2] as Element).attribs.class.includes('eu');
 
         await this.sendNews(
             links[index].attribs.href,

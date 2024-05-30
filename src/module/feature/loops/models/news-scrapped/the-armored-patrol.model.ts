@@ -1,6 +1,6 @@
 import { TimeEnum } from '../../../../shared/enums/time.enum';
 import type { NewsWebsite } from '../../../../shared/tables/complexe-table/news-websites/models/news-websites.type';
-import { EnvUtil } from '../../../../shared/utils/env.util';
+import { sleep } from '../../../../shared/utils/env.util';
 import { NewsScrapper } from './news-scrapper.model';
 import { Element, SelectorType } from 'cheerio';
 
@@ -35,7 +35,7 @@ export class TheArmoredPatrol extends NewsScrapper {
         } else if (index > 0) {
             for (let i = index - 1; i >= 0; i--) {
                 await this.armoredPatrol(containers, i, webSiteState);
-                await EnvUtil.sleep(TimeEnum.MINUTE);
+                await sleep(TimeEnum.MINUTE);
             }
         }
     }

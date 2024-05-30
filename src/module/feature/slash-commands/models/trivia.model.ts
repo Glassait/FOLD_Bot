@@ -20,8 +20,8 @@ import type { TriviaPlayer } from '../../../shared/tables/complexe-table/players
 import type { Tank } from '../../../shared/tables/complexe-table/tanks/models/tanks.type';
 import type { TriviaData } from '../../../shared/tables/complexe-table/trivia-data/models/trivia-data.type';
 import type { WinStreak } from '../../../shared/tables/complexe-table/win-streak/models/win-streak.type';
-import { StringUtil } from '../../../shared/utils/string.util';
-import { TimeUtil } from '../../../shared/utils/time.util';
+import { transformToCode } from '../../../shared/utils/string.util';
+import { convertToUnix } from '../../../shared/utils/time.util';
 import { ShellEnum, ShellType } from '../enums/shell.enum';
 import type { PlayerAnswer } from '../types/trivia-game.type';
 import { TriviaStatisticsModel } from './trivia-statistics.model';
@@ -74,7 +74,7 @@ export class TriviaModel extends TriviaStatisticsModel {
      * @param {ChatInputCommandInteraction} interaction - The chat interaction of the player
      */
     public async sendGame(interaction: ChatInputCommandInteraction): Promise<void> {
-        let player: TriviaPlayer = await this.playersTable.getPlayerByName(interaction.user.username);
+        let player: TriviaPlayer | undefined = await this.playersTable.getPlayerByName(interaction.user.username);
 
         if (!player) {
             try {
@@ -88,7 +88,7 @@ export class TriviaModel extends TriviaStatisticsModel {
             }
         }
 
-        const numberOfAnswer: number = await this.playerAnswerTable.countAnswerOfPlayer(player.id);
+        const numberOfAnswer: number = await this.playerAnswerTable.countAnswerOfPlayer(player!.id);
         if (numberOfAnswer >= this.maxNumberOfQuestion) {
             await interaction.editReply({
                 content: `Tu as atteint le nombre maximum de question par jour ! (actuellement ${this.maxNumberOfQuestion} par jour)\nReviens demain pour pouvoir rejouer !`,
@@ -96,7 +96,7 @@ export class TriviaModel extends TriviaStatisticsModel {
             return;
         }
 
-        if (this.datum.get(player.name)) {
+        if (this.datum.get(player!.name)) {
             await interaction.editReply({
                 content: `Tu as déjà une parti de trivia en cours ! Merci d'attendre que la partie précédente ce termine avant de lancer une nouvelle partie`,
             });
@@ -104,21 +104,21 @@ export class TriviaModel extends TriviaStatisticsModel {
         }
 
         const value = {
-            player: player,
+            player: player!,
             questionNumber: numberOfAnswer,
             interaction: interaction,
         };
 
-        this.datum.set(player.name, value);
+        this.datum.set(player!.name, value);
 
-        const { allTanks, selectedTanks } = this.getData(player.name);
+        const { allTanks, selectedTanks }: { allTanks?: Tank[]; selectedTanks: TriviaSelected } = this.getData(player!.name);
 
-        if (!allTanks || allTanks.length === 0) {
+        if (!allTanks || allTanks.length <= 16) {
             await interaction.editReply({
                 content:
                     'Le jeu ne semble pas encore initialisé, merci de réessayer dans quelque minutes. Si le problème persist merci de contacter <@313006042340524033>',
             });
-            this.datum.delete(player.name);
+            this.datum.delete(player!.name);
             return;
         }
 
@@ -140,7 +140,7 @@ export class TriviaModel extends TriviaStatisticsModel {
                 },
                 {
                     name: '🕒 Minuteur :',
-                    value: `<t:${TimeUtil.convertToUnix(target)}:R>`,
+                    value: `<t:${convertToUnix(target)}:R>`,
                     inline: true,
                 }
             );
@@ -171,7 +171,7 @@ export class TriviaModel extends TriviaStatisticsModel {
      * @example
      * const { allTanks, datum } = this.getData(interaction.user.username);
      */
-    private getData(username: string): { allTanks: Tank[]; selectedTanks: TriviaSelected } {
+    private getData(username: string): { allTanks?: Tank[]; selectedTanks: TriviaSelected } {
         const value = this.datum.get(username);
 
         return {
@@ -189,7 +189,7 @@ export class TriviaModel extends TriviaStatisticsModel {
     private collectAnswer(gameMessage: Message<BooleanCache<CacheType>>, username: string): void {
         this.logger.debug('Start collecting answer of {}', username);
         const timer = Date.now();
-        let playerAnswer: PlayerAnswer;
+        let playerAnswer: PlayerAnswer | undefined;
 
         gameMessage
             .createMessageComponentCollector({
@@ -207,14 +207,14 @@ export class TriviaModel extends TriviaStatisticsModel {
                         await interaction.deferReply({ ephemeral: true });
                     }
 
-                    if (!hasAlreadyAnswer || playerAnswer.response !== interaction.customId) {
+                    if (!hasAlreadyAnswer || playerAnswer?.response !== interaction.customId) {
                         playerAnswer = {
                             responseTime: Date.now() - timer,
                             response: interaction.customId,
                             interaction: playerAnswer?.interaction ?? interaction,
                         };
 
-                        await playerAnswer.interaction?.editReply({
+                        await playerAnswer.interaction.editReply({
                             content: hasAlreadyAnswer
                                 ? `Ta réponse a été mise à jour en \`${interaction.customId.split('#')[0]}\``
                                 : `Ta réponse \`${interaction.customId.split('#')[0]}\` a été enregistrée !`,
@@ -222,7 +222,7 @@ export class TriviaModel extends TriviaStatisticsModel {
 
                         changedAnswer = true;
                     } else {
-                        await playerAnswer.interaction?.editReply({
+                        await playerAnswer.interaction.editReply({
                             content: 'Ta réponse semble être la même que celle que tu as sélectionnée précédemment.',
                         });
                     }
@@ -234,7 +234,7 @@ export class TriviaModel extends TriviaStatisticsModel {
             })
             .on('end', async (): Promise<void> => {
                 this.logger.debug('Collect answer of {} end. Start calculating the scores', username);
-                await this.sendAnswerToPlayer(playerAnswer, username);
+                await this.sendAnswerToPlayer(username, playerAnswer);
             });
     }
 
@@ -253,7 +253,7 @@ export class TriviaModel extends TriviaStatisticsModel {
 
         this.logger.debug(
             `{} ${action} to the trivia game with: {}`,
-            interaction.member?.nickname ?? interaction.user.displayName,
+            interaction.member.nickname ?? interaction.user.displayName,
             interaction.customId
         );
     }
@@ -261,19 +261,19 @@ export class TriviaModel extends TriviaStatisticsModel {
     /**
      * Send the answer to the player
      *
-     * @param {PlayerAnswer} playerAnswer - The player answer
      * @param {string} username - The player name
+     * @param {PlayerAnswer} [playerAnswer] - The player answer
      */
-    private async sendAnswerToPlayer(playerAnswer: PlayerAnswer, username: string): Promise<void> {
+    private async sendAnswerToPlayer(username: string, playerAnswer?: PlayerAnswer): Promise<void> {
         const { interaction } = this.datum.get(username) ?? {};
         const { allTanks, selectedTanks } = this.getData(username);
 
-        const isGoodAnswer = this.isGoodAnswer(playerAnswer, username);
+        const isGoodAnswer = this.isGoodAnswer(username, playerAnswer);
         const answerEmbed: EmbedBuilder = this.createAnswerEmbed(true, selectedTanks.tank, isGoodAnswer);
         const otherAnswer: EmbedBuilder[] = [];
         const ammo: Ammo = selectedTanks.tank.ammo[selectedTanks.ammoIndex];
 
-        allTanks.forEach((vehicle: Tank): void => {
+        allTanks!.forEach((vehicle: Tank): void => {
             const vehicleAmmo: Ammo = vehicle.ammo[selectedTanks.ammoIndex];
             if (vehicle.name !== selectedTanks.tank.name && this.checkVehicleAmmoDetail(vehicleAmmo, ammo)) {
                 this.logger.debug('Another tank has the same shell {}', vehicle.name);
@@ -284,7 +284,7 @@ export class TriviaModel extends TriviaStatisticsModel {
         await interaction?.editReply({ embeds: [answerEmbed, ...otherAnswer], components: [] });
         this.logger.debug("Game's message update with answer");
 
-        await this.updateStatistic(playerAnswer, isGoodAnswer, username);
+        await this.updateStatistic(isGoodAnswer, username, playerAnswer);
     }
 
     /**
@@ -341,14 +341,18 @@ export class TriviaModel extends TriviaStatisticsModel {
     /**
      * Check if the player answers is the good answer
      *
-     * @param {PlayerAnswer} playerAnswer - The player answer
      * @param {string} username - The player username
+     * @param {PlayerAnswer} [playerAnswer] - The player answer
      *
      * @return {boolean} - True if the player answer is the good answer, false otherwise
      */
-    private isGoodAnswer(playerAnswer: PlayerAnswer, username: string): boolean {
+    private isGoodAnswer(username: string, playerAnswer?: PlayerAnswer): boolean {
+        if (!playerAnswer) {
+            return false;
+        }
+
         const { selectedTanks } = this.getData(username);
-        const tankId = Number(playerAnswer?.response.split('#')[1]);
+        const tankId = Number(playerAnswer.response.split('#')[1]);
         return tankId === selectedTanks.tank.id || this.isAnotherTanks(tankId, username);
     }
 
@@ -362,7 +366,7 @@ export class TriviaModel extends TriviaStatisticsModel {
      */
     private isAnotherTanks(tankId: number, username: string): boolean {
         const { allTanks, selectedTanks } = this.getData(username);
-        const vehicle: Tank | undefined = allTanks.find((vehicle: Tank): boolean => vehicle.id === tankId);
+        const vehicle: Tank | undefined = allTanks!.find((vehicle: Tank): boolean => vehicle.id === tankId);
 
         if (!vehicle) {
             return false;
@@ -374,13 +378,13 @@ export class TriviaModel extends TriviaStatisticsModel {
     /**
      * Updates the statistic after a player has completed a trivia game.
      *
-     * @param {PlayerAnswer} playerAnswer - The player's final answer.
      * @param {boolean} isGoodAnswer - Indicates whether the player's final answer is correct or not.
      * @param {string} username - The username of the player.
+     * @param {PlayerAnswer} [playerAnswer] - The player's final answer.
      */
-    private async updateStatistic(playerAnswer: PlayerAnswer, isGoodAnswer: boolean, username: string): Promise<void> {
+    private async updateStatistic(isGoodAnswer: boolean, username: string, playerAnswer?: PlayerAnswer): Promise<void> {
         this.logger.debug('Start updating {} statistic', username);
-        await this.updatePlayerStatistic(username, playerAnswer, isGoodAnswer);
+        await this.updatePlayerStatistic(username, isGoodAnswer, playerAnswer);
         this.datum.delete(username);
         this.logger.debug('End updating {} statistic', username);
     }
@@ -389,10 +393,10 @@ export class TriviaModel extends TriviaStatisticsModel {
      * Updates the player statistics after they have answered a trivia question.
      *
      * @param {string} playerName - The name of the player whose statistics need to be updated.
-     * @param {PlayerAnswer} playerAnswer - The answer provided by the player.
      * @param {boolean} isGoodAnswer - Indicates whether the player's answer is correct or not.
+     * @param {PlayerAnswer} [playerAnswer] - The answer provided by the player.
      */
-    private async updatePlayerStatistic(playerName: string, playerAnswer: PlayerAnswer, isGoodAnswer: boolean): Promise<void> {
+    private async updatePlayerStatistic(playerName: string, isGoodAnswer: boolean, playerAnswer?: PlayerAnswer): Promise<void> {
         const value = this.datum.get(playerName);
 
         if (!value) {
@@ -400,9 +404,9 @@ export class TriviaModel extends TriviaStatisticsModel {
         }
 
         const { allTanks, selectedTanks } = this.getData(playerName);
-        const lastAnswer: TriviaAnswer = await this.playerAnswerTable.getLastAnswerOfPlayer(value.player.id);
+        const lastAnswer: TriviaAnswer | undefined = await this.playerAnswerTable.getLastAnswerOfPlayer(value.player.id);
         const oldElo = lastAnswer?.elo ?? 0;
-        const elo = this.calculateElo(oldElo, playerAnswer?.responseTime, isGoodAnswer);
+        const elo = this.calculateElo(oldElo, isGoodAnswer, playerAnswer?.responseTime);
 
         try {
             await this.playerAnswerTable.addAnswer(
@@ -421,32 +425,32 @@ export class TriviaModel extends TriviaStatisticsModel {
                     content: "Une erreur est survenue lors de l'enregistrement de ta réponse dans la base de données !",
                 });
             }
-            this.logger.error(
-                StringUtil.transformToCode(`Failed to add answer of player {} in database, with error {}`, playerName, reason)
-            );
+            this.logger.error(transformToCode(`Failed to add answer of player {} in database, with error {}`, playerName, reason));
             return;
         }
 
-        let winStreak: WinStreak = await this.winStreakTable.getWinStreakFromDate(value.player.id, new Date());
+        let winStreak: WinStreak | undefined = await this.winStreakTable.getWinStreakFromDate(value.player.id, new Date());
 
         if (!winStreak) {
             try {
-                winStreak = await this.addWinStreak(playerAnswer.interaction, playerName, value.player.id);
+                winStreak = await this.addWinStreak(playerName, value.player.id, playerAnswer?.interaction);
             } catch (reason) {
-                await playerAnswer.interaction.editReply({
-                    content: 'Une erreur est survenue lors de la création de tes statistiques dans la base de données !',
-                });
+                if (playerAnswer?.interaction) {
+                    await playerAnswer.interaction.editReply({
+                        content: 'Une erreur est survenue lors de la création de tes statistiques dans la base de données !',
+                    });
+                }
                 this.logger.error(
-                    StringUtil.transformToCode(`Failed to create winstreak for player {} in database, with error {}`, playerName, reason)
+                    transformToCode(`Failed to create winstreak for player {} in database, with error {}`, playerName, reason)
                 );
                 return;
             }
         }
 
         if (isGoodAnswer) {
-            await this.handleGoodAnswer(winStreak, playerAnswer, oldElo, elo, playerName);
+            await this.handleGoodAnswer(winStreak, oldElo, elo, playerName, playerAnswer);
         } else {
-            await this.handleWrongAnswer(winStreak, playerAnswer, oldElo, elo, playerName, allTanks, selectedTanks);
+            await this.handleWrongAnswer(winStreak, oldElo, elo, playerName, allTanks!, selectedTanks, playerAnswer);
         }
     }
 
@@ -454,17 +458,17 @@ export class TriviaModel extends TriviaStatisticsModel {
      * Calculates the new elo of the player after he answered a question
      *
      * @param {number} oldElo - The player's original elo
-     * @param {number} responseTime - The player's response time of the actual question
      * @param {boolean} isGoodAnswer - If the player answer is a good response or not
+     * @param {number} [responseTime] - The player's response time of the actual question
      *
      * @return {number} - The new elo of the player
      */
-    private calculateElo(oldElo: number, responseTime: number, isGoodAnswer: boolean): number {
+    private calculateElo(oldElo: number, isGoodAnswer: boolean, responseTime?: number): number {
         let gain = -Math.floor(25 * Math.exp(0.001 * oldElo));
         if (isGoodAnswer) {
             gain = Math.floor(50 * Math.exp(-0.001 * oldElo));
 
-            if (responseTime <= this.responseTimeLimit) {
+            if (typeof responseTime === 'number' && responseTime <= this.responseTimeLimit) {
                 gain += Math.floor(gain * 0.25);
             }
         }
@@ -476,17 +480,17 @@ export class TriviaModel extends TriviaStatisticsModel {
      * Handle the logic when the player found the right answer
      *
      * @param {{ current: number; max: number }} winStreak - The player win streak
-     * @param {PlayerAnswer} playerAnswer - The player answer
      * @param {number} oldElo - The player elo before the answer
      * @param {number} newElo - The player elo after the answer
      * @param {string} playerName - The player username
+     * @param {PlayerAnswer} [playerAnswer] - The player answer
      */
     private async handleGoodAnswer(
         winStreak: WinStreak,
-        playerAnswer: PlayerAnswer,
         oldElo: number,
         newElo: number,
-        playerName: string
+        playerName: string,
+        playerAnswer?: PlayerAnswer
     ): Promise<void> {
         const value = this.datum.get(playerName);
 
@@ -517,23 +521,26 @@ export class TriviaModel extends TriviaStatisticsModel {
      * handle the logic when the player haven't answered or found the answer
      *
      * @param {{ current: number; max: number }} winStreak - The player win streak
-     * @param {PlayerAnswer} playerAnswer - The player answer
      * @param {number} oldElo - The player elo before the answer
      * @param {number} newElo - The player elo after the answer
      * @param {string} playerName - The player username
      * @param {Tank[]} allTanks - All the tanks available for the question
      * @param {TriviaSelected} datum - The tank selected for the question
+     * @param {PlayerAnswer} [playerAnswer] - The player answer
      */
     private async handleWrongAnswer(
         winStreak: WinStreak,
-        playerAnswer: PlayerAnswer,
         oldElo: number,
         newElo: number,
         playerName: string,
         allTanks: Tank[],
-        datum: TriviaSelected
+        datum: TriviaSelected,
+        playerAnswer?: PlayerAnswer
     ): Promise<void> {
         this.logger.debug('Player {} failed to find the right answer', playerName);
+
+        winStreak.current = 0;
+        await this.updateWinStreak(playerName, winStreak, playerAnswer);
 
         if (!playerAnswer) {
             return;
@@ -545,17 +552,14 @@ export class TriviaModel extends TriviaStatisticsModel {
             return;
         }
 
-        winStreak.current = 0;
-        await this.updateWinStreak(playerName, winStreak, playerAnswer);
-
-        const tank = allTanks.find((tank: Tank): boolean => tank.name === playerAnswer?.response.split('#')[0]);
+        const tank = allTanks.find((tank: Tank): boolean => tank.name === playerAnswer.response.split('#')[0]);
 
         if (!tank) {
             return;
         }
 
         const ammo = tank.ammo[datum.ammoIndex];
-        await playerAnswer?.interaction.editReply({
+        await playerAnswer.interaction.editReply({
             content: '',
             embeds: [
                 new EmbedBuilder()
@@ -587,9 +591,9 @@ export class TriviaModel extends TriviaStatisticsModel {
      *
      * @param {string} playerName - The name of the player.
      * @param {WinStreak} winStreak - The player's current winstreak data.
-     * @param {PlayerAnswer} playerAnswer - The interaction object of the player's answer.
+     * @param {PlayerAnswer} [playerAnswer] - The interaction object of the player's answer.
      */
-    private async updateWinStreak(playerName: string, winStreak: WinStreak, playerAnswer: PlayerAnswer): Promise<void> {
+    private async updateWinStreak(playerName: string, winStreak: WinStreak, playerAnswer?: PlayerAnswer): Promise<void> {
         const value = this.datum.get(playerName);
 
         if (!value) {
@@ -600,12 +604,12 @@ export class TriviaModel extends TriviaStatisticsModel {
             await this.winStreakTable.updateWinStreak(value.player.id, new Date(), winStreak);
             this.logger.info('Successfully update winstreak for player {} in database', playerName);
         } catch (reason) {
-            await playerAnswer.interaction.editReply({
-                content: 'Une erreur est survenue lors de la mise à jour de tes statistiques dans la base de données !',
-            });
-            this.logger.error(
-                StringUtil.transformToCode(`Failed to update winstreak for player {} in database, with error {}`, playerName, reason)
-            );
+            if (playerAnswer) {
+                await playerAnswer.interaction.editReply({
+                    content: 'Une erreur est survenue lors de la mise à jour de tes statistiques dans la base de données !',
+                });
+            }
+            this.logger.error(transformToCode(`Failed to update winstreak for player {} in database, with error {}`, playerName, reason));
             return;
         }
     }
@@ -627,26 +631,26 @@ export class TriviaModel extends TriviaStatisticsModel {
         }
 
         this.logger.info('New player added to trivia database {}', playerName);
-        return await this.playersTable.getPlayerByName(playerName);
+        return (await this.playersTable.getPlayerByName(playerName))!;
     }
 
     /**
      * Create the win streak line in the database for the given player
      *
-     * @param {ButtonInteraction} interaction - The interaction to replay if error
      * @param {string} playerName - The player name
      * @param {number} playerId - The id of the player in the database
+     * @param {ButtonInteraction} [interaction] - The interaction to replay if error
      *
      * @return {WinStreak} - The win streak object initialise
      */
-    private async addWinStreak(interaction: ButtonInteraction, playerName: string, playerId: number): Promise<WinStreak> {
+    private async addWinStreak(playerName: string, playerId: number, interaction?: ButtonInteraction): Promise<WinStreak> {
         const added = await this.winStreakTable.addWinStreak(playerId);
 
-        if (!added) {
+        if (!added && interaction) {
             await interaction.editReply({
                 content: 'Une erreur est survenue lors de la création de tes statistiques dans la base de données !',
             });
-            throw new Error(StringUtil.transformToCode(`Failed to create winstreak for player {} in database`, playerName));
+            throw new Error(transformToCode(`Failed to create winstreak for player {} in database`, playerName));
         }
 
         this.logger.info('Successfully create winstreak for player {} in database', playerName);

@@ -5,6 +5,7 @@ import globals from 'globals';
 export default tseslint.config(
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
     pluginJs.configs.recommended,
+    ...tseslint.configs.strictTypeChecked,
     ...tseslint.configs.recommendedTypeChecked,
     ...tseslint.configs.stylisticTypeChecked,
     {
@@ -26,6 +27,10 @@ export default tseslint.config(
             '@typescript-eslint/consistent-type-definitions': ['off', 'type'],
             '@typescript-eslint/no-explicit-any': ['error', { ignoreRestArgs: true, fixToUnknown: true }],
             '@typescript-eslint/no-misused-promises': ['error', { checksVoidReturn: false }],
+            '@typescript-eslint/adjacent-overload-signatures': ['error'],
+            '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
+            '@typescript-eslint/no-non-null-assertion': ['off'],
+            '@typescript-eslint/no-confusing-void-expression': ['error', { ignoreArrowShorthand: true }],
             'no-duplicate-imports': ['error'],
             'no-constructor-return': ['error'],
             'no-inner-declarations': ['error'],
@@ -41,7 +46,7 @@ export default tseslint.config(
             eqeqeq: ['error'],
             'grouped-accessor-pairs': ['error'],
             'max-classes-per-file': ['error', { max: 1 }],
-            'max-depth': ['error', { max: 2 }],
+            'max-depth': ['error', { max: 3 }],
             'max-lines': ['error', { max: 500, skipComments: true, skipBlankLines: true }],
             'no-else-return': ['error', { allowElseIf: true }],
         },

@@ -1,20 +1,22 @@
-on: [ push ]
+on: [push]
 name: Build node
 jobs:
-  build:
-    name: Update version
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18.X'
-      - name: Check ESLint
-        run: npm run lint
-      - name: Build
-        run: npm run build
+    build:
+        name: Build the application
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0
+                  persist-credentials: false
+            - name: Setup Node
+              uses: actions/setup-node@v3
+              with:
+                  node-version: '18.X'
+            - name: Install
+              run: npm i
+            - name: Check ESLint
+              run: npm run lint
+            - name: Build
+              run: npm run build

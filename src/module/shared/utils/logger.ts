@@ -1,6 +1,6 @@
 import { ContextAbstract } from '../abstracts/context.abstract';
 import { LoggerSingleton } from '../singleton/logger.singleton';
-import { StringUtil } from './string.util';
+import { transformToCode } from './string.util';
 
 /**
  * This class use the LoggerSingleton to write log
@@ -30,7 +30,7 @@ export class Logger {
      * @param {...unknown} args - Code snippets to include in the message.
      */
     public debug(msg: string, ...args: unknown[]): void {
-        this.logger.debug(this.context, StringUtil.transformToCode(msg, ...args));
+        this.logger.debug(this.context, transformToCode(msg, ...args));
     }
 
     /**
@@ -40,7 +40,7 @@ export class Logger {
      * @param {...unknown} args - Code snippets to include in the message.
      */
     public info(msg: string, ...args: unknown[]): void {
-        this.logger.info(this.context, StringUtil.transformToCode(msg, ...args));
+        this.logger.info(this.context, transformToCode(msg, ...args));
     }
 
     /**
@@ -50,7 +50,7 @@ export class Logger {
      * @param {...unknown} args - Code snippets to include in the message.
      */
     public warn(msg: string, ...args: unknown[]): void {
-        this.logger.warning(this.context, StringUtil.transformToCode(msg, ...args));
+        this.logger.warning(this.context, transformToCode(msg, ...args));
     }
 
     /**

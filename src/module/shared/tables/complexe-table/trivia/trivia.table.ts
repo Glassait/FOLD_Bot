@@ -2,7 +2,7 @@ import { TableAbstract } from '../../../abstracts/table.abstract';
 import { InsertIntoBuilder } from '../../../builders/query/insert-into.builder';
 import { SelectBuilder } from '../../../builders/query/select.builder';
 import { LoggerInjector } from '../../../decorators/injector/logger-injector.decorator';
-import { TriviaMapper } from './models/trivia.mapper';
+import { transformArrayTriviaRawInArrayTriviaQuestion } from './models/trivia.mapper';
 import type { TriviaQuestion } from './models/trivia.type';
 
 @LoggerInjector
@@ -20,7 +20,7 @@ export class TriviaTable extends TableAbstract {
     }
 
     public async getTriviaFromDateWithTank(date: Date): Promise<TriviaQuestion[]> {
-        return TriviaMapper.transformArrayTriviaRawInArrayTriviaQuestion(
+        return transformArrayTriviaRawInArrayTriviaQuestion(
             await this.select(
                 new SelectBuilder(this)
                     .columns(`${this.tableName}.id`, 'tank_id', 'ammo_index', 'name', 'image', 'ammo')

@@ -7,22 +7,22 @@ export class Conditions {
     /**
      * The inner join condition
      */
-    protected _innerJoin: { tableName: string; condition: Condition };
+    protected _innerJoin?: { tableName: string; condition: Condition };
 
     /**
      * The where condition
      */
-    protected _where: Condition;
+    protected _where?: Condition;
 
     /**
      * The order by condition
      */
-    protected _orderBy: OrderBy[];
+    protected _orderBy?: OrderBy[];
 
     /**
      * The max number of row to show
      */
-    protected _limit: number;
+    protected _limit?: number;
 
     /**
      * Build the condition

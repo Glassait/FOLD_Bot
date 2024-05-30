@@ -38,7 +38,7 @@ async function chatInputCommand(interaction: ChatInputCommandInteraction, client
         logger.info(
             'User {} send slash command : {}',
             interaction.user.username,
-            command.name + (interaction?.options.getSubcommand(false) ? ' ' + interaction?.options.getSubcommand() : '')
+            command.name + (interaction.options.getSubcommand(false) ? ' ' + interaction.options.getSubcommand() : '')
         );
         await command.execute(interaction, client);
     } catch (error) {

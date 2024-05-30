@@ -16,14 +16,14 @@ import type { TriviaData } from '../../tables/complexe-table/trivia-data/models/
 import { TriviaDataTable } from '../../tables/complexe-table/trivia-data/trivia-data.table';
 import type { TriviaQuestion } from '../../tables/complexe-table/trivia/models/trivia.type';
 import { TriviaTable } from '../../tables/complexe-table/trivia/trivia.table';
-import { DateUtil } from '../../utils/date.util';
-import { EnvUtil } from '../../utils/env.util';
+import { diffOfDay, getPreviousDayAsDate } from '../../utils/date.util';
+import { sleep } from '../../utils/env.util';
 import { Logger } from '../../utils/logger';
-import { RandomUtil } from '../../utils/random.util';
-import { StringUtil } from '../../utils/string.util';
-import { UserUtil } from '../../utils/user.util';
+import { transformToCode } from '../../utils/string.util';
+import { fetchChannelFromClient } from '../../utils/user.util';
 import { MEDAL } from '../../utils/variables.util';
 import type { TriviaSelected } from './models/trivia.type';
+import { getArrayWithRandomNumber, getRandomNumber } from '../../utils/random.util';
 
 /**
  * Class used to manage the trivia game
@@ -114,7 +114,7 @@ export class TriviaSingleton {
     }
 
     //region SINGLETON
-    private static _instance: TriviaSingleton;
+    private static _instance?: TriviaSingleton;
 
     static get instance(): TriviaSingleton {
         if (!this._instance) {
@@ -157,14 +157,14 @@ export class TriviaSingleton {
                 tank: Tank;
                 ammoIndex: number;
             } = {
-                tank: tanks[RandomUtil.getRandomNumber(tanks.length - 1)],
-                ammoIndex: RandomUtil.getRandomNumber(),
+                tank: tanks[getRandomNumber(tanks.length - 1)],
+                ammoIndex: getRandomNumber(),
             };
 
             await this.storeQuestionInDatabase(tanks, selectedTank, i);
         }
 
-        await EnvUtil.sleep(TimeEnum.SECONDE);
+        await sleep(TimeEnum.SECONDE);
         await this.createQuestionOfTheDay();
     }
 
@@ -191,9 +191,9 @@ export class TriviaSingleton {
      */
     public async sendTriviaResultForYesterday(client: Client): Promise<void> {
         this.logger.debug('Start collecting data to send the trivia result');
-        this.channel = await UserUtil.fetchChannelFromClient(client, await this.channels.getTrivia());
+        this.channel = await fetchChannelFromClient(client, await this.channels.getTrivia());
 
-        let questions: TriviaQuestion[] = await this.triviaTable.getTriviaFromDateWithTank(DateUtil.getPreviousDayAsDate());
+        let questions: TriviaQuestion[] = await this.triviaTable.getTriviaFromDateWithTank(getPreviousDayAsDate());
 
         if (!questions.length) {
             this.logger.debug('No questions fetch yesterday ! Not sending result');
@@ -262,7 +262,7 @@ export class TriviaSingleton {
      * If an inactive player is found, their Elo is reduced by a small percentage (currently 1.8%)
      */
     public async reduceEloOfInactifPlayer(): Promise<void> {
-        const yesterday = DateUtil.getPreviousDayAsDate();
+        const yesterday: Date = getPreviousDayAsDate();
         const questions: TriviaQuestion[] = await this.triviaTable.getTriviaFromDateWithTank(yesterday);
 
         if (!questions.length) {
@@ -282,16 +282,16 @@ export class TriviaSingleton {
         const today = new Date();
 
         for (const player of players) {
-            const lastAnswer: TriviaAnswer = await this.playerAnswerTable.getLastAnswerOfPlayer(player.id);
+            const lastAnswer: TriviaAnswer | undefined = await this.playerAnswerTable.getLastAnswerOfPlayer(player.id);
 
             if (!lastAnswer) {
                 continue;
             }
 
-            const oldElo: number = lastAnswer?.elo ?? 0;
-            const daysInactive = DateUtil.diffOfDay(today, new Date(lastAnswer.date));
+            const oldElo: number = lastAnswer.elo;
+            const daysInactive: number = diffOfDay(today, new Date(lastAnswer.date));
 
-            if ((!lastAnswer?.trivia_id && oldElo > 0) || daysInactive > 1) {
+            if ((!lastAnswer.trivia_id && oldElo > 0) || daysInactive > 1) {
                 const newElo: number = Math.round(oldElo * 0.982);
                 inactivePlayers.push({
                     playerName: player.name,
@@ -313,7 +313,7 @@ export class TriviaSingleton {
             inactivePlayers.forEach(({ eloChange, playerName }) =>
                 inactiveEmbed.addFields({
                     name: playerName,
-                    value: StringUtil.transformToCode("Diminution de {} d'élo", eloChange),
+                    value: transformToCode("Diminution de {} d'élo", eloChange),
                     inline: true,
                 })
             );
@@ -371,7 +371,7 @@ export class TriviaSingleton {
      * @returns {number[]} - Array of tank pages to fetch.
      */
     private async createTankPages(): Promise<number[]> {
-        const tankPages: number[] = RandomUtil.getArrayWithRandomNumber(false, this.lastTankPage, 4, this.totalNumberOfTanks, 1);
+        const tankPages: number[] = getArrayWithRandomNumber(false, this.lastTankPage, 4, this.totalNumberOfTanks, 1);
 
         this.lastTankPage = [...this.lastTankPage.slice(this.lastTankPage.length >= this.maxNumberOfUniqueTanks ? 4 : 0), ...tankPages];
 
@@ -425,7 +425,7 @@ export class TriviaSingleton {
         try {
             for (const data of tank) {
                 await this.triviaTable.addTrivia(new Date(), data.id, data.name === datum.tank.name ? datum.ammoIndex : null);
-                await EnvUtil.sleep(TimeEnum.SECONDE);
+                await sleep(TimeEnum.SECONDE);
             }
             this.logger.debug('Successfully stored tank in database for question n°{}', i);
         } catch (reason) {

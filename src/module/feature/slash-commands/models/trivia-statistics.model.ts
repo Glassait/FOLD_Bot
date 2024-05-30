@@ -15,7 +15,7 @@ import type { TriviaPlayer } from '../../../shared/tables/complexe-table/players
 import type { TriviaAnswer } from '../../../shared/tables/complexe-table/players-answers/models/players-answers.type';
 import { TimeEnum } from '../../../shared/enums/time.enum';
 import type { WinStreak } from '../../../shared/tables/complexe-table/win-streak/models/win-streak.type';
-import { DateUtil } from '../../../shared/utils/date.util';
+import { getCurrentMonth } from '../../../shared/utils/date.util';
 import { MEDAL } from '../../../shared/utils/variables.util';
 import { TriviaExampleModel } from './trivia-example.model';
 import { Table } from '../../../shared/decorators/injector/table-injector.decorator';
@@ -43,7 +43,7 @@ export class TriviaStatisticsModel extends TriviaExampleModel {
      * @param {ChatInputCommandInteraction} interaction - The interaction object representing the user command.
      */
     public async sendStatistics(interaction: ChatInputCommandInteraction): Promise<void> {
-        const player: TriviaPlayer = await this.playersTable.getPlayerByName(interaction.user.username);
+        const player: TriviaPlayer | undefined = await this.playersTable.getPlayerByName(interaction.user.username);
 
         if (!player) {
             await interaction.editReply({
@@ -52,7 +52,7 @@ export class TriviaStatisticsModel extends TriviaExampleModel {
             return;
         }
 
-        const lastAnswer: TriviaAnswer = await this.playerAnswerTable.getLastAnswerOfPlayer(player.id);
+        const lastAnswer: TriviaAnswer | undefined = await this.playerAnswerTable.getLastAnswerOfPlayer(player.id);
 
         if (!lastAnswer) {
             await interaction.editReply({
@@ -80,8 +80,8 @@ export class TriviaStatisticsModel extends TriviaExampleModel {
         periods.forEach((date: Date) =>
             select.addOptions(
                 new StringSelectMenuOptionBuilder()
-                    .setLabel(`${date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}`)
-                    .setValue(`${date.toISOString()}`)
+                    .setLabel(date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }))
+                    .setValue(date.toISOString())
             )
         );
 
@@ -150,7 +150,7 @@ export class TriviaStatisticsModel extends TriviaExampleModel {
         const username = interaction.user.username;
         const embedScoreboard = new EmbedBuilder()
             .setTitle('Scoreboard')
-            .setDescription(`Voici le scoreboard du mois de \`${DateUtil.getCurrentMonth()}\` pour le jeu trivia`)
+            .setDescription(`Voici le scoreboard du mois de \`${getCurrentMonth()}\` pour le jeu trivia`)
             .setFooter({ text: 'Trivia game' })
             .setColor(Colors.Fuchsia);
 

@@ -31,7 +31,7 @@ export class DatabaseSingleton {
     /**
      * The instance of the class, used for the singleton pattern
      */
-    private static _instance: DatabaseSingleton;
+    private static _instance?: DatabaseSingleton;
 
     /**
      * Gets the singleton instance of DatabaseSingleton.

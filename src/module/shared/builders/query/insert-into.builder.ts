@@ -1,6 +1,6 @@
 import type { TableAbstract } from '../../abstracts/table.abstract';
-import { Computer } from './models/computer.model';
 import type { ColumnsInterface, ComputeInterface, ValuesInterface } from './models/query.interface';
+import { computeInsertInto } from './models/computer.model';
 
 /**
  * Represents an INSERT INTO query builder.
@@ -9,12 +9,12 @@ export class InsertIntoBuilder implements ComputeInterface, ColumnsInterface, Va
     /**
      * The columns to add value when inserting new line
      */
-    private _columns: string[];
+    private _columns?: string[];
 
     /**
      * The values to insert in the columns when inserting new line
      */
-    private _values: unknown[];
+    private _values?: unknown[];
 
     /**
      * Define if the `INSERT INTO` have `IGNORE` clause
@@ -75,12 +75,12 @@ export class InsertIntoBuilder implements ComputeInterface, ColumnsInterface, Va
         if (!this._values || this._values.length === 0) {
             throw new Error('Values is mandatory to create INSERT INTO query !');
         }
-        if (this._columns && this._columns.length !== this._values?.length) {
+        if (this._columns && this._columns.length !== this._values.length) {
             throw new Error(
-                `The number of columns (${this._columns.length}) must be the same as the number of values (${this._values?.length})`
+                `The number of columns (${this._columns.length}) must be the same as the number of values (${this._values.length})`
             );
         }
 
-        return Computer.computeInsertInto(this.table.tableName, this._values, this._columns, this._ignore);
+        return computeInsertInto(this.table.tableName, this._values, this._columns, this._ignore);
     }
 }

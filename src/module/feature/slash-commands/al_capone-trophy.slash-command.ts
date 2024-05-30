@@ -6,22 +6,22 @@ import {
     type ChatInputCommandInteraction,
     type GuildMember,
     SlashCommandChannelOption,
-    type TextChannel,
+    TextChannel,
 } from 'discord.js';
-import { UserUtil } from '../../shared/utils/user.util';
+import { getGuildMemberFromInteraction } from '../../shared/utils/user.util';
 import { SlashCommandModel } from './models/slash-command.model';
 
 module.exports = new SlashCommandModel(
     'al_capone-trophy',
     'Décerne le Al_capone trophée à un joueur',
     async (interaction: ChatInputCommandInteraction): Promise<void> => {
-        const targetUser: GuildMember | undefined = await UserUtil.getGuildMemberFromInteraction(interaction, 'target', true);
+        const targetUser: GuildMember | undefined = await getGuildMemberFromInteraction(interaction, 'target', true);
 
         if (!targetUser) {
             return;
         }
 
-        const channel = interaction.options.get('salon')?.channel as TextChannel;
+        const channel: TextChannel | undefined = interaction.options.get('salon')?.channel as TextChannel | undefined;
 
         if (!channel) {
             return;

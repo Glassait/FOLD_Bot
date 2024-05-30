@@ -1,7 +1,7 @@
 import { TableAbstract } from '../../../abstracts/table.abstract';
 import { SelectBuilder } from '../../../builders/query/select.builder';
 import { LoggerInjector } from '../../../decorators/injector/logger-injector.decorator';
-import { EnvUtil } from '../../../utils/env.util';
+import { isDev } from '../../../utils/env.util';
 import type { Channel } from './models/channels.type';
 
 /**
@@ -54,7 +54,7 @@ export class ChannelsTable extends TableAbstract {
      * @returns {Promise<Channel>} - A promise that resolves to the channel.
      */
     private async getChannel(name: string): Promise<Channel> {
-        if (EnvUtil.isDev()) {
+        if (isDev()) {
             return Promise.resolve(this.DEV_CHANNEL);
         }
 

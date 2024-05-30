@@ -1,6 +1,6 @@
 import { type ChatInputCommandInteraction, SlashCommandSubcommandBuilder } from 'discord.js';
 import { FeatureFlippingTable } from '../../shared/tables/complexe-table/feature-flipping/feature-flipping.table';
-import { DateUtil } from '../../shared/utils/date.util';
+import { getCurrentMonth } from '../../shared/utils/date.util';
 import { SlashCommandModel } from './models/slash-command.model';
 import { TriviaModel } from './models/trivia.model';
 
@@ -22,7 +22,7 @@ const trivia = new TriviaModel();
 trivia
     .initialize()
     .then()
-    .catch(reason => console.error('Failed to initialize trivia command', reason));
+    .catch((reason: unknown): void => console.error('Failed to initialize trivia command', reason));
 
 module.exports = new SlashCommandModel(
     'trivia',
@@ -58,7 +58,7 @@ module.exports = new SlashCommandModel(
                 .setDescription('Visualiser-vos statistiques sur le jeu trivia'),
             new SlashCommandSubcommandBuilder()
                 .setName(MAPPING.SCOREBOARD.name)
-                .setDescription(`Visualiser le scoreboard du mois de \`${DateUtil.getCurrentMonth()}\` pour le jeu trivia`),
+                .setDescription(`Visualiser le scoreboard du mois de \`${getCurrentMonth()}\` pour le jeu trivia`),
             new SlashCommandSubcommandBuilder().setName(MAPPING.RULE.name).setDescription('Lire les règle du jeu trivia'),
         ],
     }

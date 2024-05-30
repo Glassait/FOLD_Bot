@@ -9,7 +9,7 @@ import { TimeEnum } from '../../../shared/enums/time.enum';
 import type { ChannelsTable } from '../../../shared/tables/complexe-table/channels/channels.table';
 import type { NewsWebsite } from '../../../shared/tables/complexe-table/news-websites/models/news-websites.type';
 import type { Logger } from '../../../shared/utils/logger';
-import { UserUtil } from '../../../shared/utils/user.util';
+import { fetchChannelFromClient } from '../../../shared/utils/user.util';
 import { WebsiteNameEnum } from '../enums/website-name.enum';
 import { WotExpress } from './news-scrapped/wot-express.model';
 import { TheArmoredPatrol } from './news-scrapped/the-armored-patrol.model';
@@ -33,7 +33,7 @@ export class WebSiteScraper {
      * @param {Client} client - The Discord client instance
      */
     public async initialise(client: Client): Promise<void> {
-        this.channel = await UserUtil.fetchChannelFromClient(client, await this.channels.getNewsWebsite());
+        this.channel = await fetchChannelFromClient(client, await this.channels.getNewsWebsite());
     }
 
     /**
@@ -52,10 +52,11 @@ export class WebSiteScraper {
                     .then((): void => {
                         this.logger.debug('Scraping newsletter {} end successfully', website.name);
                     })
-                    .catch(reason => {
-                        this.logger.error(`Scrapping newsletter for \`${website.name}\` failed: ${reason}`);
+                    .catch((reason: unknown): void => {
+                        this.logger.error(`Scrapping newsletter for \`${website.name}\` failed`, reason);
                     });
             })
+            // eslint-disable-next-line @typescript-eslint/use-unknown-in-catch-callback-variable
             .catch((error: AxiosError): void => {
                 this.logger.error(
                     `Fetching newsletter for \`${website.name}\` failed with error \`${error.status}\` and message \`${error.message}\``,

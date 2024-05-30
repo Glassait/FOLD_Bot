@@ -4,7 +4,7 @@ import type { Condition } from '../../../builders/query/models/computer.type';
 import { SelectBuilder } from '../../../builders/query/select.builder';
 import { LoggerInjector } from '../../../decorators/injector/logger-injector.decorator';
 import type { DeepNonNullables } from '../../../types/commons.type';
-import { DateUtil } from '../../../utils/date.util';
+import { getPreviousDayAsDate } from '../../../utils/date.util';
 import type { TriviaPlayer } from '../players/models/players.type';
 import type { TriviaAnswer } from './models/players-answers.type';
 
@@ -78,7 +78,7 @@ export class PlayersAnswersTable extends TableAbstract {
             `trivia_id = ${triviaId}`,
             `YEAR(date) = ${today.getFullYear()}`,
             `MONTH(date) = ${today.getMonth() + 1}`,
-            `(DAY(date) = ${today.getDate()} OR DAY(date) = ${DateUtil.getPreviousDayAsDate().getDate()})`,
+            `(DAY(date) = ${today.getDate()} OR DAY(date) = ${getPreviousDayAsDate().getDate()})`,
         ];
         const verdes: Condition['verdes'] = ['AND', 'AND', 'AND', 'AND'];
 
@@ -99,7 +99,7 @@ export class PlayersAnswersTable extends TableAbstract {
      *
      * @returns {Promise<TriviaAnswer>} - Promise resolving to the last answer of the player.
      */
-    public async getLastAnswerOfPlayer(playerId: number): Promise<TriviaAnswer> {
+    public async getLastAnswerOfPlayer(playerId: number): Promise<TriviaAnswer | undefined> {
         return (
             await this.select<TriviaAnswer>(
                 new SelectBuilder(this)
@@ -120,7 +120,7 @@ export class PlayersAnswersTable extends TableAbstract {
      */
     public async getLastAnswerWithPlayerOfPlayer(playerId: number): Promise<(TriviaAnswer & TriviaPlayer) | null> {
         const result: (TriviaAnswer & TriviaPlayer) | null = (
-            await this.select<TriviaAnswer & TriviaPlayer>(
+            await this.select<(TriviaAnswer & TriviaPlayer) | null>(
                 new SelectBuilder(this)
                     .columns('*')
                     .innerJoin('player', [`${this.tableName}.player_id = player.id`])
@@ -184,7 +184,7 @@ export class PlayersAnswersTable extends TableAbstract {
             `player_id = '${playerId}'`,
             `YEAR(date) = ${today.getFullYear()}`,
             `MONTH(date) = ${today.getMonth() + 1}`,
-            `${today.getHours() < 9 ? '(' : ''}DAY(date) = ${today.getDate()}${today.getHours() < 9 ? ' OR DAY(date) = ' + DateUtil.getPreviousDayAsDate().getDate() + ')' : ''}`,
+            `${today.getHours() < 9 ? '(' : ''}DAY(date) = ${today.getDate()}${today.getHours() < 9 ? ' OR DAY(date) = ' + String(getPreviousDayAsDate().getDate()) + ')' : ''}`,
         ];
         const verdes: Condition['verdes'] = ['AND', 'AND', 'AND'];
 

@@ -3,9 +3,9 @@ import { basename } from 'node:path';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
 import { CronsTable } from '../../shared/tables/complexe-table/crons/crons.table';
 import { FeatureFlippingTable } from '../../shared/tables/complexe-table/feature-flipping/feature-flipping.table';
-import { CronUtil } from '../../shared/utils/cron.util';
+import { createCron } from '../../shared/utils/cron.util';
 import { Logger } from '../../shared/utils/logger';
-import { UserUtil } from '../../shared/utils/user.util';
+import { fetchChannelFromClient } from '../../shared/utils/user.util';
 import type { BotLoop } from './types/bot-loop.type';
 import { ChannelsTable } from '../../shared/tables/complexe-table/channels/channels.table';
 
@@ -20,9 +20,9 @@ module.exports = {
             return;
         }
 
-        const channel: TextChannel = await UserUtil.fetchChannelFromClient(client, await new ChannelsTable().getTrivia());
+        const channel: TextChannel = await fetchChannelFromClient(client, await new ChannelsTable().getTrivia());
 
-        CronUtil.createCron(await new CronsTable().getCron('trivia'), 'trivia', async (): Promise<void> => {
+        createCron(await new CronsTable().getCron('trivia'), 'trivia', async (): Promise<void> => {
             await channel.send({
                 embeds: [
                     new EmbedBuilder()

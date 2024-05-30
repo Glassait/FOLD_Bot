@@ -55,6 +55,7 @@ export function Table(
     dependence: keyof typeof tableMap
     // eslint-disable-next-line @typescript-eslint/ban-types
 ): Function {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!tableMap) {
         tableMap = {
             // Commons
@@ -83,13 +84,7 @@ export function Table(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     return function actual<GTable>(_target: GTable, _context: ClassFieldDecoratorContext<GTable>) {
         return function (this: GTable, field: unknown) {
-            const req = tableMap[dependence];
-
-            if (!req) {
-                throw new Error(`Unsupported dependence type: ${dependence}`);
-            }
-
-            field = new req(); // NOSONAR
+            field = new tableMap![dependence](); // NOSONAR
             return field;
         };
     };

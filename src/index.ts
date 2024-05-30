@@ -1,12 +1,12 @@
 import { Client, GatewayIntentBits } from 'discord.js';
 import { basename } from 'node:path';
 import { token } from './module/core/config.json';
-import { EnvUtil } from './module/shared/utils/env.util';
+import { isDev } from './module/shared/utils/env.util';
 import { Logger } from './module/shared/utils/logger';
 
 const logger: Logger = new Logger(basename(__filename));
 
-if (EnvUtil.isDev()) {
+if (isDev()) {
     // eslint-disable-next-line no-console
     console.warn(
         '===========================================================\n    Bot launch on DEV. This mode is not for production.\n===========================================================`'
@@ -36,7 +36,7 @@ client
             logger.error('Failed to connect, error');
         }
     })
-    .catch(reason => logger.error('Failed to connect, error {}', reason));
+    .catch((reason: unknown) => logger.error('Failed to connect', reason));
 
 /**
  * Code to tracked API Errors
@@ -52,5 +52,5 @@ process.on('unhandledRejection', error => {
  * @param {Error} err - The uncaught exception error object.
  */
 process.on('uncaughtException', (err: Error): void => {
-    logger.error(`${err.name}`, err);
+    logger.error(err.name, err);
 });

@@ -22,9 +22,9 @@ import type { Clan } from '../../../shared/tables/complexe-table/watch-clans/mod
 import type { WatchClansTable } from '../../../shared/tables/complexe-table/watch-clans/watch-clans.table';
 import type { FoldRecruitmentTable } from '../../../shared/tables/simple-table/fold-recruitment.table';
 import type { Logger } from '../../../shared/utils/logger';
-import { StringUtil } from '../../../shared/utils/string.util';
-import { UrlUtil } from '../../../shared/utils/url.util';
-import { UserUtil } from '../../../shared/utils/user.util';
+import { transformToCode } from '../../../shared/utils/string.util';
+import { getTomatoPlayerUrl, getWargamingClanUrl, getWargamingPlayerUrl, getWotLifePlayerUrl } from '../../../shared/utils/url.util';
+import { fetchChannelFromClient } from '../../../shared/utils/user.util';
 import { WotClanActivity } from '../enums/fold-recruitment.enum';
 
 @LoggerInjector
@@ -128,7 +128,7 @@ export class FoldRecruitmentModel {
      * @param {Client} client - The Discord client instance.
      */
     public async initialise(client: Client): Promise<void> {
-        this.channel = await UserUtil.fetchChannelFromClient(client, await this.channels.getFoldRecruitment());
+        this.channel = await fetchChannelFromClient(client, await this.channels.getFoldRecruitment());
 
         this.minWn8 = await this.foldRecruitmentTable.getMinWn8();
         this.minBattles = await this.foldRecruitmentTable.getMinBattles();
@@ -150,7 +150,7 @@ export class FoldRecruitmentModel {
         }
 
         try {
-            return await this.manageClanActivities(clan, await this.wargamingApi.clansNewsfeed(clan.id));
+            await this.manageClanActivities(clan, await this.wargamingApi.clansNewsfeed(clan.id));
         } catch (error) {
             this.logger.error('An error occurred while fetching the activity of the clan', error);
         }
@@ -241,7 +241,7 @@ export class FoldRecruitmentModel {
 
         embed.addFields({
             name: this.mapText[type],
-            value: StringUtil.transformToCode(
+            value: transformToCode(
                 'Le joueur a fait moins de {} en {} au cours des 28 derniers jours (actuellement {})',
                 limit,
                 this.mapText[type].toLowerCase(),
@@ -301,14 +301,14 @@ export class FoldRecruitmentModel {
             .setAuthor({
                 name: `${clan.name} ${EmojiEnum.REDIRECTION}`,
                 iconURL: clan.image_url,
-                url: UrlUtil.getWargamingClanUrl(clan.id),
+                url: getWargamingClanUrl(clan.id),
             })
             .setTitle(blacklisted ? 'Joueur sur liste noire détecté' : 'Nouveau joueur pouvant être recruté')
             .setDescription(
-                StringUtil.transformToCode(
+                transformToCode(
                     `Le joueur suivant {} a quitté {}.${
                         blacklisted
-                            ? StringUtil.transformToCode(
+                            ? transformToCode(
                                   '\n\nLe joueur suivant a été mis sur liste noire pour la raison suivante : {}',
                                   blacklisted.reason
                               )
@@ -321,17 +321,17 @@ export class FoldRecruitmentModel {
             .setFields(
                 {
                     name: 'Wargaming',
-                    value: `[Redirection ${EmojiEnum.REDIRECTION}](${UrlUtil.getWargamingPlayerUrl(player.name, player.id)})`,
+                    value: `[Redirection ${EmojiEnum.REDIRECTION}](${getWargamingPlayerUrl(player.name, player.id)})`,
                     inline: true,
                 },
                 {
                     name: 'TomatoGG',
-                    value: `[Redirection ${EmojiEnum.REDIRECTION}](${UrlUtil.getTomatoPlayerUrl(player.name, player.id)})`,
+                    value: `[Redirection ${EmojiEnum.REDIRECTION}](${getTomatoPlayerUrl(player.name, player.id)})`,
                     inline: true,
                 },
                 {
                     name: 'Wot Life',
-                    value: `[Redirection ${EmojiEnum.REDIRECTION}](${UrlUtil.getWotLifePlayerUrl(player.name, player.id)})`,
+                    value: `[Redirection ${EmojiEnum.REDIRECTION}](${getWotLifePlayerUrl(player.name, player.id)})`,
                     inline: true,
                 }
             )
@@ -358,7 +358,7 @@ export class FoldRecruitmentModel {
     } {
         const extracted: LeaveClanActivity[] = data.items.filter(
             (item: ClanActivity): boolean =>
-                item.subtype === WotClanActivity.LEAVE_CLAN && new Date(item.created_at) > new Date(clan?.last_activity ?? '')
+                item.subtype === WotClanActivity.LEAVE_CLAN && new Date(item.created_at) > new Date(clan.last_activity ?? '')
         ) as unknown as LeaveClanActivity[];
 
         const datum: Players[] = extracted.flatMap((activity: LeaveClanActivity) =>

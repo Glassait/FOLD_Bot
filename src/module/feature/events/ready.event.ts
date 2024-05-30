@@ -3,9 +3,9 @@ import { basename } from 'node:path';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
 import { TriviaSingleton } from '../../shared/singleton/trivia/trivia.singleton';
 import { FeatureFlippingTable } from '../../shared/tables/complexe-table/feature-flipping/feature-flipping.table';
-import { EnvUtil } from '../../shared/utils/env.util';
+import { asyncThread, thread } from '../../shared/utils/env.util';
 import { Logger } from '../../shared/utils/logger';
-import { SentenceUtil } from '../../shared/utils/sentence.util';
+import { getRandomStatus } from '../../shared/utils/sentence.util';
 import { TriviaMonthModel } from './models/trivia-month.model';
 import type { BotEvent } from './types/bot-event.type';
 
@@ -17,7 +17,7 @@ module.exports = {
         const featuresTable: FeatureFlippingTable = new FeatureFlippingTable();
         logger.info(`${EmojiEnum.MUSCLE} Logged in as {}`, client.user!.tag);
 
-        const [activityType, sentence] = SentenceUtil.getRandomStatus();
+        const [activityType, sentence] = getRandomStatus();
         logger.debug('Status of the bot set to {} and {}', activityType, sentence);
 
         client.user?.setPresence({ activities: [{ type: activityType, name: sentence }], status: 'online' });
@@ -29,7 +29,7 @@ module.exports = {
         }
 
         if (await featuresTable.getFeature('trivia_month')) {
-            EnvUtil.thread(async (): Promise<void> => {
+            thread(async (): Promise<void> => {
                 const triviaMonth: TriviaMonthModel = new TriviaMonthModel();
                 await triviaMonth.initialise(client);
                 await triviaMonth.createEmbedAndSendToChannel();
@@ -37,6 +37,6 @@ module.exports = {
         }
 
         const trivia: TriviaSingleton = TriviaSingleton.instance;
-        EnvUtil.asyncThread(trivia.updateTanksTableFromWotApi.bind(trivia));
+        asyncThread(trivia.updateTanksTableFromWotApi.bind(trivia));
     },
 } as BotEvent;

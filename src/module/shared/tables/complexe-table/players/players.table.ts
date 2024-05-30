@@ -14,7 +14,7 @@ export class PlayersTable extends TableAbstract {
         return await this.insert(new InsertIntoBuilder(this).columns('name').values(name));
     }
 
-    public async getPlayerByName(name: string): Promise<TriviaPlayer> {
+    public async getPlayerByName(name: string): Promise<TriviaPlayer | undefined> {
         return (await this.select<TriviaPlayer>(new SelectBuilder(this).columns('*').where([`name LIKE '${name}'`])))[0];
     }
 

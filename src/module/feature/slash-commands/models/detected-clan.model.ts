@@ -7,8 +7,8 @@ import { EmojiEnum } from '../../../shared/enums/emoji.enum';
 import type { ChannelsTable } from '../../../shared/tables/complexe-table/channels/channels.table';
 import type { PotentialClansTable } from '../../../shared/tables/simple-table/potential-clans.table';
 import type { Logger } from '../../../shared/utils/logger';
-import { UrlUtil } from '../../../shared/utils/url.util';
-import { UserUtil } from '../../../shared/utils/user.util';
+import { getWargamingClanUrl, getWotLifeClanUrl } from '../../../shared/utils/url.util';
+import { fetchChannelFromClient } from '../../../shared/utils/user.util';
 
 /**
  * DetectedClanModel class responsible for managing and processing detected clans.
@@ -38,7 +38,7 @@ export class DetectedClanModel {
      * @param {Client} client - The client instance to use.
      */
     public async initialize(client: Client): Promise<void> {
-        this.channel = await UserUtil.fetchChannelFromClient(client, await this.channelsTable.getFoldRecruitment());
+        this.channel = await fetchChannelFromClient(client, await this.channelsTable.getFoldRecruitment());
     }
 
     /**
@@ -63,8 +63,8 @@ export class DetectedClanModel {
             const tag: string = (await this.wotApi.clansInfo(clanId)).data[clanId].tag;
 
             embed.addFields({
-                name: `${tag}`,
-                value: `[WG](${UrlUtil.getWargamingClanUrl(clanId)}) ${EmojiEnum.REDIRECTION} | [Wot Life](${UrlUtil.getWotLifeClanUrl(tag, clanId)}) ${EmojiEnum.REDIRECTION}`,
+                name: tag,
+                value: `[WG](${getWargamingClanUrl(clanId)}) ${EmojiEnum.REDIRECTION} | [Wot Life](${getWotLifeClanUrl(tag, clanId)}) ${EmojiEnum.REDIRECTION}`,
                 inline: true,
             });
 

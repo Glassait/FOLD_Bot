@@ -26,7 +26,7 @@ export class WinStreakTable extends TableAbstract {
         );
     }
 
-    public async getWinStreakFromDate(playerId: number, date: Date): Promise<WinStreak> {
+    public async getWinStreakFromDate(playerId: number, date: Date): Promise<WinStreak | undefined> {
         return (
             await this.select<WinStreak>(
                 new SelectBuilder(this)
