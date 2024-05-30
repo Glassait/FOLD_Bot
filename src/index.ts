@@ -28,7 +28,7 @@ const client: Client = new Client({
 require('./module/feature/handlers/handlers.handler.ts')(client);
 
 client
-    .login(token)
+    .login(String(token))
     .then((value: string): void => {
         if (value) {
             logger.info('The bot is ready to kick some ass');

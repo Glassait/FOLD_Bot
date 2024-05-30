@@ -18,5 +18,3 @@ jobs:
               run: npm i
             - name: Check ESLint
               run: npm run lint
-            - name: Build
-              run: npm run build

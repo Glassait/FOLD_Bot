@@ -31,11 +31,11 @@ module.exports = async (): Promise<void> => {
         logger.info(`${EmojiEnum.FLAME} Successfully loaded command {}`, command.name);
     }
 
-    const rest: REST = new REST({ version: '10' }).setToken(token);
+    const rest: REST = new REST({ version: '10' }).setToken(String(token));
 
     for (const [serverId, command] of Object.entries(body)) {
         try {
-            await rest.put(Routes.applicationGuildCommands(client_id, serverId), { body: command });
+            await rest.put(Routes.applicationGuildCommands(String(client_id), serverId), { body: command });
 
             logger.info('Successfully reloaded application {} slash-commands for guild {}', String(command.length), serverId);
         } catch (error) {

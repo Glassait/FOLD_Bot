@@ -67,10 +67,10 @@ export class DatabaseSingleton {
      */
     private createPool(): void {
         this._pool = mysql.createPool({
-            user,
-            host,
-            database,
-            password,
+            user: String(user),
+            host: String(host),
+            database: String(database),
+            password: String(password),
             waitForConnections: true,
             connectionLimit: 10,
             maxIdle: 10,
