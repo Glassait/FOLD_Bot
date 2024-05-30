@@ -16,10 +16,10 @@ import { fetchChannelFromClient } from '../../../shared/utils/user.util';
 @LoggerInjector
 export class DetectedClanModel {
     //region INJECTION
-    private readonly logger: Logger;
     @Table('PotentialClans') private readonly potentialClanTable: PotentialClansTable;
     @Table('Channels') private readonly channelsTable: ChannelsTable;
     @Api('Wot') private readonly wotApi: WotApi;
+    private readonly logger: Logger;
     //endregion
 
     /**

@@ -8,8 +8,8 @@ import type { Logger } from '../utils/logger';
  */
 export class ApiBase {
     //region INJECTION
-    protected readonly logger: Logger;
     @Singleton('Axios', TimeEnum.SECONDE * 30) private readonly axios: AxiosInstance;
+    protected readonly logger: Logger;
     //endregion
 
     /**

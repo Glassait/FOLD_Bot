@@ -21,12 +21,12 @@ import { MEDAL } from '../../../shared/utils/variables.util';
 @LoggerInjector
 export class TriviaMonthModel {
     //region INJECTABLE
-    private readonly logger: Logger;
     @Table('Channels') private readonly channels: ChannelsTable;
     @Table('PlayersAnswer') private readonly playersAnswersTable: PlayersAnswersTable;
     @Table('Players') private readonly playersTable: PlayersTable;
     @Table('WinStreak') private readonly winStreakTable: WinStreakTable;
     @Table('Trivia') private readonly triviaTable: TriviaTable;
+    private readonly logger: Logger;
     //endregion
 
     //region PRIVATE
@@ -34,10 +34,12 @@ export class TriviaMonthModel {
      * The trivia text channel, used to send the month message into
      */
     private channel?: TextChannel;
+
     /**
      * The previous month
      */
     private month: Date = getPreviousMonthAsDate();
+
     /**
      * Represents the list of player statistics.
      * Each entry is a tuple containing the player's name and their monthly statistics.

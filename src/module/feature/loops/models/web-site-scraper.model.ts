@@ -17,9 +17,9 @@ import { TheArmoredPatrol } from './news-scrapped/the-armored-patrol.model';
 @LoggerInjector
 export class WebSiteScraper {
     //region INJECTABLE
-    private readonly logger: Logger;
     @Singleton('Axios', TimeEnum.SECONDE * 10) private readonly axios: AxiosInstance;
     @Table('Channels') private readonly channels: ChannelsTable;
+    private readonly logger: Logger;
     //endregion
 
     /**

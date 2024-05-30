@@ -29,12 +29,12 @@ import type { TriviaDataTable } from '../../../shared/tables/complexe-table/triv
 
 export class TriviaStatisticsModel extends TriviaExampleModel {
     //region INJECTION
-    protected readonly logger: Logger;
     @Singleton('Trivia') protected readonly trivia: TriviaSingleton;
     @Table('TriviaData') protected readonly triviaTable: TriviaDataTable;
     @Table('Players') protected readonly playersTable: PlayersTable;
     @Table('PlayersAnswer') protected readonly playerAnswerTable: PlayersAnswersTable;
     @Table('WinStreak') protected readonly winStreakTable: WinStreakTable;
+    protected readonly logger: Logger;
     //endregion
 
     /**

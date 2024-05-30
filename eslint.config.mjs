@@ -52,6 +52,121 @@ export default tseslint.config(
             'max-depth': ['error', { max: 3 }],
             'max-lines': ['error', { max: 500, skipComments: true, skipBlankLines: true }],
             'no-else-return': ['error', { allowElseIf: true }],
+            '@typescript-eslint/member-ordering': [
+                'error',
+                {
+                    default: {
+                        memberTypes: [
+                            // Index signature
+                            'signature',
+                            'call-signature',
+
+                            // Statics
+                            'public-static-field',
+                            'protected-static-field',
+                            'private-static-field',
+                            '#private-static-field',
+
+                            'static-initialization',
+
+                            'public-static-accessor',
+                            'protected-static-accessor',
+                            'private-static-accessor',
+                            '#private-static-accessor',
+
+                            'public-static-method',
+                            'protected-static-method',
+                            'private-static-method',
+                            '#private-static-method',
+
+                            // Fields
+                            'public-decorated-field',
+                            'protected-decorated-field',
+                            'private-decorated-field',
+
+                            'public-instance-field',
+                            'protected-instance-field',
+                            'private-instance-field',
+                            '#private-instance-field',
+
+                            'public-abstract-field',
+                            'protected-abstract-field',
+
+                            'public-field',
+                            'protected-field',
+                            'private-field',
+                            '#private-field',
+
+                            'static-field',
+                            'instance-field',
+                            'abstract-field',
+
+                            'decorated-field',
+
+                            'field',
+
+                            // Constructors
+                            'public-constructor',
+                            'protected-constructor',
+                            'private-constructor',
+
+                            'constructor',
+
+                            // Accessors
+                            'public-decorated-accessor',
+                            'protected-decorated-accessor',
+                            'private-decorated-accessor',
+
+                            'public-instance-accessor',
+                            'protected-instance-accessor',
+                            'private-instance-accessor',
+                            '#private-instance-accessor',
+
+                            'public-abstract-accessor',
+                            'protected-abstract-accessor',
+
+                            'public-accessor',
+                            'protected-accessor',
+                            'private-accessor',
+                            '#private-accessor',
+
+                            'static-accessor',
+                            'instance-accessor',
+                            'abstract-accessor',
+
+                            'decorated-accessor',
+
+                            'accessor',
+
+                            // Methods
+                            'public-decorated-method',
+                            'protected-decorated-method',
+                            'private-decorated-method',
+
+                            'public-instance-method',
+                            'protected-instance-method',
+                            'private-instance-method',
+                            '#private-instance-method',
+
+                            'public-abstract-method',
+                            'protected-abstract-method',
+
+                            'public-method',
+                            'protected-method',
+                            'private-method',
+                            '#private-method',
+
+                            'static-method',
+                            'instance-method',
+                            'abstract-method',
+
+                            'decorated-method',
+
+                            'method',
+                        ],
+                    },
+                },
+            ],
         },
     }
 );

@@ -8,25 +8,6 @@ import { Logger } from '../utils/logger';
  * Singleton class for managing MySQL database connections.
  */
 export class DatabaseSingleton {
-    //region INJECTABLE
-    private readonly logger: Logger = new Logger(basename(__filename));
-    //endregion
-
-    //region PRIVATE FIELDS
-    /**
-     * The pool to execute query to the database
-     */
-    private _pool: Pool;
-    //endregion
-
-    /**
-     * Private constructor for the DatabaseSingleton class.
-     */
-    private constructor() {
-        this.createPool();
-        this.logger.info(`${EmojiEnum.HAMMER} {} instance initialized`, DatabaseSingleton.name);
-    }
-
     //region SINGLETON
     /**
      * The instance of the class, used for the singleton pattern
@@ -45,6 +26,25 @@ export class DatabaseSingleton {
         return this._instance;
     }
     //endregion
+
+    //region INJECTABLE
+    private readonly logger: Logger = new Logger(basename(__filename));
+    //endregion
+
+    //region PRIVATE FIELDS
+    /**
+     * The pool to execute query to the database
+     */
+    private _pool: Pool;
+    //endregion
+
+    /**
+     * Private constructor for the DatabaseSingleton class.
+     */
+    private constructor() {
+        this.createPool();
+        this.logger.info(`${EmojiEnum.HAMMER} {} instance initialized`, DatabaseSingleton.name);
+    }
 
     /**
      * Executes a SQL query.

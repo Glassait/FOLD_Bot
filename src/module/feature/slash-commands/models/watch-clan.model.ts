@@ -26,12 +26,12 @@ import { fetchChannelFromClient } from '../../../shared/utils/user.util';
 @LoggerInjector
 export class WatchClanModel {
     //region INJECTABLE
-    private readonly logger: Logger;
     @Api('Wot') private readonly wotApi: WotApi;
     @Table('WatchClans') private readonly watchClans: WatchClansTable;
     @Table('BlacklistedPlayers') private readonly blacklistedPlayers: BlacklistedPlayersTable;
     @Table('Channels') private readonly channels: ChannelsTable;
     @Table('FeatureFlipping') private readonly featureFlippingTable: FeatureFlippingTable;
+    private readonly logger: Logger;
     //endregion
 
     /**

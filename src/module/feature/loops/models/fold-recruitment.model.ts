@@ -29,6 +29,18 @@ import { WotClanActivity } from '../enums/fold-recruitment.enum';
 
 @LoggerInjector
 export class FoldRecruitmentModel {
+    //region INJECTABLE
+    @Table('WatchClans') private readonly watchClans: WatchClansTable;
+    @Table('BlacklistedPlayers') private readonly blacklistedPlayers: BlacklistedPlayersTable;
+    @Table('LeavingPlayers') private readonly leavingPlayers: LeavingPlayersTable;
+    @Table('Channels') private readonly channels: ChannelsTable;
+    @Table('FoldRecruitment') private readonly foldRecruitmentTable: FoldRecruitmentTable;
+    @Api('Wargaming') private readonly wargamingApi: WargamingApi;
+    @Api('Tomato') private readonly tomatoApi: TomatoApi;
+    @Api('Wot') private readonly wotApi: WotApi;
+    private readonly logger: Logger;
+    //endregion
+
     //region PRIVATE READONLY FIELDS
     /**
      * Embed for the message indicating that no player was found.
@@ -62,18 +74,6 @@ export class FoldRecruitmentModel {
     };
     //endregion
 
-    //region INJECTABLE
-    private readonly logger: Logger;
-    @Table('WatchClans') private readonly watchClans: WatchClansTable;
-    @Table('BlacklistedPlayers') private readonly blacklistedPlayers: BlacklistedPlayersTable;
-    @Table('LeavingPlayers') private readonly leavingPlayers: LeavingPlayersTable;
-    @Table('Channels') private readonly channels: ChannelsTable;
-    @Table('FoldRecruitment') private readonly foldRecruitmentTable: FoldRecruitmentTable;
-    @Api('Wargaming') private readonly wargamingApi: WargamingApi;
-    @Api('Tomato') private readonly tomatoApi: TomatoApi;
-    @Api('Wot') private readonly wotApi: WotApi;
-    //endregion
-
     //region PRIVATE FIELDS
     /**
      * The channel to send the leaving player inside
@@ -103,20 +103,20 @@ export class FoldRecruitmentModel {
     //endregion
 
     //region GETTER
-    get noPlayerFound(): boolean {
+    public get noPlayerFound(): boolean {
         return this._noPlayerFound;
     }
 
-    set noPlayerFound(bool: boolean) {
+    public set noPlayerFound(bool: boolean) {
         this._noPlayerFound = bool;
     }
 
-    get noPlayerMeetCriteria(): boolean {
-        return this._noPlayerMeetCriteria;
+    public set noPlayerMeetCriteria(bool: boolean) {
+        this._noPlayerMeetCriteria = bool;
     }
 
-    set noPlayerMeetCriteria(bool: boolean) {
-        this._noPlayerMeetCriteria = bool;
+    public get noPlayerMeetCriteria(): boolean {
+        return this._noPlayerMeetCriteria;
     }
     //endregion
 

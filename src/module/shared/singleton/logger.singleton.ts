@@ -8,6 +8,23 @@ import { writeFile } from '../utils/file.util';
  * This class implement the Singleton pattern
  */
 export class LoggerSingleton {
+    //region SINGLETON
+    /**
+     * The instance of the class, used for the singleton pattern
+     */
+    private static _instance: LoggerSingleton | undefined;
+
+    /**
+     * Getter for {@link _instance}
+     */
+    public static get instance(): LoggerSingleton {
+        if (!this._instance) {
+            this._instance = new LoggerSingleton();
+        }
+        return this._instance;
+    }
+    //endregion
+
     //region PRIVATE FIELD
     /**
      * The directory where the logs are stored
@@ -31,23 +48,6 @@ export class LoggerSingleton {
     private constructor() {
         this.createLogFile();
     }
-
-    //region SINGLETON
-    /**
-     * The instance of the class, used for the singleton pattern
-     */
-    private static _instance: LoggerSingleton | undefined;
-
-    /**
-     * Getter for {@link _instance}
-     */
-    public static get instance(): LoggerSingleton {
-        if (!this._instance) {
-            this._instance = new LoggerSingleton();
-        }
-        return this._instance;
-    }
-    //endregion
 
     //region LOG-METHODS
     /**

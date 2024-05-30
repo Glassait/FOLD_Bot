@@ -30,6 +30,18 @@ import { getArrayWithRandomNumber, getRandomNumber } from '../../utils/random.ut
  * This class implement the Singleton pattern
  */
 export class TriviaSingleton {
+    //region SINGLETON
+    private static _instance?: TriviaSingleton;
+
+    static get instance(): TriviaSingleton {
+        if (!this._instance) {
+            this._instance = new TriviaSingleton();
+        }
+
+        return this._instance;
+    }
+    //endregion
+
     //region INJECTION
     private readonly logger: Logger;
     private readonly wotApi: WotApi;
@@ -112,18 +124,6 @@ export class TriviaSingleton {
 
         this.createQuestionOfTheDay.bind(this);
     }
-
-    //region SINGLETON
-    private static _instance?: TriviaSingleton;
-
-    static get instance(): TriviaSingleton {
-        if (!this._instance) {
-            this._instance = new TriviaSingleton();
-        }
-
-        return this._instance;
-    }
-    //endregion
 
     //region GETTER-SETTER
     get selectedTanks(): TriviaSelected[] {
