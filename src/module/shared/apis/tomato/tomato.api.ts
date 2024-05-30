@@ -1,5 +1,5 @@
 import { LoggerInjector } from '../../decorators/injector/logger-injector.decorator';
-import { StringUtil } from '../../utils/string.util';
+import { transformToCode } from '../../utils/string.util';
 import { ApiBase } from '../api.base';
 import type { TomatoError, TomatoOverall, TomatoSuccess } from './models/tomato-api.type';
 
@@ -14,7 +14,7 @@ export class TomatoApi extends ApiBase {
         const data: TomatoError | TomatoSuccess<TomatoOverall> = await this.getData(url);
 
         if (data.meta.status === 'error') {
-            throw new Error(StringUtil.transformToCode('Failed to call Tomato api with error {}', data.meta.message));
+            throw new Error(transformToCode('Failed to call Tomato api with error {}', data.meta.message));
         }
 
         return data as TomatoSuccess<TomatoOverall>;

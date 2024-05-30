@@ -7,8 +7,8 @@ import {
     type TextChannel,
 } from 'discord.js';
 import { ChannelsTable } from '../../shared/tables/complexe-table/channels/channels.table';
-import { TimeUtil } from '../../shared/utils/time.util';
-import { UserUtil } from '../../shared/utils/user.util';
+import { convertToUnix } from '../../shared/utils/time.util';
+import { fetchChannelFromClient } from '../../shared/utils/user.util';
 import { SlashCommandModel } from './models/slash-command.model';
 
 const channelTable = new ChannelsTable();
@@ -21,10 +21,10 @@ module.exports = new SlashCommandModel(
         await interaction.deferReply({ ephemeral: true });
 
         if (!channels.foldRecruitment) {
-            channels.foldRecruitment = await UserUtil.fetchChannelFromClient(client as Client, await channelTable.getFoldRecruitment());
+            channels.foldRecruitment = await fetchChannelFromClient(client!, await channelTable.getFoldRecruitment());
         }
         if (!channels.trivia) {
-            channels.trivia = await UserUtil.fetchChannelFromClient(client as Client, await channelTable.getTrivia());
+            channels.trivia = await fetchChannelFromClient(client!, await channelTable.getTrivia());
         }
 
         switch (interaction.options.getSubcommand()) {
@@ -33,7 +33,7 @@ module.exports = new SlashCommandModel(
                 const duration: number = interaction.options.get('duration')?.value as number;
                 const date = new Date();
                 date.setMinutes(date.getMinutes() + howLong);
-                const message = `Le bot passe en maintenance : <t:${TimeUtil.convertToUnix(date)}:R> pour ${duration} minute(s)`;
+                const message = `Le bot passe en maintenance : <t:${convertToUnix(date)}:R> pour ${duration} minute(s)`;
 
                 await channels.foldRecruitment.send({
                     content: message,

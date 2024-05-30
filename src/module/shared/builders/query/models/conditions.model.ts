@@ -7,22 +7,22 @@ export class Conditions {
     /**
      * The inner join condition
      */
-    protected _innerJoin: { tableName: string; condition: Condition };
+    protected _innerJoin?: { tableName: string; condition: Condition };
 
     /**
      * The where condition
      */
-    protected _where: Condition;
+    protected _where?: Condition;
 
     /**
      * The order by condition
      */
-    protected _orderBy: OrderBy[];
+    protected _orderBy?: OrderBy[];
 
     /**
      * The max number of row to show
      */
-    protected _limit: number;
+    protected _limit?: number;
 
     /**
      * Build the condition
@@ -68,7 +68,7 @@ export class Conditions {
             throw new Error('Verde length different of condition length (minus one)');
         }
 
-        this._where = { conditions: conditions };
+        this._where = { conditions };
 
         if (verdes) {
             this._where.verdes = verdes;
@@ -125,14 +125,12 @@ export class Conditions {
      * @returns {string} The reduced WHERE conditions string.
      */
     private reduceConditionsAndVerdes(conditions: Condition): string {
-        return conditions.conditions.reduce((where: string, condition: any, index: number): string => {
-            return (
+        return conditions.conditions.reduce(
+            (where: string, condition: string, index: number): string =>
                 where +
                 condition +
-                (conditions.conditions.length > 1 && index <= conditions.conditions.length - 2
-                    ? ` ${(conditions.verdes as string[])[index]} `
-                    : '')
-            );
-        }, '');
+                (conditions.conditions.length > 1 && index <= conditions.conditions.length - 2 ? ` ${conditions.verdes![index]} ` : ''),
+            ''
+        );
     }
 }

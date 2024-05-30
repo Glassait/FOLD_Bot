@@ -7,13 +7,14 @@ export type GlobalClanActivity = {
     initiator_id: null;
     created_at: string;
     accounts_ids: number[];
-    accounts_info: {
-        [account: string]: {
+    accounts_info: Record<
+        string,
+        {
             url: string;
             role: string;
             name: string;
-        };
-    };
+        }
+    >;
 };
 
 /**
@@ -22,8 +23,9 @@ export type GlobalClanActivity = {
 export type ChangeRoleClanActivity = {
     subtype: 'change_role';
     type: 'change_role';
-    additional_info: {
-        [key: string]: {
+    additional_info: Record<
+        string,
+        {
             old_role: {
                 rank: number;
                 name: string;
@@ -34,8 +36,8 @@ export type ChangeRoleClanActivity = {
                 name: string;
                 localized: string;
             };
-        }[];
-    };
+        }[]
+    >;
 } & GlobalClanActivity;
 
 /**
@@ -44,12 +46,13 @@ export type ChangeRoleClanActivity = {
 export type JoinClanActivity = {
     subtype: 'join_clan';
     type: 'join_clan';
-    additional_info: {
-        [key: string]: {
+    additional_info: Record<
+        string,
+        {
             transaction_id: number;
             joining_method: string;
-        }[];
-    };
+        }[]
+    >;
 } & GlobalClanActivity;
 
 /**
@@ -58,12 +61,13 @@ export type JoinClanActivity = {
 export type LeaveClanActivity = {
     subtype: 'leave_clan';
     type: 'leave_clan';
-    additional_info: {
-        [key: string]: {
+    additional_info: Record<
+        string,
+        {
             last_role_name: string;
             transaction_id: number;
-        }[];
-    };
+        }[]
+    >;
 } & GlobalClanActivity;
 
 /**

@@ -24,7 +24,7 @@ Basically a handler is a script who is executed at the start of the bot
     ```typescript
     import type { Client } from 'discord.js';
 
-    module.exports = async (client: Client): Promise<void> => {
+    module.exports = (client: Client): void => {
         // Thing to handler at the start of the bot
     };
     ```

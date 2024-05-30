@@ -20,18 +20,18 @@ import type { FeatureFlippingTable } from '../../../shared/tables/complexe-table
 import type { Clan } from '../../../shared/tables/complexe-table/watch-clans/models/watch-clans.type';
 import type { WatchClansTable } from '../../../shared/tables/complexe-table/watch-clans/watch-clans.table';
 import type { Logger } from '../../../shared/utils/logger';
-import { StringUtil } from '../../../shared/utils/string.util';
-import { UserUtil } from '../../../shared/utils/user.util';
+import { sanitize, transformToCode } from '../../../shared/utils/string.util';
+import { fetchChannelFromClient } from '../../../shared/utils/user.util';
 
 @LoggerInjector
 export class WatchClanModel {
     //region INJECTABLE
-    private readonly logger: Logger;
     @Api('Wot') private readonly wotApi: WotApi;
     @Table('WatchClans') private readonly watchClans: WatchClansTable;
     @Table('BlacklistedPlayers') private readonly blacklistedPlayers: BlacklistedPlayersTable;
     @Table('Channels') private readonly channels: ChannelsTable;
     @Table('FeatureFlipping') private readonly featureFlippingTable: FeatureFlippingTable;
+    private readonly logger: Logger;
     //endregion
 
     /**
@@ -47,9 +47,9 @@ export class WatchClanModel {
     //endregion
 
     //region GETTER-SETTER
-    private _channel: TextChannel;
+    private _channel?: TextChannel;
 
-    get channel(): TextChannel {
+    get channel(): TextChannel | undefined {
         return this._channel;
     }
     //endregion
@@ -65,7 +65,7 @@ export class WatchClanModel {
      * console.log(instance.channel); // Updated channel information
      */
     public async initialise(client: Client): Promise<void> {
-        this._channel = await UserUtil.fetchChannelFromClient(client, await this.channels.getFoldRecruitment());
+        this._channel = await fetchChannelFromClient(client, await this.channels.getFoldRecruitment());
     }
 
     /**
@@ -84,7 +84,7 @@ export class WatchClanModel {
 
         const id: number = interaction.options.get(optionsName[0])?.value as number;
         let name: string = interaction.options.get(optionsName[1])?.value as string;
-        name = StringUtil.sanitize(name).toUpperCase();
+        name = sanitize(name).toUpperCase();
 
         const clan: Clan[] = await this.watchClans.selectClan(String(id));
 
@@ -94,7 +94,7 @@ export class WatchClanModel {
             return;
         }
 
-        const added: boolean = await this.watchClans.addClan({ id: id, name: name });
+        const added: boolean = await this.watchClans.addClan({ id, name });
 
         if (!added) {
             this.logger.warn('An error occur during adding clan to the database');
@@ -112,9 +112,9 @@ export class WatchClanModel {
 
         this.confirmationEmbed
             .setTitle("Ajout de clan à l'observateur")
-            .setDescription(StringUtil.transformToCode('Le clan {} a été ajouté à la liste des clans à observer !', name));
+            .setDescription(transformToCode('Le clan {} a été ajouté à la liste des clans à observer !', name));
 
-        await this.channel.send({ embeds: [this.confirmationEmbed] });
+        await this._channel!.send({ embeds: [this.confirmationEmbed] });
     }
 
     /**
@@ -132,7 +132,7 @@ export class WatchClanModel {
         }
 
         let idOrName: string = interaction.options.get(optionsName[0])?.value as string;
-        idOrName = StringUtil.sanitize(idOrName).toUpperCase();
+        idOrName = sanitize(idOrName).toUpperCase();
 
         const clans: Clan[] = await this.watchClans.selectClan(idOrName);
 
@@ -147,7 +147,7 @@ export class WatchClanModel {
             return;
         }
 
-        const clan: Clan = clans.shift() as Clan;
+        const clan: Clan = clans.shift()!;
         const removed: boolean = await this.watchClans.removeClan(String(clan.id));
 
         if (!removed) {
@@ -164,9 +164,9 @@ export class WatchClanModel {
 
         this.confirmationEmbed
             .setTitle("Suppression de clan de l'observateur")
-            .setDescription(StringUtil.transformToCode('Le clan {} a été supprimé de la liste des clans à observer !', clan.name));
+            .setDescription(transformToCode('Le clan {} a été supprimé de la liste des clans à observer !', clan.name));
 
-        await this.channel.send({ embeds: [this.confirmationEmbed] });
+        await this._channel!.send({ embeds: [this.confirmationEmbed] });
     }
 
     /**
@@ -234,12 +234,12 @@ export class WatchClanModel {
             return;
         }
 
-        const reason: string = interaction.options.get(optionsName[1])?.value as string;
+        const reason: string | undefined = interaction.options.get(optionsName[1])?.value as string | undefined;
 
         let [id, name] = idAndName.split('#');
 
         if (!id || !name) {
-            let searchResult: WargamingSuccessType<PlayerData[]>;
+            let searchResult: WargamingSuccessType<PlayerData[]> | undefined;
 
             try {
                 searchResult = await this.wotApi.accountList(idAndName);
@@ -247,11 +247,6 @@ export class WatchClanModel {
                 await interaction.editReply({
                     content: 'Le pseudo passé contient une ou plusieurs erreurs !',
                 });
-                return;
-            }
-
-            if (!searchResult) {
-                await interaction.editReply({ content: "The player pass doesn't exist" });
                 return;
             }
 
@@ -271,7 +266,7 @@ export class WatchClanModel {
 
         const added: boolean = await this.blacklistedPlayers.addPlayer({
             id: Number(id),
-            name: name,
+            name,
             reason: reason ?? this.defaultReason,
         });
 
@@ -289,7 +284,7 @@ export class WatchClanModel {
             .setDescription(`Le joueur \`${name}\` a été ajouté sur liste noire !`);
 
         await interaction.editReply({ content: 'Le joueur a bien été ajouté à la liste noire !' });
-        await this._channel.send({
+        await this._channel!.send({
             embeds: [this.confirmationEmbed],
         });
     }
@@ -309,7 +304,7 @@ export class WatchClanModel {
         }
 
         let idAndName: string = interaction.options.get(optionsName[0])?.value as string;
-        idAndName = StringUtil.sanitize(idAndName);
+        idAndName = sanitize(idAndName);
         const [id, name] = idAndName.split('#');
 
         if (!id || !name) {
@@ -352,7 +347,7 @@ export class WatchClanModel {
             .setDescription(`Le joueur \`${name}\` a été supprimé de la liste noire !`);
 
         await interaction.editReply({ content: 'Le joueur a bien été supprimé de la liste noire !' });
-        await this._channel.send({
+        await this._channel!.send({
             embeds: [this.confirmationEmbed],
         });
     }
@@ -383,7 +378,7 @@ export class WatchClanModel {
                 await this.autocompleteRemovePlayer(interaction);
                 break;
             default:
-                throw new Error(`Invalid interactionType: ${interactionType}`);
+                throw new Error(`Invalid interactionType: ${interactionType as string}`);
         }
     }
 
@@ -402,7 +397,7 @@ export class WatchClanModel {
         await interaction.respond(
             (await this.blacklistedPlayers.findPlayer(idOrName))
                 .map((player: BlacklistedPlayer): { name: string; value: string } => ({
-                    name: `${player.name}`,
+                    name: player.name,
                     value: `${player.id}#${player.name}`,
                 }))
                 .slice(0, 24)
@@ -431,7 +426,7 @@ export class WatchClanModel {
             await interaction.respond(
                 searchResult.data
                     .map((player: { nickname: string; account_id: number }): { name: string; value: string } => ({
-                        name: `${player.nickname}`,
+                        name: player.nickname,
                         value: `${player.account_id}#${player.nickname}`,
                     }))
                     .slice(0, 24)
@@ -459,9 +454,9 @@ export class WatchClanModel {
         const idOrName: string = interaction.options.getFocused(true).value;
 
         await interaction.respond(
-            (await this.watchClans.selectClan(StringUtil.sanitize(idOrName).toUpperCase()))
+            (await this.watchClans.selectClan(sanitize(idOrName).toUpperCase()))
                 .map((clan: Clan): { name: string; value: string } => ({
-                    name: `${clan.name} | ${clan.id}`,
+                    name: clan.name,
                     value: String(clan.id),
                 }))
                 .slice(0, 24)

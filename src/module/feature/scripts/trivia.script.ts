@@ -1,7 +1,7 @@
 import { type Client } from 'discord.js';
-import type { TriviaSingleton } from '../../shared/singleton/trivia/trivia.singleton';
+import { TriviaSingleton } from '../../shared/singleton/trivia/trivia.singleton';
 import { FeatureFlippingTable } from '../../shared/tables/complexe-table/feature-flipping/feature-flipping.table';
-import { EnvUtil } from '../../shared/utils/env.util';
+import { asyncThread, thread } from '../../shared/utils/env.util';
 import { ScriptModel } from './models/script.model';
 
 module.exports = new ScriptModel('trivia-init', async (client: Client) => {
@@ -11,10 +11,10 @@ module.exports = new ScriptModel('trivia-init', async (client: Client) => {
         return;
     }
 
-    const trivia: TriviaSingleton = require('../../shared/singleton/trivia/trivia.singleton').TriviaSingleton.instance;
+    const trivia: TriviaSingleton = TriviaSingleton.instance;
 
-    EnvUtil.asyncThread(trivia.createQuestionOfTheDay.bind(trivia));
-    EnvUtil.thread(async (): Promise<void> => {
+    asyncThread(trivia.createQuestionOfTheDay.bind(trivia));
+    thread(async (): Promise<void> => {
         if (!(await trivia.canReduceElo())) {
             return;
         }

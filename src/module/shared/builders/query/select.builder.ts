@@ -1,8 +1,8 @@
 import type { TableAbstract } from '../../abstracts/table.abstract';
-import { Computer } from './models/computer.model';
 import type { Condition, OrderBy } from './models/computer.type';
 import { Conditions } from './models/conditions.model';
 import type { ColumnsInterface, ComputeInterface } from './models/query.interface';
+import { computeSelect } from './models/computer.model';
 
 /**
  * Represents a SELECT query builder.
@@ -11,7 +11,7 @@ export class SelectBuilder extends Conditions implements ComputeInterface, Colum
     /**
      * The columns to select in the table
      */
-    private _columns: string[];
+    private _columns?: string[];
 
     constructor(private table: TableAbstract) {
         super();
@@ -40,12 +40,7 @@ export class SelectBuilder extends Conditions implements ComputeInterface, Colum
             throw new Error('Verde length different of condition length (minus one)');
         }
 
-        this._innerJoin = {
-            tableName: tableName,
-            condition: {
-                conditions: conditions,
-            },
-        };
+        this._innerJoin = { tableName, condition: { conditions } };
 
         if (verdes) {
             this._innerJoin.condition.verdes = verdes;
@@ -85,6 +80,6 @@ export class SelectBuilder extends Conditions implements ComputeInterface, Colum
             throw new Error('Columns are mandatory to create SELECT query !');
         }
 
-        return Computer.computeSelect(this.table.tableName, this._columns, this);
+        return computeSelect(this.table.tableName, this._columns, this);
     }
 }

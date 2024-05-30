@@ -1,4 +1,4 @@
-import { FileUtil } from '../utils/file.util';
+import { createFolder, folderOrFileExists, readFile, writeIntoJson } from '../utils/file.util';
 import type { Logger } from '../utils/logger';
 
 /**
@@ -47,11 +47,11 @@ export class CoreFileAbstract<DType extends object> {
      * Creates a backup of the data in the file.
      */
     public backupData(): void {
-        if (!FileUtil.folderOrFileExists(this.backupPath)) {
-            FileUtil.createFolder(this.backupPath);
+        if (!folderOrFileExists(this.backupPath)) {
+            createFolder(this.backupPath);
         }
 
-        FileUtil.writeIntoJson(`${this.backupPath}/${this.fileName}`, this._data);
+        writeIntoJson(`${this.backupPath}/${this.fileName}`, this._data);
     }
 
     /**
@@ -64,18 +64,18 @@ export class CoreFileAbstract<DType extends object> {
      * @template Buffer - Template to allow Buffer type in comment
      */
     protected readFile(): Buffer {
-        if (!FileUtil.folderOrFileExists(`${this.path}/${this.fileName}`)) {
+        if (!folderOrFileExists(`${this.path}/${this.fileName}`)) {
             throw new Error(`File ${this.path}/${this.fileName} does not exist`);
         }
 
-        return FileUtil.readFile(`${this.path}/${this.fileName}`);
+        return readFile(`${this.path}/${this.fileName}`);
     }
 
     /**
      * Writes data to the file.
      */
     protected writeData(): void {
-        FileUtil.writeIntoJson(`${this.path}/${this.fileName}`, this._data);
+        writeIntoJson(`${this.path}/${this.fileName}`, this._data);
     }
 
     /**
@@ -88,8 +88,8 @@ export class CoreFileAbstract<DType extends object> {
      *
      * @template T - The type of data being verified and updated.
      */
-    protected verifyData<T>(initialValue: any, updatedData: T): T {
-        const data: any = initialValue;
+    protected verifyData<T extends Record<string, unknown>>(initialValue: T, updatedData: T): T {
+        const data = { ...initialValue };
 
         Object.keys(initialValue).forEach((key: string): void => {
             data[key as keyof T] = updatedData[key as keyof T] ?? initialValue[key as keyof T];

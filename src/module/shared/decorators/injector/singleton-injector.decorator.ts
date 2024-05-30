@@ -30,18 +30,18 @@ export function Singleton<GSingleton extends SingletonDependence>(
     // eslint-disable-next-line @typescript-eslint/ban-types
 ): Function {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    return function actual<GClass>(_target: GClass, _context: ClassFieldDecoratorContext<GClass, any>) {
-        return function (this: GClass, field: any) {
+    return function actual<GClass>(_target: GClass, _context: ClassFieldDecoratorContext<GClass>) {
+        return function (this: GClass, field: unknown) {
             switch (dependence) {
                 case 'Trivia':
                     field = require('../../singleton/trivia/trivia.singleton').TriviaSingleton.instance;
                     break;
                 case 'Axios':
                     field = axios.create({
-                        timeout: timeout,
+                        timeout,
                         headers: { 'Content-Type': 'application/json;' },
-                        httpAgent: new AgentHttp({ keepAlive: true, timeout: timeout }),
-                        httpsAgent: new AgentHttps({ keepAlive: true, timeout: timeout }),
+                        httpAgent: new AgentHttp({ keepAlive: true, timeout }),
+                        httpsAgent: new AgentHttps({ keepAlive: true, timeout }),
                     });
                     break;
                 case 'Database':

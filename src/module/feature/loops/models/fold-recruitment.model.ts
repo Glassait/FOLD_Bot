@@ -22,13 +22,25 @@ import type { Clan } from '../../../shared/tables/complexe-table/watch-clans/mod
 import type { WatchClansTable } from '../../../shared/tables/complexe-table/watch-clans/watch-clans.table';
 import type { FoldRecruitmentTable } from '../../../shared/tables/simple-table/fold-recruitment.table';
 import type { Logger } from '../../../shared/utils/logger';
-import { StringUtil } from '../../../shared/utils/string.util';
-import { UrlUtil } from '../../../shared/utils/url.util';
-import { UserUtil } from '../../../shared/utils/user.util';
+import { transformToCode } from '../../../shared/utils/string.util';
+import { getTomatoPlayerUrl, getWargamingClanUrl, getWargamingPlayerUrl, getWotLifePlayerUrl } from '../../../shared/utils/url.util';
+import { fetchChannelFromClient } from '../../../shared/utils/user.util';
 import { WotClanActivity } from '../enums/fold-recruitment.enum';
 
 @LoggerInjector
 export class FoldRecruitmentModel {
+    //region INJECTABLE
+    @Table('WatchClans') private readonly watchClans: WatchClansTable;
+    @Table('BlacklistedPlayers') private readonly blacklistedPlayers: BlacklistedPlayersTable;
+    @Table('LeavingPlayers') private readonly leavingPlayers: LeavingPlayersTable;
+    @Table('Channels') private readonly channels: ChannelsTable;
+    @Table('FoldRecruitment') private readonly foldRecruitmentTable: FoldRecruitmentTable;
+    @Api('Wargaming') private readonly wargamingApi: WargamingApi;
+    @Api('Tomato') private readonly tomatoApi: TomatoApi;
+    @Api('Wot') private readonly wotApi: WotApi;
+    private readonly logger: Logger;
+    //endregion
+
     //region PRIVATE READONLY FIELDS
     /**
      * Embed for the message indicating that no player was found.
@@ -47,7 +59,10 @@ export class FoldRecruitmentModel {
     /**
      * A map storing data where each key is the id of the player and each value is an object containing the recruitment message and the player name.
      */
-    private readonly datum: Map<number, { message: Message<true>; playerName: string }> = new Map();
+    private readonly datum: Map<number, { message: Message<true>; playerName: string; isBlacklisted: boolean }> = new Map<
+        number,
+        { message: Message<true>; playerName: string; isBlacklisted: boolean }
+    >();
 
     /**
      * Map the types of battles with the corresponding title of embed field
@@ -57,18 +72,6 @@ export class FoldRecruitmentModel {
         fort_battles: 'Incursions',
         fort_sorties: 'Escarmouches',
     };
-    //endregion
-
-    //region INJECTABLE
-    private readonly logger: Logger;
-    @Table('WatchClans') private readonly watchClans: WatchClansTable;
-    @Table('BlacklistedPlayers') private readonly blacklistedPlayers: BlacklistedPlayersTable;
-    @Table('LeavingPlayers') private readonly leavingPlayers: LeavingPlayersTable;
-    @Table('Channels') private readonly channels: ChannelsTable;
-    @Table('FoldRecruitment') private readonly foldRecruitmentTable: FoldRecruitmentTable;
-    @Api('Wargaming') private readonly wargamingApi: WargamingApi;
-    @Api('Tomato') private readonly tomatoApi: TomatoApi;
-    @Api('Wot') private readonly wotApi: WotApi;
     //endregion
 
     //region PRIVATE FIELDS
@@ -100,20 +103,20 @@ export class FoldRecruitmentModel {
     //endregion
 
     //region GETTER
-    get noPlayerFound(): boolean {
+    public get noPlayerFound(): boolean {
         return this._noPlayerFound;
     }
 
-    set noPlayerFound(bool: boolean) {
+    public set noPlayerFound(bool: boolean) {
         this._noPlayerFound = bool;
     }
 
-    get noPlayerMeetCriteria(): boolean {
-        return this._noPlayerMeetCriteria;
+    public set noPlayerMeetCriteria(bool: boolean) {
+        this._noPlayerMeetCriteria = bool;
     }
 
-    set noPlayerMeetCriteria(bool: boolean) {
-        this._noPlayerMeetCriteria = bool;
+    public get noPlayerMeetCriteria(): boolean {
+        return this._noPlayerMeetCriteria;
     }
     //endregion
 
@@ -125,7 +128,7 @@ export class FoldRecruitmentModel {
      * @param {Client} client - The Discord client instance.
      */
     public async initialise(client: Client): Promise<void> {
-        this.channel = await UserUtil.fetchChannelFromClient(client, await this.channels.getFoldRecruitment());
+        this.channel = await fetchChannelFromClient(client, await this.channels.getFoldRecruitment());
 
         this.minWn8 = await this.foldRecruitmentTable.getMinWn8();
         this.minBattles = await this.foldRecruitmentTable.getMinBattles();
@@ -147,7 +150,7 @@ export class FoldRecruitmentModel {
         }
 
         try {
-            return await this.manageClanActivities(clan, await this.wargamingApi.clansNewsfeed(clan.id));
+            await this.manageClanActivities(clan, await this.wargamingApi.clansNewsfeed(clan.id));
         } catch (error) {
             this.logger.error('An error occurred while fetching the activity of the clan', error);
         }
@@ -183,6 +186,10 @@ export class FoldRecruitmentModel {
      */
     public async checkPlayerActivity(): Promise<void> {
         for (const [playerId, data] of this.datum) {
+            if (data.isBlacklisted) {
+                continue;
+            }
+
             this.logger.debug('Checking recent activity of {}', data.playerName);
             const messageEmbed = new EmbedBuilder(data.message.embeds[0].data).setColor(Colors.Yellow);
 
@@ -206,6 +213,43 @@ export class FoldRecruitmentModel {
                 await data.message.edit({ embeds: [messageEmbed] });
             }
         }
+    }
+
+    /**
+     * Check the recent activity of a player in a specific type of battles.
+     *
+     * @param {EmbedBuilder} embed - The embed to update with a warning message if needed.
+     * @param {number} playerId - The ID of the player.
+     * @param {string} playerName - The name of the player.
+     * @param {'random' | 'fort_battles' | 'fort_sorties'} type - The type of battles to check.
+     *
+     * @returns {Promise<[boolean, boolean]>} - Returns the couple [isUnderLimite, has0Battle]
+     */
+    public async checkRecentActivity(
+        embed: EmbedBuilder,
+        playerId: number,
+        playerName: string,
+        type: 'random' | 'fort_battles' | 'fort_sorties'
+    ): Promise<[boolean, boolean]> {
+        const accounts: WargamingAccounts = await this.wargamingApi.accounts(playerId, playerName, type, 28);
+        const limit = await this.foldRecruitmentTable.getLimitByType(type);
+
+        const battlesCount: number | null = accounts.accounts[0].table_fields.battles_count;
+        if (battlesCount !== null && battlesCount >= limit) {
+            return [false, false];
+        }
+
+        embed.addFields({
+            name: this.mapText[type],
+            value: transformToCode(
+                'Le joueur a fait moins de {} batailles en {} au cours des 28 derniers jours (actuellement {})',
+                limit,
+                this.mapText[type].toLowerCase(),
+                battlesCount ?? 0
+            ),
+        });
+        this.logger.info('The following player {} have low recent activity in {} (detected {})', playerName, type, battlesCount);
+        return [true, battlesCount === null];
     }
 
     /**
@@ -239,11 +283,15 @@ export class FoldRecruitmentModel {
      * @param {Clan} clan - The clan from which the player has left.
      */
     private async buildAndSendEmbedForPlayer(player: Players, clan: Clan): Promise<void> {
-        const tomatoOverall: TomatoSuccess<TomatoOverall> = await this.tomatoApi.playerOverall(player.id);
+        try {
+            const tomatoOverall: TomatoSuccess<TomatoOverall> | undefined = await this.tomatoApi.playerOverall(player.id);
 
-        if (tomatoOverall.data.overallWN8 < this.minWn8 || tomatoOverall.data.battles < this.minBattles) {
-            this.logger.info("The following player {} doesn't meet critéria", player.name);
-            return;
+            if (tomatoOverall.data.overallWN8 < this.minWn8 || tomatoOverall.data.battles < this.minBattles) {
+                this.logger.info("The following player {} doesn't meet critéria", player.name);
+                return;
+            }
+        } catch (reason) {
+            this.logger.warn('', reason);
         }
 
         this._noPlayerMeetCriteria = false;
@@ -253,14 +301,14 @@ export class FoldRecruitmentModel {
             .setAuthor({
                 name: `${clan.name} ${EmojiEnum.REDIRECTION}`,
                 iconURL: clan.image_url,
-                url: UrlUtil.getWargamingClanUrl(clan.id),
+                url: getWargamingClanUrl(clan.id),
             })
             .setTitle(blacklisted ? 'Joueur sur liste noire détecté' : 'Nouveau joueur pouvant être recruté')
             .setDescription(
-                StringUtil.transformToCode(
+                transformToCode(
                     `Le joueur suivant {} a quitté {}.${
                         blacklisted
-                            ? StringUtil.transformToCode(
+                            ? transformToCode(
                                   '\n\nLe joueur suivant a été mis sur liste noire pour la raison suivante : {}',
                                   blacklisted.reason
                               )
@@ -273,24 +321,24 @@ export class FoldRecruitmentModel {
             .setFields(
                 {
                     name: 'Wargaming',
-                    value: `[Redirection ${EmojiEnum.REDIRECTION}](${UrlUtil.getWargamingPlayerUrl(player.name, player.id)})`,
+                    value: `[Redirection ${EmojiEnum.REDIRECTION}](${getWargamingPlayerUrl(player.name, player.id)})`,
                     inline: true,
                 },
                 {
                     name: 'TomatoGG',
-                    value: `[Redirection ${EmojiEnum.REDIRECTION}](${UrlUtil.getTomatoPlayerUrl(player.name, player.id)})`,
+                    value: `[Redirection ${EmojiEnum.REDIRECTION}](${getTomatoPlayerUrl(player.name, player.id)})`,
                     inline: true,
                 },
                 {
                     name: 'Wot Life',
-                    value: `[Redirection ${EmojiEnum.REDIRECTION}](${UrlUtil.getWotLifePlayerUrl(player.name, player.id)})`,
+                    value: `[Redirection ${EmojiEnum.REDIRECTION}](${getWotLifePlayerUrl(player.name, player.id)})`,
                     inline: true,
                 }
             )
             .setColor(blacklisted ? Colors.Red : Colors.Blurple);
 
         const message: Message<true> = await this.channel.send({ embeds: [embedPlayer] });
-        this.datum.set(player.id, { message: message, playerName: player.name });
+        this.datum.set(player.id, { message, playerName: player.name, isBlacklisted: !!blacklisted });
     }
 
     /**
@@ -310,55 +358,18 @@ export class FoldRecruitmentModel {
     } {
         const extracted: LeaveClanActivity[] = data.items.filter(
             (item: ClanActivity): boolean =>
-                item.subtype === WotClanActivity.LEAVE_CLAN && new Date(item.created_at) > new Date(clan?.last_activity ?? '')
+                item.subtype === WotClanActivity.LEAVE_CLAN && new Date(item.created_at) > new Date(clan.last_activity ?? '')
         ) as unknown as LeaveClanActivity[];
 
         const datum: Players[] = extracted.flatMap((activity: LeaveClanActivity) =>
             activity.accounts_ids.map(
                 (id: number): Players => ({
                     name: activity.accounts_info[String(id)].name,
-                    id: id,
+                    id,
                 })
             )
         );
 
-        return { datum: datum, extracted: extracted };
-    }
-
-    /**
-     * Check the recent activity of a player in a specific type of battles.
-     *
-     * @param {EmbedBuilder} embed - The embed to update with a warning message if needed.
-     * @param {number} playerId - The ID of the player.
-     * @param {string} playerName - The name of the player.
-     * @param {'random' | 'fort_battles' | 'fort_sorties'} type - The type of battles to check.
-     *
-     * @returns {Promise<[boolean, boolean]>} - Returns the couple [isUnderLimite, has0Battle]
-     */
-    public async checkRecentActivity(
-        embed: EmbedBuilder,
-        playerId: number,
-        playerName: string,
-        type: 'random' | 'fort_battles' | 'fort_sorties'
-    ): Promise<[boolean, boolean]> {
-        const accounts: WargamingAccounts = await this.wargamingApi.accounts(playerId, playerName, type, 28);
-        const limit = await this.foldRecruitmentTable.getLimitByType(type);
-
-        const battlesCount: number | null = accounts.accounts[0].table_fields.battles_count;
-        if (battlesCount !== null && battlesCount >= limit) {
-            return [false, false];
-        }
-
-        embed.addFields({
-            name: this.mapText[type],
-            value: StringUtil.transformToCode(
-                'Le joueur a fait moins de {} en {} au cours des 28 derniers jours (actuellement {})',
-                limit,
-                this.mapText[type].toLowerCase(),
-                battlesCount ?? 0
-            ),
-        });
-        this.logger.info('The following player {} have low recent activity in {} (detected {})', playerName, type, battlesCount);
-        return [true, battlesCount === null];
+        return { datum, extracted };
     }
 }

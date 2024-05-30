@@ -21,7 +21,7 @@ export class CommandsTable extends TableAbstract {
      */
     public async getCommand(name: CommandName): Promise<string[]> {
         return (
-            (await this.select(new SelectBuilder(this).columns('servers_id').where([`name LIKE '${name}'`]))) as any
+            await this.select<{ servers_id: string }>(new SelectBuilder(this).columns('servers_id').where([`name LIKE '${name}'`]))
         )[0].servers_id.split(',');
     }
 }

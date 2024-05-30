@@ -3,7 +3,7 @@ import { DeleteBuilder } from '../../../builders/query/delete.builder';
 import { InsertIntoBuilder } from '../../../builders/query/insert-into.builder';
 import { SelectBuilder } from '../../../builders/query/select.builder';
 import { LoggerInjector } from '../../../decorators/injector/logger-injector.decorator';
-import { StringUtil } from '../../../utils/string.util';
+import { escape } from '../../../utils/string.util';
 import type { BlacklistedPlayer } from './models/blacklisted-players.type';
 
 /**
@@ -30,9 +30,7 @@ export class BlacklistedPlayersTable extends TableAbstract {
         }
 
         return await this.insert(
-            new InsertIntoBuilder(this)
-                .columns('id', 'name', 'reason')
-                .values(player.id, StringUtil.escape(player.name), StringUtil.escape(player.reason))
+            new InsertIntoBuilder(this).columns('id', 'name', 'reason').values(player.id, escape(player.name), escape(player.reason))
         );
     }
 

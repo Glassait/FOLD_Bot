@@ -141,7 +141,7 @@ export class WotApi extends ApiBase {
      */
     private async getDataFromUrl<GSuccess, GData extends WargamingSuccessType<object> | WargamingErrorType>(url: URL): Promise<GSuccess> {
         let numberOfTry: number = 0;
-        let data: GData;
+        let data: GData | undefined;
 
         do {
             data = await this.getData(url);

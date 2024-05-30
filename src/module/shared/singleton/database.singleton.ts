@@ -8,6 +8,25 @@ import { Logger } from '../utils/logger';
  * Singleton class for managing MySQL database connections.
  */
 export class DatabaseSingleton {
+    //region SINGLETON
+    /**
+     * The instance of the class, used for the singleton pattern
+     */
+    private static _instance?: DatabaseSingleton;
+
+    /**
+     * Gets the singleton instance of DatabaseSingleton.
+     *
+     * @returns {DatabaseSingleton} - The singleton instance.
+     */
+    public static get instance(): DatabaseSingleton {
+        if (!this._instance) {
+            this._instance = new DatabaseSingleton();
+        }
+        return this._instance;
+    }
+    //endregion
+
     //region INJECTABLE
     private readonly logger: Logger = new Logger(basename(__filename));
     //endregion
@@ -27,25 +46,6 @@ export class DatabaseSingleton {
         this.logger.info(`${EmojiEnum.HAMMER} {} instance initialized`, DatabaseSingleton.name);
     }
 
-    //region SINGLETON
-    /**
-     * The instance of the class, used for the singleton pattern
-     */
-    private static _instance: DatabaseSingleton;
-
-    /**
-     * Gets the singleton instance of DatabaseSingleton.
-     *
-     * @returns {DatabaseSingleton} - The singleton instance.
-     */
-    public static get instance(): DatabaseSingleton {
-        if (!this._instance) {
-            this._instance = new DatabaseSingleton();
-        }
-        return this._instance;
-    }
-    //endregion
-
     /**
      * Executes a SQL query.
      *
@@ -55,10 +55,10 @@ export class DatabaseSingleton {
      */
     public async query(sql: string): Promise<[QueryResult, FieldPacket[]]> {
         try {
-            const [rows, fields] = await this._pool.execute({ sql: sql });
+            const [rows, fields] = await this._pool.execute({ sql });
             return [rows, fields];
         } catch (error) {
-            throw new Error(`Error executing SQL query, error : ${error}`, { cause: error });
+            throw new Error(`Error executing SQL query`, { cause: error });
         }
     }
 
@@ -67,10 +67,10 @@ export class DatabaseSingleton {
      */
     private createPool(): void {
         this._pool = mysql.createPool({
-            user: user,
-            host: host,
-            database: database,
-            password: password,
+            user: String(user),
+            host: String(host),
+            database: String(database),
+            password: String(password),
             waitForConnections: true,
             connectionLimit: 10,
             maxIdle: 10,

@@ -6,19 +6,21 @@ import { EmojiEnum } from '../../shared/enums/emoji.enum';
 import { Logger } from '../../shared/utils/logger';
 import type { BotEvent } from '../events/types/bot-event.type';
 
-module.exports = async (client: Client): Promise<void> => {
+module.exports = (client: Client): void => {
     const logger: Logger = new Logger(basename(__filename));
     const eventsDir: string = join(__dirname, '../events');
     let numberOfEvents: number = 0;
 
     readdirSync(eventsDir).forEach((file: string): void => {
-        if (!file.endsWith('.ts')) return;
+        if (!file.endsWith('.ts')) {
+            return;
+        }
 
-        const event: BotEvent = require(`${eventsDir}/${file}`);
+        const event: BotEvent = require(`${eventsDir}/${file}`) as BotEvent;
 
         event.once
-            ? client.once(event.name.toString(), (...args: any[]) => event.execute(client, ...args))
-            : client.on(event.name.toString(), (...args: any[]) => event.execute(client, ...args));
+            ? client.once(event.name.toString(), (...args: unknown[]) => event.execute(client, ...args))
+            : client.on(event.name.toString(), (...args: unknown[]) => event.execute(client, ...args));
 
         ++numberOfEvents;
         logger.info(`${EmojiEnum.STAR} Successfully loaded event {} as {} listener !`, event.name, event.once ? 'temporary' : 'permanent');

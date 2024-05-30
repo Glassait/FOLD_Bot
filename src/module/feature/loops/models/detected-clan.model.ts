@@ -12,11 +12,11 @@ import type { Logger } from '../../../shared/utils/logger';
 @LoggerInjector
 export class DetectedClanModel {
     //region INJECTABLE
-    private readonly logger: Logger;
     @Api('Wot') private readonly wotApi: WotApi;
     @Table('WatchClans') private readonly watchClans: WatchClansTable;
     @Table('LeavingPlayers') private readonly leavingPlayers: LeavingPlayersTable;
     @Table('PotentialClans') private readonly potentialClans: PotentialClansTable;
+    private readonly logger: Logger;
     //endregion
 
     /**

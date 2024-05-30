@@ -1,45 +1,43 @@
 import { SlashCommandMentionableOption } from '@discordjs/builders';
-import { Canvas, Image, type SKRSContext2D } from '@napi-rs/canvas';
+import { Canvas, Image, loadImage, type SKRSContext2D } from '@napi-rs/canvas';
 import {
     AttachmentBuilder,
     ChannelType,
     type ChatInputCommandInteraction,
     type GuildMember,
     SlashCommandChannelOption,
-    type TextChannel,
+    TextChannel,
 } from 'discord.js';
-import { UserUtil } from '../../shared/utils/user.util';
+import { getGuildMemberFromInteraction } from '../../shared/utils/user.util';
 import { SlashCommandModel } from './models/slash-command.model';
 
 module.exports = new SlashCommandModel(
     'al_capone-trophy',
     'Décerne le Al_capone trophée à un joueur',
     async (interaction: ChatInputCommandInteraction): Promise<void> => {
-        const Canvas = require('@napi-rs/canvas');
-
-        const targetUser: GuildMember | undefined = await UserUtil.getGuildMemberFromInteraction(interaction, 'target', true);
+        const targetUser: GuildMember | undefined = await getGuildMemberFromInteraction(interaction, 'target', true);
 
         if (!targetUser) {
             return;
         }
 
-        const channel = interaction.options.get('salon')?.channel as TextChannel;
+        const channel: TextChannel | undefined = interaction.options.get('salon')?.channel as TextChannel | undefined;
 
         if (!channel) {
             return;
         }
 
-        const canvas: Canvas = Canvas.createCanvas(612, 612);
+        const canvas: Canvas = new Canvas(612, 612);
         const context: SKRSContext2D = canvas.getContext('2d');
 
-        const background: Image = await Canvas.loadImage('src/assets/img/trophy.jpg');
+        const background: Image = await loadImage('src/assets/img/trophy.jpg');
         context.drawImage(background, 0, 0, canvas.width, canvas.height);
 
         context.beginPath();
         context.arc(307, 198, 75, 0, Math.PI * 2, true);
         context.closePath();
         context.clip();
-        const avatar = await Canvas.loadImage(targetUser.displayAvatarURL({ extension: 'jpg' }));
+        const avatar = await loadImage(targetUser.displayAvatarURL({ extension: 'jpg' }));
         context.drawImage(avatar, 231, 120, 150, 150);
 
         const attachment = new AttachmentBuilder(await canvas.encode('jpeg'), { name: 'Al_capone-trophée.jpg' });

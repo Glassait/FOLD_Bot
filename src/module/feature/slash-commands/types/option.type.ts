@@ -16,10 +16,11 @@ export type OptionType =
 /**
  * Define all discord option, according to the {@link OptionType}
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const OptionMap: Record<string, (value: any, data: SlashCommandBuilder) => void> = {
-    SlashCommandStringOption: (value: any, data: SlashCommandBuilder) => data.addStringOption(value),
-    SlashCommandIntegerOption: (value: any, data: SlashCommandBuilder) => data.addIntegerOption(value),
-    SlashCommandMentionableOption: (value: any, data: SlashCommandBuilder) => data.addMentionableOption(value),
-    SlashCommandSubcommandBuilder: (value: any, data: SlashCommandBuilder) => data.addSubcommand(value),
-    SlashCommandChannelOption: (value: any, data: SlashCommandBuilder) => data.addChannelOption(value),
+    SlashCommandStringOption: (value: SlashCommandStringOption, data: SlashCommandBuilder) => data.addStringOption(value),
+    SlashCommandIntegerOption: (value: SlashCommandIntegerOption, data: SlashCommandBuilder) => data.addIntegerOption(value),
+    SlashCommandMentionableOption: (value: SlashCommandMentionableOption, data: SlashCommandBuilder) => data.addMentionableOption(value),
+    SlashCommandSubcommandBuilder: (value: SlashCommandSubcommandBuilder, data: SlashCommandBuilder) => data.addSubcommand(value),
+    SlashCommandChannelOption: (value: SlashCommandChannelOption, data: SlashCommandBuilder) => data.addChannelOption(value),
 };

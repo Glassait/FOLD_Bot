@@ -8,8 +8,8 @@ import type { Logger } from '../utils/logger';
  */
 export class ApiBase {
     //region INJECTION
-    protected readonly logger: Logger;
     @Singleton('Axios', TimeEnum.SECONDE * 30) private readonly axios: AxiosInstance;
+    protected readonly logger: Logger;
     //endregion
 
     /**
@@ -33,9 +33,9 @@ export class ApiBase {
      *
      * @param {URL} url - The URL to which the search parameter will be added.
      * @param {string} key - The key of the search parameter.
-     * @param {any} value - The value of the search parameter.
+     * @param {unknown} value - The value of the search parameter.
      */
-    protected addSearchParam(url: URL, key: string, value: any): void {
+    protected addSearchParam(url: URL, key: string, value: unknown): void {
         url.searchParams.append(key, String(value));
     }
 
@@ -50,6 +50,6 @@ export class ApiBase {
      */
     protected async getData<GData>(url: string | URL): Promise<GData> {
         this.logger.debug('HTTP(S) call to {}', url);
-        return (await this.axios.get(url.toString(), { responseType: 'json' })).data;
+        return (await this.axios.get(url.toString(), { responseType: 'json' })).data as GData;
     }
 }

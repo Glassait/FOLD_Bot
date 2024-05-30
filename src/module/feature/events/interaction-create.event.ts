@@ -15,7 +15,7 @@ const logger: Logger = new Logger(basename(__filename));
  */
 function getCommand(interaction: { commandName: string }): SlashCommandModel | undefined {
     try {
-        return require(`../slash-commands/${interaction.commandName}.slash-command`);
+        return require(`../slash-commands/${interaction.commandName}.slash-command`) as SlashCommandModel;
     } catch (err) {
         return undefined;
     }
@@ -38,11 +38,11 @@ async function chatInputCommand(interaction: ChatInputCommandInteraction, client
         logger.info(
             'User {} send slash command : {}',
             interaction.user.username,
-            command.name + (interaction?.options.getSubcommand(false) ? ' ' + interaction?.options.getSubcommand() : '')
+            command.name + (interaction.options.getSubcommand(false) ? ' ' + interaction.options.getSubcommand() : '')
         );
         await command.execute(interaction, client);
     } catch (error) {
-        logger.error(`${error}`, error);
+        logger.error('An error occur during execute', error);
     }
 }
 
@@ -61,7 +61,7 @@ async function autocomplete(interaction: AutocompleteInteraction): Promise<void>
     try {
         await command.autocomplete(interaction);
     } catch (error) {
-        logger.error(`${error}`, error);
+        logger.error('An error occur during autocomplete', error);
     }
 }
 

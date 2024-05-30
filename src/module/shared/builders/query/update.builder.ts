@@ -1,7 +1,7 @@
 import type { TableAbstract } from '../../abstracts/table.abstract';
-import { Computer } from './models/computer.model';
 import { Conditions } from './models/conditions.model';
 import type { ColumnsInterface, ComputeInterface, ValuesInterface } from './models/query.interface';
+import { computeUpdate } from './models/computer.model';
 
 /**
  * Represents an UPDATE query builder.
@@ -10,12 +10,12 @@ export class UpdateBuilder extends Conditions implements ComputeInterface, Colum
     /**
      * The columns to update in the table
      */
-    private _columns: string[];
+    private _columns?: string[];
 
     /**
      * The value to put in the columns in the table
      */
-    private _values: string[];
+    private _values?: unknown[];
 
     constructor(private table: TableAbstract) {
         super();
@@ -42,7 +42,7 @@ export class UpdateBuilder extends Conditions implements ComputeInterface, Colum
      *
      * @inheritdoc
      */
-    public values(...values: any[]): this {
+    public values(...values: unknown[]): this {
         this._values = values;
         return this;
     }
@@ -66,12 +66,12 @@ export class UpdateBuilder extends Conditions implements ComputeInterface, Colum
             throw new Error('Columns is mandatory to create UPDATE query !');
         }
 
-        if (this._columns.length !== this._values?.length) {
+        if (this._columns.length !== this._values.length) {
             throw new Error(
-                `The number of columns (${this._columns.length}) must be the same as the number of values (${this._values?.length})`
+                `The number of columns (${this._columns.length}) must be the same as the number of values (${this._values.length})`
             );
         }
 
-        return Computer.computeUpdate(this.table.tableName, this._values, this._columns, this);
+        return computeUpdate(this.table.tableName, this._values, this._columns, this);
     }
 }

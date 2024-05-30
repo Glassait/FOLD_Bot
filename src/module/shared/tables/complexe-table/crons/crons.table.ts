@@ -20,6 +20,6 @@ export class CronsTable extends TableAbstract {
      * @returns {Promise<string>} A promise that resolves to the cron expression associated with the given name.
      */
     public async getCron(name: CronName): Promise<string> {
-        return ((await this.select(new SelectBuilder(this).columns('cron').where([`name LIKE '${name}'`]))) as any)[0].cron;
+        return (await this.select<{ cron: string }>(new SelectBuilder(this).columns('cron').where([`name LIKE '${name}'`])))[0].cron;
     }
 }

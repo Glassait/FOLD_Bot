@@ -1,12 +1,30 @@
 import { existsSync, mkdirSync } from 'fs';
 import type { ContextAbstract } from '../abstracts/context.abstract';
 import { EmojiEnum } from '../enums/emoji.enum';
+import { writeFile } from '../utils/file.util';
 
 /**
  * Class used to manage the persistence of the log
  * This class implement the Singleton pattern
  */
 export class LoggerSingleton {
+    //region SINGLETON
+    /**
+     * The instance of the class, used for the singleton pattern
+     */
+    private static _instance: LoggerSingleton | undefined;
+
+    /**
+     * Getter for {@link _instance}
+     */
+    public static get instance(): LoggerSingleton {
+        if (!this._instance) {
+            this._instance = new LoggerSingleton();
+        }
+        return this._instance;
+    }
+    //endregion
+
     //region PRIVATE FIELD
     /**
      * The directory where the logs are stored
@@ -30,23 +48,6 @@ export class LoggerSingleton {
     private constructor() {
         this.createLogFile();
     }
-
-    //region SINGLETON
-    /**
-     * The instance of the class, used for the singleton pattern
-     */
-    private static _instance: LoggerSingleton | undefined;
-
-    /**
-     * Getter for {@link _instance}
-     */
-    public static get instance(): LoggerSingleton {
-        if (!this._instance) {
-            this._instance = new LoggerSingleton();
-        }
-        return this._instance;
-    }
-    //endregion
 
     //region LOG-METHODS
     /**
@@ -106,7 +107,7 @@ export class LoggerSingleton {
             mkdirSync(this.dir);
         }
 
-        require('../utils/file.util').FileUtil.writeFile(this.path, this.log);
+        writeFile(this.path, this.log);
     }
 
     /**
@@ -123,6 +124,6 @@ export class LoggerSingleton {
             second: '2-digit',
             hourCycle: 'h24',
         })}][${level}][${context}] ${msg.replace(/application_id=[0-9a-z]{32}/, 'application_id=*********')}  \n`;
-        require('../utils/file.util').FileUtil.writeFile(this.path, this.log);
+        writeFile(this.path, this.log);
     }
 }

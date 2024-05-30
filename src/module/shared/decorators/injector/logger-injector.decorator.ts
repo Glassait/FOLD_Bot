@@ -1,5 +1,6 @@
 import { ContextAbstract } from '../../abstracts/context.abstract';
 import type { Constructor } from './models/injector.type';
+import { Logger } from '../../utils/logger';
 
 /**
  * Decorator function that injects a logger instance into a class.
@@ -20,14 +21,13 @@ import type { Constructor } from './models/injector.type';
  *      private readonly logger: Logger
  * }
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function LoggerInjector<GClass extends Constructor>(target: GClass, _context: ClassDecoratorContext<GClass>): GClass {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+export function LoggerInjector<GClass extends Constructor<any>>(target: GClass, _context: ClassDecoratorContext<GClass>): GClass {
     return class extends target {
         constructor(...args: any[]) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
             super(...args);
-
-            const req = require('../../utils/logger');
-            this.logger = new req.Logger(new ContextAbstract(target.name));
+            this.logger = new Logger(new ContextAbstract(target.name));
         }
     };
 }

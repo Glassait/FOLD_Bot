@@ -26,16 +26,16 @@ export class WinStreakTable extends TableAbstract {
         );
     }
 
-    public async getWinStreakFromDate(playerId: number, date: Date): Promise<WinStreak> {
+    public async getWinStreakFromDate(playerId: number, date: Date): Promise<WinStreak | undefined> {
         return (
-            (await this.select(
+            await this.select<WinStreak>(
                 new SelectBuilder(this)
                     .columns('current', 'max')
                     .where(
                         [`player_id = ${playerId}`, `MONTH(date) = ${date.getMonth() + 1}`, `YEAR(date) = ${date.getFullYear()}`],
                         ['AND', 'AND']
                     )
-            )) as any
+            )
         )[0];
     }
 }

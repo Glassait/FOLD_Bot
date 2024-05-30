@@ -17,7 +17,7 @@ const MAPPING = {
     },
     REMOVE: {
         name: 'remove',
-        optionsName: ['id-ou-name'],
+        optionsName: ['name'],
     },
     LIST: {
         name: 'list',
@@ -83,7 +83,7 @@ module.exports = new SlashCommandModel(
                 .addStringOption((builder: SlashCommandStringOption) =>
                     builder
                         .setName(MAPPING.REMOVE.optionsName[0])
-                        .setDescription("L'id ou le nom du clan à supprimer")
+                        .setDescription('Le nom du clan à supprimer')
                         .setRequired(true)
                         .setAutocomplete(true)
                 ),

@@ -1,7 +1,7 @@
 import type { TableAbstract } from '../../abstracts/table.abstract';
-import { Computer } from './models/computer.model';
 import { Conditions } from './models/conditions.model';
 import type { ComputeInterface } from './models/query.interface';
+import { computeDelete } from './models/computer.model';
 
 /**
  * Represents a DELETE query builder.
@@ -22,6 +22,6 @@ export class DeleteBuilder extends Conditions implements ComputeInterface {
      * @inheritdoc
      */
     public compute(): string {
-        return Computer.computeDelete(this.table.tableName, this);
+        return computeDelete(this.table.tableName, this);
     }
 }

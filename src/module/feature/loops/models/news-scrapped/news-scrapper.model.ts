@@ -14,9 +14,9 @@ import type { Logger } from '../../../../shared/utils/logger';
 @LoggerInjector
 export class NewsScrapper {
     //region INJECTABLE
-    private readonly logger: Logger;
     @Table('NewsWebsites') private readonly newsWebsites: NewsWebsitesTable;
     @Table('BanWords') private readonly banWords: BanWordsTable;
+    private readonly logger: Logger;
     //endregion
 
     /**

@@ -32,7 +32,8 @@ export class PotentialClansTable extends TableAbstract {
      * @returns {Promise<boolean>} - A promise that resolves to a boolean indicating whether the clan exists.
      */
     public async clanExist(clanId: number): Promise<boolean> {
-        return !!((await this.select(new SelectBuilder(this).columns('COUNT(1) as  count').where([`id = ${clanId}`]))) as any)[0].count;
+        return !!(await this.select<{ count: number }>(new SelectBuilder(this).columns('COUNT(1) as  count').where([`id = ${clanId}`])))[0]
+            .count;
     }
 
     /**

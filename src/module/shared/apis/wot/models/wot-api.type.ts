@@ -39,9 +39,7 @@ export type VehicleData = {
  * Represents a successful response from the Tankopedia Vehicles API.
  */
 export type TankopediaVehiclesSuccess = WargamingSuccessType<
-    {
-        [key: string]: VehicleData;
-    },
+    Record<string, VehicleData>,
     {
         page_total: number;
         limit: number;
@@ -123,7 +121,7 @@ export type ClansDto = ClansError | ClansSuccess;
 //region PLAYER_PERSONAL_DTO
 export type PlayerPersonalDataDetail = { clan_id: number | null };
 
-export type PlayerPersonalData = { [id: string]: PlayerPersonalDataDetail };
+export type PlayerPersonalData = Record<string, PlayerPersonalDataDetail>;
 
 export type PlayerPersonalDataSuccess = WargamingSuccessType<PlayerPersonalData>;
 
@@ -152,9 +150,7 @@ export type ClanDetail = {
     tag: string;
 };
 
-export type ClanDetails = {
-    [clanId: string]: ClanDetail;
-};
+export type ClanDetails = Record<string, ClanDetail>;
 
 export type ClanDetailsSuccess = WargamingSuccessType<ClanDetails>;
 

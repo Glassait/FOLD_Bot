@@ -1,26 +1,42 @@
 import type { Constructor } from './models/injector.type';
+import { ChannelsTable } from '../../tables/complexe-table/channels/channels.table';
+import { FeatureFlippingTable } from '../../tables/complexe-table/feature-flipping/feature-flipping.table';
+import { WinStreakTable } from '../../tables/complexe-table/win-streak/win-streak.table';
+import { TriviaTable } from '../../tables/complexe-table/trivia/trivia.table';
+import { CommandsTable } from '../../tables/complexe-table/commands/commands.table';
+import { WatchClansTable } from '../../tables/complexe-table/watch-clans/watch-clans.table';
+import { BlacklistedPlayersTable } from '../../tables/complexe-table/blacklisted-players/blacklisted-players.table';
+import { LeavingPlayersTable } from '../../tables/complexe-table/leaving-players/leaving-players.table';
+import { PotentialClansTable } from '../../tables/simple-table/potential-clans.table';
+import { FoldRecruitmentTable } from '../../tables/simple-table/fold-recruitment.table';
+import { NewsWebsitesTable } from '../../tables/complexe-table/news-websites/news-websites.table';
+import { BanWordsTable } from '../../tables/simple-table/ban-words.table';
+import { TriviaDataTable } from '../../tables/complexe-table/trivia-data/trivia-data.table';
+import { TanksTable } from '../../tables/complexe-table/tanks/tanks.table';
+import { PlayersTable } from '../../tables/complexe-table/players/players.table';
+import { PlayersAnswersTable } from '../../tables/complexe-table/players-answers/players-answers.table';
 
 let tableMap: {
     // Commons
-    Channels: Constructor;
-    FeatureFlipping: Constructor;
-    Commands: Constructor;
+    Channels: Constructor<ChannelsTable>;
+    FeatureFlipping: Constructor<FeatureFlippingTable>;
+    Commands: Constructor<CommandsTable>;
     // Fold Recruitment
-    WatchClans: Constructor;
-    BlacklistedPlayers: Constructor;
-    LeavingPlayers: Constructor;
-    PotentialClans: Constructor;
-    FoldRecruitment: Constructor;
+    WatchClans: Constructor<WatchClansTable>;
+    BlacklistedPlayers: Constructor<BlacklistedPlayersTable>;
+    LeavingPlayers: Constructor<LeavingPlayersTable>;
+    PotentialClans: Constructor<PotentialClansTable>;
+    FoldRecruitment: Constructor<FoldRecruitmentTable>;
     // Newsletter
-    NewsWebsites: Constructor;
-    BanWords: Constructor;
+    NewsWebsites: Constructor<NewsWebsitesTable>;
+    BanWords: Constructor<BanWordsTable>;
     // Trivia game
-    TriviaData: Constructor;
-    Tanks: Constructor;
-    Players: Constructor;
-    PlayersAnswer: Constructor;
-    Trivia: Constructor;
-    WinStreak: Constructor;
+    TriviaData: Constructor<TriviaDataTable>;
+    Tanks: Constructor<TanksTable>;
+    Players: Constructor<PlayersTable>;
+    PlayersAnswer: Constructor<PlayersAnswersTable>;
+    Trivia: Constructor<TriviaTable>;
+    WinStreak: Constructor<WinStreakTable>;
 };
 
 /**
@@ -39,42 +55,36 @@ export function Table(
     dependence: keyof typeof tableMap
     // eslint-disable-next-line @typescript-eslint/ban-types
 ): Function {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!tableMap) {
         tableMap = {
             // Commons
-            Channels: require('../../tables/complexe-table/channels/channels.table').ChannelsTable,
-            FeatureFlipping: require('../../tables/complexe-table/feature-flipping/feature-flipping.table').FeatureFlippingTable,
-            Commands: require('../../tables/complexe-table/commands/commands.table').CommandsTable,
+            Channels: ChannelsTable,
+            FeatureFlipping: FeatureFlippingTable,
+            Commands: CommandsTable,
             // Fold Recruitment
-            WatchClans: require('../../tables/complexe-table/watch-clans/watch-clans.table').WatchClansTable,
-            BlacklistedPlayers: require('../../tables/complexe-table/blacklisted-players/blacklisted-players.table')
-                .BlacklistedPlayersTable,
-            LeavingPlayers: require('../../tables/complexe-table/leaving-players/leaving-players.table').LeavingPlayersTable,
-            PotentialClans: require('../../tables/simple-table/potential-clans.table').PotentialClansTable,
-            FoldRecruitment: require('../../tables/simple-table/fold-recruitment.table').FoldRecruitmentTable,
+            WatchClans: WatchClansTable,
+            BlacklistedPlayers: BlacklistedPlayersTable,
+            LeavingPlayers: LeavingPlayersTable,
+            PotentialClans: PotentialClansTable,
+            FoldRecruitment: FoldRecruitmentTable,
             // Newsletter
-            NewsWebsites: require('../../tables/complexe-table/news-websites/news-websites.table').NewsWebsitesTable,
-            BanWords: require('../../tables/simple-table/ban-words.table').BanWordsTable,
+            NewsWebsites: NewsWebsitesTable,
+            BanWords: BanWordsTable,
             // Trivia game
-            TriviaData: require('../../tables/complexe-table/trivia-data/trivia-data.table').TriviaDataTable,
-            Tanks: require('../../tables/complexe-table/tanks/tanks.table').TanksTable,
-            Players: require('../../tables/complexe-table/players/players.table').PlayersTable,
-            PlayersAnswer: require('../../tables/complexe-table/players-answers/players-answers.table').PlayersAnswersTable,
-            Trivia: require('../../tables/complexe-table/trivia/trivia.table').TriviaTable,
-            WinStreak: require('../../tables/complexe-table/win-streak/win-streak.table').WinStreakTable,
+            TriviaData: TriviaDataTable,
+            Tanks: TanksTable,
+            Players: PlayersTable,
+            PlayersAnswer: PlayersAnswersTable,
+            Trivia: TriviaTable,
+            WinStreak: WinStreakTable,
         };
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    return function actual<GTable>(_target: GTable, _context: ClassFieldDecoratorContext<GTable, any>) {
-        return function (this: GTable, field: any) {
-            const req: Constructor = tableMap[dependence];
-
-            if (!req) {
-                throw new Error(`Unsupported dependence type: ${dependence}`);
-            }
-
-            field = new req(); // NOSONAR
+    return function actual<GTable>(_target: GTable, _context: ClassFieldDecoratorContext<GTable>) {
+        return function (this: GTable, field: unknown) {
+            field = new tableMap![dependence](); // NOSONAR
             return field;
         };
     };
