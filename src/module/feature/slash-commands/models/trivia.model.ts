@@ -103,17 +103,13 @@ export class TriviaModel extends TriviaStatisticsModel {
             return;
         }
 
-        const value = {
-            player: player!,
-            questionNumber: numberOfAnswer,
-            interaction: interaction,
-        };
+        const value = { player: player!, questionNumber: numberOfAnswer, interaction };
 
         this.datum.set(player!.name, value);
 
         const { allTanks, selectedTanks }: { allTanks?: Tank[]; selectedTanks: TriviaSelected } = this.getData(player!.name);
 
-        if (!allTanks || allTanks.length <= 16) {
+        if (!allTanks || allTanks.length < 4) {
             await interaction.editReply({
                 content:
                     'Le jeu ne semble pas encore initialisé, merci de réessayer dans quelque minutes. Si le problème persist merci de contacter <@313006042340524033>',

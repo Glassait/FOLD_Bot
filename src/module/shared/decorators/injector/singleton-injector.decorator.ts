@@ -3,8 +3,6 @@ import { Agent as AgentHttp } from 'node:http';
 import { Agent as AgentHttps } from 'node:https';
 import { TimeEnum } from '../../enums/time.enum';
 import type { SingletonDependence } from './models/injector.type';
-import { TriviaSingleton } from '../../singleton/trivia/trivia.singleton';
-import { DatabaseSingleton } from '../../singleton/database.singleton';
 
 /**
  * Decorator function that injects singleton instances based on the provided dependence type.
@@ -36,18 +34,18 @@ export function Singleton<GSingleton extends SingletonDependence>(
         return function (this: GClass, field: unknown) {
             switch (dependence) {
                 case 'Trivia':
-                    field = TriviaSingleton.instance;
+                    field = require('../../singleton/trivia/trivia.singleton').TriviaSingleton.instance;
                     break;
                 case 'Axios':
                     field = axios.create({
-                        timeout: timeout,
+                        timeout,
                         headers: { 'Content-Type': 'application/json;' },
-                        httpAgent: new AgentHttp({ keepAlive: true, timeout: timeout }),
-                        httpsAgent: new AgentHttps({ keepAlive: true, timeout: timeout }),
+                        httpAgent: new AgentHttp({ keepAlive: true, timeout }),
+                        httpsAgent: new AgentHttps({ keepAlive: true, timeout }),
                     });
                     break;
                 case 'Database':
-                    field = DatabaseSingleton.instance;
+                    field = require('../../singleton/database.singleton').DatabaseSingleton.instance;
                     break;
                 default:
                     throw new Error(`Unsupported dependence type: ${dependence}`);

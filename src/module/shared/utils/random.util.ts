@@ -49,7 +49,7 @@ export function getArrayWithRandomNumber(
     while (result.length < length) {
         const randomNumber: number = getRandomNumber(max, min);
 
-        if (allowRepeat ?? !uniqueNumbers.has(randomNumber)) {
+        if (allowRepeat || !uniqueNumbers.has(randomNumber)) {
             result.push(randomNumber);
             uniqueNumbers.add(randomNumber);
         }

@@ -94,7 +94,7 @@ export class WatchClanModel {
             return;
         }
 
-        const added: boolean = await this.watchClans.addClan({ id: id, name: name });
+        const added: boolean = await this.watchClans.addClan({ id, name });
 
         if (!added) {
             this.logger.warn('An error occur during adding clan to the database');
@@ -266,7 +266,7 @@ export class WatchClanModel {
 
         const added: boolean = await this.blacklistedPlayers.addPlayer({
             id: Number(id),
-            name: name,
+            name,
             reason: reason ?? this.defaultReason,
         });
 
@@ -456,7 +456,7 @@ export class WatchClanModel {
         await interaction.respond(
             (await this.watchClans.selectClan(sanitize(idOrName).toUpperCase()))
                 .map((clan: Clan): { name: string; value: string } => ({
-                    name: `${clan.name} | ${clan.id}`,
+                    name: clan.name,
                     value: String(clan.id),
                 }))
                 .slice(0, 24)

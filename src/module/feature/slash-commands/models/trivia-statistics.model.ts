@@ -98,7 +98,7 @@ export class TriviaStatisticsModel extends TriviaExampleModel {
                 const date = new Date(i.values[0]);
 
                 const stats: TriviaAnswer[] = await this.playerAnswerTable.getPeriodAnswerOfPlayer(player.id, date);
-                const winStreak: WinStreak = await this.winStreakTable.getWinStreakFromDate(player.id, date);
+                const winStreak: WinStreak | undefined = await this.winStreakTable.getWinStreakFromDate(player.id, date);
 
                 const embed = new EmbedBuilder()
                     .setTitle(
@@ -116,7 +116,7 @@ export class TriviaStatisticsModel extends TriviaExampleModel {
                             value: `\`${stats.reduce((number: number, { right_answer }) => number + (right_answer ? 1 : 0), 0)}\``,
                             inline: true,
                         },
-                        { name: 'Plus longue séquence correcte', value: `\`${winStreak.max}\`` },
+                        { name: 'Plus longue séquence correcte', value: `\`${winStreak?.max}\`` },
                         {
                             name: 'Réponse la plus rapide',
                             value: `\`${Math.min(...stats.filter(({ answer_time }): boolean => answer_time !== null).flatMap(({ answer_time }): number => answer_time!)) / TimeEnum.SECONDE}\` sec`,

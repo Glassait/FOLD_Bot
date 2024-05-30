@@ -55,7 +55,7 @@ export class DatabaseSingleton {
      */
     public async query(sql: string): Promise<[QueryResult, FieldPacket[]]> {
         try {
-            const [rows, fields] = await this._pool.execute({ sql: sql });
+            const [rows, fields] = await this._pool.execute({ sql });
             return [rows, fields];
         } catch (error) {
             throw new Error(`Error executing SQL query`, { cause: error });
@@ -67,10 +67,10 @@ export class DatabaseSingleton {
      */
     private createPool(): void {
         this._pool = mysql.createPool({
-            user: user,
-            host: host,
-            database: database,
-            password: password,
+            user,
+            host,
+            database,
+            password,
             waitForConnections: true,
             connectionLimit: 10,
             maxIdle: 10,

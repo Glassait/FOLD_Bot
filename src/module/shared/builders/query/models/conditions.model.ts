@@ -68,7 +68,7 @@ export class Conditions {
             throw new Error('Verde length different of condition length (minus one)');
         }
 
-        this._where = { conditions: conditions };
+        this._where = { conditions };
 
         if (verdes) {
             this._where.verdes = verdes;

@@ -242,7 +242,7 @@ export class FoldRecruitmentModel {
         embed.addFields({
             name: this.mapText[type],
             value: transformToCode(
-                'Le joueur a fait moins de {} en {} au cours des 28 derniers jours (actuellement {})',
+                'Le joueur a fait moins de {} batailles en {} au cours des 28 derniers jours (actuellement {})',
                 limit,
                 this.mapText[type].toLowerCase(),
                 battlesCount ?? 0
@@ -338,7 +338,7 @@ export class FoldRecruitmentModel {
             .setColor(blacklisted ? Colors.Red : Colors.Blurple);
 
         const message: Message<true> = await this.channel.send({ embeds: [embedPlayer] });
-        this.datum.set(player.id, { message: message, playerName: player.name, isBlacklisted: !!blacklisted });
+        this.datum.set(player.id, { message, playerName: player.name, isBlacklisted: !!blacklisted });
     }
 
     /**
@@ -365,11 +365,11 @@ export class FoldRecruitmentModel {
             activity.accounts_ids.map(
                 (id: number): Players => ({
                     name: activity.accounts_info[String(id)].name,
-                    id: id,
+                    id,
                 })
             )
         );
 
-        return { datum: datum, extracted: extracted };
+        return { datum, extracted };
     }
 }

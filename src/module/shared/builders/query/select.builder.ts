@@ -40,12 +40,7 @@ export class SelectBuilder extends Conditions implements ComputeInterface, Colum
             throw new Error('Verde length different of condition length (minus one)');
         }
 
-        this._innerJoin = {
-            tableName: tableName,
-            condition: {
-                conditions: conditions,
-            },
-        };
+        this._innerJoin = { tableName, condition: { conditions } };
 
         if (verdes) {
             this._innerJoin.condition.verdes = verdes;

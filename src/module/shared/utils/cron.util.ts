@@ -23,7 +23,7 @@ export function createCron(cron: string, name: CronName, callback: () => void | 
         },
         start: true,
         timeZone: 'system',
-        runOnInit: runOnInit,
+        runOnInit,
         onComplete: (): void => {
             logger.info('The cron {} finish executing', name);
         },
