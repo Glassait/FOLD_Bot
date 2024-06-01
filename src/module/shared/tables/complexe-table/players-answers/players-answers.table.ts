@@ -77,7 +77,7 @@ export class PlayersAnswersTable extends TableAbstract {
             `right_answer = 1`,
             `trivia_id = ${triviaId}`,
             `YEAR(date) = ${today.getFullYear()}`,
-            `MONTH(date) = ${today.getMonth() + 1}`,
+            `MONTH(date) = ${today.getMonth() + (today.getDate() === 1 ? 0 : 1)}`,
             `(DAY(date) = ${today.getDate()} OR DAY(date) = ${getPreviousDayAsDate().getDate()})`,
         ];
         const verdes: Condition['verdes'] = ['AND', 'AND', 'AND', 'AND'];
