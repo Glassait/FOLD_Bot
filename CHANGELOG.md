@@ -24,7 +24,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.1.1] <span data-view-component="true" class="label pre-release">Pre-release</span>
+## [3.2.0] - Jun 01, 2024 <span data-view-component="true" class="label pre-release">Pre-release</span>
+
+### Fixed
+
+-   Pipeline to auto upgrade version
+-   Trivia result for yesterday when new month
+-   Trivia month not send
+
+## [3.1.1] - Jun 01, 2024 <span data-view-component="true" class="label latest">Latest</span>
 
 ### Changed
 
@@ -37,7 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 -   Real fix of counting game for trivia when player play after midnight
 
-## [3.1.0] - Mai 26, 2024 <span data-view-component="true" class="label latest">Latest</span>
+## [3.1.0] - Mai 26, 2024 
 
 ### Added
 
@@ -519,7 +527,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[3.1.1]: https://github.com/Glassait/FOLD_Bot/compare/v3.1.0-10...v3.1.1-0
+[3.2.0]: https://github.com/Glassait/FOLD_Bot/compare/v3.1.1-1...v3.2.0-1
+[3.1.1]: https://github.com/Glassait/FOLD_Bot/compare/v3.1.0-10...v3.1.1-1
 [3.1.0]: https://github.com/Glassait/FOLD_Bot/compare/v3.0.0-2...v3.1.0-10
 [3.0.0]: https://github.com/Glassait/FOLD_Bot/compare/v2.3.0-6...v3.0.0-2
 [2.3.0]: https://github.com/Glassait/FOLD_Bot/compare/v2.2.10-6...v2.3.0-5
