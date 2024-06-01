@@ -14,7 +14,7 @@ jobs:
       - name: Start
         run: |
           echo "The job_id is: $GITHUB_JOB"
-      - uses: ./.github/workflows/jobs/update-version.yml
+      - uses: ./.github/workflows/jobs/update-version
         with:
           version_type: prerelease
 
@@ -26,7 +26,7 @@ jobs:
       - name: Start
         run: |
           echo "The job_id is: $GITHUB_JOB"
-      - uses: ./.github/workflows/jobs/update-version.yml
+      - uses: ./.github/workflows/jobs/update-version
         with:
           version_type: prepatch
 
@@ -38,7 +38,7 @@ jobs:
       - name: Start
         run: |
           echo "The job_id is: $GITHUB_JOB"
-      - uses: ./.github/workflows/jobs/update-version.yml
+      - uses: ./.github/workflows/jobs/update-version
         with:
           version_type: preminor
 
@@ -50,6 +50,6 @@ jobs:
       - name: Start
         run: |
           echo "The job_id is: $GITHUB_JOB"
-      - uses: ./.github/workflows/jobs/update-version.yml
+      - uses: ./.github/workflows/jobs/update-version
         with:
           version_type: premajor
