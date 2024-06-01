@@ -9,8 +9,10 @@ jobs:
   release:
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.event.head_commit.message, 'release') }}
-    needs: update
     steps:
+      - name: Start
+        run: |
+          echo "The job_id is: $GITHUB_JOB"
       - uses: ./workflows/update-version.yml@v1  # Replace with your workflow file path and version
         with:
           version_type: prerelease
@@ -18,8 +20,10 @@ jobs:
   patch:
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.event.head_commit.message, 'patch') }}
-    needs: update
     steps:
+      - name: Start
+        run: |
+          echo "The job_id is: $GITHUB_JOB"
       - uses: ./workflows/update-version.yml@v1  # Replace with your workflow file path and version
         with:
           version_type: prepatch
@@ -27,8 +31,10 @@ jobs:
   minor:
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.event.head_commit.message, 'minor') }}
-    needs: update
     steps:
+      - name: Start
+        run: |
+          echo "The job_id is: $GITHUB_JOB"
       - uses: ./workflows/update-version.yml@v1  # Replace with your workflow file path and version
         with:
           version_type: preminor
@@ -36,8 +42,10 @@ jobs:
   major:
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.event.head_commit.message, 'major') }}
-    needs: update
     steps:
+      - name: Start
+        run: |
+          echo "The job_id is: $GITHUB_JOB"
       - uses: ./workflows/update-version.yml@v1  # Replace with your workflow file path and version
         with:
           version_type: premajor
