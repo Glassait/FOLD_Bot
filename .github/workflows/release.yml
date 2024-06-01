@@ -8,6 +8,8 @@ jobs:
     name: Update version with release (1.0.0-x)
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.event.head_commit.message, 'release') }}
+    env:
+      GIT_PUSH_URL: https://${{ github.actor }}@github.com/${{ github.repository }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -24,11 +26,15 @@ jobs:
           git config user.email 'github-actions[bot]@users.noreply.github.com'
       - name: Prerelease version
         run: npm version prerelease
+      - name: Push version
+        run: git push --tags $GIT_PUSH_URL main
 
   patch:
     name: Update version with patch (1.0.x-0)
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.event.head_commit.message, 'patch') }}
+    env:
+      GIT_PUSH_URL: https://${{ github.actor }}@github.com/${{ github.repository }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -45,11 +51,15 @@ jobs:
           git config user.email 'github-actions[bot]@users.noreply.github.com'
       - name: Patch version
         run: npm version prepatch
+      - name: Push version
+        run: git push --tags $GIT_PUSH_URL main
 
   minor:
     name: Update version with minor (1.x.0-0)
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.event.head_commit.message, 'minor') }}
+    env:
+      GIT_PUSH_URL: https://${{ github.actor }}@github.com/${{ github.repository }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -66,11 +76,15 @@ jobs:
           git config user.email 'github-actions[bot]@users.noreply.github.com'
       - name: Minor version
         run: npm version preminor
+      - name: Push version
+        run: git push --tags $GIT_PUSH_URL main
 
   major:
     name: Update version with major (x.0.0-0)
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.event.head_commit.message, 'major') }}
+    env:
+      GIT_PUSH_URL: https://${{ github.actor }}@github.com/${{ github.repository }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -87,26 +101,5 @@ jobs:
           git config user.email 'github-actions[bot]@users.noreply.github.com'
       - name: Major version
         run: npm version premajor
-
-  push:
-    name: Push the version
-    runs-on: ubuntu-latest
-    needs:
-      - release
-      - patch
-      - minor
-      - major
-    if: |
-      needs.release.result == 'success' ||
-      needs.patch.result == 'success' ||
-      needs.minor.result == 'success' ||
-      needs.major.result == 'success'
-    env:
-      GIT_PUSH_URL: https://${{ github.actor }}@github.com/${{ github.repository }}
-    steps:
-      - name: Setup Git
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email 'github-actions[bot]@users.noreply.github.com'
       - name: Push version
         run: git push --tags $GIT_PUSH_URL main
