@@ -24,7 +24,7 @@ module.exports = {
 
         const today: Date = new Date();
 
-        if (today.getDate() !== 28) {
+        if (today.getDate() !== 1) {
             return;
         }
 
