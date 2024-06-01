@@ -7,20 +7,25 @@ jobs:
   config:
     name: Configure action
     runs-on: ubuntu-latest
+    outputs:
+      workspace: ${{ steps.workspace.outputs.workspace }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: false
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18.X'
+      - name: Set project directory output
+        run: echo "PROJECT_DIR=$(pwd)" >> $GITHUB_ENV
       - name: Setup Git
         run: |
-          git config user.name '${{ secrets.MAINTAINER_NAME }}'
-          git config user.email '${{ secrets.MAINTAINER_EMAIL }}'
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+
   release:
     name: Update version with release (1.0.0-x)
     runs-on: ubuntu-latest
@@ -29,9 +34,9 @@ jobs:
       - config
     steps:
       - name: Prerelease version
+        working-directory: ${{ env.PROJECT_DIR }}
         run: npm version prerelease
-      - name: Push version
-        run: git push --tags https://${{ secrets.TOKEN }}@github.com/${{ github.repository }} main
+
   patch:
     name: Update version with patch (1.0.x-0)
     runs-on: ubuntu-latest
@@ -40,9 +45,9 @@ jobs:
       - config
     steps:
       - name: Patch version
+        working-directory: ${{ env.PROJECT_DIR }}
         run: npm version prepatch
-      - name: Push version
-        run: git push --tags https://${{ secrets.TOKEN }}@github.com/${{ github.repository }} main
+
   minor:
     name: Update version with minor (1.x.0-0)
     runs-on: ubuntu-latest
@@ -51,9 +56,9 @@ jobs:
       - config
     steps:
       - name: Minor version
+        working-directory: ${{ env.PROJECT_DIR }}
         run: npm version preminor
-      - name: Push version
-        run: git push --tags https://${{ secrets.TOKEN }}@github.com/${{ github.repository }} main
+
   major:
     name: Update version with major (x.0.0-0)
     runs-on: ubuntu-latest
@@ -63,5 +68,17 @@ jobs:
     steps:
       - name: Major version
         run: npm version premajor
+
+  push:
+    name: Push the version
+    runs-on: ubuntu-latest
+    needs:
+      - release
+      - patch
+      - minor
+      - major
+    env:
+      GIT_PUSH_URL: https://${{ github.actor }}@github.com/${{ github.repository }
+    steps:
       - name: Push version
-        run: git push --tags https://${{ secrets.TOKEN }}@github.com/${{ github.repository }} main
+        run: git push --tags $GIT_PUSH_URL main
