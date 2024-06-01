@@ -2,7 +2,9 @@ on:
   push:
     branches:
       - main
+
 name: Update package version
+
 jobs:
   release:
     name: Update version with release (1.0.0-x)
