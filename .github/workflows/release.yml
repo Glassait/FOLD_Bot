@@ -2,66 +2,106 @@ on:
   push:
     branches:
       - main
+
 name: Update package version
+
 jobs:
-  config:
-    name: Configure action
+  release:
+    name: Update version with release (1.0.0-x)
     runs-on: ubuntu-latest
+    if: ${{ startsWith(github.event.head_commit.message, 'release') }}
+    env:
+      GIT_PUSH_URL: https://${{ secrets.TOKEN }}@github.com/${{ github.repository }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: false
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18.X'
       - name: Setup Git
         run: |
-          git config user.name '${{ secrets.MAINTAINER_NAME }}'
-          git config user.email '${{ secrets.MAINTAINER_EMAIL }}'
-  release:
-    name: Update version with release (1.0.0-x)
-    runs-on: ubuntu-latest
-    if: ${{ contains(github.event.head_commit.message, 'release') }}
-    needs:
-      - config
-    steps:
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
       - name: Prerelease version
         run: npm version prerelease
       - name: Push version
-        run: git push --tags https://${{ secrets.TOKEN }}@github.com/${{ github.repository }} main
+        run: git push --tags $GIT_PUSH_URL main
+
   patch:
     name: Update version with patch (1.0.x-0)
     runs-on: ubuntu-latest
-    if: ${{ contains(github.event.head_commit.message, 'patch') }}
-    needs:
-      - config
+    if: ${{ startsWith(github.event.head_commit.message, 'patch') }}
+    env:
+      GIT_PUSH_URL: https://${{ secrets.TOKEN }}@github.com/${{ github.repository }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.X'
+      - name: Setup Git
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
       - name: Patch version
         run: npm version prepatch
       - name: Push version
-        run: git push --tags https://${{ secrets.TOKEN }}@github.com/${{ github.repository }} main
+        run: git push --tags $GIT_PUSH_URL main
+
   minor:
     name: Update version with minor (1.x.0-0)
     runs-on: ubuntu-latest
-    if: ${{ contains(github.event.head_commit.message, 'minor') }}
-    needs:
-      - config
+    if: ${{ startsWith(github.event.head_commit.message, 'minor') }}
+    env:
+      GIT_PUSH_URL: https://${{ secrets.TOKEN }}@github.com/${{ github.repository }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.X'
+      - name: Setup Git
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
       - name: Minor version
         run: npm version preminor
       - name: Push version
-        run: git push --tags https://${{ secrets.TOKEN }}@github.com/${{ github.repository }} main
+        run: git push --tags $GIT_PUSH_URL main
+
   major:
     name: Update version with major (x.0.0-0)
     runs-on: ubuntu-latest
-    if: ${{ contains(github.event.head_commit.message, 'major') }}
-    needs:
-      - config
+    if: ${{ startsWith(github.event.head_commit.message, 'major') }}
+    env:
+      GIT_PUSH_URL: https://${{ secrets.TOKEN }}@github.com/${{ github.repository }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.X'
+      - name: Setup Git
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
       - name: Major version
         run: npm version premajor
       - name: Push version
-        run: git push --tags https://${{ secrets.TOKEN }}@github.com/${{ github.repository }} main
+        run: git push --tags $GIT_PUSH_URL main
