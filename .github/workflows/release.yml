@@ -96,6 +96,11 @@ jobs:
       - patch
       - minor
       - major
+    if: |
+      needs.release.result == 'success' ||
+      needs.patch.result == 'success' ||
+      needs.minor.result == 'success' ||
+      needs.major.result == 'success'
     env:
       GIT_PUSH_URL: https://${{ github.actor }}@github.com/${{ github.repository }}
     steps:
