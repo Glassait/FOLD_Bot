@@ -4,10 +4,21 @@ on:
       - main
 name: Update package version
 jobs:
+  config:
+    name: Configure action
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Git
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+
   release:
     name: Update version with release (1.0.0-x)
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.event.head_commit.message, 'release') }}
+    needs:
+      - config
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -25,6 +36,8 @@ jobs:
     name: Update version with patch (1.0.x-0)
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.event.head_commit.message, 'patch') }}
+    needs:
+      - config
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -42,6 +55,8 @@ jobs:
     name: Update version with minor (1.x.0-0)
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.event.head_commit.message, 'minor') }}
+    needs:
+      - config
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -59,6 +74,8 @@ jobs:
     name: Update version with major (x.0.0-0)
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.event.head_commit.message, 'major') }}
+    needs:
+      - config
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -83,9 +100,5 @@ jobs:
     env:
       GIT_PUSH_URL: https://${{ github.actor }}@github.com/${{ github.repository }}
     steps:
-      - name: Setup Git
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email 'github-actions[bot]@users.noreply.github.com'
       - name: Push version
         run: git push --tags $GIT_PUSH_URL main
