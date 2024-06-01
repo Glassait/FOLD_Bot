@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.event.head_commit.message, 'release') }}
     steps:
+      - uses: actions/checkout@v4
       - name: Start
         run: |
           echo "The job_id is: $GITHUB_JOB"
@@ -21,6 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.event.head_commit.message, 'patch') }}
     steps:
+      - uses: actions/checkout@v4
       - name: Start
         run: |
           echo "The job_id is: $GITHUB_JOB"
@@ -32,6 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.event.head_commit.message, 'minor') }}
     steps:
+      - uses: actions/checkout@v4
       - name: Start
         run: |
           echo "The job_id is: $GITHUB_JOB"
@@ -43,6 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.event.head_commit.message, 'major') }}
     steps:
+      - uses: actions/checkout@v4
       - name: Start
         run: |
           echo "The job_id is: $GITHUB_JOB"
