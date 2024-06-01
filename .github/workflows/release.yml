@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.event.head_commit.message, 'release') }}
     env:
-      GIT_PUSH_URL: https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+      GIT_PUSH_URL: https://${{ secrets.TOKEN }}@github.com/${{ github.repository }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -34,10 +34,11 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.event.head_commit.message, 'patch') }}
     env:
-      GIT_PUSH_URL: https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+      GIT_PUSH_URL: https://${{ secrets.TOKEN }}@github.com/${{ github.repository }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        run: git push --tags https://${{ secrets.TOKEN }}@github.com/${{ github.repository }} main
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -59,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.event.head_commit.message, 'minor') }}
     env:
-      GIT_PUSH_URL: https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+      GIT_PUSH_URL: https://${{ secrets.TOKEN }}@github.com/${{ github.repository }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -84,7 +85,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.event.head_commit.message, 'major') }}
     env:
-      GIT_PUSH_URL: https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+      GIT_PUSH_URL: https://${{ secrets.TOKEN }}@github.com/${{ github.repository }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
