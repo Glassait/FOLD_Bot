@@ -78,7 +78,7 @@ jobs:
       - minor
       - major
     env:
-      GIT_PUSH_URL: https://${{ github.actor }}@github.com/${{ github.repository }
+      GIT_PUSH_URL: https://${{ github.actor }}@github.com/${{ github.repository }}
     steps:
       - name: Push version
         run: git push --tags $GIT_PUSH_URL main
