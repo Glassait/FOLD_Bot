@@ -1,6 +1,7 @@
 import { TableAbstract } from '../../abstracts/table.abstract';
 import { SelectBuilder } from '../../builders/query/select.builder';
 import { LoggerInjector } from '../../decorators/injector/logger-injector.decorator';
+import { WargamingBattleType } from '../../apis/wargaming/models/wargaming.type';
 
 /**
  * Represents a table for storing information related to Fold Recruitment.
@@ -51,11 +52,11 @@ export class FoldRecruitmentTable extends TableAbstract {
     /**
      * Get the minimum limit of battles based on the type.
      *
-     * @param {'random' | 'fort_battles' | 'fort_sorties'} type - The type of battles.
+     * @param {WargamingBattleType} type - The type of battles.
      *
      * @returns {Promise<number>} - Returns the minimum limit of battles for the given type.
      */
-    public async getLimitByType(type: 'random' | 'fort_battles' | 'fort_sorties'): Promise<number> {
+    public async getLimitByType(type: WargamingBattleType): Promise<number> {
         switch (type) {
             case 'random':
                 return this.getMinRandom28();
