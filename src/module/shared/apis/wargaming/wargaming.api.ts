@@ -59,9 +59,9 @@ export class WargamingApi extends ApiBase {
      * @returns {Promise<WargamingPlayers>} - A promise that resolves to a WargamingPlayers object containing the players' information.
      */
     public async players(clanId: number, battleType: WargamingBattleType, timeframe: WargamingTimeframe): Promise<WargamingPlayers> {
-        const url: URL = this.createUrl(`/clans/wot/${clanId}/api/players/?limit=100&offset=0`);
+        const url: URL = this.createUrl(`/clans/wot/${clanId}/api/players/?limit=100&offset=0&order=-role`);
         this.addSearchParam(url, 'battle_type', battleType);
         this.addSearchParam(url, 'timeframe', timeframe);
-        return await this.getData(url);
+        return await this.getData(url, { 'x-requested-with': 'XMLHttpRequest' });
     }
 }

@@ -4,7 +4,7 @@
  * - fort_battles = incursions
  * - fort_sorties = escarmouches
  */
-export type WargamingBattleType = 'random' | 'fort_battles' | 'fort_sorties';
+export type WargamingBattleType = 'random' | 'fort_battles' | 'fort_sorties' | 'global_map';
 
 /**
  * Represent all the time frame where player statistics are available
@@ -323,7 +323,7 @@ export type WargamingPlayers = {
      * The status of the response.
      * Typically 'ok' if the request was successful.
      */
-    status: 'ok';
+    status: string;
     /**
      * The list of players.
      */

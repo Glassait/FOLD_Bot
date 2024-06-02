@@ -43,13 +43,14 @@ export class ApiBase {
      * Makes a GET request to the given URL and returns the response data.
      *
      * @param {string | URL} url - The URL to make the GET request to.
+     * @param {object} headers - The http(s) header to add to the request
      *
      * @returns {Promise<GData>} - A promise that resolves to the response data.
      *
      * @template GData - The data get from the call
      */
-    protected async getData<GData>(url: string | URL): Promise<GData> {
+    protected async getData<GData>(url: string | URL, headers?: object): Promise<GData> {
         this.logger.debug('HTTP(S) call to {}', url);
-        return (await this.axios.get(url.toString(), { responseType: 'json' })).data as GData;
+        return (await this.axios.get(url.toString(), { responseType: 'json', headers })).data as GData;
     }
 }
