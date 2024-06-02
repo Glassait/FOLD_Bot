@@ -1,3 +1,16 @@
+/**
+ * Represent all the type of battles where player statistics are available
+ * - random = battailes aléatoires
+ * - fort_battles = incursions
+ * - fort_sorties = escarmouches
+ */
+export type WargamingBattleType = 'random' | 'fort_battles' | 'fort_sorties';
+
+/**
+ * Represent all the time frame where player statistics are available
+ */
+export type WargamingTimeframe = 28 | 'all';
+
 //region NEWSFEED
 /**
  * The common part of the activity type
@@ -95,6 +108,7 @@ export type WargamingNewsfeed = {
 };
 //endregion
 
+//region ACCOUNTS
 /**
  * Represents a Wargaming account with various statistical fields and clan information.
  */
@@ -205,3 +219,127 @@ export type WargamingAccounts = {
      */
     accounts: WargamingAccount[];
 };
+//endregion
+
+//region PLAYERS
+/**
+ * Represents a role in the Wargaming context.
+ */
+export type WargamingRole = {
+    /**
+     * The localized name of the role.
+     */
+    localized_name: string;
+    /**
+     * The name of the role.
+     */
+    name: string;
+    /**
+     * The rank of the role.
+     */
+    rank: number;
+    /**
+     * The order of the role.
+     */
+    order: number;
+};
+
+/**
+ * Represents a player in the Wargaming context.
+ */
+export type WargamingPlayer = {
+    /**
+     * The number of days the player has been in the clan.
+     */
+    days_in_clan: number;
+    /**
+     * The timestamp of the player's last battle.
+     */
+    last_battle_time: number;
+    /**
+     * The average number of battles per day the player participates in.
+     */
+    battles_per_day: number;
+    /**
+     * The personal rating of the player.
+     */
+    personal_rating: number;
+    /**
+     * The average experience points per battle.
+     */
+    exp_per_battle: number;
+    /**
+     * The average damage per battle.
+     */
+    damage_per_battle: number;
+    /**
+     * The online status of the player.
+     * Can be true (online), false (offline), or null (unknown).
+     */
+    online_status: boolean | null;
+    /**
+     * The average number of frags per battle.
+     */
+    frags_per_battle: number;
+    /**
+     * Indicates if the player is press.
+     */
+    is_press: boolean;
+    /**
+     * The win percentage of the player.
+     */
+    wins_percentage: number;
+    /**
+     * The role of the player.
+     */
+    role: WargamingRole;
+    /**
+     * Indicates if the player has abnormal results.
+     */
+    abnormal_results: boolean;
+    /**
+     * The total number of battles the player has participated in.
+     */
+    battles_count: number;
+    /**
+     * The unique identifier of the player.
+     */
+    id: number;
+    /**
+     * The profile link of the player.
+     */
+    profile_link: string;
+    /**
+     * The name of the player.
+     */
+    name: string;
+};
+
+/**
+ * Represents a collection of players in the Wargaming context.
+ */
+export type WargamingPlayers = {
+    /**
+     * The status of the response.
+     * Typically 'ok' if the request was successful.
+     */
+    status: 'ok';
+    /**
+     * The list of players.
+     */
+    items: WargamingPlayer[];
+    /**
+     * Indicates if the player's statistics are hidden.
+     */
+    is_hidden_statistics: boolean;
+    /**
+     * The clan statistics.
+     * Currently represented as an empty object, can be extended in the future.
+     */
+    clan_statistics: unknown;
+    /**
+     * The timestamp of the last update.
+     */
+    last_updated_at: string;
+};
+//endregion
