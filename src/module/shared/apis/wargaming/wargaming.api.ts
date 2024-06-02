@@ -1,6 +1,6 @@
 import { LoggerInjector } from '../../decorators/injector/logger-injector.decorator';
 import { ApiBase } from '../api.base';
-import type { WargamingAccounts, WargamingNewsfeed } from './models/wargaming.type';
+import { WargamingAccounts, WargamingBattleType, WargamingNewsfeed, WargamingPlayers, WargamingTimeframe } from './models/wargaming.type';
 
 /**
  * API client for interacting with Wargaming.net services.
@@ -30,26 +30,38 @@ export class WargamingApi extends ApiBase {
      *
      * @param {number} playerId - The ID of the player.
      * @param {string} playerName - The name of the player.
-     * @param {'random' | 'fort_battles' | 'fort_sorties'} type - The type of battles to filter.
-     * - random = battailes aléatoires
-     * - fort_battles = incursions
-     * - fort_sorties = escarmouches
-     *
-     * @param {28 | 'all'} timeframe - The timeframe for the battle data.
+     * @param {WargamingBattleType} battleType - The type of battles to filter the data.
+     * @param {WargamingTimeframe} timeframe - The timeframe to filter the battle data.
      *
      * @returns {Promise<WargamingAccounts>} - The account details of the player.
      */
     public async accounts(
         playerId: number,
         playerName: string,
-        type: 'random' | 'fort_battles' | 'fort_sorties',
-        timeframe: 28 | 'all'
+        battleType: WargamingBattleType,
+        timeframe: WargamingTimeframe
     ): Promise<WargamingAccounts> {
         const url: URL = this.createUrl('/clans/wot/search/api/accounts/?limit=10&offset=0');
         this.addSearchParam(url, 'search', playerName);
         this.addSearchParam(url, 'account_id', playerId);
-        this.addSearchParam(url, 'battle_type', type);
+        this.addSearchParam(url, 'battle_type', battleType);
         this.addSearchParam(url, 'timeframe', timeframe);
         return await this.getData(url);
+    }
+
+    /**
+     * Retrieves a list of players in a clan for a specific battle type and timeframe.
+     *
+     * @param {number} clanId - The unique identifier of the clan.
+     * @param {WargamingBattleType} battleType - The type of battles to filter the data.
+     * @param {WargamingTimeframe} timeframe - The timeframe to filter the battle data.
+     *
+     * @returns {Promise<WargamingPlayers>} - A promise that resolves to a WargamingPlayers object containing the players' information.
+     */
+    public async players(clanId: number, battleType: WargamingBattleType, timeframe: WargamingTimeframe): Promise<WargamingPlayers> {
+        const url: URL = this.createUrl(`/clans/wot/${clanId}/api/players/?limit=100&offset=0&order=-role`);
+        this.addSearchParam(url, 'battle_type', battleType);
+        this.addSearchParam(url, 'timeframe', timeframe);
+        return await this.getData(url, { 'x-requested-with': 'XMLHttpRequest' });
     }
 }

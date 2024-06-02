@@ -6,6 +6,7 @@ import type {
     LeaveClanActivity,
     Players,
     WargamingAccounts,
+    WargamingBattleType,
     WargamingNewsfeed,
 } from '../../../shared/apis/wargaming/models/wargaming.type';
 import type { WargamingApi } from '../../../shared/apis/wargaming/wargaming.api';
@@ -67,10 +68,11 @@ export class FoldRecruitmentModel {
     /**
      * Map the types of battles with the corresponding title of embed field
      */
-    private readonly mapText = {
+    private readonly mapText: Record<WargamingBattleType, string> = {
         random: 'Batailles aléatoires',
         fort_battles: 'Incursions',
         fort_sorties: 'Escarmouches',
+        global_map: 'Clan Wars',
     };
     //endregion
 
@@ -229,7 +231,7 @@ export class FoldRecruitmentModel {
         embed: EmbedBuilder,
         playerId: number,
         playerName: string,
-        type: 'random' | 'fort_battles' | 'fort_sorties'
+        type: WargamingBattleType
     ): Promise<[boolean, boolean]> {
         const accounts: WargamingAccounts = await this.wargamingApi.accounts(playerId, playerName, type, 28);
         const limit = await this.foldRecruitmentTable.getLimitByType(type);
@@ -291,7 +293,7 @@ export class FoldRecruitmentModel {
                 return;
             }
         } catch (reason) {
-            this.logger.warn('', reason);
+            this.logger.warn(reason as string);
         }
 
         this._noPlayerMeetCriteria = false;

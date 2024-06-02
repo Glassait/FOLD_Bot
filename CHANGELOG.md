@@ -26,6 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.2.0] - Jun 01, 2024 <span data-view-component="true" class="label pre-release">Pre-release</span>
 
+### Added
+
+-   Slash-command to get all clan players activity that under a given number of battle
+
 ### Fixed
 
 -   Pipeline to auto upgrade version
@@ -45,7 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 -   Real fix of counting game for trivia when player play after midnight
 
-## [3.1.0] - Mai 26, 2024 
+## [3.1.0] - Mai 26, 2024
 
 ### Added
 
@@ -527,7 +531,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[3.2.0]: https://github.com/Glassait/FOLD_Bot/compare/v3.1.1-1...v3.2.0-1
+[3.2.0]: https://github.com/Glassait/FOLD_Bot/compare/v3.1.1-1...v3.2.0-2
 [3.1.1]: https://github.com/Glassait/FOLD_Bot/compare/v3.1.0-10...v3.1.1-1
 [3.1.0]: https://github.com/Glassait/FOLD_Bot/compare/v3.0.0-2...v3.1.0-10
 [3.0.0]: https://github.com/Glassait/FOLD_Bot/compare/v2.3.0-6...v3.0.0-2
