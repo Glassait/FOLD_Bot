@@ -58,6 +58,15 @@ export class FoldRecruitmentModel {
         .setTitle("Le recrutement n'a trouvé aucun joueur satisfaisant les conditions requises.");
 
     /**
+     * Embed for the message indicating that all calls to api failed.
+     */
+    private readonly embedOnlyError: EmbedBuilder = new EmbedBuilder()
+        .setColor(Colors.DarkRed)
+        .setTitle(
+            'Le recrutement a échoué en raison de plusieurs problèmes, souvent des boucles de timeouts. Nous nous excusons pour la gêne occasionnée.'
+        );
+
+    /**
      * A map storing data where each key is the id of the player and each value is an object containing the recruitment message and the player name.
      */
     private readonly datum: Map<number, { message: Message<true>; playerName: string; isBlacklisted: boolean }> = new Map<
@@ -93,6 +102,11 @@ export class FoldRecruitmentModel {
     private _noPlayerMeetCriteria: boolean;
 
     /**
+     * Indicates that all calls to wargaming api failed
+     */
+    private _onlyError: boolean;
+
+    /**
      * The minimal wn8 for the fold recruitment
      */
     private minWn8: number;
@@ -109,16 +123,12 @@ export class FoldRecruitmentModel {
         return this._noPlayerFound;
     }
 
-    public set noPlayerFound(bool: boolean) {
-        this._noPlayerFound = bool;
-    }
-
-    public set noPlayerMeetCriteria(bool: boolean) {
-        this._noPlayerMeetCriteria = bool;
-    }
-
     public get noPlayerMeetCriteria(): boolean {
         return this._noPlayerMeetCriteria;
+    }
+
+    public get onlyError(): boolean {
+        return this._onlyError;
     }
     //endregion
 
@@ -134,6 +144,17 @@ export class FoldRecruitmentModel {
 
         this.minWn8 = await this.foldRecruitmentTable.getMinWn8();
         this.minBattles = await this.foldRecruitmentTable.getMinBattles();
+    }
+
+    /**
+     * Reset the context of the class for starting a new loop
+     */
+    public reset(): void {
+        this.datum.clear();
+
+        this._noPlayerMeetCriteria = true;
+        this._noPlayerFound = true;
+        this._onlyError = true;
     }
 
     /**
@@ -155,7 +176,10 @@ export class FoldRecruitmentModel {
             await this.manageClanActivities(clan, await this.wargamingApi.clansNewsfeed(clan.id));
         } catch (error) {
             this.logger.error('An error occurred while fetching the activity of the clan', error);
+            return;
         }
+
+        this._onlyError = false;
     }
 
     /**
@@ -169,18 +193,17 @@ export class FoldRecruitmentModel {
     /**
      * Sends a message to the fold recruitment channel indicating that no player meets the criteria.
      */
-    public async sendMessageNoPlayerMeetCriteria() {
+    public async sendMessageNoPlayerMeetCriteria(): Promise<void> {
         this.logger.info('No player meet the clan criteria during the fold recruitment !');
         await this.channel.send({ embeds: [this.embedNoPlayerMeetCriteria] });
     }
 
     /**
-     * Clears the data stored in the `datum` property.
-     *
-     * This method removes all elements from the `datum` collection, leaving it empty.
+     * Sends a message to the fold recruitment channel indicating that all api calls failed.
      */
-    public clearDatum(): void {
-        this.datum.clear();
+    public async sendMessageOnlyError(): Promise<void> {
+        this.logger.warn('All calls to api failed !');
+        await this.channel.send({ embeds: [this.embedOnlyError] });
     }
 
     /**
@@ -293,7 +316,7 @@ export class FoldRecruitmentModel {
                 return;
             }
         } catch (reason) {
-            this.logger.warn(reason as string);
+            this.logger.error('', reason);
         }
 
         this._noPlayerMeetCriteria = false;
