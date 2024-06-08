@@ -5,10 +5,11 @@ import { createCron } from '../../shared/utils/cron.util';
 import { Logger } from '../../shared/utils/logger';
 import { DetectedClanModel } from './models/detected-clan.model';
 import type { BotLoop } from './types/bot-loop.type';
+import { Client } from 'discord.js';
 
 module.exports = {
     name: 'detected-clan',
-    execute: async (): Promise<void> => {
+    execute: async (client: Client): Promise<void> => {
         const logger: Logger = new Logger(basename(__filename));
         const featureFlippingTable: FeatureFlippingTable = new FeatureFlippingTable();
 
@@ -20,8 +21,11 @@ module.exports = {
         const cronsTable: CronsTable = new CronsTable();
         const detectedClanModel: DetectedClanModel = new DetectedClanModel();
 
+        await detectedClanModel.initialize(client);
+
         createCron(await cronsTable.getCron('detected-clan'), 'detected-clan', async (): Promise<void> => {
             await detectedClanModel.searchClanFromLeavingPlayer();
+            await detectedClanModel.sendMessageClanDetectedReady();
         });
     },
 } as BotLoop;

@@ -22,7 +22,13 @@ module.exports = async (): Promise<void> => {
 
         const command: SlashCommandModel = require(`${slashCommandsDir}/${file}`) as SlashCommandModel;
 
-        (await commandsTable.getCommand(command.name as CommandName)).forEach((serverId: string): void => {
+        const servers = await commandsTable.getCommand(command.name as CommandName);
+
+        if (!servers[0]) {
+            continue;
+        }
+
+        servers.forEach((serverId: string): void => {
             const guild: RESTPostAPIChatInputApplicationCommandsJSONBody[] = body[serverId] ?? [];
             guild.push(command.data.toJSON());
             body[serverId] = guild;
