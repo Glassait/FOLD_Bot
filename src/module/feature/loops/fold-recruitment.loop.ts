@@ -48,6 +48,7 @@ module.exports = {
                 await recruitmentModel.sendMessageNoPlayerMeetCriteria();
             } else {
                 await recruitmentModel.checkPlayerActivity();
+                await recruitmentModel.sendListIgnoredPlayer();
             }
         });
     },
