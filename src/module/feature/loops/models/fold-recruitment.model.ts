@@ -67,7 +67,7 @@ export class FoldRecruitmentModel {
         );
 
     /**
-     * Embed for the message indicating that all calls to api failed.
+     * Embed for the message indicating that not players have been ignored during the recruitment process.
      */
     private readonly embedNoPlayerIgnored: EmbedBuilder = new EmbedBuilder()
         .setColor(Colors.Blurple)
