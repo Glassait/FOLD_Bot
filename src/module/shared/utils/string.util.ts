@@ -22,6 +22,10 @@
  * console.log(StringUtil.transformToCode(text)); // ERROR: Mismatch between the number of placeholders and the number of code snippets provided.
  */
 export function transformToCode(text: string, ...args: any[]): string {
+    if (!args.length) {
+        return text;
+    }
+
     if ((text.match(/{}/g) ?? []).length !== args.length) {
         throw new Error('Mismatch between the number of placeholders and the number of code snippets provided.');
     }
