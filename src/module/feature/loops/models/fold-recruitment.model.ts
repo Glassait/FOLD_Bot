@@ -67,6 +67,13 @@ export class FoldRecruitmentModel {
         );
 
     /**
+     * Embed for the message indicating that all calls to api failed.
+     */
+    private readonly embedNoPlayerIgnored: EmbedBuilder = new EmbedBuilder()
+        .setColor(Colors.Blurple)
+        .setTitle("Aucun joueur n'a été ignoré pendant le recrutement.");
+
+    /**
      * A map storing data where each key is the id of the player and each value is an object containing the recruitment message and the player name.
      */
     private readonly datum: Map<number, { message: Message<true>; playerName: string; isBlacklisted: boolean }> = new Map<
@@ -116,6 +123,10 @@ export class FoldRecruitmentModel {
      */
     private minBattles: number;
 
+    /**
+     * The list of player that doesn't meet the criteria or there activity is low
+     */
+    private listPlayerIgnored: string[];
     //endregion
 
     //region GETTER
@@ -155,6 +166,7 @@ export class FoldRecruitmentModel {
         this._noPlayerMeetCriteria = true;
         this._noPlayerFound = true;
         this._onlyError = true;
+        this.listPlayerIgnored = [];
     }
 
     /**
@@ -207,6 +219,30 @@ export class FoldRecruitmentModel {
     }
 
     /**
+     * Send a message to the fold recruitment channel to indicated the player that have been ignored.
+     */
+    public async sendListIgnoredPlayer(): Promise<void> {
+        if (!this.listPlayerIgnored.length) {
+            this.logger.info('No players ignored during the fold recruitment !');
+            await this.channel.send({ embeds: [this.embedNoPlayerIgnored] });
+        }
+
+        this.logger.info('There are {} players ignored', this.listPlayerIgnored.length);
+
+        const embed = new EmbedBuilder().setColor(Colors.Blue).setTitle('Liste des joueurs ignorés');
+
+        for (let i = 0; i < (this.listPlayerIgnored.length - 1) / 10; i++) {
+            embed.addFields({
+                name: transformToCode('Page n°{}', i + 1),
+                value: '- ' + this.listPlayerIgnored.slice(i * 10, (i + 1) * 10).join(';\n- ') + ';',
+                inline: true,
+            });
+        }
+
+        await this.channel.send({ embeds: [embed] });
+    }
+
+    /**
      * Check the player activity on the 3 types of battles : random, fort_sorties, fort_battles
      */
     public async checkPlayerActivity(): Promise<void> {
@@ -233,6 +269,7 @@ export class FoldRecruitmentModel {
             );
 
             if (has0Random && has0FortSorties && has0FortBattles) {
+                this.listPlayerIgnored.push(data.playerName);
                 await data.message.delete();
             } else if (isUnderActivityFortBattles || isUnderActivityFortSorties || isUnderActivityRandom) {
                 await data.message.edit({ embeds: [messageEmbed] });
@@ -313,6 +350,7 @@ export class FoldRecruitmentModel {
 
             if (tomatoOverall.data.overallWN8 < this.minWn8 || tomatoOverall.data.battles < this.minBattles) {
                 this.logger.info("The following player {} doesn't meet critéria", player.name);
+                this.listPlayerIgnored.push(player.name);
                 return;
             }
         } catch (reason) {
