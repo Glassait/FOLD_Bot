@@ -1,5 +1,5 @@
-import type { ChatInputCommandInteraction, Client, CommandInteractionOption, Guild, GuildMember, TextChannel } from 'discord.js';
-import type { Channel } from '../tables/complexe-table/channels/models/channels.type';
+import type { Channel, ChatInputCommandInteraction, Client, CommandInteractionOption, Guild, GuildMember } from 'discord.js';
+import type { Channel as ChannelType } from '../tables/complexe-table/channels/models/channels.type';
 
 /**
  * Retrieves the guild member from the provided interaction option.
@@ -50,16 +50,18 @@ export async function getGuildMemberFromInteraction(
  * Get the text channel from the cache and if is not loaded, fetch it from the guild manager
  *
  * @param {Client} client - The Discord client instance.
- * @param {Channel} channel - The channel to fetch from the client.
+ * @param {ChannelType} channel - The channel to fetch from the client.
  *
- * @returns {TextChannel} - The Discord text channel.
+ * @returns {GChannel} - The Discord channel instance.
+ *
+ * @template GChannel - The type of channel fetch
  */
-export async function fetchChannelFromClient(client: Client, channel: Channel): Promise<TextChannel> {
-    const chan: TextChannel | undefined = client.channels.cache.get(channel.channel_id) as TextChannel | undefined;
+export async function fetchChannelFromClient<GChannel extends Channel>(client: Client, channel: ChannelType): Promise<GChannel> {
+    const chan: GChannel | undefined = client.channels.cache.get(channel.channel_id) as GChannel | undefined;
 
     if (!chan) {
         const g: Guild = await client.guilds.fetch(channel.guild_id);
-        return (await g.channels.fetch(channel.channel_id)) as TextChannel;
+        return (await g.channels.fetch(channel.channel_id)) as GChannel;
     }
 
     return chan;
