@@ -1,9 +1,8 @@
 import { Table } from '../../../shared/decorators/injector/table-injector.decorator';
 import { ChannelsTable } from '../../../shared/tables/complexe-table/channels/channels.table';
-import { Client, Embed, EmbedBuilder, ForumChannel, GuildForumTag, GuildForumTagData, Message, Snowflake } from 'discord.js';
+import { Client, Embed, EmbedBuilder, ForumChannel, Message, Snowflake } from 'discord.js';
 import { fetchChannelFromClient } from '../../../shared/utils/user.util';
 import { isDev } from '../../../shared/utils/env.util';
-import { WotNewsTags } from '../enums/forum-tag.enum';
 
 export class WotNewsForumModel {
     @Table('Channels') private readonly channelsTable: ChannelsTable;
@@ -20,6 +19,8 @@ export class WotNewsForumModel {
 
     private channel: ForumChannel;
 
+    private noTagId: Snowflake;
+
     constructor(client: Client) {
         if (!isDev()) {
             return;
@@ -32,6 +33,7 @@ export class WotNewsForumModel {
 
     public async initialize(client: Client): Promise<void> {
         this.channel = await fetchChannelFromClient(client, await this.channelsTable.getWotNews());
+        this.noTagId = this.channel.availableTags.find(({ name }): boolean => name.toLowerCase() === 'Autres nouveautés'.toLowerCase())!.id;
     }
 
     public async crosspostMessage(message: Message): Promise<void> {
@@ -39,38 +41,25 @@ export class WotNewsForumModel {
             await this.channel.threads.create({
                 name: 'Code bonus',
                 message: { content: message.content },
-                appliedTags: [await this.manageTag('code')],
+                appliedTags: [this.noTagId],
             });
 
             return;
         }
 
         const embed: Embed = message.embeds.shift()!;
+        const tags = this.channel.availableTags
+            .filter(({ name }): boolean => embed.title!.toLowerCase().includes(name.toLowerCase()))
+            .map(({ id }) => id);
+
+        if (!tags.length) {
+            tags.push(this.noTagId);
+        }
+
         await this.channel.threads.create({
             name: embed.title!,
             message: { embeds: [new EmbedBuilder(embed.data)] },
-            appliedTags: [await this.manageTag(embed.title!)],
+            appliedTags: tags,
         });
-    }
-
-    private async manageTag(title: string): Promise<Snowflake> {
-        title = title.toLowerCase();
-        let tag: [string, GuildForumTagData] | undefined = Object.entries(WotNewsTags).find(([key]) => title.includes(key.toLowerCase()));
-
-        if (!tag) {
-            tag = [WotNewsTags.NoTag.name, WotNewsTags.NoTag];
-        }
-
-        const tagExist: GuildForumTag | undefined = this.findTag(tag[0]);
-
-        if (!tagExist) {
-            await this.channel.edit({ availableTags: [...this.channel.availableTags, tag[1]] });
-        }
-
-        return this.findTag(tag[0])!.id;
-    }
-
-    private findTag(tag: string): GuildForumTag | undefined {
-        return this.channel.availableTags.find(({ name }): boolean => name.toLowerCase() === tag.toLowerCase());
     }
 }

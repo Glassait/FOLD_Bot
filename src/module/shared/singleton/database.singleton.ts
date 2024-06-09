@@ -1,6 +1,6 @@
 import mysql, { type FieldPacket, type Pool, type QueryResult } from 'mysql2/promise';
 import { basename } from 'node:path';
-import { database, host, password, user } from '../../core/config.dev.json';
+import { database, host, password, user } from '../../core/config.json';
 import { EmojiEnum } from '../enums/emoji.enum';
 import { Logger } from '../utils/logger';
 
