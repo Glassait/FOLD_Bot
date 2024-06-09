@@ -1,4 +1,4 @@
-import { application_id_wot } from '../../../core/config.json';
+import { application_id_wot } from '../../../core/config.dev.json';
 import { LoggerInjector } from '../../decorators/injector/logger-injector.decorator';
 import { ApiBase } from '../api.base';
 import type {

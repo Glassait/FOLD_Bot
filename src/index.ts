@@ -1,6 +1,6 @@
 import { Client, GatewayIntentBits } from 'discord.js';
 import { basename } from 'node:path';
-import { token } from './module/core/config.json';
+import { token } from './module/core/config.dev.json';
 import { isDev } from './module/shared/utils/env.util';
 import { Logger } from './module/shared/utils/logger';
 

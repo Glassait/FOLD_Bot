@@ -2,7 +2,7 @@ import { REST, type RESTPostAPIChatInputApplicationCommandsJSONBody, Routes, typ
 import { readdirSync } from 'fs';
 import { basename } from 'node:path';
 import { join } from 'path';
-import { client_id, token } from '../../core/config.json';
+import { client_id, token } from '../../core/config.dev.json';
 import { EmojiEnum } from '../../shared/enums/emoji.enum';
 import { CommandsTable } from '../../shared/tables/complexe-table/commands/commands.table';
 import type { CommandName } from '../../shared/tables/complexe-table/commands/models/commands.type';
