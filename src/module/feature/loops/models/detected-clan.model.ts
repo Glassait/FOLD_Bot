@@ -1,4 +1,4 @@
-import type { PlayerPersonalDataSuccess } from '../../../shared/apis/wot/models/wot-api.type';
+import type { PlayerPersonalDataDetail, PlayerPersonalDataSuccess } from '../../../shared/apis/wot/models/wot-api.type';
 import type { WotApi } from '../../../shared/apis/wot/wot.api';
 import { Api } from '../../../shared/decorators/injector/api-injector.decorator';
 import { LoggerInjector } from '../../../shared/decorators/injector/logger-injector.decorator';
@@ -43,16 +43,25 @@ export class DetectedClanModel {
     public async searchClanFromLeavingPlayer(): Promise<void> {
         this.logger.info('Starting fetching clan of leaving player');
 
-        for (const playerId of await this.leavingPlayers.getAll()) {
-            const result: PlayerPersonalDataSuccess = await this.wotApi.accountInfo(playerId.id);
-            const clanId = result.data[playerId.id].clan_id;
+        for (const player of await this.leavingPlayers.getAll()) {
+            const result: PlayerPersonalDataSuccess = await this.wotApi.accountInfo(player.id);
+
+            const datum: PlayerPersonalDataDetail | null = result.data[player.id];
+            if (!datum) {
+                this.logger.debug('Player account {} has been deleted !', player.id);
+                await this.leavingPlayers.deletePlayer(player.id);
+                continue;
+            }
+
+            const clanId = datum.clan_id;
             const clans: Clan[] = await this.watchClans.selectClan(String(clanId));
 
             if (clanId !== null && clanId !== 500312605 && clans.length === 0 && !(await this.potentialClans.clanExist(clanId))) {
+                this.logger.debug('Clan found from leaving player : {}', clanId);
                 await this.potentialClans.addClan(clanId);
                 this.numberOfClansDetected++;
             } else {
-                await this.leavingPlayers.deletePlayer(playerId.id);
+                await this.leavingPlayers.deletePlayer(player.id);
             }
         }
 

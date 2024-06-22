@@ -121,7 +121,7 @@ export type ClansDto = ClansError | ClansSuccess;
 //region PLAYER_PERSONAL_DTO
 export type PlayerPersonalDataDetail = { clan_id: number | null };
 
-export type PlayerPersonalData = Record<string, PlayerPersonalDataDetail>;
+export type PlayerPersonalData = Record<string, PlayerPersonalDataDetail | null>;
 
 export type PlayerPersonalDataSuccess = WargamingSuccessType<PlayerPersonalData>;
 
