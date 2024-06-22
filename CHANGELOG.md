@@ -41,6 +41,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   Breaking recruitment loop when tomato api failed
 -   Trivia Reminder loop name
 -   Leaving player who delete there account
+-   Clan-player-activity
+    -   Now filter player that are under 30 day in clan
+    -   Escape `_` in player name
 
 ## [3.1.1] - Jun 01, 2024 <span class="label latest">Latest</span>
 
@@ -537,7 +540,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[3.2.0]: https://github.com/Glassait/FOLD_Bot/compare/v3.1.1-1...v3.2.0-8
+[3.2.0]: https://github.com/Glassait/FOLD_Bot/compare/v3.1.1-1...v3.2.0-9
 [3.1.1]: https://github.com/Glassait/FOLD_Bot/compare/v3.1.0-10...v3.1.1-1
 [3.1.0]: https://github.com/Glassait/FOLD_Bot/compare/v3.0.0-2...v3.1.0-10
 [3.0.0]: https://github.com/Glassait/FOLD_Bot/compare/v2.3.0-6...v3.0.0-2
