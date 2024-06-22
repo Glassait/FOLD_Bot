@@ -10,7 +10,7 @@ import type { BotLoop } from './types/bot-loop.type';
 import { ChannelsTable } from '../../shared/tables/complexe-table/channels/channels.table';
 
 module.exports = {
-    name: 'Fold Recruitment',
+    name: 'Trivia Reminder',
     execute: async (client: Client): Promise<void> => {
         const logger: Logger = new Logger(basename(__filename));
         const features: FeatureFlippingTable = new FeatureFlippingTable();

@@ -24,7 +24,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.2.0] - Jun 01, 2024 <span data-view-component="true" class="label pre-release">Pre-release</span>
+## [3.2.0] - Jun 01, 2024 <span class="label pre-release">Pre-release</span>
 
 ### Added
 
@@ -39,8 +39,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   Trivia result for yesterday when new month
 -   Trivia month not send
 -   Breaking recruitment loop when tomato api failed
+-   Trivia Reminder loop name
 
-## [3.1.1] - Jun 01, 2024 <span data-view-component="true" class="label latest">Latest</span>
+## [3.1.1] - Jun 01, 2024 <span class="label latest">Latest</span>
 
 ### Changed
 
