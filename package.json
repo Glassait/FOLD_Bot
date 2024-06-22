@@ -1,6 +1,6 @@
 {
 	"name": "fold_bot",
-	"version": "3.2.0-6",
+	"version": "3.2.0-7",
 	"description": "A bot for the FOLD_ discord server and WoT clan",
 	"main": "src/index.ts",
 	"engines": {
