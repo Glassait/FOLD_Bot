@@ -37,7 +37,7 @@ export class WatchClanModel {
     /**
      * The default reason to be used when a player is not suitable for the clan without any specific reason provided.
      */
-    private readonly defaultReason = 'Ce joueur ne convient pas au clan (aucune de raison fourni)';
+    private readonly defaultReason = 'Ce joueur ne convient pas au clan (aucune de raison fournie)';
 
     //region PRIVATE
     /**
