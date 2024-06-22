@@ -15,7 +15,7 @@ import { WargamingApi } from '../../../shared/apis/wargaming/wargaming.api';
 import { ClanPlayersActivity } from '../types/clan-players-activity.type';
 import { LoggerInjector } from '../../../shared/decorators/injector/logger-injector.decorator';
 import { Logger } from '../../../shared/utils/logger';
-import { transformToCode } from '../../../shared/utils/string.util';
+import { escape, transformToCode } from '../../../shared/utils/string.util';
 import { TimeEnum } from '../../../shared/enums/time.enum';
 import { createCsv } from '../../../shared/utils/csv.util';
 import { WargamingPlayers } from '../../../shared/apis/wargaming/models/wargaming.type';
@@ -71,6 +71,7 @@ export class ClanPlayersActivityModel {
         }
 
         const clanPlayersActivities: ClanPlayersActivity[] = clanStatisticRandom.items
+            .filter(({ days_in_clan }): boolean => days_in_clan > 30)
             .map(
                 ({ battles_count, name }, index: number): ClanPlayersActivity => ({
                     name,
@@ -102,7 +103,7 @@ export class ClanPlayersActivityModel {
 
         clanPlayersActivities.forEach(({ fortBattles, fortSorties, name, random, globalMap, total }): void => {
             embed.addFields({
-                name,
+                name: escape(name),
                 value: transformToCode(
                     'Aléatoires : {}, Escarmouches : {}, Incursions : {}, CW : {}, Total format clan : {}',
                     random,

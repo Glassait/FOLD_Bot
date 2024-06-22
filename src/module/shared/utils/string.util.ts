@@ -78,5 +78,5 @@ export function escape(text: string): string {
         return text;
     }
 
-    return text.trim().replace(/"/g, '\\"').replace(/'/g, "\\'");
+    return text.trim().replace(/"/g, '\\"').replace(/'/g, "\\'").replace(/_/g, '\\_');
 }
