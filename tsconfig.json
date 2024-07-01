@@ -126,6 +126,6 @@
 		/* Skip type checking all .d.ts files. */
 	},
 	"files": ["src/index.ts"],
-	"include": ["./**/*.ts", "./**/*.mjs", "./**/config.json"],
+	"include": ["./**/*.ts", "./**/*.mjs", "./**/config.json", "./**/core/*.json"],
 	"exclude": ["node_modules", "dist", "./**/*.js"]
 }
