@@ -3,21 +3,21 @@ import { WORDING } from '../../core/json-module';
 /**
  * Retrieve the value inside a record by following the given path.
  *
- * @param {Record<string, any>} record - The record to get the value;
+ * @param {Record<string, unknown>} record - The record to get the value;
  * @param {string[]} path - The path to the value;
  *
  * @return {string | undefined} - The value if the path is correct and defined, undefined otherwise.
  */
-function retrieveValueFromPath(record: Record<string, any>, path: string[]): string | undefined {
+function retrieveValueFromPath(record: Record<string, unknown> | undefined, path: string[]): string | undefined {
     if (!record) {
         return undefined;
     }
 
     if (path.length <= 1) {
-        return record[path.shift()!];
+        return record[path.shift()!] as string;
     }
 
-    return retrieveValueFromPath(record[path.shift()!], path);
+    return retrieveValueFromPath(record[path.shift()!] as Record<string, unknown>, path);
 }
 
 /**

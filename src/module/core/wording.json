@@ -2,13 +2,19 @@
 	"clan-player-activity": {
 		"texts": {
 			"wargaming-unavailable": "Une indisponibilité de Wargaming est survenue, merci de réessayer plus tard. Si le problème persiste, merci de contacter <@313006042340524033>",
-			"no-player-found": "Il semblerait que l'ensemble des joueurs du clan ait une activité surpérieure à {} batailles"
+			"no-players-found": "Il semblerait que l'ensemble des joueurs du clan ait une activité surpérieure à {} batailles"
 		},
-		"error": {
+		"errors": {
 			"fetch-random-failed": "Random battle failed to be fetched",
 			"fetch-fort-sorties-failed": "Fort sorties battle failed to be fetched",
 			"fetch-fort-battles-failed": "Fort battles failed to be fetched",
 			"fetch-global-map-failed": "Global map failed to be fetched"
+		},
+		"buttons": {
+			"download-csv": {
+				"id": "download",
+				"label": "Format CSV"
+			}
 		}
 	}
 }

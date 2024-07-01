@@ -7,6 +7,6 @@ import wording from './wording.json';
 /**
  * Transform the wording json type to a record
  */
-const WORDING: Record<string, any> = wording;
+const WORDING: Record<string, unknown> = wording;
 
 export { WORDING };

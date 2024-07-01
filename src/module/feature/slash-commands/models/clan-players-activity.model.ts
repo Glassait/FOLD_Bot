@@ -29,8 +29,14 @@ export class ClanPlayersActivityModel {
     private readonly logger: Logger;
     //endregion
 
+    /**
+     * Action row to handle the downloading of csv file
+     */
     private readonly downloadCVSActionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
-        new ButtonBuilder().setCustomId('download').setLabel('Format CSV').setStyle(ButtonStyle.Primary)
+        new ButtonBuilder()
+            .setCustomId(wording('clan-player-activity.buttons.download-csv.id'))
+            .setLabel(wording('clan-player-activity.buttons.download-csv.label'))
+            .setStyle(ButtonStyle.Primary)
     );
 
     /**
@@ -64,7 +70,7 @@ export class ClanPlayersActivityModel {
 
         if (!clanPlayersActivities.length) {
             await interaction.editReply({
-                content: transformToCode(wording('clan-player-activity.texts.no-player-found'), minimumBattles),
+                content: transformToCode(wording('clan-player-activity.texts.no-players-found'), minimumBattles),
             });
             return;
         }
