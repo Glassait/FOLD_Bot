@@ -20,7 +20,10 @@
             "files": ["*.json"],
             "options": {
                 "useTabs": true,
-                "parser": "json5"
+                "parser": "json5",
+                "trailingComma": "none",
+                "singleQuote": false,
+                "quoteProps": "preserve"
             }
         },
         {

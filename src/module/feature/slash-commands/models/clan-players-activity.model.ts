@@ -18,8 +18,9 @@ import { Logger } from '../../../shared/utils/logger';
 import { escape, transformToCode } from '../../../shared/utils/string.util';
 import { TimeEnum } from '../../../shared/enums/time.enum';
 import { createCsv } from '../../../shared/utils/csv.util';
-import { WargamingPlayers } from '../../../shared/apis/wargaming/models/wargaming.type';
+import { WargamingPlayer, WargamingPlayers } from '../../../shared/apis/wargaming/models/wargaming.type';
 import { EmojiEnum } from '../../../shared/enums/emoji.enum';
+import { wording } from '../../../shared/utils/config';
 
 @LoggerInjector
 export class ClanPlayersActivityModel {
@@ -27,6 +28,10 @@ export class ClanPlayersActivityModel {
     @Api('Wargaming') private readonly wargamingApi: WargamingApi;
     private readonly logger: Logger;
     //endregion
+
+    private readonly downloadCVSActionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+        new ButtonBuilder().setCustomId('download').setLabel('Format CSV').setStyle(ButtonStyle.Primary)
+    );
 
     /**
      * Show all players that are under the given activity.
@@ -37,66 +42,149 @@ export class ClanPlayersActivityModel {
      * @param {ChatInputCommandInteraction} interaction - The interaction created with the slash-command
      */
     public async showPlayersUnderActivity(minimumBattles: number, interaction: ChatInputCommandInteraction): Promise<void> {
+        const { clanStatisticRandom, clanStatisticFortSorties, clanStatisticFortBattles, clanStatisticGlobalMap } =
+            await this.fetchDataFromWargaming();
+        const errors = this.checkError(clanStatisticRandom, clanStatisticFortSorties, clanStatisticFortBattles, clanStatisticGlobalMap);
+
+        if (errors.length > 0) {
+            this.logger.warn(errors.join(', '));
+            await interaction.editReply({
+                content: wording('clan-player-activity.texts.wargaming-unavailable'),
+            });
+            return;
+        }
+
+        const clanPlayersActivities = this.filterData(
+            clanStatisticRandom,
+            clanStatisticFortSorties,
+            clanStatisticFortBattles,
+            clanStatisticGlobalMap,
+            minimumBattles
+        );
+
+        if (!clanPlayersActivities.length) {
+            await interaction.editReply({
+                content: transformToCode(wording('clan-player-activity.texts.no-player-found'), minimumBattles),
+            });
+            return;
+        }
+
+        const embeds = this.buildEmbeds(minimumBattles, clanPlayersActivities);
+
+        const message = await interaction.editReply({
+            embeds,
+            components: [this.downloadCVSActionRow],
+        });
+
+        await this.manageDownloadCSV(message, clanPlayersActivities);
+    }
+
+    /**
+     * Fetch the clan data from wargaming api
+     *
+     * @return A promise with all the data needed
+     */
+    private async fetchDataFromWargaming(): Promise<{
+        clanStatisticRandom: Awaited<WargamingPlayers>;
+        clanStatisticGlobalMap: Awaited<WargamingPlayers>;
+        clanStatisticFortSorties: Awaited<WargamingPlayers>;
+        clanStatisticFortBattles: Awaited<WargamingPlayers>;
+    }> {
         const [clanStatisticRandom, clanStatisticFortSorties, clanStatisticFortBattles, clanStatisticGlobalMap] = await Promise.all([
             this.wargamingApi.players(500312605, 'random', 28),
             this.wargamingApi.players(500312605, 'fort_sorties', 28),
             this.wargamingApi.players(500312605, 'fort_battles', 28),
             this.wargamingApi.players(500312605, 'global_map', 28),
         ]);
+        return { clanStatisticRandom, clanStatisticFortSorties, clanStatisticFortBattles, clanStatisticGlobalMap };
+    }
 
-        const errors = [clanStatisticRandom, clanStatisticFortSorties, clanStatisticFortBattles, clanStatisticGlobalMap]
+    /**
+     * Check if the data fetch contain failed http response, in this case return the corresponding error
+     *
+     * @param {WargamingPlayers} clanStatisticRandom - The Wargaming data about the activities of the clan player in Random
+     * @param {WargamingPlayers} clanStatisticFortSorties - The Wargaming data about the activities of the clan player in FortSorties
+     * @param {WargamingPlayers} clanStatisticFortBattles - The Wargaming data about the activities of the clan player in FortBattles
+     * @param {WargamingPlayers} clanStatisticGlobalMap - The Wargaming data about the activities of the clan player in GlobalMap
+     *
+     * @return {string} The error corresponding to the error found, empty string otherwise
+     */
+    private checkError(
+        clanStatisticRandom: Awaited<WargamingPlayers>,
+        clanStatisticFortSorties: Awaited<WargamingPlayers>,
+        clanStatisticFortBattles: Awaited<WargamingPlayers>,
+        clanStatisticGlobalMap: Awaited<WargamingPlayers>
+    ): string[] {
+        return [clanStatisticRandom, clanStatisticFortSorties, clanStatisticFortBattles, clanStatisticGlobalMap]
             .filter((statistic: Awaited<WargamingPlayers>): boolean => statistic.status !== 'ok')
             .map((statistic: Awaited<WargamingPlayers>): string => {
                 switch (statistic) {
                     case clanStatisticRandom:
-                        return 'Random battle failed to be fetched';
+                        return wording('clan-player-activity.errors.fetch-random-failed');
                     case clanStatisticFortSorties:
-                        return 'Fort sorties battle failed to be fetched';
+                        return wording('clan-player-activity.errors.fetch-fort-sorties-failed');
                     case clanStatisticFortBattles:
-                        return 'Fort battles failed to be fetched';
+                        return wording('clan-player-activity.errors.fetch-fort-battles-failed');
                     case clanStatisticGlobalMap:
-                        return 'Global map failed to be fetched';
+                        return wording('clan-player-activity.errors.fetch-global-map-failed');
                     default:
                         return '';
                 }
             });
+    }
 
-        if (errors.length > 0) {
-            this.logger.warn(errors.join(', '));
-            await interaction.editReply({
-                content:
-                    'Une indisponibilité de Wargaming est survenue, merci de réessayer plus tard. Si le problème persiste, merci de contacter <@313006042340524033>',
-            });
-            return;
-        }
-
-        const clanPlayersActivities: ClanPlayersActivity[] = clanStatisticRandom.items
+    /**
+     * This method will filter the data fetch from wargaming api and map it to gathered data of one player in one object
+     *
+     * @param {WargamingPlayers} clanStatisticRandom - The Wargaming data about the activities of the clan player in Random
+     * @param {WargamingPlayers} clanStatisticFortSorties - The Wargaming data about the activities of the clan player in FortSorties
+     * @param {WargamingPlayers} clanStatisticFortBattles - The Wargaming data about the activities of the clan player in FortBattles
+     * @param {WargamingPlayers} clanStatisticGlobalMap - The Wargaming data about the activities of the clan player in GlobalMap
+     * @param {number} minimumBattles - The minimal number of battles wanted.
+     *
+     * @return {ClanPlayersActivity[]} - The map of player activities gathered.
+     */
+    private filterData(
+        clanStatisticRandom: Awaited<WargamingPlayers>,
+        clanStatisticFortSorties: Awaited<WargamingPlayers>,
+        clanStatisticFortBattles: Awaited<WargamingPlayers>,
+        clanStatisticGlobalMap: Awaited<WargamingPlayers>,
+        minimumBattles: number
+    ): ClanPlayersActivity[] {
+        return clanStatisticRandom.items
             .filter(({ days_in_clan }): boolean => days_in_clan > 30)
-            .map(
-                ({ battles_count, name }, index: number): ClanPlayersActivity => ({
+            .map(({ battles_count, name }): ClanPlayersActivity => {
+                const { battles_count: fortSorties } = clanStatisticFortSorties.items.find(
+                    ({ name: playerName }): boolean => playerName === name
+                )!;
+                const { battles_count: fortBattles } = clanStatisticFortBattles.items.find(
+                    ({ name: playerName }: WargamingPlayer): boolean => playerName === name
+                )!;
+                const { battles_count: globalMap } = clanStatisticGlobalMap.items.find(
+                    ({ name: playerName }: WargamingPlayer): boolean => playerName === name
+                )!;
+
+                return {
                     name,
                     random: battles_count,
-                    fortSorties: clanStatisticFortSorties.items[index].battles_count,
-                    fortBattles: clanStatisticFortBattles.items[index].battles_count,
-                    globalMap: clanStatisticGlobalMap.items[index].battles_count,
-                    total:
-                        clanStatisticGlobalMap.items[index].battles_count +
-                        clanStatisticFortSorties.items[index].battles_count +
-                        clanStatisticFortBattles.items[index].battles_count,
-                })
-            )
+                    fortSorties,
+                    fortBattles,
+                    globalMap,
+                    total: fortSorties + fortBattles + globalMap,
+                };
+            })
             .filter(({ total }): boolean => total < minimumBattles);
+    }
 
-        if (!clanPlayersActivities.length) {
-            await interaction.editReply({
-                content: transformToCode(
-                    "Il semblerait que l'ensemble des joueurs du clan ait une activité surpérieure à {} batailles",
-                    minimumBattles
-                ),
-            });
-            return;
-        }
-
+    /**
+     * This method create all the embeds used by the bot to display the player.
+     *
+     * @param {number} minimumBattles - The upper limits of activity;
+     * @param {ClanPlayersActivity[]} clanPlayersActivities - The list of players activities;
+     *
+     * @return {EmbedBuilder[]} - The list of embed send to the user.
+     */
+    private buildEmbeds(minimumBattles: number, clanPlayersActivities: ClanPlayersActivity[]): EmbedBuilder[] {
         const embeds: EmbedBuilder[] = [];
         let numberOfFields: number = 0;
         let embed: EmbedBuilder = this.createEmbed(minimumBattles);
@@ -126,22 +214,15 @@ export class ClanPlayersActivityModel {
             embeds.push(embed);
         }
 
-        const actionRow: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder<ButtonBuilder>().addComponents(
-            new ButtonBuilder().setCustomId('download').setLabel('Format CSV').setStyle(ButtonStyle.Primary)
-        );
-
-        const message = await interaction.editReply({
-            embeds,
-            components: [actionRow],
-        });
-
-        await this.manageDownloadCSV(message, clanPlayersActivities);
+        return embeds;
     }
 
     /**
      * Create the embed to send
      *
      * @param {number} minimumBattles - The minimal number of battles wanted. Used only for display
+     *
+     * @return {EmbedBuilder} - The base embed for the message
      */
     private createEmbed(minimumBattles: number): EmbedBuilder {
         return new EmbedBuilder()

@@ -76,7 +76,7 @@ export class DetectedClanModel {
             embeds: [
                 new EmbedBuilder()
                     .setColor(Colors.DarkGold)
-                    .setTitle('La détection de clan est fini !')
+                    .setTitle('La détection de clan vient de se terminer !')
                     .setDescription(
                         transformToCode(
                             "Un total de {} clan a été détecté parmi l'ensemble des joueurs ayant quitté leur clan. Utilisez la commande `/detected-clan` pour voir les clans.",
