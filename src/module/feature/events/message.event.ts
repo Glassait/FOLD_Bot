@@ -16,7 +16,7 @@ module.exports = {
         logger.debug(
             'Webhook message detected, id {}, author name {}',
             message.webhookId,
-            message.author.displayName ?? message.author.globalName
+            message.author.displayName || message.author.globalName
         );
         const wotNewsForumModel: WotNewsForumModel = new WotNewsForumModel();
 
