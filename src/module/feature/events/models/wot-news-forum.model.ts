@@ -8,9 +8,7 @@ import { Logger } from '../../../shared/utils/logger';
 
 @LoggerInjector
 export class WotNewsForumModel {
-    //region INJECTION
     @Table('Channels') private readonly channelsTable: ChannelsTable;
-    //endregion
 
     //region PUBLIC READONLY FIELDS
     /**
@@ -22,13 +20,11 @@ export class WotNewsForumModel {
      * List if channel id, where the crosspost check
      */
     public readonly channelId: Snowflake[] = ['1185175797628149790'];
-
-    /**
-     * List of author id, who are accepted to crosspost
-     */
-    public readonly authorId: Snowflake[];
     //endregion
 
+    /**
+     * LOGGER INJECTION
+     */
     private readonly logger: Logger;
 
     /**
@@ -39,7 +35,7 @@ export class WotNewsForumModel {
     /**
      * Id of the wot user
      */
-    private readonly wot: Snowflake = '1190773147297914900';
+    private readonly _wot: Snowflake = '1190773147297914900';
 
     /**
      * The forum channel to post inside
@@ -56,14 +52,11 @@ export class WotNewsForumModel {
      */
     private codeTagId: Snowflake;
 
-    constructor(client: Client) {
-        this.authorId = [this.wot, this.wotFr];
-
+    constructor() {
         if (!isDev()) {
             return;
         }
 
-        this.authorId.push(client.user!.id);
         this.channelId.push('1218558387361546412');
         this.guildId.push('1218558386761891901');
     }
@@ -85,13 +78,7 @@ export class WotNewsForumModel {
      * @param {Message} message - The message to crosspost
      */
     public async crosspostMessage(message: Message): Promise<void> {
-        this.logger.debug(
-            'Message to crosspost detected, author {}, name {}',
-            message.author.id,
-            message.author.globalName ?? message.author.displayName
-        );
-
-        if (message.author.id === this.wotFr || (isDev() && message.author.id === this.authorId[2])) {
+        if (message.author.id === this.wotFr) {
             this.logger.debug('Crosspost wot fr message (bonus code)');
             await this.channel.threads.create({
                 name: 'Code bonus',
@@ -117,5 +104,16 @@ export class WotNewsForumModel {
             message: { embeds: [new EmbedBuilder(embed.data)] },
             appliedTags: tags,
         });
+    }
+
+    /**
+     * Check if the message can be crosspost.
+     *
+     * @param {Message} message - The incoming message.
+     *
+     * @return {boolean} - True if the message can be crosspost, false otherwise.
+     */
+    public canBeCrosspost(message: Message): boolean {
+        return this.guildId.includes(message.guildId!) && this.channelId.includes(message.channelId);
     }
 }
