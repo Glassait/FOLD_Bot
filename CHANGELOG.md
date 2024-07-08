@@ -24,7 +24,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.2.0] - Jun 01, 2024 <span class="label pre-release">Pre-release</span>
+## [3.2.0] <span class="label pre-release">Pre-release</span>
 
 ### Added
 
@@ -32,6 +32,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   Message send to fold recruitment channel that indicated that all api calls failed
 -   Message send to fold recruitment channel that show all players ignored
 -   Message send when detection of clan from leaving player is done
+
+### Changed
+
+-   Detected loop now remove at each iteration the leaving player
 
 ### Fixed
 
@@ -541,7 +545,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[3.2.0]: https://github.com/Glassait/FOLD_Bot/compare/v3.1.1-1...v3.2.0-10
+[3.2.0]: https://github.com/Glassait/FOLD_Bot/compare/v3.1.1-1...v3.2.0-13
 [3.1.1]: https://github.com/Glassait/FOLD_Bot/compare/v3.1.0-10...v3.1.1-1
 [3.1.0]: https://github.com/Glassait/FOLD_Bot/compare/v3.0.0-2...v3.1.0-10
 [3.0.0]: https://github.com/Glassait/FOLD_Bot/compare/v2.3.0-6...v3.0.0-2

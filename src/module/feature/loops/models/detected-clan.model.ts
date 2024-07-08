@@ -60,9 +60,9 @@ export class DetectedClanModel {
                 this.logger.debug('Clan found from leaving player : {}', clanId);
                 await this.potentialClans.addClan(clanId);
                 this.numberOfClansDetected++;
-            } else {
-                await this.leavingPlayers.deletePlayer(player.id);
             }
+
+            await this.leavingPlayers.deletePlayer(player.id);
         }
 
         this.logger.info('End fetching clan from leaving player');
