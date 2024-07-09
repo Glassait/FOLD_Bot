@@ -343,3 +343,91 @@ export type WargamingPlayers = {
     last_updated_at: string;
 };
 //endregion
+
+//region CLAN INFO
+/**
+ * Represents a profile within the Wargaming API response.
+ */
+export type WargamingProfiles = {
+    /**
+     * The number of battles played by the account.
+     */
+    account_battles_count?: number;
+    /**
+     * Unknown data type (refer to Wargaming API documentation).
+     */
+    account_join_purposes?: unknown;
+    /**
+     * Unknown data type (refer to Wargaming API documentation).
+     */
+    account_join_purposes_localized?: unknown;
+    /**
+     * The win rate of the account.
+     */
+    account_win_rate?: number;
+    /**
+     * The average number of days per week the account plays.
+     */
+    days_per_week?: number;
+    /**
+     * A list of languages spoken by the account.
+     */
+    languages_list?: string[];
+    /**
+     * The number of members in the profile (clan or account).
+     */
+    members_count?: number;
+    /**
+     * The starting time of the prime time for the profile (in hours).
+     */
+    prime_time_from?: number;
+    /**
+     * The ending time of the prime time for the profile (in hours).
+     */
+    prime_time_to?: number;
+    /**
+     * The stronghold level of the profile (if applicable).
+     */
+    stronghold_level?: number;
+    /**
+     * The type of profile, either "account" or "clan".
+     */
+    type: 'account' | 'clan';
+    /**
+     * The win rate of the profile (may differ from account_win_rate).
+     */
+    win_rate?: number;
+};
+
+/**
+ * Represents the clan view data within the Wargaming API response.
+ */
+export type WargamingClanView = {
+    /**
+     * Unknown data type (refer to Wargaming API documentation).
+     */
+    clan: unknown;
+    /**
+     * Unknown data type (refer to Wargaming API documentation).
+     */
+    currency: unknown;
+    /**
+     * An array of WargamingProfiles objects containing details about clan members or the account itself.
+     */
+    profiles: WargamingProfiles[];
+    /**
+     * Unknown data type (refer to Wargaming API documentation).
+     */
+    rating: unknown;
+};
+
+/**
+ * Represents the complete clan information data within the Wargaming API response.
+ */
+export type WargamingClanInfo = {
+    /**
+     * The clan view data object containing details about the clan.
+     */
+    clanview: WargamingClanView;
+};
+//endregion

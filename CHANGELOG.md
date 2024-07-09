@@ -32,10 +32,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   Message send to fold recruitment channel that indicated that all api calls failed
 -   Message send to fold recruitment channel that show all players ignored
 -   Message send when detection of clan from leaving player is done
+-   Detected clan loop now filter on language of the clan
 
 ### Changed
 
--   Detected loop now remove at each iteration the leaving player
+-   Detected clan loop now remove at each iteration the leaving player
 
 ### Fixed
 

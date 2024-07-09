@@ -16,5 +16,16 @@
 				"label": "Format CSV"
 			}
 		}
+	},
+	"detected-clan": {
+		"texts": {
+			"embed-clan-detected": {
+				"title": "La détection de clan vient de se terminer !",
+				"description": "Un total de {} clan a été détecté parmi l'ensemble des joueurs ayant quitté leur clan. Utilisez la commande `/detected-clan` pour voir les clans."
+			}
+		},
+		"errors": {
+			"failed-clan-info": "Failed to fetch clan information for the clan id : {}"
+		}
 	}
 }

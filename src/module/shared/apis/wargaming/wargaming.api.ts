@@ -1,6 +1,13 @@
 import { LoggerInjector } from '../../decorators/injector/logger-injector.decorator';
 import { ApiBase } from '../api.base';
-import { WargamingAccounts, WargamingBattleType, WargamingNewsfeed, WargamingPlayers, WargamingTimeframe } from './models/wargaming.type';
+import {
+    WargamingAccounts,
+    WargamingBattleType,
+    WargamingClanInfo,
+    WargamingNewsfeed,
+    WargamingPlayers,
+    WargamingTimeframe,
+} from './models/wargaming.type';
 
 /**
  * API client for interacting with Wargaming.net services.
@@ -63,5 +70,16 @@ export class WargamingApi extends ApiBase {
         this.addSearchParam(url, 'battle_type', battleType);
         this.addSearchParam(url, 'timeframe', timeframe);
         return await this.getData(url, { 'x-requested-with': 'XMLHttpRequest' });
+    }
+
+    /**
+     * Retrieves the information about the clan from the wargaming api.
+     *
+     * @param {number} clanId - The clan id to retrieve information about
+     *
+     * @returns {Promise<WargamingClanInfo>} - A promise that resolves to a WargamingClanInfo object containing the clan' information.
+     */
+    public async clanInfo(clanId: number): Promise<WargamingClanInfo> {
+        return await this.getData(this.createUrl(`/clans/wot/${clanId}/api/claninfo`), { 'x-requested-with': 'XMLHttpRequest' });
     }
 }
