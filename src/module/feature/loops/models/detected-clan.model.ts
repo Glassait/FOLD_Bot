@@ -71,6 +71,22 @@ export class DetectedClanModel {
     }
 
     /**
+     * Send message to announce that the detection of clan is finished
+     */
+    public async sendMessageClanDetectedReady(): Promise<void> {
+        await this.channel.send({
+            embeds: [
+                new EmbedBuilder()
+                    .setColor(Colors.DarkGold)
+                    .setTitle(wording('detected-clan.texts.embed-clan-detected.title'))
+                    .setDescription(
+                        transformToCode(wording('detected-clan.texts.embed-clan-detected.description'), this.numberOfClansDetected)
+                    ),
+            ],
+        });
+    }
+
+    /**
      * Check if the clan of the player is a potential clan to watch
      *
      * @param {number | null} clanId - The clan id of the player, if null, the player doesn't has clan
@@ -88,22 +104,6 @@ export class DetectedClanModel {
     }
 
     /**
-     * Send message to announce that the detection of clan is finished
-     */
-    public async sendMessageClanDetectedReady(): Promise<void> {
-        await this.channel.send({
-            embeds: [
-                new EmbedBuilder()
-                    .setColor(Colors.DarkGold)
-                    .setTitle(wording('detected-clan.texts.embed-clan-detected.title'))
-                    .setDescription(
-                        transformToCode(wording('detected-clan.texts.embed-clan-detected.description'), this.numberOfClansDetected)
-                    ),
-            ],
-        });
-    }
-
-    /**
      * Check if the clan of the leaving player is a french clan.
      *
      * @param {number} clanId - The clan id to check
@@ -111,7 +111,7 @@ export class DetectedClanModel {
      * @return {Promise<boolean>} - True if is a french tank, false otherwise
      */
     private async isFrenchClan(clanId: number): Promise<boolean> {
-        const clanInfo: WargamingClanInfo = await this.wargamingApi.clanInfo(clanId);
+        const clanInfo: WargamingClanInfo | undefined = await this.wargamingApi.clanInfo(clanId);
 
         if (!clanInfo) {
             this.logger.error(wording('detected-clan.errors.failed-clan-info'), clanId);

@@ -79,7 +79,7 @@ export class WargamingApi extends ApiBase {
      *
      * @returns {Promise<WargamingClanInfo>} - A promise that resolves to a WargamingClanInfo object containing the clan' information.
      */
-    public async clanInfo(clanId: number): Promise<WargamingClanInfo> {
+    public async clanInfo(clanId: number): Promise<WargamingClanInfo | undefined> {
         return await this.getData(this.createUrl(`/clans/wot/${clanId}/api/claninfo`), { 'x-requested-with': 'XMLHttpRequest' });
     }
 }
