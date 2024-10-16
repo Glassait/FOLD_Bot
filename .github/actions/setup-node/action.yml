@@ -1,0 +1,10 @@
+name: 'Setup node for the action'
+description: 'Setup node for the workflow'
+
+runs:
+    using: 'composite'
+    steps:
+        -   name: Set up Node.js
+            uses: actions/setup-node@v3
+            with:
+                node-version: '18.X'

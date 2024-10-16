@@ -1,0 +1,35 @@
+name: 'Setup Maven for the action'
+description: 'Bump the Maven version (stored in properties.revision) and push it on the repo'
+
+inputs:
+    version_type:
+        description: 'Type of version bump (major, minor, patch)'
+        required: true
+        type: string
+    TOKEN:
+        description: "The git hub token to push the bumped version"
+        required: true
+        type: string
+
+runs:
+    using: 'composite'
+    steps:
+        -   name: Validate version_type input
+            shell: bash
+            run: |
+                if [[ "${{ inputs.version_type }}" != "major" && "${{ inputs.version_type }}" != "minor" && "${{ inputs.version_type }}" != "patch" ]]; then
+                  echo "Invalid version_type: '${{ inputs.version_type }}'. Must be 'major', 'minor', or 'patch'."
+                  exit 1
+                fi
+        -   name: GIT config
+            shell: bash
+            run: |
+                git config user.name 'github-actions[bot]'
+                git config user.email 'github-actions[bot]@users.noreply.github.com'
+        -   name: Bump version
+            shell: bash
+            run: npm version ${{ inputs.version_type }} -m "Bumped revision version to %s"
+        -   name: Push version bump commit
+            shell: bash
+            run: |
+                git push --tags https://${{ inputs.TOKEN }}@github.com/${{ github.repository }} $BRANCH
