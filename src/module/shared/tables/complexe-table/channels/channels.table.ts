@@ -1,6 +1,6 @@
-import { TableAbstract } from '../../../abstracts/table.abstract';
-import { SelectBuilder } from '../../../builders/query/select.builder';
-import { LoggerInjector } from '../../../decorators/injector/logger-injector.decorator';
+import { TableAbstract } from 'abstracts/table.abstract';
+import { SelectBuilder } from 'builders/query/select.builder';
+import { LoggerInjector } from 'decorators/injector/logger-injector.decorator';
 import type { Channel } from './models/channels.type';
 
 /**
@@ -19,15 +19,6 @@ export class ChannelsTable extends TableAbstract {
      */
     public async getNewsWebsite(): Promise<Channel> {
         return await this.getChannel('news');
-    }
-
-    /**
-     * Retrieves the trivia channel.
-     *
-     * @returns {Promise<Channel>} - A promise that resolves to the trivia channel.
-     */
-    public async getTrivia(): Promise<Channel> {
-        return await this.getChannel('trivia');
     }
 
     /**

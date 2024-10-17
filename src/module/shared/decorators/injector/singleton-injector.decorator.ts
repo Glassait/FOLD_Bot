@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Agent as AgentHttp } from 'node:http';
 import { Agent as AgentHttps } from 'node:https';
-import { TimeEnum } from '../../enums/time.enum';
+import { TimeEnum } from 'enums/time.enum';
 import type { SingletonDependence } from './models/injector.type';
 
 /**
@@ -18,10 +18,10 @@ import type { SingletonDependence } from './models/injector.type';
  *
  * @example
  * import { Singleton } from './singleton.decorator';
- * import { TriviaSingleton } from '../../singleton/trivia.singleton';
+ * import { BotDatabase } from 'bot-database.singleton';
  *
  * class MyComponent {
- *   \@Singleton('Trivia') private readonly triviaSingleton: TriviaSingleton;
+ *   \@Singleton('BotDatabase') private readonly botDatabase: BotDatabase;
  * }
  */
 export function Singleton<GSingleton extends SingletonDependence>(
@@ -33,9 +33,6 @@ export function Singleton<GSingleton extends SingletonDependence>(
     return function actual<GClass>(_target: GClass, _context: ClassFieldDecoratorContext<GClass>) {
         return function (this: GClass, field: unknown) {
             switch (dependence) {
-                case 'Trivia':
-                    field = require('../../singleton/trivia/trivia.singleton').TriviaSingleton.instance;
-                    break;
                 case 'Axios':
                     field = axios.create({
                         timeout,
