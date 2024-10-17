@@ -1,18 +1,18 @@
 import type { QueryResult } from 'mysql2/promise';
-import type { DeleteBuilder } from '../builders/query/delete.builder';
-import type { InsertIntoBuilder } from '../builders/query/insert-into.builder';
-import type { SelectBuilder } from '../builders/query/select.builder';
-import type { UpdateBuilder } from '../builders/query/update.builder';
-import { Singleton } from '../decorators/injector/singleton-injector.decorator';
-import type { DatabaseSingleton } from '../singleton/database.singleton';
-import type { Logger } from '../utils/logger';
+import type { DeleteBuilder } from 'builders/query/delete.builder';
+import type { InsertIntoBuilder } from 'builders/query/insert-into.builder';
+import type { SelectBuilder } from 'builders/query/select.builder';
+import type { UpdateBuilder } from 'builders/query/update.builder';
+import { Singleton } from 'decorators/injector/singleton-injector.decorator';
+import type { Logger } from 'utils/logger';
+import { BotDatabaseSingleton } from 'singleton/bot-database.singleton';
 
 /**
  * Represents a database table with common CRUD operations.
  */
 export class TableAbstract {
     //region INJECTABLE
-    @Singleton('Database') protected readonly database: DatabaseSingleton;
+    @Singleton('BotDatabase') protected readonly database: BotDatabaseSingleton;
     private readonly logger: Logger;
     //endregion
 

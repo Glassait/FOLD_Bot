@@ -41,8 +41,8 @@ export function Singleton<GSingleton extends SingletonDependence>(
                         httpsAgent: new AgentHttps({ keepAlive: true, timeout }),
                     });
                     break;
-                case 'Database':
-                    field = require('../../singleton/database.singleton').DatabaseSingleton.instance;
+                case 'BotDatabase':
+                    field = require('../../singleton/bot-database.singleton').BotDatabaseSingleton.instance;
                     break;
                 default:
                     throw new Error(`Unsupported dependence type: ${dependence}`);
