@@ -7,8 +7,8 @@
 		"node": ">= 18.18.0"
 	},
 	"scripts": {
-		"start": "ts-node .",
-		"start:mock": "ts-node . -- DEV",
+		"start": "ts-node -r tsconfig-paths/register .",
+		"start:mock": "ts-node -r tsconfig-paths/register . -- DEV",
 		"build": "tsc --build",
 		"clean": "tsc --build --clean",
 		"lint": "eslint src",
@@ -72,6 +72,7 @@
 		"husky": "^9.1.6",
 		"lint-staged": "^15.2.10",
 		"prettier": "3.2.5",
+		"tsconfig-paths": "^4.2.0",
 		"typescript": "^5.6.3",
 		"typescript-eslint": "^7.18.0"
 	}
