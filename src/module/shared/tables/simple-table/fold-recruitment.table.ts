@@ -1,12 +1,14 @@
-import { TableAbstract } from '../../abstracts/table.abstract';
-import { SelectBuilder } from '../../builders/query/select.builder';
-import { LoggerInjector } from '../../decorators/injector/logger-injector.decorator';
-import { WargamingBattleType } from '../../apis/wargaming/models/wargaming.type';
+import { TableAbstract } from 'abstracts/table.abstract';
+import { SelectBuilder } from 'builders/query/select.builder';
+import { LoggerInjector } from 'decorators/injector/logger-injector.decorator';
+import { WargamingBattleType } from 'apis/wargaming/models/wargaming.type';
+import { SingletonClass } from "decorators/injector/singleton-injector.decorator";
 
 /**
  * Represents a table for storing information related to Fold Recruitment.
  */
 @LoggerInjector
+@SingletonClass('BotDatabase')
 export class FoldRecruitmentTable extends TableAbstract {
     constructor() {
         super('fold_recruitment');

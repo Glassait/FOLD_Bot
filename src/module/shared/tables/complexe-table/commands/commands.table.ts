@@ -1,12 +1,14 @@
-import { TableAbstract } from '../../../abstracts/table.abstract';
-import { SelectBuilder } from '../../../builders/query/select.builder';
-import { LoggerInjector } from '../../../decorators/injector/logger-injector.decorator';
+import { TableAbstract } from 'abstracts/table.abstract';
+import { SelectBuilder } from 'builders/query/select.builder';
+import { LoggerInjector } from 'decorators/injector/logger-injector.decorator';
 import type { CommandName } from './models/commands.type';
+import { SingletonClass } from "decorators/injector/singleton-injector.decorator";
 
 /**
  * Represents a table for storing commands.
  */
 @LoggerInjector
+@SingletonClass('BotDatabase')
 export class CommandsTable extends TableAbstract {
     constructor() {
         super('commands');

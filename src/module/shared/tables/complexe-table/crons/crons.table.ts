@@ -1,12 +1,14 @@
-import { TableAbstract } from '../../../abstracts/table.abstract';
-import { SelectBuilder } from '../../../builders/query/select.builder';
-import { LoggerInjector } from '../../../decorators/injector/logger-injector.decorator';
+import { TableAbstract } from 'abstracts/table.abstract';
+import { SelectBuilder } from 'builders/query/select.builder';
+import { LoggerInjector } from 'decorators/injector/logger-injector.decorator';
 import type { CronName } from './models/crons.type';
+import { SingletonClass } from "decorators/injector/singleton-injector.decorator";
 
 /**
  * Represent the cron table
  */
 @LoggerInjector
+@SingletonClass('BotDatabase')
 export class CronsTable extends TableAbstract {
     constructor() {
         super('crons');

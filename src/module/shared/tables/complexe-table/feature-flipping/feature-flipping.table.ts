@@ -1,12 +1,14 @@
-import { TableAbstract } from '../../../abstracts/table.abstract';
-import { SelectBuilder } from '../../../builders/query/select.builder';
-import { LoggerInjector } from '../../../decorators/injector/logger-injector.decorator';
+import { TableAbstract } from 'abstracts/table.abstract';
+import { SelectBuilder } from 'builders/query/select.builder';
+import { LoggerInjector } from 'decorators/injector/logger-injector.decorator';
 import type { FeatureFlippingName } from './models/feature-flipping.type';
+import { SingletonClass } from "decorators/injector/singleton-injector.decorator";
 
 /**
  * Represents a table to manage feature flipping in the database.
  */
 @LoggerInjector
+@SingletonClass('BotDatabase')
 export class FeatureFlippingTable extends TableAbstract {
     constructor() {
         super('feature_flipping');

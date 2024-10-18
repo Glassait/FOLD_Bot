@@ -1,15 +1,17 @@
-import { TableAbstract } from '../../../abstracts/table.abstract';
-import { DeleteBuilder } from '../../../builders/query/delete.builder';
-import { InsertIntoBuilder } from '../../../builders/query/insert-into.builder';
-import { SelectBuilder } from '../../../builders/query/select.builder';
-import { LoggerInjector } from '../../../decorators/injector/logger-injector.decorator';
-import { escape } from '../../../utils/string.util';
+import { TableAbstract } from 'abstracts/table.abstract';
+import { DeleteBuilder } from 'builders/query/delete.builder';
+import { InsertIntoBuilder } from 'builders/query/insert-into.builder';
+import { SelectBuilder } from 'builders/query/select.builder';
+import { LoggerInjector } from 'decorators/injector/logger-injector.decorator';
+import { escape } from 'utils/string.util';
 import type { BlacklistedPlayer } from './models/blacklisted-players.type';
+import { SingletonClass } from "decorators/injector/singleton-injector.decorator";
 
 /**
  * Represents a table for managing blacklisted players.
  */
 @LoggerInjector
+@SingletonClass('BotDatabase')
 export class BlacklistedPlayersTable extends TableAbstract {
     constructor() {
         super('blacklisted_players');
