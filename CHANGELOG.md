@@ -30,11 +30,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add ts path in tsconfig.json
 - Add ts build to action
+- A brand new XML parser
+- World Of Tanks now get scrapped with the rss lin
 
 ### Changed
 
 - The github action pass to a new system
 - DatabaseSingleton transform in DatabaseAbstract to allow handling multiple database connection
+- Update cheerio to 1.0.0
+- Update NewsScapper to manage xml or html et text or forum channel
 
 ### Removed
 

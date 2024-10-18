@@ -1,13 +1,13 @@
-import { TimeEnum } from '../../../../shared/enums/time.enum';
-import type { NewsWebsite } from '../../../../shared/tables/complexe-table/news-websites/models/news-websites.type';
-import { sleep } from '../../../../shared/utils/env.util';
+import { TimeEnum } from 'enums/time.enum';
+import type { NewsWebsite } from 'tables/complexe-table/news-websites/models/news-websites.type';
+import { sleep } from 'utils/env.util';
 import { NewsScrapper } from './news-scrapper.model';
-import { Element, SelectorType } from 'cheerio';
+import { type CheerioAPI, Element, SelectorType } from 'cheerio';
 
 /**
  * Class responsible for scraping news from Wot Express website.
  */
-export class WotExpress extends NewsScrapper {
+export class WotExpress extends NewsScrapper<CheerioAPI> {
     /**
      * The default index used when the url is not found
      */

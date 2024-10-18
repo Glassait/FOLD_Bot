@@ -1,18 +1,20 @@
 import type { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
-import { type CheerioAPI, load } from 'cheerio';
-import type { Client, TextChannel } from 'discord.js';
-import { LoggerInjector } from '../../../shared/decorators/injector/logger-injector.decorator';
-import { Singleton } from '../../../shared/decorators/injector/singleton-injector.decorator';
-import { Table } from '../../../shared/decorators/injector/table-injector.decorator';
-import { EmojiEnum } from '../../../shared/enums/emoji.enum';
-import { TimeEnum } from '../../../shared/enums/time.enum';
-import type { ChannelsTable } from '../../../shared/tables/complexe-table/channels/channels.table';
-import type { NewsWebsite } from '../../../shared/tables/complexe-table/news-websites/models/news-websites.type';
-import type { Logger } from '../../../shared/utils/logger';
-import { fetchChannelFromClient } from '../../../shared/utils/user.util';
+import { load } from 'cheerio';
+import { Client, ForumChannel, TextChannel } from 'discord.js';
+import { LoggerInjector } from 'decorators/injector/logger-injector.decorator';
+import { Singleton } from 'decorators/injector/singleton-injector.decorator';
+import { Table } from 'decorators/injector/table-injector.decorator';
+import { EmojiEnum } from 'enums/emoji.enum';
+import { TimeEnum } from 'enums/time.enum';
+import type { ChannelsTable } from 'tables/complexe-table/channels/channels.table';
+import type { NewsWebsite } from 'tables/complexe-table/news-websites/models/news-websites.type';
+import type { Logger } from 'utils/logger';
+import { fetchChannelFromClient } from 'utils/user.util';
 import { WebsiteNameEnum } from '../enums/website-name.enum';
 import { WotExpress } from './news-scrapped/wot-express.model';
 import { TheArmoredPatrol } from './news-scrapped/the-armored-patrol.model';
+import { WotNews } from './news-scrapped/wot-news.model';
+import { SimpleXMLParser } from 'utils/parser';
 
 @LoggerInjector
 export class WebSiteScraper {
@@ -26,6 +28,10 @@ export class WebSiteScraper {
      * The channel for the newsletter
      */
     private channel: TextChannel;
+    /**
+     * The channel for the wot news
+     */
+    private channelWotNews: ForumChannel;
 
     /**
      * Fetch the channel for the newsletter
@@ -34,6 +40,7 @@ export class WebSiteScraper {
      */
     public async initialise(client: Client): Promise<void> {
         this.channel = await fetchChannelFromClient(client, await this.channels.getNewsWebsite());
+        this.channelWotNews = await fetchChannelFromClient(client, await this.channels.getWotNews());
     }
 
     /**
@@ -68,16 +75,18 @@ export class WebSiteScraper {
     /**
      * Use the Cheerios API to scrap the html
      *
-     * @param {string} html - The html of the website
-     * @param {NewsWebsite} newsWebsite - The website scrapped
+     * @param html - The html of the website
+     * @param newsWebsite - The website scrapped
      */
     public async getLastNews(html: string, newsWebsite: NewsWebsite): Promise<void> {
-        const $: CheerioAPI = load(html);
-
         if (newsWebsite.name === WebsiteNameEnum.WOT_EXPRESS) {
-            await new WotExpress($, this.channel).scrap(newsWebsite);
+            await new WotExpress(load(html), this.channel).scrap(newsWebsite);
         } else if (newsWebsite.name === WebsiteNameEnum.THE_ARMORED_PATROL) {
-            await new TheArmoredPatrol($, this.channel).scrap(newsWebsite);
+            await new TheArmoredPatrol(load(html), this.channel).scrap(newsWebsite);
+        } else if (newsWebsite.name === WebsiteNameEnum.WORLD_OF_TANKS) {
+            await new WotNews(new SimpleXMLParser(html).parse(), this.channelWotNews).scrap(newsWebsite);
+        } else {
+            this.logger.error('No scrapper for {}, please add one !', newsWebsite.name);
         }
         this.logger.debug(`${EmojiEnum.MINE} End scrapping for {}`, newsWebsite.name);
     }

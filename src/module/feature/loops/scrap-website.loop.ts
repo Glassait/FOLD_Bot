@@ -1,12 +1,12 @@
 import type { Client } from 'discord.js';
 import { basename } from 'node:path';
-import { EmojiEnum } from '../../shared/enums/emoji.enum';
-import { CronsTable } from '../../shared/tables/complexe-table/crons/crons.table';
-import { FeatureFlippingTable } from '../../shared/tables/complexe-table/feature-flipping/feature-flipping.table';
-import type { NewsWebsite } from '../../shared/tables/complexe-table/news-websites/models/news-websites.type';
-import { NewsWebsitesTable } from '../../shared/tables/complexe-table/news-websites/news-websites.table';
-import { createCron } from '../../shared/utils/cron.util';
-import { Logger } from '../../shared/utils/logger';
+import { EmojiEnum } from 'enums/emoji.enum';
+import { CronsTable } from 'tables/complexe-table/crons/crons.table';
+import { FeatureFlippingTable } from 'tables/complexe-table/feature-flipping/feature-flipping.table';
+import type { NewsWebsite } from 'tables/complexe-table/news-websites/models/news-websites.type';
+import { NewsWebsitesTable } from 'tables/complexe-table/news-websites/news-websites.table';
+import { createCron } from 'utils/cron.util';
+import { Logger } from 'utils/logger';
 import { WebSiteScraper } from './models/web-site-scraper.model';
 import type { BotLoop } from './types/bot-loop.type';
 
