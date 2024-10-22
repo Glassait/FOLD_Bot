@@ -32,4 +32,4 @@ runs:
         -   name: Push version bump commit
             shell: bash
             run: |
-                git push --tags https://${{ inputs.TOKEN }}@github.com/${{ github.repository }} $BRANCH
+                git push --follow-tags https://${{ inputs.TOKEN }}@github.com/${{ github.repository }} $BRANCH
