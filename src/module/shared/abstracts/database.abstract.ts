@@ -1,49 +1,24 @@
 import mysql, { type FieldPacket, type Pool, type QueryResult } from 'mysql2/promise';
-import { basename } from 'node:path';
-import { database, host, password, user } from '../../core/config.json';
-import { EmojiEnum } from '../enums/emoji.enum';
-import { Logger } from '../utils/logger';
+import { EmojiEnum } from 'enums/emoji.enum';
+import { Logger } from 'utils/logger';
 
 /**
  * Singleton class for managing MySQL database connections.
  */
-export class DatabaseSingleton {
-    //region SINGLETON
-    /**
-     * The instance of the class, used for the singleton pattern
-     */
-    private static _instance?: DatabaseSingleton;
-
-    /**
-     * Gets the singleton instance of DatabaseSingleton.
-     *
-     * @returns {DatabaseSingleton} - The singleton instance.
-     */
-    public static get instance(): DatabaseSingleton {
-        if (!this._instance) {
-            this._instance = new DatabaseSingleton();
-        }
-        return this._instance;
-    }
-    //endregion
-
-    //region INJECTABLE
-    private readonly logger: Logger = new Logger(basename(__filename));
-    //endregion
-
+export class DatabaseAbstract {
     //region PRIVATE FIELDS
     /**
      * The pool to execute query to the database
      */
-    private _pool: Pool;
+    private pool: Pool;
     //endregion
 
-    /**
-     * Private constructor for the DatabaseSingleton class.
-     */
-    private constructor() {
-        this.createPool();
-        this.logger.info(`${EmojiEnum.HAMMER} {} instance initialized`, DatabaseSingleton.name);
+    constructor(
+        bdd: { user: string; host: string; database: string; password: string },
+        protected readonly logger: Logger
+    ) {
+        this.createPool(bdd.user, bdd.host, bdd.database, bdd.password);
+        this.logger.info(`${EmojiEnum.HAMMER} {} instance initialized`, DatabaseAbstract.name);
     }
 
     /**
@@ -55,7 +30,7 @@ export class DatabaseSingleton {
      */
     public async query(sql: string): Promise<[QueryResult, FieldPacket[]]> {
         try {
-            const [rows, fields] = await this._pool.execute({ sql });
+            const [rows, fields] = await this.pool.execute({ sql });
             return [rows, fields];
         } catch (error) {
             throw new Error(`Error executing SQL query`, { cause: error });
@@ -65,8 +40,8 @@ export class DatabaseSingleton {
     /**
      * Creates the MySQL connection pool.
      */
-    private createPool(): void {
-        this._pool = mysql.createPool({
+    private createPool(user: string, host: string, database: string, password: string): void {
+        this.pool = mysql.createPool({
             user: String(user),
             host: String(host),
             database: String(database),

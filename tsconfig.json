@@ -1,7 +1,5 @@
 {
 	"compilerOptions": {
-		/* Visit https://aka.ms/tsconfig to read more about this file */
-
 		/* Projects */
 		// "incremental": true,                              /* Save .tsbuildinfo files to allow for incremental compilation of projects. */
 		// "composite": true,                                /* Enable constraints that allow a TypeScript project to be used with project references. */
@@ -122,10 +120,23 @@
 
 		/* Completeness */
 		// "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
-		"skipLibCheck": true
+		"skipLibCheck": true,
 		/* Skip type checking all .d.ts files. */
+
+		"paths": {
+			"core/*": ["src/module/core/*"],
+			"abstracts/*": ["src/module/shared/abstracts/*"],
+			"apis/*": ["src/module/shared/apis/*"],
+			"builders/*": ["src/module/shared/builders/*"],
+			"decorators/*": ["src/module/shared/decorators/*"],
+			"enums/*": ["src/module/shared/enums/*"],
+			"singleton/*": ["src/module/shared/singleton/*"],
+			"tables/*": ["src/module/shared/tables/*"],
+			"types/*": ["src/module/shared/types/*"],
+			"utils/*": ["src/module/shared/utils/*"]
+		}
 	},
 	"files": ["src/index.ts"],
-	"include": ["./**/*.ts", "./**/*.mjs", "./**/config.json", "./**/core/*.json"],
+	"include": ["./**/*.ts", "./**/*.mjs", "./src/module/core/*.json"],
 	"exclude": ["node_modules", "dist", "./**/*.js"]
 }

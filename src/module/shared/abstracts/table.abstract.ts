@@ -1,18 +1,18 @@
 import type { QueryResult } from 'mysql2/promise';
-import type { DeleteBuilder } from '../builders/query/delete.builder';
-import type { InsertIntoBuilder } from '../builders/query/insert-into.builder';
-import type { SelectBuilder } from '../builders/query/select.builder';
-import type { UpdateBuilder } from '../builders/query/update.builder';
-import { Singleton } from '../decorators/injector/singleton-injector.decorator';
-import type { DatabaseSingleton } from '../singleton/database.singleton';
-import type { Logger } from '../utils/logger';
+import type { DeleteBuilder } from 'builders/query/delete.builder';
+import type { InsertIntoBuilder } from 'builders/query/insert-into.builder';
+import type { SelectBuilder } from 'builders/query/select.builder';
+import type { UpdateBuilder } from 'builders/query/update.builder';
+import type { Logger } from 'utils/logger';
+import { BotDatabaseSingleton } from 'singleton/bot-database.singleton';
+import { FoldDatabaseSingleton } from 'singleton/fold-database.singleton';
 
 /**
  * Represents a database table with common CRUD operations.
  */
 export class TableAbstract {
     //region INJECTABLE
-    @Singleton('Database') protected readonly database: DatabaseSingleton;
+    private readonly database: BotDatabaseSingleton | FoldDatabaseSingleton
     private readonly logger: Logger;
     //endregion
 
@@ -32,7 +32,9 @@ export class TableAbstract {
         return this._tableName;
     }
 
-    constructor(private readonly _tableName: string) {}
+    constructor(
+        private readonly _tableName: string,
+    ) {}
 
     /**
      * Inserts a new record into the database table.

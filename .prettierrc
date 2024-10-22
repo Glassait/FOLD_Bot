@@ -1,37 +1,37 @@
 {
-    "tabWidth": 4,
-    "useTabs": false,
-    "singleQuote": true,
-    "semi": true,
-    "trailingComma": "es5",
-    "bracketSpacing": true,
-    "bracketSameLine": false,
-    "arrowParens": "avoid",
-    "embeddedLanguageFormatting": "auto",
-    "printWidth": 140,
-    "overrides": [
-        {
-            "files": ["*.ts"],
-            "options": {
-                "parser": "typescript"
-            }
-        },
-        {
-            "files": ["*.json"],
-            "options": {
-                "useTabs": true,
-                "parser": "json5",
-                "trailingComma": "none",
-                "singleQuote": false,
-                "quoteProps": "preserve"
-            }
-        },
-        {
-            "files": ["*.YML"],
-            "options": {
-                "tabWidth": 2,
-                "parser": "yaml"
-            }
-        }
-    ]
+	"tabWidth": 4,
+	"useTabs": false,
+	"singleQuote": true,
+	"semi": true,
+	"trailingComma": "es5",
+	"bracketSpacing": true,
+	"bracketSameLine": false,
+	"arrowParens": "avoid",
+	"embeddedLanguageFormatting": "auto",
+	"printWidth": 140,
+	"overrides": [
+		{
+			"files": ["*.ts"],
+			"options": {
+				"parser": "typescript"
+			}
+		},
+		{
+			"files": ["*.json", ".prettierrc"],
+			"options": {
+				"useTabs": true,
+				"parser": "json5",
+				"trailingComma": "none",
+				"singleQuote": false,
+				"quoteProps": "preserve"
+			}
+		},
+		{
+			"files": ["*.yml", "*.yaml"],
+			"options": {
+				"tabWidth": 2,
+				"parser": "yaml"
+			}
+		}
+	]
 }

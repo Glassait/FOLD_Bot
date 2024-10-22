@@ -1,13 +1,15 @@
-import { TableAbstract } from '../../../abstracts/table.abstract';
-import { SelectBuilder } from '../../../builders/query/select.builder';
-import { UpdateBuilder } from '../../../builders/query/update.builder';
-import { LoggerInjector } from '../../../decorators/injector/logger-injector.decorator';
+import { TableAbstract } from 'abstracts/table.abstract';
+import { SelectBuilder } from 'builders/query/select.builder';
+import { UpdateBuilder } from 'builders/query/update.builder';
+import { LoggerInjector } from 'decorators/injector/logger-injector.decorator';
 import type { NewsWebsite } from './models/news-websites.type';
+import { SingletonClass } from "decorators/injector/singleton-injector.decorator";
 
 /**
  * Represents a NewsWebsiteTable class for managing news websites.
  */
 @LoggerInjector
+@SingletonClass('BotDatabase')
 export class NewsWebsitesTable extends TableAbstract {
     constructor() {
         super('news_websites');

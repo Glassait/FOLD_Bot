@@ -1,12 +1,14 @@
-import { TableAbstract } from '../../../abstracts/table.abstract';
-import { SelectBuilder } from '../../../builders/query/select.builder';
-import { LoggerInjector } from '../../../decorators/injector/logger-injector.decorator';
+import { TableAbstract } from 'abstracts/table.abstract';
+import { SelectBuilder } from 'builders/query/select.builder';
+import { LoggerInjector } from 'decorators/injector/logger-injector.decorator';
 import type { Channel } from './models/channels.type';
+import { SingletonClass } from "decorators/injector/singleton-injector.decorator";
 
 /**
  * Represents a ChannelsTable class for managing channels.
  */
 @LoggerInjector
+@SingletonClass('BotDatabase')
 export class ChannelsTable extends TableAbstract {
     constructor() {
         super('channels');
@@ -19,15 +21,6 @@ export class ChannelsTable extends TableAbstract {
      */
     public async getNewsWebsite(): Promise<Channel> {
         return await this.getChannel('news');
-    }
-
-    /**
-     * Retrieves the trivia channel.
-     *
-     * @returns {Promise<Channel>} - A promise that resolves to the trivia channel.
-     */
-    public async getTrivia(): Promise<Channel> {
-        return await this.getChannel('trivia');
     }
 
     /**

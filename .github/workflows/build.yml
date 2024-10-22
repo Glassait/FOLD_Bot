@@ -1,20 +1,21 @@
-on: [push]
+on: [ push ]
 name: Build node
 jobs:
     build:
         name: Build the application
         runs-on: ubuntu-latest
         steps:
-            - name: Checkout repository
-              uses: actions/checkout@v2
-              with:
-                  fetch-depth: 0
-                  persist-credentials: false
-            - name: Setup Node
-              uses: actions/setup-node@v3
-              with:
-                  node-version: '18.X'
-            - name: Install
-              run: npm i
-            - name: Check ESLint
-              run: npm run lint
+            -   name: Checkout repository
+                uses: actions/checkout@v4
+                with:
+                    fetch-depth: 0
+            -   name: Setup Node.js
+                uses: ./.github/actions/setup-node
+            -   name: Install dependencies
+                run: npm ci
+            -   name: Build
+                run: |
+                    echo "{\"token\": \"token\", \"client_id\": \"client_id\", \"application_id_wot\": \"application_id_wot\", \"bdd\": { \"bot\": { \"host\": \"localhost\", \"database\": \"dev\", \"user\": \"root\", \"password\": \"\" }, \"fold-backend\": {  \"host\": \"localhost\", \"database\": \"tanks-and-equipments\", \"user\": \"root\", \"password\": \"\" }}}" > src/module/core/config.json
+                    npm run build
+            -   name: Run lint
+                run: npm run lint

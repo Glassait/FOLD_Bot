@@ -1,15 +1,17 @@
-import { TableAbstract } from '../../../abstracts/table.abstract';
-import { DeleteBuilder } from '../../../builders/query/delete.builder';
-import { InsertIntoBuilder } from '../../../builders/query/insert-into.builder';
-import { SelectBuilder } from '../../../builders/query/select.builder';
-import { UpdateBuilder } from '../../../builders/query/update.builder';
-import { LoggerInjector } from '../../../decorators/injector/logger-injector.decorator';
+import { TableAbstract } from 'abstracts/table.abstract';
+import { DeleteBuilder } from 'builders/query/delete.builder';
+import { InsertIntoBuilder } from 'builders/query/insert-into.builder';
+import { SelectBuilder } from 'builders/query/select.builder';
+import { UpdateBuilder } from 'builders/query/update.builder';
+import { LoggerInjector } from 'decorators/injector/logger-injector.decorator';
 import type { Clan } from './models/watch-clans.type';
+import { SingletonClass } from "decorators/injector/singleton-injector.decorator";
 
 /**
  * Represents a table for watching clans in the database.
  */
 @LoggerInjector
+@SingletonClass('BotDatabase')
 export class WatchClansTable extends TableAbstract {
     constructor() {
         super('watch_clans');

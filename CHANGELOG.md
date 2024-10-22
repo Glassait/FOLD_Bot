@@ -24,7 +24,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.2.0] <span class="label pre-release">Pre-release</span>
+## [3.3.0]  <span class="label pre-release">Pre-release</span>
+
+### Added
+
+- Add ts path in tsconfig.json
+- Add ts build to action
+- A brand new XML parser
+- World Of Tanks now get scrapped with the rss lin
+
+### Changed
+
+- The github action pass to a new system
+- DatabaseSingleton transform in DatabaseAbstract to allow handling multiple database connection
+- Update cheerio to 1.0.0
+- Update NewsScapper to manage xml or html et text or forum channel
+
+### Removed
+
+- Clear files :
+  - WotNewsForum feature replace by scrapping rss api 
+  - CoreFileAbstract
+  - All Trivia related class or type
+
+
+## [3.2.0] - Oct 16, 2024 <span class="label latest">Latest</span>
 
 ### Added
 
@@ -51,7 +75,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     -   Escape `_` in player name
 -   Fix typo in blacklist player when no reason given
 
-## [3.1.1] - Jun 01, 2024 <span class="label latest">Latest</span>
+## [3.1.1] - Jun 01, 2024
 
 ### Changed
 
@@ -546,6 +570,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+[3.3.0]: https://github.com/Glassait/FOLD_Bot/compare/v3.2.0-13...v3.3.0-0
 [3.2.0]: https://github.com/Glassait/FOLD_Bot/compare/v3.1.1-1...v3.2.0-13
 [3.1.1]: https://github.com/Glassait/FOLD_Bot/compare/v3.1.0-10...v3.1.1-1
 [3.1.0]: https://github.com/Glassait/FOLD_Bot/compare/v3.0.0-2...v3.1.0-10

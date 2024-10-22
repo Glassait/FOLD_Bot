@@ -1,4 +1,4 @@
 /**
  * All names of features using cron
  */
-export type CronName = 'fold-recruitment' | 'newsletter' | 'trivia' | 'detected-clan';
+export type CronName = 'fold-recruitment' | 'newsletter' | 'detected-clan';

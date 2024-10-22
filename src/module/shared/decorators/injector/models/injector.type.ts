@@ -7,7 +7,7 @@ export type Constructor<G = unknown> = new (...args: any[]) => G;
 /**
  * All the singleton that can be injected with the decorator
  */
-export type SingletonDependence = 'Trivia' | 'Axios' | 'Database';
+export type SingletonDependence = 'Axios' | 'BotDatabase' | 'FoldDatabase';
 
 /**
  * All the api that can be injected with the decorator
