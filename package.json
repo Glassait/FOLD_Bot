@@ -57,6 +57,7 @@
 		"cron": "^3.1.7",
 		"discord.js": "^14.16.3",
 		"mysql2": "^3.11.3",
+		"tsconfig-paths": "^4.2.0",
 		"ts-node": "10.9.2"
 	},
 	"devDependencies": {
@@ -72,7 +73,6 @@
 		"husky": "^9.1.6",
 		"lint-staged": "^15.2.10",
 		"prettier": "3.2.5",
-		"tsconfig-paths": "^4.2.0",
 		"typescript": "^5.6.3",
 		"typescript-eslint": "^7.18.0"
 	}
