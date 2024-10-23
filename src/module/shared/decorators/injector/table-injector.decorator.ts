@@ -9,6 +9,7 @@ import { PotentialClansTable } from 'tables/simple-table/potential-clans.table';
 import { FoldRecruitmentTable } from 'tables/simple-table/fold-recruitment.table';
 import { NewsWebsitesTable } from 'tables/complexe-table/news-websites/news-websites.table';
 import { BanWordsTable } from 'tables/simple-table/ban-words.table';
+import { WotNewsTable } from 'tables/complexe-table/wot-news/wot-news.table';
 
 let tableMap: {
     // Commons
@@ -24,6 +25,7 @@ let tableMap: {
     // Newsletter
     NewsWebsites: Constructor<NewsWebsitesTable>;
     BanWords: Constructor<BanWordsTable>;
+    WotNews: Constructor<WotNewsTable>;
 };
 
 /**
@@ -58,6 +60,7 @@ export function Table(
             // Newsletter
             NewsWebsites: NewsWebsitesTable,
             BanWords: BanWordsTable,
+            WotNews: WotNewsTable,
         };
     }
 

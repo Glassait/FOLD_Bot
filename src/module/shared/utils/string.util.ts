@@ -80,3 +80,26 @@ export function escape(text: string): string {
 
     return text.trim().replace(/"/g, '\\"').replace(/'/g, "\\'").replace(/_/g, '\\_');
 }
+
+/**
+ * Transform some unicode in there reel representation
+ *
+ * @unicode
+ * ```
+ * &#39; = '
+ * NBSP or ( ) = space
+ * ```
+ *
+ * @param text - The text to check.
+ *
+ * @return The text without all unicode manage.
+ *
+ * @example
+ * const textWithUnicode = "J&#39;aime l&#39;espace"
+ * const textWithoutUnicode = transformUnicodeToLetter(textWithUnicode) // "J'aime l'espace"
+ *
+ * @see https://www.nicolas-hoffmann.net/utilitaires/codes-hexas-ascii-unicode-utf8-caracteres-usuels.php
+ */
+export function transformUnicodeToLetter(text: string): string {
+    return text.replace(/&#39;/g, "'").replace(/ /g, ' ')
+}

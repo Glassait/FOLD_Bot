@@ -1,14 +1,18 @@
 import type { NewsWebsite } from 'tables/complexe-table/news-websites/models/news-websites.type';
 import { NewsScrapper } from './news-scrapper.model';
 import { SimpleXMLParser, XmlElement } from 'utils/parser';
-import { transformToCode } from 'utils/string.util';
+import { transformToCode, transformUnicodeToLetter } from 'utils/string.util';
 import { TimeEnum } from 'enums/time.enum';
 import { sleep } from 'utils/env.util';
+import { Table } from 'decorators/injector/table-injector.decorator';
+import { WotNewsTable } from 'tables/complexe-table/wot-news/wot-news.table';
 
 /**
  * Class responsible for scraping news from Wot Express website.
  */
 export class WotNews extends NewsScrapper<XmlElement> {
+    @Table('WotNews') private readonly wotNewsTable: WotNewsTable;
+
     /**
      * The default index used when the url is not found
      */
@@ -37,7 +41,7 @@ export class WotNews extends NewsScrapper<XmlElement> {
         if (!newsWebsite.last_url) {
             await this.wotNews(items[0], newsWebsite);
         } else if (index > 0) {
-            for (let i = index - 1; i >= 1; i--) {
+            for (let i = index - 1; i >= 0; i--) {
                 await this.wotNews(items[i], newsWebsite);
                 await sleep(TimeEnum.MINUTE);
             }
@@ -51,14 +55,19 @@ export class WotNews extends NewsScrapper<XmlElement> {
      * @param newsWebsite - The website to scrap and get the news.
      */
     private async wotNews(items: XmlElement, newsWebsite: NewsWebsite): Promise<void> {
-        const description: XmlElement = new SimpleXMLParser(items.children![2].text!).parse()
+        const description: XmlElement = new SimpleXMLParser(items.children![2].text!).parse();
+        const title: string = transformUnicodeToLetter(items.children![0].text!);
+        const image: string = items.children![6].attributes!.url;
+        const url: string = items.children![1].text!;
 
-        await this.sendNews(
-            items.children![1].text!,
-            items.children![0].text!,
-            description.text!,
+        const tags: string[] = (await this.sendNews(
+            url,
+            title,
+            transformUnicodeToLetter(description.text!),
             newsWebsite,
-            items.children![6].attributes!.url
-        );
+            image
+        ))!;
+
+        await this.wotNewsTable.addNews(title, url, image, tags)
     }
 }

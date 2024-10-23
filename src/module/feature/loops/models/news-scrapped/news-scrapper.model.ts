@@ -1,4 +1,4 @@
-import { Colors, EmbedBuilder, ForumChannel, Snowflake, TextChannel } from 'discord.js';
+import { Colors, EmbedBuilder, ForumChannel, GuildForumTag, TextChannel } from 'discord.js';
 import { LoggerInjector } from 'decorators/injector/logger-injector.decorator';
 import { Table } from 'decorators/injector/table-injector.decorator';
 import { EmojiEnum } from 'enums/emoji.enum';
@@ -19,7 +19,7 @@ export class NewsScrapper<GParser> {
     //endregion
 
     //region PRIVATE READONLY FIELD
-    private readonly noTagId: Snowflake;
+    private readonly baseTag: GuildForumTag;
     //endregion
 
     /**
@@ -33,9 +33,9 @@ export class NewsScrapper<GParser> {
         private readonly channel: TextChannel | ForumChannel
     ) {
         if (this.channel instanceof ForumChannel) {
-            this.noTagId = this.channel.availableTags.find(
+            this.baseTag = this.channel.availableTags.find(
                 ({ name }): boolean => name.toLowerCase() === 'Autres nouveautés'.toLowerCase()
-            )!.id;
+            )!;
         }
     }
 
@@ -48,7 +48,13 @@ export class NewsScrapper<GParser> {
      * @param newsWebsite - The  website from which the news is scraped.
      * @param [image] - The URL of the image associated with the news article.
      */
-    protected async sendNews(url: string, title: string, description: string, newsWebsite: NewsWebsite, image?: string): Promise<void> {
+    protected async sendNews(
+        url: string,
+        title: string,
+        description: string,
+        newsWebsite: NewsWebsite,
+        image?: string
+    ): Promise<string[] | undefined> {
         const updated: boolean = await this.newsWebsites.updateWebsite(newsWebsite.name, url);
 
         if (updated) {
@@ -75,7 +81,7 @@ export class NewsScrapper<GParser> {
         if (this.channel instanceof TextChannel) {
             await this.channel.send({ embeds: [embed] });
         } else {
-            await this.sendForumMessage(url, title, description, image);
+            return this.sendForumMessage(url, title, description, image);
         }
     }
 
@@ -98,7 +104,7 @@ export class NewsScrapper<GParser> {
      * @param description - The description of the news
      * @param [image] - The image url of the news
      */
-    private async sendForumMessage(url: string, title: string, description: string, image?: string): Promise<void> {
+    private async sendForumMessage(url: string, title: string, description: string, image?: string): Promise<string[]> {
         const embed: EmbedBuilder = new EmbedBuilder().setTitle(title).setURL(url).setDescription(description).setColor(Colors.Red);
 
         if (image) {
@@ -106,22 +112,24 @@ export class NewsScrapper<GParser> {
         }
 
         if (this.channel instanceof TextChannel) {
-            return;
+            return [];
         }
 
-        const tags = this.channel.availableTags
-            .filter(({ name }): boolean => title.toLowerCase().includes(name.toLowerCase()))
-            .map(({ id }) => id);
+        const tags: GuildForumTag[] = this.channel.availableTags.filter(({ name }): boolean =>
+            title.toLowerCase().includes(name.toLowerCase())
+        );
 
         if (!tags.length) {
-            tags.push(this.noTagId);
+            tags.push(this.baseTag);
         }
         this.logger.debug('Crosspost wot message with tag [{}]', tags.join(', '));
 
         await this.channel.threads.create({
             name: title,
             message: { embeds: [new EmbedBuilder(embed.data)] },
-            appliedTags: tags,
+            appliedTags: tags.map(({ id }) => id),
         });
+
+        return tags.map(({ name }) => name);
     }
 }
