@@ -8,7 +8,7 @@ import {
     SlashCommandChannelOption,
     TextChannel,
 } from 'discord.js';
-import { getGuildMemberFromInteraction } from '../../shared/utils/user.util';
+import { getGuildMemberFromInteraction } from 'utils/user.util';
 import { SlashCommandModel } from './models/slash-command.model';
 
 module.exports = new SlashCommandModel(
@@ -30,17 +30,17 @@ module.exports = new SlashCommandModel(
         const canvas: Canvas = new Canvas(612, 612);
         const context: SKRSContext2D = canvas.getContext('2d');
 
-        const background: Image = await loadImage('src/assets/img/trophy.jpg');
+        const background: Image = await loadImage('src/assets/img/trophy.png');
         context.drawImage(background, 0, 0, canvas.width, canvas.height);
 
         context.beginPath();
-        context.arc(307, 198, 75, 0, Math.PI * 2, true);
+        context.arc(304, 140, 50, 0, Math.PI * 2, true);
         context.closePath();
         context.clip();
         const avatar = await loadImage(targetUser.displayAvatarURL({ extension: 'jpg' }));
-        context.drawImage(avatar, 231, 120, 150, 150);
+        context.drawImage(avatar, 245, 85, avatar.width*0.9, avatar.height*0.9);
 
-        const attachment = new AttachmentBuilder(await canvas.encode('jpeg'), { name: 'Al_capone-trophée.jpg' });
+        const attachment = new AttachmentBuilder(await canvas.encode('jpeg'), { name: 'capone-trophy.jpg' });
 
         await interaction.deleteReply();
         await channel.send({
