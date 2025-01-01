@@ -3,6 +3,8 @@ import { basename } from 'node:path';
 import { token } from './module/core/config.json';
 import { isDev } from 'utils/env.util';
 import { Logger } from 'utils/logger';
+import { BotDatabaseSingleton } from 'singleton/bot-database.singleton';
+import { FoldDatabaseSingleton } from 'singleton/fold-database.singleton';
 
 const logger: Logger = new Logger(basename(__filename));
 
@@ -53,4 +55,26 @@ process.on('unhandledRejection', error => {
  */
 process.on('uncaughtException', (err: Error): void => {
     logger.error(`The Uncaught Exception with name : \`${err.name}\` practically crash the bot !`, err);
+});
+
+async function cleanUp() {
+    logger.info('Start cleanup');
+    await BotDatabaseSingleton.instance.endPool();
+    await FoldDatabaseSingleton.instance.endPool();
+    logger.info('Cleanup end successfully. Shutting down the bot !');
+}
+
+// Handle application shutdown
+process.on('SIGINT', async () => {
+    await cleanUp();
+    process.exit('SIGINT');
+});
+
+process.on('SIGTERM', async () => {
+    await cleanUp();
+    process.exit('SIGTERM');
+});
+
+process.on('exit', (code: number): void => {
+    logger.warn('Bot shutting down with code {}', code);
 });
