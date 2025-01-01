@@ -1,6 +1,7 @@
 import mysql, { type FieldPacket, type Pool, type QueryResult } from 'mysql2/promise';
 import { EmojiEnum } from 'enums/emoji.enum';
 import { Logger } from 'utils/logger';
+import { transformToCode } from 'utils/string.util';
 
 /**
  * Singleton class for managing MySQL database connections.
@@ -30,10 +31,12 @@ export class DatabaseAbstract {
      */
     public async query(sql: string): Promise<[QueryResult, FieldPacket[]]> {
         try {
-            const [rows, fields] = await this.pool.execute({ sql });
-            return [rows, fields];
+            return await this.pool.execute({ sql });
         } catch (error) {
-            throw new Error(`Error executing SQL query`, { cause: error });
+            const { message } = error as { message: string; sql: string };
+            throw new Error(transformToCode('Error executing the following {} SQL query with the message : {}', sql, message), {
+                cause: error,
+            });
         }
     }
 

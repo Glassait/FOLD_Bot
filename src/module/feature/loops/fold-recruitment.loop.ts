@@ -1,11 +1,11 @@
 import type { Client } from 'discord.js';
 import { basename } from 'node:path';
-import { EmojiEnum } from '../../shared/enums/emoji.enum';
-import { CronsTable } from '../../shared/tables/complexe-table/crons/crons.table';
-import { FeatureFlippingTable } from '../../shared/tables/complexe-table/feature-flipping/feature-flipping.table';
-import { WatchClansTable } from '../../shared/tables/complexe-table/watch-clans/watch-clans.table';
-import { createCron } from '../../shared/utils/cron.util';
-import { Logger } from '../../shared/utils/logger';
+import { EmojiEnum } from 'enums/emoji.enum';
+import { CronsTable } from 'tables/complexe-table/crons/crons.table';
+import { FeatureFlippingTable } from 'tables/complexe-table/feature-flipping/feature-flipping.table';
+import { WatchClansTable } from 'tables/complexe-table/watch-clans/watch-clans.table';
+import { createCron } from 'utils/cron.util';
+import { Logger } from 'utils/logger';
 import { FoldRecruitmentModel } from './models/fold-recruitment.model';
 import type { BotLoop } from './types/bot-loop.type';
 
@@ -28,13 +28,16 @@ module.exports = {
 
         createCron(await cronsTable.getCron('fold-recruitment'), 'fold-recruitment', async (): Promise<void> => {
             if (!(await featureFlippingTable.getFeature('fold_recruitment'))) {
-                logger.info('Fold recruitment has been disabled during execution of loop');
+                logger.warn('Fold recruitment has been disabled during execution of loop');
                 return;
             }
 
+            logger.debug('Resetting data of previous recruitment');
             recruitmentModel.reset();
 
-            for (const clan of await watchClansTable.getAll()) {
+            const clans = await watchClansTable.getAll();
+            logger.debug('Find {} clans to check during the fold recruitment', clans.length);
+            for (const clan of clans) {
                 logger.debug(`${EmojiEnum.MALE} Start recruitment for {}`, clan.name);
                 await recruitmentModel.fetchClanActivity(clan);
                 logger.debug(`${EmojiEnum.MALE} End recruitment for {}`, clan.name);
