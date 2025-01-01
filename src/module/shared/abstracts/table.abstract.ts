@@ -109,7 +109,6 @@ export class TableAbstract {
      * @returns {Promise<QueryResult>} - A Promise that resolves to the result of the query.
      */
     private async query(sql: string): Promise<QueryResult> {
-        this.logger.debug('Run following query : {}', sql);
         return (await this.database.query(sql))[0];
     }
 

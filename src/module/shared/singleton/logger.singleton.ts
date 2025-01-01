@@ -58,7 +58,7 @@ export class LoggerSingleton {
      */
     public debug(context: ContextAbstract, msg: string): void {
         // eslint-disable-next-line no-console
-        console.debug(`%c${EmojiEnum.DEBUG} : ${msg}`, 'color: white');
+        console.debug(`${EmojiEnum.DEBUG} : ${msg}`);
         this.addToLog('DEBUG', context.context, msg);
     }
 
@@ -70,7 +70,7 @@ export class LoggerSingleton {
      */
     public info(context: ContextAbstract, msg: string): void {
         // eslint-disable-next-line no-console
-        console.info(`%c${EmojiEnum.INFO} : ${msg}`, 'color: #31c82f');
+        console.info(`${EmojiEnum.INFO} : ${msg}`);
         this.addToLog('INFO', context.context, msg);
     }
 
@@ -82,7 +82,7 @@ export class LoggerSingleton {
      */
     public warning(context: ContextAbstract, msg: string): void {
         // eslint-disable-next-line no-console
-        console.warn(`%c${EmojiEnum.WARNING} : ${msg}`, 'color: orange');
+        console.warn(`${EmojiEnum.WARNING} : ${msg}`);
         this.addToLog('WARNING', context.context, msg);
     }
 
@@ -94,7 +94,7 @@ export class LoggerSingleton {
      */
     public error(context: ContextAbstract, msg: string): void {
         // eslint-disable-next-line no-console
-        console.error(`%c${EmojiEnum.ERROR} : ${msg}`, 'color: red');
+        console.error(`${EmojiEnum.ERROR} : ${msg}`);
         this.addToLog('ERROR', EmojiEnum.ERROR + context.context, msg);
     }
     //endregion
