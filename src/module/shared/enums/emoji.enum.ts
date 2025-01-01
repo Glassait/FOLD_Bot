@@ -21,7 +21,7 @@ export enum EmojiEnum {
     /**
      * Represents an informative message or status.
      */
-    INFO = '🛈',
+    INFO = 'ℹ️',
     /**
      * Represents a debugging or troubleshooting message.
      */
@@ -37,7 +37,7 @@ export enum EmojiEnum {
     /**
      * Represents a mining or digging-related action.
      */
-    MINE = '⛏',
+    MINE = '⛏️',
     /**
      * Represents a male-related item or message.
      */

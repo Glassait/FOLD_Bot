@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync } from 'fs';
-import type { ContextAbstract } from '../abstracts/context.abstract';
-import { EmojiEnum } from '../enums/emoji.enum';
-import { writeFile } from '../utils/file.util';
+import type { ContextAbstract } from 'abstracts/context.abstract';
+import { EmojiEnum } from 'enums/emoji.enum';
+import { writeFile } from 'utils/file.util';
 
 /**
  * Class used to manage the persistence of the log
@@ -29,12 +29,12 @@ export class LoggerSingleton {
     /**
      * The directory where the logs are stored
      */
-    private dir: string = './src/logs/';
+    private readonly dir: string = './logs/';
 
     /**
      * The path to the log file
      */
-    private path: string = `${this.dir}${new Date().toLocaleString('fr-FR').replace(/\//g, '-').replace(/ /g, '_').replace(/:/g, '-')}.md`;
+    private readonly path: string = `${this.dir}${new Date().toLocaleString('fr-FR').replace(/\//g, '-').replace(/ /g, '_').replace(/:/g, '-')}.md`;
 
     /**
      * The actual log text
@@ -58,7 +58,7 @@ export class LoggerSingleton {
      */
     public debug(context: ContextAbstract, msg: string): void {
         // eslint-disable-next-line no-console
-        console.debug(`${EmojiEnum.DEBUG} : ${msg}`);
+        console.debug(`%c${EmojiEnum.DEBUG} : ${msg}`, 'color: white');
         this.addToLog('DEBUG', context.context, msg);
     }
 
@@ -70,7 +70,7 @@ export class LoggerSingleton {
      */
     public info(context: ContextAbstract, msg: string): void {
         // eslint-disable-next-line no-console
-        console.info(`${EmojiEnum.INFO} : ${msg}`);
+        console.info(`%c${EmojiEnum.INFO} : ${msg}`, 'color: #31c82f');
         this.addToLog('INFO', context.context, msg);
     }
 
@@ -82,7 +82,7 @@ export class LoggerSingleton {
      */
     public warning(context: ContextAbstract, msg: string): void {
         // eslint-disable-next-line no-console
-        console.warn(`${EmojiEnum.WARNING} : ${msg}`);
+        console.warn(`%c${EmojiEnum.WARNING} : ${msg}`, 'color: orange');
         this.addToLog('WARNING', context.context, msg);
     }
 
@@ -94,7 +94,7 @@ export class LoggerSingleton {
      */
     public error(context: ContextAbstract, msg: string): void {
         // eslint-disable-next-line no-console
-        console.error(`${EmojiEnum.ERROR} : ${msg}`);
+        console.error(`%c${EmojiEnum.ERROR} : ${msg}`, 'color: red');
         this.addToLog('ERROR', EmojiEnum.ERROR + context.context, msg);
     }
     //endregion

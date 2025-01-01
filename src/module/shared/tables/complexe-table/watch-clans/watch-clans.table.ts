@@ -5,7 +5,7 @@ import { SelectBuilder } from 'builders/query/select.builder';
 import { UpdateBuilder } from 'builders/query/update.builder';
 import { LoggerInjector } from 'decorators/injector/logger-injector.decorator';
 import type { Clan } from './models/watch-clans.type';
-import { SingletonClass } from "decorators/injector/singleton-injector.decorator";
+import { SingletonClass } from 'decorators/injector/singleton-injector.decorator';
 
 /**
  * Represents a table for watching clans in the database.
@@ -90,7 +90,7 @@ export class WatchClansTable extends TableAbstract {
      * @returns {Promise<Clan[]>} - A promise that resolves to an array of all clans.
      */
     public async getAll(): Promise<Clan[]> {
-        return await this.select(new SelectBuilder(this).columns('*'));
+        return await this.select(new SelectBuilder(this).columns('id', 'name', 'image_url', 'last_activity'));
     }
 
     /**

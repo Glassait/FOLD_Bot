@@ -1,7 +1,7 @@
 import { CronJob } from 'cron';
 import { basename } from 'node:path';
-import { EmojiEnum } from '../enums/emoji.enum';
-import type { CronName } from '../tables/complexe-table/crons/models/crons.type';
+import { EmojiEnum } from 'enums/emoji.enum';
+import type { CronName } from 'tables/complexe-table/crons/models/crons.type';
 import { Logger } from './logger';
 
 const logger: Logger = new Logger(basename(__filename));
@@ -15,17 +15,19 @@ const logger: Logger = new Logger(basename(__filename));
  * @param {boolean} [runOnInit] - Whether the cron job should run immediately upon creation.
  */
 export function createCron(cron: string, name: CronName, callback: () => void | Promise<void>, runOnInit?: boolean): void {
-    CronJob.from({
+    const cronJob = CronJob.from({
         cronTime: cron,
         onTick: async (): Promise<void> => {
-            logger.info(`${EmojiEnum.LOOP} {} loop start at {}`, name, new Date().toISOString());
+            logger.info(`${EmojiEnum.LOOP} {} cron start at {}`, name, new Date().toISOString());
             await callback();
         },
         start: true,
         timeZone: 'system',
         runOnInit,
         onComplete: (): void => {
-            logger.info('The cron {} finish executing', name);
+            logger.info('The cron {} finish executing at {}', name, new Date().toISOString());
         },
     });
+
+    logger.info("Successfully create cron job with name {}, first run at {}", name, cronJob.nextDate().toJSDate())
 }

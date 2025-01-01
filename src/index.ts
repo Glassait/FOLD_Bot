@@ -52,5 +52,5 @@ process.on('unhandledRejection', error => {
  * @param {Error} err - The uncaught exception error object.
  */
 process.on('uncaughtException', (err: Error): void => {
-    logger.error(err.name, err);
+    logger.error(`The Uncaught Exception with name : \`${err.name}\` practically crash the bot !`, err);
 });
