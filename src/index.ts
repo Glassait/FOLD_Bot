@@ -57,6 +57,9 @@ process.on('uncaughtException', (err: Error): void => {
     logger.error(`The Uncaught Exception with name : \`${err.name}\` practically crash the bot !`, err);
 });
 
+/**
+ * Ending pool connection before ending connection to respect the best practice
+ */
 async function cleanUp() {
     logger.info('Start cleanup');
     await BotDatabaseSingleton.instance.endPool();
